@@ -1,0 +1,36 @@
+build/
+linux/
+linux/build/
+codeql/
+tmp/
+*.log
+*.tmp
+.DS_Store
+.vscode/
+.idea/
+linux-db/
+llvm-project/
+
+## build目录
+llvm-project/build/
+
+
+codeql-linux64.zip
+# 其他常见的需要排除的文件和目录
+*.o
+*.a
+*.so
+*.out
+*.exe
+*.app
+
+# IDE 相关文件
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 编译产物
+*.dll
+*.lib
+*.class

@@ -1,0 +1,2 @@
+"查找 devm_kzalloc 调用","在驱动代码中查找所有对 devm_kzalloc 函数的调用位置。","warning","找到对 devm_kzalloc 的调用","/drivers/spi/spi-pci1xxxx.c","818","12","818","23"
+"查找 devm_kzalloc 调用","在驱动代码中查找所有对 devm_kzalloc 函数的调用位置。","warning","找到对 devm_kzalloc 的调用","/drivers/spi/spi-pci1xxxx.c","829","28","829","39"
