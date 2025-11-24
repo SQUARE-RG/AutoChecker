@@ -29,6 +29,10 @@ codeql-linux64.zip
 .idea/
 *.swp
 *.swo
+.env
+*.yaml
+*.yml   
+
 
 # 编译产物
 *.dll
