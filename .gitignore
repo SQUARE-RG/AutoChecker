@@ -38,3 +38,5 @@ codeql-linux64.zip
 *.dll
 *.lib
 *.class
+*.pyc
+__pycache__/    
