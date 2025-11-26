@@ -3,9 +3,10 @@ import json
 import os
 import subprocess
 from pathlib import Path
+import time
 #实现Checker的增删改查
-
-with open('/root/cw-base/AutoChecker/config.json', 'r') as f:
+config = {}
+with open("/root/code_check/src/config.json", 'r') as f:
     config = json.load(f)
 
 ## 该函数用于生成Clang Tidy Checker模板
@@ -79,7 +80,7 @@ def runChecker(checker_name=config['check']['name'],testCase_path=[]):
             print("错误输出:\n", result.stderr)
 
 def run_Checker_with_Check_clang_tidy(
-    checker_cpp: str,
+    test_case_path: str,
     rule_name: str,
     temp_dir: str,
     std: str = "c++17",
@@ -97,7 +98,7 @@ def run_Checker_with_Check_clang_tidy(
 
     cmd = [
         "python", script_path,
-        checker_cpp,          # 绝对路径
+        test_case_path,          # 绝对路径
         rule_name,
         temp_dir,             # 绝对路径
         f"-std={std}", "--",
@@ -113,14 +114,14 @@ def run_Checker_with_Check_clang_tidy(
 
     full_output = proc.stdout
     # 同时打印 & 写日志
-    # print(full_output, end="")
-    Path(log_name).write_text(full_output, encoding="utf-8")
-    #成功就是返回码为0
-    # print(proc.returncode)
-    print("输出日志已保存到:", log_name)
+    
+    # Path(log_name).write_text(full_output, encoding="utf-8")
+    # #成功就是返回码为0
+    
+    # print("输出日志已保存到:", log_name)
     if proc.returncode != 0:
-        print(f"运行 {checker_cpp} 时发生错误，返回码: {proc.returncode}")
-        print("输出日志已保存到:", log_name)
+        print(f"运行 {test_case_path} 时发生错误，返回码: {proc.returncode}")
+       
         return full_output, -1
     warning_count = full_output.count("warning:")
     return full_output, warning_count
@@ -147,7 +148,7 @@ def compiler_clang_tidy():
         '--build',
         config['compiler']['build_dir'],
         '--config', 'RelWithDebInfo',
-        '--target', 'clang-tidy',
+        '--target', 'clang-tidy','-j','56',
         '--'
     ], 
     stdout=subprocess.PIPE, 
@@ -163,12 +164,22 @@ def compiler_clang_tidy():
     return result.returncode,result.stdout, result.stderr,compiler_success
 
 if __name__ == "__main__":
-    print("main")
-    # pre_Generate_Checker_Template(checker_name="meta-operation-sample")
-    #该函数可以生成Checker模板
-    #如果正确生成，返回码为0，发生错误返回码不为0
+    # print("main")
+    # start = time.time()
     # compiler_clang_tidy()
-    remove_Checker_Template(checker_name="readability-named-parameter")
+    # pre_Generate_Checker_Template(checker_name="readability-named-parameter")
+    # compiler_clang_tidy()
+    # remove_Checker_Template(checker_name="readability-named-parameter")
+    # compiler_clang_tidy()
+    # end = time.time()
+    # print(f"总共耗时: {end - start} 秒")
+
+    run_Checker_with_Check_clang_tidy(test_case_path="/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/named-parameter.cpp",
+    rule_name="readability-named-parameter",
+    temp_dir="/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/tmp/tmp-readability-named-parameter",
+    include_dir="/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability"
+    )
+
     # remove_Checker_Template(checker_name="readability-string-compare")
     # remove_Checker_Template(checker_name="clang-tidy-metaOperation-sample")  # 如果需要删除模板，可以取消注释这一行
     #如果正确删除，返回码为0，发生错误返回码不为0

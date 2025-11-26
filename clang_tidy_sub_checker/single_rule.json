@@ -1,0 +1,19 @@
+{
+    "data": {
+        "readability": [
+            {
+                "title": "clang-tidy - readability-named-parameter",
+                "main_title": "readability-named-parameter",
+                "description": "Find functions with unnamed arguments.All parameters should be named, with identical names in the declaration and implementation.",
+                "code_blocks": [],
+                "category": "readability",
+                "file_path": "/root/code_check/llvm-project/clang-tools-extra/docs/clang-tidy/checks/readability/named-parameter.rst",
+                "rule_test_path": "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/named-parameter",
+                "negative_case_amount": 7,
+                "positive_case_amount": 13,
+                "issuccess": "True",
+                "performance": "15/20"
+            }
+        ]
+    }
+}
