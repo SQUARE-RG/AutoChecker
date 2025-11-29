@@ -9,9 +9,13 @@ from dotenv import load_dotenv
 import loguru
 from entity.factory import Factory_Clang_Tidy, Factory_CodeQL
 from plateform.clang_tidy import compiler_clang_tidy,pre_Generate_Checker_Template,remove_Checker_Template
+from help.clang_tidy_utils import get_camel_check_name
+from entity.abstractProduct import AbstractCase
+from generator import Clang_tidy_CheckerGenerator
+from typing import List
 logger = loguru.logger
 
-# from entity.concreteProduct_Clang_Tidy import Case_Clang_Tidy
+
 load_dotenv()
 
 # API_KEY = os.getenv("DEEPSEEK_API_KEY", "your_default_api_key_here")
@@ -43,15 +47,6 @@ def load_all_cpp(root_dir: str):
         with open(file_path, encoding='utf-8') as f:
             cpp_dict[file_path] = f.read()
     return cpp_dict
-
-def get_camel_name(check_name):
-    return "".join(map(lambda elem: elem.capitalize(), check_name.split("-")))
-
-
-def get_camel_check_name(check_name):
-    return get_camel_name(check_name) + "Check"
-
-
 def get_entity(factory):
     case = factory.create_case()
     checker = factory.create_checker()
@@ -129,6 +124,13 @@ def process_rule_info(rule_info,plateform: str):
     print(f"负例数量： {negative_case_count}")
                 
     return rule,Case_List
+
+def get_checker_generator(plateform: str,rule,all_Test_Case_List: List[AbstractCase]=None,skipped_Test_Cases: List[AbstractCase]=None):
+    if plateform == "clang-tidy":
+        checker_generator = Clang_tidy_CheckerGenerator(rule, all_Test_Case_List, skipped_Test_Cases)
+    
+    return checker_generator
+
 def main(plateform: str = "clang-tidy"):
     # 初始化日志
     init_logger()
@@ -157,7 +159,7 @@ def main(plateform: str = "clang-tidy"):
             logger.info(f"成功生成Checker模板，规则名：{rule.get_rule_name()}")
             # 开启生成checker的流程
             start = time.perf_counter()
-            checker_generator = CheckerGenerator()
+            checker_generator = get_checker_generator(plateform,rule,all_Test_Case_List=Case_List,skipped_Test_Cases=None)
             checkers_list = checker_generator.generate_checker()
 
             save_final_checkers(rule.get_rule_name(),rule_result_dir,plateform)
@@ -193,3 +195,4 @@ def main(plateform: str = "clang-tidy"):
                     
 if __name__ == "__main__":
     main()
+    

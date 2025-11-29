@@ -1,0 +1,71 @@
+from config import global_config as config
+from loguru import logger
+import json
+import torch
+import os
+import time
+from retriever.bge_embedding import parallel_encode,sequential_encode
+
+
+
+from retriever.chromadb_utils import chromadb_client
+ast_matchers_db_path = "src/embedding_db/ast_matchers_db.pt"
+ast_matcher_database=[]
+
+def get_data(file_path: str):
+    documents = []
+    with open(file_path, 'r', encoding='utf-8') as f:
+        ast_matcher_json = json.load(f)
+    for ast_matcher in ast_matcher_json:
+        if 'Node Matchers' in ast_matcher:
+            node_matchers = ast_matcher['Node Matchers']
+            node_matchers_list = node_matchers['matchers']
+            for matcher in node_matchers_list:
+                matchers_comment = f"Node Matcher: {matcher['name']}\n Parameters;{matcher['Parameters']}\n return type {matcher['return type']}\n Description: {matcher['description']}\n"
+                documents.append(matchers_comment)
+        elif 'Narrowing Matchers' in ast_matcher:
+            narrowing_matchers = ast_matcher['Narrowing Matchers']
+            narrowing_matchers_list = narrowing_matchers['matchers']
+            for matcher in narrowing_matchers_list:
+                matchers_comment = f"Narrowing Matcher: {matcher['name']}\n Parameters;{matcher['Parameters']}\n return type {matcher['return type']}\n Description: {matcher['description']}\n"
+                documents.append(matchers_comment)
+        elif 'AST Traversal Matchers' in ast_matcher:
+            ast_traversal_matchers = ast_matcher['AST Traversal Matchers']
+            ast_traversal_matchers_list = ast_traversal_matchers['matchers']
+            for matcher in ast_traversal_matchers_list:
+                matchers_comment = f"AST Traversal Matcher: {matcher['name']}\n Parameters;{matcher['Parameters']}\n Return type {matcher['return type']}\n Description: {matcher['description']}\n"
+                documents.append(matchers_comment)
+    return documents
+
+def embedding_ast_matchers():
+    if os.path.exists(ast_matchers_db_path):
+        logger.info(f"AST Matchers embedding database already exists at {ast_matchers_db_path}. Skipping embedding.")
+        saved =  torch.load(ast_matchers_db_path)
+        ast_matcher_database.clear()
+        ast_matcher_database.extend(saved)
+        return
+    logger.info("Starting embedding of AST Matchers...")
+    # 清空知识库
+    ast_matcher_database.clear()
+    # 获取知识库
+    ast_matchers_documents=[]
+    ast_matchers_documents= get_data(config['knowledge_base']['addMatcher_api_path'])
+
+
+    embedding_start_time = time.perf_counter()
+    logger.info(f"Total AST Matchers documents to embed: {len(ast_matchers_documents)}")
+    sentence_embeddings = sequential_encode(ast_matchers_documents, model_path=config['embedding_model']['bge_model_path'], batch_size=64)
+
+    emvbedding_end_time = time.perf_counter()
+    logger.info(f"Embedding completed in {emvbedding_end_time - embedding_start_time:.2f} seconds.")
+    logger.info(f"Generated embeddings shape: {sentence_embeddings.shape}")
+    for i, doc in enumerate(ast_matchers_documents):
+        ast_matcher_database.append({
+            'document': doc,
+            'embedding': sentence_embeddings[i]
+        })
+    logger.info(f"validate: {sentence_embeddings[0].shape}")
+    torch.save(ast_matcher_database, ast_matchers_db_path)
+
+
+    
