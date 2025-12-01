@@ -164,3 +164,24 @@ def parse_cpp_h_code_from_answer(answer: str):
     checker_cpp_code = cpp_match.group(1).strip() if cpp_match else None
     checker_h_code = h_match.group(1).strip() if h_match else None
     return checker_cpp_code,checker_h_code
+
+def save_checker_code(checker_cpp: str, checker_h:str,rule_name: str):
+    """将生成的检查器代码保存到指定路径。"""
+    ruler_checker_cpp = config['checker']['checker_path'] + get_camel_check_name(rule_name) + ".cpp"
+    with open(ruler_checker_cpp, 'w', encoding='utf-8') as file:
+        file.write(checker_cpp)
+    ruler_checker_h = config['checker']['checker_path'] + get_camel_check_name(rule_name) + ".h"
+    with open(ruler_checker_h, 'w', encoding='utf-8') as file:
+        file.write(checker_h)
+    return ""
+
+def get_checker_code(rule_name: str):
+
+    """读取指定规则名称的检查器代码。"""
+    ruler_checker_cpp = config['checker']['checker_path'] + get_camel_check_name(rule_name) + ".cpp"    
+    with open(ruler_checker_cpp, 'r', encoding='utf-8') as file:
+        checker_code = file.read()
+    ruler_checker_h = config['checker']['checker_path'] + get_camel_check_name(rule_name) + ".h"
+    with open(ruler_checker_h, 'r', encoding='utf-8') as file:
+        checker_h = file.read()
+    return checker_code,checker_h

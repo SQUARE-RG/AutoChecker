@@ -21,7 +21,8 @@
 
     },
     "checker":{
-        "checker_path":"/root/code_check/llvm-project/clang-tools-extra/clang-tidy/ucassaat/"
+        "checker_path":"/root/code_check/llvm-project/clang-tools-extra/clang-tidy/ucassaat/",
+        "temp_test_dir":"/root/code_check/temp_test_dir/"
     },
     "test":{
         "test_check_clang_tidy_script":"/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/test_check_clang_tidy.py",
@@ -33,8 +34,8 @@
     "knowledge_base":{
         "astMatcher_api_path":"/root/code_check/clang_tidy_collect/collect_clang_tidy_astMatchers/astMatchers.json",
         "ast_api_path":"/root/code_check/clang_tidy_collect/collect_clang_tidy_ast_api/clang_tidy_ast_api.json",
-        "meta_OP_path":"/root/cw-base/AutoChecker/meta_api_db/meta_operations_hand_with_category.json",
-        "ast_matcher_meta_operation_path":"/root/cw-base/AutoChecker/ast_matcher_meta_op_db/ast_matcher_meta_operations_dedup_v3.json"
+        "check_op_path":"/root/cw-base/AutoChecker/meta_api_db/meta_operations_hand_with_category.json",
+        "ast_matcher_meta_operation_path":"/root/code_check/clang_tidy_collect/collect_clang_tidy_astMatchers_op/astMatchers_meta_op.json"
     },
     "arguments":{
         "max_round": 5,

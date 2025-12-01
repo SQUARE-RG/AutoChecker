@@ -1,0 +1,5 @@
+{
+    "_type": "prompt",
+    "input_variables": ["checker_code"],
+    "template_path": "/root/code_check/clang_tidy_collect/collect_check_op/collect_check_op.txt"
+}

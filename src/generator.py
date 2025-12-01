@@ -1,17 +1,19 @@
-from entity.abstractProduct import AbstractCase
+from entity.abstractProduct import AbstractCase,AbstractRule
 from typing import List
-from help.clang_tidy_utils import get_camel_check_name,count_negative_cases,select_negative_case,get_Case_AST,get_most_similar_astMatcher_and_class_struct,parse_cpp_h_code_from_answer
+from help.clang_tidy_utils import get_camel_check_name,count_negative_cases,select_negative_case,get_Case_AST,get_most_similar_astMatcher_and_class_struct,parse_cpp_h_code_from_answer,save_checker_code,get_checker_code
 from config import global_config as config
 from loguru import logger
 import re
 import json
 from prompt.clang_tidy_prompt.build_prompt import get_prompt_for_clang_tidy
 from llm_interface.llm_provider import llm_client,llm_invoke
+from plateform.clang_tidy import compiler_clang_tidy,run_Checker_with_Check_clang_tidy
+from entity.concreteProduct_Clang_Tidy import AbstractChecker, Checker_Clang_Tidy
 
 max_round = config['arguments']['max_round']
 max_compiler_trys = config['arguments']['max_compiler_trys']
 class Clang_tidy_CheckerGenerator(object):
-    def __init__(self,rule,all_Test_Case_List: List[AbstractCase]=None,skipped_Test_Cases: List[AbstractCase]=None):
+    def __init__(self,rule:AbstractRule,all_Test_Case_List: List[AbstractCase]=None,skipped_Test_Cases: List[AbstractCase]=None):
 
         self.all_Test_Case_List = all_Test_Case_List
         self.skipped_Test_Cases = skipped_Test_Cases
@@ -21,8 +23,15 @@ class Clang_tidy_CheckerGenerator(object):
         self.EMBEDDED_AST_NODES = []
 
     def generate_checker(self):
-
-        pass
+        success, init_checker = self.first_checker_generation()
+        if not success:
+            print(f"Failed to generate initial checker for rule: {self.RULE.get_rule_name()}")
+            return None
+        print("初始checker生成成功")
+        self.RULE.add_checker(init_checker)
+        self.checker_augmentation(init_checker)
+        return self.RULE.get_checkers()
+        
     def run_logic_for_negative_case(self, query, testcase):
         prompt = get_prompt_for_clang_tidy("logic_for_negative_case")   
         logic_query = prompt.format(
@@ -52,28 +61,73 @@ class Clang_tidy_CheckerGenerator(object):
         with open(ruler_checker_h, 'r',encoding="utf-8") as file:
             content_h = file.read()
         for attempt in range(1,config['arguments']['max_llm_tries'] + 1):
-            prompt = get_prompt_for_clang_tidy("generate_checker_with_single_case")   
-            # generation_query = prompt.format(
-            #     rule_name = self.RULE.get_rule_name(),
-            #     rule_description = self.RULE.get_rule_description(),
-            #     negative_test_case = current_case.get_case_code(),
-            #     negative_test_case_ast = current_case_ast_txt,
-            #     existing_checker_cpp = content_cpp,
-            #     existing_checker_h = content_h,
-            #     astMatcher_suggestions = astMatch_suggest_string,
-            #     class_struct_suggestions = class_struct_suggest_string,
-            #     logic_steps = logics
-            # )
-            # answer = llm_invoke(llm_client, generation_query)
-            # logger.debug(f"LLM checker generation attempt {attempt + 1}: {answer}")
-            # # 提取代码块
-            # generator_cpp_code,generator_h_code = parse_cpp_h_code_from_answer(answer)
-            # if generator_cpp_code and generator_h_code:
-            #     return generator_cpp_code,generator_h_code,logics
-            # else:
-            #     logger.debug("未能从回答中提取到完整的checker代码。尝试重新生成...")
+            prompt = get_prompt_for_clang_tidy("generate_checker_with_single_case")  
+            generation_query = prompt.format(
+                rule_description = self.RULE.get_rule_description(),
+                test_code = current_case.get_case_code(),
+                ast_txt = current_case_ast_txt,
+                logics = logics,
+                reference_astMatchers = astMatch_suggest_string,
+                renference_check_api = class_struct_suggest_string,
+                ruler_checker_cpp_name = ruler_checker_cpp,
+                content_of_ruler_checker_cpp = content_cpp,
+                ruler_checker_h_name = ruler_checker_h,
+                content_of_ruler_checker_h = content_h,
+            )
+            answer = llm_invoke(llm_client, generation_query)
+            logger.debug(f"LLM checker generation attempt {attempt + 1}: {answer}")
+            # 提取代码块
+            generator_cpp_code,generator_h_code = parse_cpp_h_code_from_answer(answer)
+            if generator_cpp_code and generator_h_code:
+                return generator_cpp_code,generator_h_code,logics
+            else:
+                logger.debug("未能从回答中提取到完整的checker代码。尝试重新生成...")
         
         return None,None,logics
+    def generate_checker_with_single_case_and_checker(self,current_case:AbstractCase,current_case_ast_txt,case_ast_node_list,current_checker:AbstractChecker):
+        checker_cpp,checker_h = get_checker_code(self.RULE.get_rule_name())
+        if current_case.get_flag() == False:
+            # 负例
+            temp =1
+        elif current_case.get_flag() == True:
+            # 正例
+            temp =0
+        
+
+    def generate_checker_with_query(self, query: str):
+        checker_cpp =""
+        checker_h = ""
+        while(checker_cpp == "" or checker_h =="" or checker_cpp is None or checker_h is None):
+            checker = llm_invoke(llm_client, query)
+            checker_cpp,checker_h = parse_cpp_h_code_from_answer(checker)
+        return checker_cpp,checker_h
+
+    def analyze_compiler_error(self, compiler_output: str, cpp_temp: str, h_temp: str) :
+        analyze_prompt = get_prompt_for_clang_tidy("analyze_compiler_error")
+        analyze_query = analyze_prompt.format(
+            check_cpp_code = cpp_temp,
+            check_h_code = h_temp,
+            compiler_error_info = compiler_output
+        )
+        data = None
+        suggestions = []
+        for attempt in range(1,config['arguments']['max_llm_tries'] + 1):
+            answer = llm_invoke(llm_client, analyze_query)
+            logger.debug(f"LLM analyze compiler error attempt {attempt + 1}: {answer}")
+            # cleaned = re.sub(r'```json|```', '', answer).strip()
+            try:
+                data = json.loads(answer)
+                
+            except json.JSONDecodeError as e:
+                logger.debug(f"JSON解析错误: {e}. 尝试重新生成...")
+        if data is not None:
+            repair_steps = data.get("repair_steps", [])
+            wait_retrieve_code_snippet = data.get("wait_retrieve_code_snippet", [])
+            # 检索代码片段
+            # TODO:检索
+        return repair_steps,suggestions
+                             
+        
     def first_checker_generation(self):
         #计算flag=0的测试用例数量，也就是负例
         total_negative_number = count_negative_cases(self.all_Test_Case_List)
@@ -101,13 +155,194 @@ class Clang_tidy_CheckerGenerator(object):
                     logger.info(f"达到最大生成轮数{max_round}，停止当前测试用例的生成尝试")
                     self.skipped_Test_Cases.append(current_case)
                     break
-                checker_cpp,checker_h  = self.generate_checker_with_single_case(current_case,current_case_ast_txt,case_ast_node_list)
+                checker_cpp,checker_h,logics  = self.generate_checker_with_single_case(current_case,current_case_ast_txt,case_ast_node_list)
+                if checker_cpp is None or checker_h is None:
+                    logger.info("未能生成有效的checker代码，跳过当前测试用例")
+                    self.skipped_Test_Cases.append(current_case)
+                    round += 1
+                    continue
+                save_checker_code(checker_cpp,checker_h,self.RULE.get_rule_name())
 
+                logger.info("开始编译")
+                current_try_compiler_count = 1
+                compiler_return_code,compiler_return_stdout,compiler_return_stderr,compiler_success =compiler_clang_tidy()
+                round += 1
+                while not compiler_success:
+                    logger.info(f"第{round}轮生成的checker编译失败，使用编译修复功能，开始第{current_try_compiler_count}次重试")
+                    single_success = False
+                    if current_try_compiler_count > config['arguments']['max_compiler_trys']:
+                        logger.info(f"达到最大编译修复尝试次数{config['arguments']['max_compiler_trys']}，停止当前测试用例的生成尝试")
+                        single_success =False
+                        compiler_success = False
+                        
+                        break
+                    cpp_temp,h_temp = get_checker_code(self.RULE.get_rule_name())
+                    repair_steps,suggestions = self.analyze_compiler_error(str(compiler_return_stdout),cpp_temp,h_temp)
+                    repair_query = get_prompt_for_clang_tidy("repair_compiler_error_code").format(
+                        check_cpp_code = cpp_temp,
+                        check_h_code = h_temp,
+                        compiler_error_info = str(compiler_return_stdout),
+                        repair_steps = repair_steps,
+                        repair_suggestions = suggestions
+                    )
+                    wait_compiler_checker_cpp,wait_compiler_checker_h = self.generate_checker_with_query(repair_query)
+                    current_try_compiler_count += 1
+                    save_checker_code(wait_compiler_checker_cpp, wait_compiler_checker_h,self.RULE.get_rule_name())
+                    _,_,_ ,compiler_success=compiler_clang_tidy()
+                if compiler_success:
+                    logger.info(f"第{round}轮生成的checker编译成功，下面运行测试用例进行验证")
+                    BASE = config['test']['base']
+                    full_output, warning_count = run_Checker_with_Check_clang_tidy(
+                        test_case_path=current_case.get_case_path(),
+                        rule_name=f"ucassaat-{self.RULE.get_rule_name()}",
+                        temp_dir=f"{config['checker']['temp_test_dir']}tmp_{self.RULE.get_rule_name()}",
+                        include_dir=f"{BASE}/checkers/{self.RULE.get_rule_category()}"
+                    )
+                    logger.info(f"测试用例运行完成,warning数量为:{warning_count}")
+                    if warning_count >=1:
+                        single_success = True
+                        passed_cases = [current_case]
+                        tmp_checker_cpp,tmp_checker_h = get_checker_code(self.RULE.get_rule_name())
+                        source_code ="check.cpp:\n"+ tmp_checker_cpp + "\n" +"check.h:\n"+ tmp_checker_h
+                        init_checker = Checker_Clang_Tidy(source_code,passed_cases)
+                        logger.info(f"规则{self.RULE.get_rule_name()}的Checker在第{round}轮生成成功")
+                        return single_success,init_checker
+        return False, None
+    def runAllTestCase(self,init_checker: AbstractChecker):    
+        failed_case_list =[]
+        success_case_list = []
+        all_success = False
+        init_checker.clear_passed_cases()
+        for test_case in self.all_Test_Case_List:
+            if test_case in self.skipped_Test_Cases:
+                continue
+            BASE = config['test']['base']
+            full_output, warning_count = run_Checker_with_Check_clang_tidy(
+                test_case_path=test_case.get_case_path(),
+                rule_name=f"ucassaat-{self.RULE.get_rule_name()}",
+                temp_dir=f"{config['checker']['temp_test_dir']}tmp_{self.RULE.get_rule_name()}",
+                include_dir=f"{BASE}/checkers/{self.RULE.get_rule_category()}"
+            )
+            if test_case.get_flag():
+                # 这是一个正例，应该通过测试,CHECK-MESSAGES不在代码注释中,符合规则
+                if warning_count ==0:
+                    success_case_list.append(test_case)
+                    init_checker.add_passed_cases(test_case)
+                elif warning_count > 0:
+                    # 这是一个正例，但是没有通过测试，说明checker不够完善，需要继续迭代
+                    failed_case_list.append(test_case)
+            else:
+                # 这是一个负例，应该不通过测试,CHECK-MESSAGES在代码注释中,不符合规则
+                if warning_count > 0:
+                    success_case_list.append(test_case)
+                    init_checker.add_passed_cases(test_case)
+                elif warning_count == 0:
+                    failed_case_list.append(test_case)
+        if len(failed_case_list) == 0:   
+            all_success = True 
+        return  success_case_list, failed_case_list,all_success
 
+    def checker_augmentation(self, init_checker: AbstractChecker):
+        failed_case_list = []
+        success_case_list = []
+        all_success = False
+        success_case_list, failed_case_list,all_success = self.runAllTestCase(init_checker)
+        init_checker.set_passed_cases(success_case_list)
 
-
-    def checker_augmentation(self):
-        pass
+        current_checker = init_checker
+        while not all_success:
+            if len(failed_case_list) ==0:
+                all_success = True
+                break
+            round = 1
+            for failed_case in failed_case_list:
+                logger.info(f"增强阶段，当前选择的失败测试用例路径为：{failed_case.get_case_path()}")
+                current_case_ast_txt,current_case_ast_json,case_ast_node_list = get_Case_AST(failed_case.get_case_path())
+                # for ast_node in case_ast_node_list:
+                #     if ast_node not in self.EMBEDDED_AST_NODES:
+                #         self.EMBEDDED_AST_NODES.append(ast_node)
+                round = 1
+                current_case_success =False
+                while not current_case_success:
+                    if round > config['arguments']['max_round']:
+                        logger.info(f"增强阶段，达到最大生成轮数{max_round}，停止当前测试用例的生成尝试")
+                        failed_case_list.remove(failed_case)
+                        self.skipped_Test_Cases.append(failed_case)
+                        break
+                    wait_compiler_checker_cpp,wait_compiler_checker_h  = self.generate_checker_with_single_case_and_checker(failed_case,current_case_ast_txt,case_ast_node_list,current_checker)
+                    save_checker_code(wait_compiler_checker_cpp,wait_compiler_checker_h, self.RULE.get_rule_name())
+                    round += 1
+                    logger.info("增强阶段，开始编译")
+                    current_try_compiler_count = 1
+                    compiler_return_code,compiler_return_stdout,compiler_return_stderr,compiler_success =compiler_clang_tidy()
+                    while not compiler_success:
+                        logger.info(f"增强阶段，第{round}轮生成的checker编译失败，使用编译修复功能，开始第{current_try_compiler_count}次重试")
+                        if current_try_compiler_count > config['arguments']['max_compiler_trys']:
+                            logger.info(f"增强阶段，达到最大编译修复尝试次数{config['arguments']['max_compiler_trys']}，停止当前测试用例的生成尝试")
+                            current_case_success =False
+                            compiler_success = False
+                            break
+                        cpp_temp,h_temp = get_checker_code(self.RULE.get_rule_name())
+                        repair_steps,suggestions = self.analyze_compiler_error(str(compiler_return_stdout),cpp_temp,h_temp)
+                        repair_query = get_prompt_for_clang_tidy("repair_compiler_error_code").format(
+                            check_cpp_code = cpp_temp,
+                            check_h_code = h_temp,
+                            compiler_error_info = str(compiler_return_stdout),
+                            repair_steps = repair_steps,
+                            repair_suggestions = suggestions
+                        )
+                        wait_compiler_checker_cpp,wait_compiler_checker_h = self.generate_checker_with_query(repair_query)
+                        current_try_compiler_count += 1
+                        save_checker_code(wait_compiler_checker_cpp, wait_compiler_checker_h,self.RULE.get_rule_name())
+                        _,_,_ ,compiler_success=compiler_clang_tidy()
+                    if compiler_success:
+                        logger.info(f"增强阶段，第{round}轮生成的checker编译成功，下面运行测试用例进行验证")
+                        BASE = config['test']['base']
+                        full_output, warning_count = run_Checker_with_Check_clang_tidy(
+                            test_case_path=failed_case.get_case_path(),
+                            rule_name=f"ucassaat-{self.RULE.get_rule_name()}",
+                            temp_dir=f"{config['checker']['temp_test_dir']}tmp_{self.RULE.get_rule_name()}",
+                            include_dir=f"{BASE}/checkers/{self.RULE.get_rule_category()}"
+                        )
+                        logger.info(f"增强阶段，测试用例运行完成,warning数量为:{warning_count}")
+                        if failed_case.get_flag():
+                            # 这是一个正例，应该通过测试,CHECK-MESSAGES不在代码注释中,符合规则
+                            if warning_count ==0:
+                                current_case_success = True
+                               
+                                failed_case_list.remove(failed_case)
+                            elif warning_count > 0:
+                                # 这是一个正例，但是没有通过测试，说明checker不够完善，需要继续迭代
+                                current_case_success = False
+                        else:
+                            # 这是一个负例，应该不通过测试,CHECK-MESSAGES在代码注释中,不符合规则
+                            if warning_count > 0:
+                                current_case_success = True
+                                
+                                failed_case_list.remove(failed_case)
+                            elif warning_count == 0:
+                                current_case_success = False
+                if current_case_success:
+                    tmp_checker_cpp,tmp_checker_h = get_checker_code(self.RULE.get_rule_name())
+                    source_code ="check.cpp:\n"+ tmp_checker_cpp + "\n" +"check.h:\n"+ tmp_checker_h
+                    current_checker.set_checker_code(source_code)
+                    current_checker_success_case_list, current_checker_failed_case_list,_= self.runAllTestCase(current_checker)
+                    
+                    current_checker.set_passed_cases(current_checker_success_case_list)
+                    tmp_cpp,tmp_h = get_checker_code(self.RULE.get_rule_name())
+                    code = "check.cpp:\n"+ tmp_cpp + "\n" +"check.h:\n"+ tmp_h
+                    new_checker = Checker_Clang_Tidy(code,current_checker_success_case_list)
+                    self.RULE.add_checker(new_checker)
+                    break
+            #重新运行所有的测试用例
+            tmp_cpp,tmp_h = get_checker_code(self.RULE.get_rule_name())
+            code = "check.cpp:\n"+ tmp_cpp + "\n" +"check.h:\n"+ tmp_h
+            current_checker.set_checker_code(code)
+            success_case_list, failed_case_list,all_success = self.runTestCase(current_checker)
+            current_checker.set_passed_cases(success_case_list)   
+        return ""
+                
+            
 
 
 if __name__ == "__main__":
