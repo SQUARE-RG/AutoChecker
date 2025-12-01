@@ -1,0 +1,90 @@
+[
+    {
+        "meta_op": "Detect methods that are static",
+        "meta_impl": "AST_MATCHER(CXXMethodDecl, isStatic) { return Node.isStatic(); }"
+    },
+    {
+        "meta_op": "Detect methods that have a trivial body",
+        "meta_impl": "AST_MATCHER(CXXMethodDecl, hasTrivialBody) { return Node.hasTrivialBody(); }"
+    },
+    {
+        "meta_op": "Detect methods that are overloaded operators",
+        "meta_impl": "AST_MATCHER(CXXMethodDecl, isOverloadedOperator) { return Node.isOverloadedOperator(); }"
+    },
+    {
+        "meta_op": "Detect classes that have dependent base classes",
+        "meta_impl": "AST_MATCHER(CXXRecordDecl, hasAnyDependentBases) { return Node.hasAnyDependentBases(); }"
+    },
+    {
+        "meta_op": "Detect methods that are templates",
+        "meta_impl": "AST_MATCHER(CXXMethodDecl, isTemplate) { return Node.getTemplatedKind() != FunctionDecl::TK_NonTemplate; }"
+    },
+    {
+        "meta_op": "Detect methods that are in a dependent context",
+        "meta_impl": "AST_MATCHER(CXXMethodDecl, isDependentContext) { return Node.isDependentContext(); }"
+    },
+    {
+        "meta_op": "Detect methods defined inside a macro definition",
+        "meta_impl": "AST_MATCHER(CXXMethodDecl, isInsideMacroDefinition) {\n  const ASTContext &Ctxt = Finder->getASTContext();\n  return clang::Lexer::makeFileCharRange(\n             clang::CharSourceRange::getCharRange(\n                 Node.getTypeSourceInfo()->getTypeLoc().getSourceRange()),\n             Ctxt.getSourceManager(), Ctxt.getLangOpts())\n      .isInvalid();\n}"
+    },
+    {
+        "meta_op": "Match the canonical declaration of a method against an inner matcher",
+        "meta_impl": "AST_MATCHER_P(CXXMethodDecl, hasCanonicalDecl,\n              ast_matchers::internal::Matcher<CXXMethodDecl>, InnerMatcher) {\n  return InnerMatcher.matches(*Node.getCanonicalDecl(), Finder, Builder);\n}"
+    },
+    {
+        "meta_op": "Detect methods whose body uses the 'this' pointer",
+        "meta_impl": "AST_MATCHER(CXXMethodDecl, usesThis) {\n  class FindUsageOfThis : public RecursiveASTVisitor<FindUsageOfThis> {\n  public:\n    bool Used = false;\n    bool VisitCXXThisExpr(const CXXThisExpr *E) {\n      Used = true;\n      return false;\n    }\n    bool TraverseCXXRecordDecl(CXXRecordDecl *RD) { return true; }\n  } UsageOfThis;\n  UsageOfThis.TraverseStmt(const_cast<Stmt *>(Node.getBody()));\n  return UsageOfThis.Used;\n}"
+    },
+    {
+        "meta_op": "Match methods that are definitions",
+        "meta_impl": "cxxMethodDecl(isDefinition())"
+    },
+    {
+        "meta_op": "Match methods that are user-provided",
+        "meta_impl": "cxxMethodDecl(isUserProvided())"
+    },
+    {
+        "meta_op": "Exclude methods expanded in system headers",
+        "meta_impl": "cxxMethodDecl(isExpansionInSystemHeader())"
+    },
+    {
+        "meta_op": "Exclude virtual methods",
+        "meta_impl": "cxxMethodDecl(isVirtual())"
+    },
+    {
+        "meta_op": "Exclude constructors",
+        "meta_impl": "cxxMethodDecl(cxxConstructorDecl())"
+    },
+    {
+        "meta_op": "Exclude destructors",
+        "meta_impl": "cxxMethodDecl(cxxDestructorDecl())"
+    },
+    {
+        "meta_op": "Exclude conversion operators",
+        "meta_impl": "cxxMethodDecl(cxxConversionDecl())"
+    },
+    {
+        "meta_op": "Exclude methods whose class is a lambda",
+        "meta_impl": "ofClass(isLambda())"
+    },
+    {
+        "meta_op": "Exclude methods whose class has dependent bases",
+        "meta_impl": "ofClass(hasAnyDependentBases())"
+    },
+    {
+        "meta_op": "Exclude methods whose class is either a lambda or has dependent bases",
+        "meta_impl": "ofClass(anyOf(isLambda(), hasAnyDependentBases()))"
+    },
+    {
+        "meta_op": "Exclude methods whose canonical declaration is inside a macro definition",
+        "meta_impl": "cxxMethodDecl(hasCanonicalDecl(isInsideMacroDefinition()))"
+    },
+    {
+        "meta_op": "Exclude methods that use the 'this' pointer",
+        "meta_impl": "cxxMethodDecl(usesThis())"
+    },
+    {
+        "meta_op": "Match methods that satisfy all required conditions for conversion to static",
+        "meta_impl": "Finder->addMatcher(\n  cxxMethodDecl(\n    isDefinition(),\n    isUserProvided(),\n    unless(anyOf(\n      isExpansionInSystemHeader(),\n      isVirtual(),\n      isStatic(),\n      hasTrivialBody(),\n      isOverloadedOperator(),\n      cxxConstructorDecl(),\n      cxxDestructorDecl(),\n      cxxConversionDecl(),\n      isTemplate(),\n      isDependentContext(),\n      ofClass(anyOf(isLambda(), hasAnyDependentBases())),\n      isInsideMacroDefinition(),\n      hasCanonicalDecl(isInsideMacroDefinition()),\n      usesThis()))\n  ).bind(\" x \"),\n  this);"
+    }
+]

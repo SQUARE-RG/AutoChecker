@@ -31,15 +31,16 @@
         "result_dir":"/root/code_check/result-generation/"
     },
     "knowledge_base":{
-        "addMatcher_api_path":"/root/code_check/clang_tidy_collect/collect_clang_tidy_astMatchers/astMatchers.json",
-        "ast_class_struct_api_path":"/root/cw-base/AutoChecker/collect_AST_api/class_struct__api.json",
-        "ast_class_struct_signature_path":"/root/cw-base/AutoChecker/collect_AST_api/class_struct_signature_api.json",
+        "astMatcher_api_path":"/root/code_check/clang_tidy_collect/collect_clang_tidy_astMatchers/astMatchers.json",
+        "ast_api_path":"/root/code_check/clang_tidy_collect/collect_clang_tidy_ast_api/clang_tidy_ast_api.json",
         "meta_OP_path":"/root/cw-base/AutoChecker/meta_api_db/meta_operations_hand_with_category.json",
         "ast_matcher_meta_operation_path":"/root/cw-base/AutoChecker/ast_matcher_meta_op_db/ast_matcher_meta_operations_dedup_v3.json"
     },
     "arguments":{
         "max_round": 5,
         "max_compiler_trys": 2,
-        "max_llm_tries": 3
+        "max_llm_tries": 3,
+        "top_key":1,
+        "filter_rule":"NamedParameterCheck"
     }
 }

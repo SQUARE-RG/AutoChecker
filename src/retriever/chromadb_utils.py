@@ -11,7 +11,7 @@
 
 
 import chromadb
-from bge_embedding import sequential_encode
+from retriever.bge_embedding import sequential_encode
 chroma_client = chromadb.PersistentClient(path="/root/code_check/src/embedding_db")
 
 # collection = chroma_client.create_collection(name="my_collection")

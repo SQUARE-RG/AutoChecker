@@ -1,0 +1,5 @@
+{
+    "_type": "prompt",
+    "input_variables": ["rule_description", "test_code","ast_txt","logics","reference_astMatchers","renference_check_api","ruler_checker_cpp_name","content_of_ruler_checker_cpp","ruler_checker_h_name","content_of_ruler_checker_h"],
+    "template_path": "/root/code_check/src/prompt/clang_tidy_prompt/prompt_txt/generate_checker_with_single_case.txt"
+}

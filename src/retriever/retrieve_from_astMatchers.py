@@ -4,11 +4,11 @@ import json
 import torch
 import os
 import time
-from retriever.bge_embedding import parallel_encode,sequential_encode
+from retriever.bge_embedding import parallel_encode,sequential_encode,top_k_per_query
 
 
 
-from retriever.chromadb_utils import chromadb_client
+# from retriever.chromadb_utils import chromadb_client
 ast_matchers_db_path = "src/embedding_db/ast_matchers_db.pt"
 ast_matcher_database=[]
 
@@ -40,17 +40,22 @@ def get_data(file_path: str):
 def embedding_ast_matchers():
     if os.path.exists(ast_matchers_db_path):
         logger.info(f"AST Matchers embedding database already exists at {ast_matchers_db_path}. Skipping embedding.")
-        saved =  torch.load(ast_matchers_db_path)
+        saved =  torch.load(ast_matchers_db_path, weights_only=False)
         ast_matcher_database.clear()
         ast_matcher_database.extend(saved)
-        return
+        # 提取文档列表
+        ast_matchers_documents = [item['document'] for item in ast_matcher_database]
+
+        # 提取嵌入向量列表
+        sentence_embeddings = [item['embedding'] for item in ast_matcher_database]
+        return ast_matchers_documents , sentence_embeddings
     logger.info("Starting embedding of AST Matchers...")
     # 清空知识库
     ast_matcher_database.clear()
     # 获取知识库
     ast_matchers_documents=[]
-    ast_matchers_documents= get_data(config['knowledge_base']['addMatcher_api_path'])
-
+    ast_matchers_documents= get_data(config['knowledge_base']['astMatcher_api_path'])
+    
 
     embedding_start_time = time.perf_counter()
     logger.info(f"Total AST Matchers documents to embed: {len(ast_matchers_documents)}")
@@ -66,6 +71,16 @@ def embedding_ast_matchers():
         })
     logger.info(f"validate: {sentence_embeddings[0].shape}")
     torch.save(ast_matcher_database, ast_matchers_db_path)
+    return ast_matchers_documents , sentence_embeddings
 
-
-    
+def get_related_astMatchers(logic_query):
+    ast_matchers_documents , sentence_embeddings = embedding_ast_matchers()
+    query_embeddings = sequential_encode([logic_query], model_path=config['embedding_model']['bge_model_path'], batch_size=1)
+    topk = top_k_per_query(query_embeddings, sentence_embeddings, k=config['arguments']['top_key'])
+    results = []
+    for qi,row in enumerate(topk):
+        
+        for doc_idx, score in row:
+            results.append(ast_matchers_documents[doc_idx])
+            
+    return results

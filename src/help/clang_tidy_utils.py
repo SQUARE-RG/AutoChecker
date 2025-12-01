@@ -6,6 +6,9 @@ import subprocess
 from collections import OrderedDict
 import re
 import json
+
+from retriever.retrieve_from_astMatchers import get_related_astMatchers
+
 # Clang tidy check name utils
 #只适用于clang tidy的checker生成过程
 def get_camel_name(check_name):
@@ -138,11 +141,26 @@ def get_logic_json(logics_json):
 
 
         
-
+def get_related_astMatchers(logic_for_registerMatchers):
+    pass
 
 def get_most_similar_astMatcher_and_class_struct(self, node:list, logics_json):
     logic_for_registerMatchers,logic_for_check = get_logic_json(logics_json)
-    for step in logic_for_registerMatchers:
-        logger.info(f"Logic for registerMatchers step: {step}")
-        pass
+
+    related_astMatchers= get_related_astMatchers(logic_for_registerMatchers)
+    logger.info(f"相关的AST Matchers建议:\n{related_astMatchers}")
+
     
+def parse_cpp_h_code_from_answer(answer: str):
+    """返回第一个 ```cpp ... ``` 中的纯代码，若无则 None。"""
+    # 定义正则表达式模式
+    cpp_pattern = r"checker_cpp:\s*```cpp\s*(.*?)\s*```"
+    h_pattern = r"checker_h:\s*```cpp\s*(.*?)\s*```"
+    # 使用 re.DOTALL 使 . 匹配包括换行符在内的所有字符
+    cpp_match = re.search(cpp_pattern, answer, re.DOTALL)
+    h_match = re.search(h_pattern, answer, re.DOTALL)
+    
+    # 提取代码内容
+    checker_cpp_code = cpp_match.group(1).strip() if cpp_match else None
+    checker_h_code = h_match.group(1).strip() if h_match else None
+    return checker_cpp_code,checker_h_code

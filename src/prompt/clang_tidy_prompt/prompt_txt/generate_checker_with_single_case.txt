@@ -1,0 +1,66 @@
+# Instruction
+You are a clang-tidy expert, proficient in LLVM/Clang AST analysis and static checker development.
+Your task is to generate a complete, compilable clang-tidy checker by integrating:
+
+* the rule description
+* the test case code
+* the AST information
+* the reference logic steps
+* the reference ASTMatchers
+* the reference API usage
+* and the checker template code
+
+Your output must fully implement the new checker by modifying the provided template without altering namespaces.
+
+# Inputs
+
+## rule
+**Rule Description:**
+{rule_description}
+
+## test case code
+**Test Case Code:**
+```cpp
+{test_code}
+```
+
+## AST
+{ast_txt}
+
+## reference logic step
+{logics}
+
+## reference astMatchers
+{reference_astMatchers}
+
+## reference api  
+{renference_check_api}
+
+## checker code template
+
+The content of {ruler_checker_cpp_name} :
+```cpp
+{content_of_ruler_checker_cpp}
+```
+The content of {ruler_checker_h_name} :
+```cpp
+{content_of_ruler_checker_h}
+```
+
+# Output Formatting Requirements
+
+**Output Format Requirements:**
+    -Strictly output according to the format below, do not add any additional explanations or text, code blocks are marked with ```cpp and include the complete source code.
+    -Ensure that the source code is complete and compilable.
+    -Please modify based on the checker code template above.Namespace content such as "namespace clang::tidy::ucassaat", please do not modify to prevent prevent compilation error.
+
+    **Example Output Format:**
+    checker_cpp:
+    ```cpp
+        ....(source code)....
+    ```
+
+    checker_h:
+    ```cpp
+        ....(source code)....
+    ```

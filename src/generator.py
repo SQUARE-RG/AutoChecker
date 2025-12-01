@@ -1,6 +1,6 @@
 from entity.abstractProduct import AbstractCase
 from typing import List
-from help.clang_tidy_utils import get_camel_check_name,count_negative_cases,select_negative_case,get_Case_AST,get_most_similar_astMatcher_and_class_struct
+from help.clang_tidy_utils import get_camel_check_name,count_negative_cases,select_negative_case,get_Case_AST,get_most_similar_astMatcher_and_class_struct,parse_cpp_h_code_from_answer
 from config import global_config as config
 from loguru import logger
 import re
@@ -44,7 +44,36 @@ class Clang_tidy_CheckerGenerator(object):
         logics = self.run_logic_for_negative_case(self.RULE.get_rule_description(), current_case.get_case_code())
         
         astMatch_suggest_string , class_struct_suggest_string =get_most_similar_astMatcher_and_class_struct(case_ast_node_list,logics)
-        return logics,logics
+        ruler_checker_cpp = config['checker']['checker_path'] + get_camel_check_name(self.RULE.get_rule_name()) + ".cpp"
+        with open(ruler_checker_cpp, 'r',encoding="utf-8") as file:
+            content_cpp = file.read()
+        
+        ruler_checker_h = config['checker']['checker_path'] + get_camel_check_name(self.RULE.get_rule_name()) + ".h"
+        with open(ruler_checker_h, 'r',encoding="utf-8") as file:
+            content_h = file.read()
+        for attempt in range(1,config['arguments']['max_llm_tries'] + 1):
+            prompt = get_prompt_for_clang_tidy("generate_checker_with_single_case")   
+            # generation_query = prompt.format(
+            #     rule_name = self.RULE.get_rule_name(),
+            #     rule_description = self.RULE.get_rule_description(),
+            #     negative_test_case = current_case.get_case_code(),
+            #     negative_test_case_ast = current_case_ast_txt,
+            #     existing_checker_cpp = content_cpp,
+            #     existing_checker_h = content_h,
+            #     astMatcher_suggestions = astMatch_suggest_string,
+            #     class_struct_suggestions = class_struct_suggest_string,
+            #     logic_steps = logics
+            # )
+            # answer = llm_invoke(llm_client, generation_query)
+            # logger.debug(f"LLM checker generation attempt {attempt + 1}: {answer}")
+            # # 提取代码块
+            # generator_cpp_code,generator_h_code = parse_cpp_h_code_from_answer(answer)
+            # if generator_cpp_code and generator_h_code:
+            #     return generator_cpp_code,generator_h_code,logics
+            # else:
+            #     logger.debug("未能从回答中提取到完整的checker代码。尝试重新生成...")
+        
+        return None,None,logics
     def first_checker_generation(self):
         #计算flag=0的测试用例数量，也就是负例
         total_negative_number = count_negative_cases(self.all_Test_Case_List)
