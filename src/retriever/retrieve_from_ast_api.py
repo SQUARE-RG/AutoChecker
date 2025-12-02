@@ -104,3 +104,18 @@ def embedding_ast_api():
 
 
     torch.save(ast_matcher_database, ast_api_db_path)
+
+def get_related_ast_api(logic_for_ast_api:list):
+    ast_api_documents , sentence_embeddings = embedding_ast_api()
+    related_ast_api = []
+    for query in logic_for_ast_api:
+        top_k_results = top_k_per_query(
+            query=query,
+            documents=ast_api_documents,
+            document_embeddings=sentence_embeddings,
+            top_k=3,
+            model_path=config['embedding_model']['bge_model_path'],
+        )
+        for doc, score in top_k_results:
+            related_ast_api.append(f"AST API建议: {doc} , 方法签名: {get_data(config['knowledge_base']['ast_api_path'])[doc]} , 相似度得分: {score:.4f}")
+    return related_ast_api

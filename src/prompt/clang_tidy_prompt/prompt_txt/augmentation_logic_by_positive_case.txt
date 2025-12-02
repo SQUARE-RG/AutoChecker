@@ -1,0 +1,91 @@
+# Instruction
+You are a senior Clang/LLVM expert mentoring newcomers in designing a custom Clang-Tidy checker.
+Your task is to improve the **step-by-step implementation logic** based on the current checker code, as well as the passed and failed test cases, including:
+
+## **Checker Design Requirements**
+
+A Clang-Tidy checker consists of two main parts:
+
+### **1. AST Matcher Logic (`registerMatchers`)**
+
+* Use the **ASTMatcher DSL** to define precise matching rules.
+* Bind matched nodes with `bind("name")`.
+* The matcher must reflect the checker’s rule and trigger for all relevant code patterns.
+
+#### **2. Callback Checking Logic (`check`)**
+
+* In `check()`, retrieve bound nodes via `Result.Nodes.getNodeAs<T>()`.
+* Implement all necessary diagnostics and logic required by the rule.
+* The logic here must NOT include or consider any fix-it generation or code-fix–related behavior.
+* Describe each step in a clear, logical sequence.
+
+
+# Inputs
+
+## current checker code
+checker_cpp:
+```cpp
+{check_cpp_code}
+```
+
+checker_h:
+```cpp
+{check_h_code}
+```
+
+## passed test cases code
+
+```cpp
+{passed_test_cases}
+```
+
+## failed test cases code
+This test case should not report an issue, but the current checker code reports an issue in the code, which is a false positive.
+```cpp
+{failed_test_cases}
+```
+
+---
+
+# Output Formatting Requirements
+
+Return **only** a JSON array containing exactly one object with the following keys:
+
+* `"logic_registerMatchers"` — an ordered list of reasoning steps describing how to design the AST matcher.
+* `"logic_check"` — an ordered list of reasoning steps describing how to implement the diagnostic logic in the callback.(Reminder: no fix-it logic should appear here.)
+
+**Do NOT:**
+
+* include explanations, comments, or markdown
+* include code fences
+* add extra fields
+* wrap output in text outside the JSON
+
+## Example Output Format
+
+```json
+[
+    {{
+        "logic_registerMatchers": [
+            "1. Match function declarations that are definitions",
+            "2. Exclude function declarations with Naked attribute",
+            "3. Check if a function is an override method",
+            "4. bind ..."
+        ],
+        "logic_check": [
+            "1. Get the canonical declaration of a function",
+            "2. Check whether a function is a virtual method",
+            "3. Check whether a function has a written prototype",
+            "4. Get the number of parameters in a function"
+        ]
+    }}
+]
+```
+
+You can proceed with the analysis according to the following steps:
+
+1.  Read the provided current checker code and analyze its implementation logic.
+2.  Analyze the passed test cases code to understand how the checker correctly identifies issues in the code without generating false positives; retain this effective logic.
+3.  Analyze why the current checker code is incorrectly reporting failed test cases, as the code in the failed test cases is correct and should not be reported, and generate improved logic that can successfully identify them.
+4.  Synthesize the insights from the above analyses to formulate a comprehensive implementation logic capable of detecting all issues present in the test cases while avoiding false positives.
+5.  Output the final logic strictly adhering to the specified output format requirements.

@@ -62,7 +62,7 @@ def embedding_ast_matchers_meta_op():
 
 def get_related_astMatchers_meta_op(logic_query):
     ast_matchers_meta_op_documents , sentence_embeddings = embedding_ast_matchers_meta_op()
-    query_embeddings = sequential_encode([logic_query], model_path=config['embedding_model']['bge_model_path'], batch_size=1)
+    query_embeddings = sequential_encode(logic_query, model_path=config['embedding_model']['bge_model_path'], batch_size=1)
     topk = top_k_per_query(query_embeddings, sentence_embeddings, k=config['arguments']['top_key'])
     results = []
     for qi,row in enumerate(topk):

@@ -48,7 +48,43 @@ class Clang_tidy_CheckerGenerator(object):
             except json.JSONDecodeError as e:
                 logger.debug(f"JSON解析错误: {e}. 尝试重新生成...")
         return []
-
+    def augmentation_logic_by_negative_case(self,check_cpp_code,check_h_code,passed_test_cases,failed_test_cases):
+        prompt = get_prompt_for_clang_tidy("augmentation_logic_by_negative_case")   
+        augmentation_query = prompt.format(
+            check_cpp_code = check_cpp_code,
+            check_h_code = check_h_code,
+            passed_test_cases = passed_test_cases,
+            failed_test_cases = failed_test_cases
+        )
+        for attempt in range(1,config['arguments']['max_llm_tries'] + 1):
+            answer = llm_invoke(llm_client, augmentation_query)
+            logger.debug(f"LLM augmentation logic by negative case attempt {attempt + 1}: {answer}")
+            # cleaned = re.sub(r'```json|```', '', answer).strip()
+            try:
+                json_logic = json.loads(answer)
+                return json_logic
+            except json.JSONDecodeError as e:
+                logger.debug(f"JSON解析错误: {e}. 尝试重新生成...")
+        return []
+    
+    def augmentation_logic_by_positive_case(self,check_cpp_code,check_h_code,passed_test_cases,failed_test_cases):
+        prompt = get_prompt_for_clang_tidy("augmentation_logic_by_positive_case")   
+        augmentation_query = prompt.format(
+            check_cpp_code = check_cpp_code,
+            check_h_code = check_h_code,
+            passed_test_cases = passed_test_cases,
+            failed_test_cases = failed_test_cases
+        )
+        for attempt in range(1,config['arguments']['max_llm_tries'] + 1):
+            answer = llm_invoke(llm_client, augmentation_query)
+            logger.debug(f"LLM augmentation logic by positive case attempt {attempt + 1}: {answer}")
+            # cleaned = re.sub(r'```json|```', '', answer).strip()
+            try:
+                json_logic = json.loads(answer)
+                return json_logic
+            except json.JSONDecodeError as e:
+                logger.debug(f"JSON解析错误: {e}. 尝试重新生成...")
+        return []
     def generate_checker_with_single_case(self,current_case:AbstractCase,current_case_ast_txt,case_ast_node_list):
         logics = self.run_logic_for_negative_case(self.RULE.get_rule_description(), current_case.get_case_code())
         
@@ -88,11 +124,41 @@ class Clang_tidy_CheckerGenerator(object):
         checker_cpp,checker_h = get_checker_code(self.RULE.get_rule_name())
         if current_case.get_flag() == False:
             # 负例
-            temp =1
+            logics = self.augmentation_logic_by_negative_case(checker_cpp,checker_h,current_checker.get_passed_cases(),[current_case])
+            astMatch_suggest_string , class_struct_suggest_string =get_most_similar_astMatcher_and_class_struct(case_ast_node_list,logics)
+            repair_negative_case_prompt = get_prompt_for_clang_tidy("augmentation_check_by_negative_case").format(
+                rule_description = self.RULE.get_rule_description(),
+                ast_txt = current_case_ast_txt,
+                logics = logics,
+                reference_astMatchers = astMatch_suggest_string,
+                renference_check_api = class_struct_suggest_string,
+                content_of_ruler_checker_cpp = checker_cpp,
+                content_of_ruler_checker_h = checker_h,
+                passed_test_cases = "\n".join([case.get_case_code() for case in current_checker.get_passed_cases()]),
+                failed_test_cases = current_case.get_case_code()
+            )
+            logger.info(f"针对负例{current_case.get_case_path()}开始使用增强逻辑生成checker代码")
+            checker_cpp,checker_h = self.generate_checker_with_query(repair_negative_case_prompt)
+            return checker_cpp,checker_h,logics 
         elif current_case.get_flag() == True:
             # 正例
-            temp =0
-        
+            logics = self.augmentation_logic_by_positive_case(checker_cpp,checker_h,current_checker.get_passed_cases(),[current_case])
+            astMatch_suggest_string , class_struct_suggest_string =get_most_similar_astMatcher_and_class_struct(case_ast_node_list,logics)
+            repair_positive_case_prompt = get_prompt_for_clang_tidy("augmentation_check_by_positive_case").format(
+                rule_description = self.RULE.get_rule_description(),
+                ast_txt = current_case_ast_txt,
+                logics = logics,
+                reference_astMatchers = astMatch_suggest_string,
+                renference_check_api = class_struct_suggest_string, 
+                content_of_ruler_checker_cpp = checker_cpp,
+                content_of_ruler_checker_h = checker_h,
+                passed_test_cases = "\n".join([case.get_case_code() for case in current_checker.get_passed_cases()]),
+                failed_test_cases = current_case.get_case_code()
+            )
+            logger.info(f"针对正例{current_case.get_case_path()}开始使用增强逻辑生成checker代码")
+            checker_cpp,checker_h = self.generate_checker_with_query(repair_positive_case_prompt)
+            return checker_cpp,checker_h,logics 
+  
 
     def generate_checker_with_query(self, query: str):
         checker_cpp =""
@@ -341,24 +407,5 @@ class Clang_tidy_CheckerGenerator(object):
             success_case_list, failed_case_list,all_success = self.runTestCase(current_checker)
             current_checker.set_passed_cases(success_case_list)   
         return ""
-                
-            
-
-
-if __name__ == "__main__":
-    get_Case_AST("/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/abseil/duration-conversion-cast.cpp")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# if __name__ == "__main__":
+#     get_Case_AST("/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/abseil/duration-conversion-cast.cpp")

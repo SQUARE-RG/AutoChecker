@@ -1,0 +1,76 @@
+# Instruction
+You are a clang-tidy expert, proficient in LLVM/Clang AST analysis and static checker development.
+
+Your task is to generate an enhanced checker code based on the provided rules, the current checker's source code, the passed test cases, and the failed test cases. You may refer to the reference logic steps, reference AST matchers, and reference code snippets.
+
+# Inputs
+
+## rule
+**Rule Description:**
+{rule_description}
+
+## current checker code
+
+checker_cpp:
+```cpp
+{check_cpp_code}
+```
+
+checker_h:
+```cpp
+{check_h_code}
+```
+
+## passed test cases code
+
+```cpp
+{passed_test_cases}
+```
+
+## failed test cases code
+This test case should report an issue, but the current checker code cannot detect this code's problem.
+```cpp
+{failed_test_cases}
+```
+
+### ast of  failed test cases 
+{ast_txt}
+
+
+## reference logic step
+{logics}
+
+## reference astMatchers
+{reference_astMatchers}
+
+## reference code snippets  
+{renference_check_api}
+
+
+# Output Formatting Requirements
+
+**Output Format Requirements:**
+    -Strictly output according to the format below, do not add any additional explanations or text, code blocks are marked with ```cpp and include the complete source code.
+    -Ensure that the source code is complete and compilable.
+    -Please modify based on the current checker code above.Namespace content such as "namespace clang::tidy::ucassaat", please do not modify to prevent prevent compilation error.
+
+    **Example Output Format:**
+    checker_cpp:
+    ```cpp
+        ....(source code)....
+    ```
+
+    checker_h:
+    ```cpp
+        ....(source code)....
+    ```
+
+
+You can proceed with the analysis according to the following steps:
+
+1.  Read the provided current checker code and analyze its implementation logic.
+2.  Analyze the passed test cases code to understand how the checker successfully identifies issues in the code without generating false positives.
+3.  Analyze the failed test cases code to determine why the checker fails to detect the issues present in these cases.
+4.  Synthesize the findings from the above analyses. When generating the new code, follow the reference logic steps, consult the reference AST matchers, and utilize the reference code snippets to produce a complete and robust checker implementation. This new checker code should be capable of detecting all issues in the test cases while avoiding false positives.
+5.  Output the final code strictly adhering to the specified output format requirements.
+

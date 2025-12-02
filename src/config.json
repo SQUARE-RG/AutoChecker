@@ -34,7 +34,7 @@
     "knowledge_base":{
         "astMatcher_api_path":"/root/code_check/clang_tidy_collect/collect_clang_tidy_astMatchers/astMatchers.json",
         "ast_api_path":"/root/code_check/clang_tidy_collect/collect_clang_tidy_ast_api/clang_tidy_ast_api.json",
-        "check_op_path":"/root/cw-base/AutoChecker/meta_api_db/meta_operations_hand_with_category.json",
+        "check_op_path":"/root/code_check/clang_tidy_collect/collect_check_op/clang_tidy_check_op_dedup.json",
         "ast_matcher_meta_operation_path":"/root/code_check/clang_tidy_collect/collect_clang_tidy_astMatchers_op/astMatchers_meta_op.json"
     },
     "arguments":{

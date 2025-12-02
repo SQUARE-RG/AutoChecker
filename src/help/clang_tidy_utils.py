@@ -8,7 +8,9 @@ import re
 import json
 
 from retriever.retrieve_from_astMatchers import get_related_astMatchers
-
+from retriever.retrieve_from_astMatchers_meta_op import get_related_astMatchers_meta_op
+from retriever.retrieve_from_check_op import get_related_check_op
+from retriever.retrieve_from_ast_api import get_related_ast_api
 # Clang tidy check name utils
 #只适用于clang tidy的checker生成过程
 def get_camel_name(check_name):
@@ -140,17 +142,30 @@ def get_logic_json(logics_json):
     return logic_for_registerMatchers,logic_for_check
 
 
-        
-def get_related_astMatchers(logic_for_registerMatchers):
-    pass
-
 def get_most_similar_astMatcher_and_class_struct(self, node:list, logics_json):
+    astMatch_suggest_string= '' 
+    class_struct_suggest_string = ''
     logic_for_registerMatchers,logic_for_check = get_logic_json(logics_json)
 
     related_astMatchers= get_related_astMatchers(logic_for_registerMatchers)
     logger.info(f"相关的AST Matchers建议:\n{related_astMatchers}")
+    related_astMatchers_meta_op= get_related_astMatchers_meta_op(logic_for_registerMatchers)
+    logger.info(f"相关的AST Matchers Meta Op建议:\n{related_astMatchers_meta_op}")
+    for a in related_astMatchers:
+        astMatch_suggest_string += a + "\n"
+    for b in related_astMatchers_meta_op:
+        astMatch_suggest_string += b + "\n"
 
-    
+
+    related_check_op= get_related_check_op(logic_for_check)
+    logger.info(f"相关的Check Op建议:\n{related_check_op}")
+    for c in related_check_op:
+        class_struct_suggest_string += c + "\n" 
+    related_ast_api= get_related_ast_api(node)
+    logger.info(f"相关的AST API建议:\n{related_ast_api}")
+    for d in related_ast_api:
+        class_struct_suggest_string += d + "\n" 
+    return astMatch_suggest_string,class_struct_suggest_string
 def parse_cpp_h_code_from_answer(answer: str):
     """返回第一个 ```cpp ... ``` 中的纯代码，若无则 None。"""
     # 定义正则表达式模式
