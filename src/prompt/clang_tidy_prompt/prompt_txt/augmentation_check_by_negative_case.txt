@@ -13,12 +13,12 @@ Your task is to generate an enhanced checker code based on the provided rules, t
 
 checker_cpp:
 ```cpp
-{check_cpp_code}
+{content_of_ruler_checker_cpp}
 ```
 
 checker_h:
 ```cpp
-{check_h_code}
+{content_of_ruler_checker_h}
 ```
 
 ## passed test cases code

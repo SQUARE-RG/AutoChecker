@@ -161,11 +161,57 @@ def get_most_similar_astMatcher_and_class_struct(self, node:list, logics_json):
     logger.info(f"相关的Check Op建议:\n{related_check_op}")
     for c in related_check_op:
         class_struct_suggest_string += c + "\n" 
-    related_ast_api= get_related_ast_api(node)
+    related_ast_api= get_related_ast_api(logic_for_check)
     logger.info(f"相关的AST API建议:\n{related_ast_api}")
     for d in related_ast_api:
         class_struct_suggest_string += d + "\n" 
     return astMatch_suggest_string,class_struct_suggest_string
+
+def get_suggest_string_from_hint(hint):
+    result = ''
+    related_astMatchers= get_related_astMatchers(hint)
+    logger.info(f"相关的AST Matchers建议:\n{related_astMatchers}")
+    related_astMatchers_meta_op= get_related_astMatchers_meta_op(hint)
+    logger.info(f"相关的AST Matchers Meta Op建议:\n{related_astMatchers_meta_op}")
+    for a in related_astMatchers:
+        result += a + "\n"
+    for b in related_astMatchers_meta_op:
+        result += b + "\n"
+
+
+    related_check_op= get_related_check_op(hint)
+    logger.info(f"相关的Check Op建议:\n{related_check_op}")
+    for c in related_check_op:
+        result += c + "\n" 
+    related_ast_api= get_related_ast_api(hint)
+    logger.info(f"相关的AST API建议:\n{related_ast_api}")
+    for d in related_ast_api:
+        result += d + "\n" 
+    return result
+# def tk(logic_for_registerMatchers,logic_for_check):
+#     astMatch_suggest_string= '' 
+#     class_struct_suggest_string = ''
+#     related_astMatchers= get_related_astMatchers(logic_for_registerMatchers)
+#     logger.info(f"相关的AST Matchers建议:\n{related_astMatchers}")
+#     related_astMatchers_meta_op= get_related_astMatchers_meta_op(logic_for_registerMatchers)
+#     logger.info(f"相关的AST Matchers Meta Op建议:\n{related_astMatchers_meta_op}")
+#     for a in related_astMatchers:
+#         astMatch_suggest_string += a + "\n"
+#     for b in related_astMatchers_meta_op:
+#         astMatch_suggest_string += b + "\n"
+
+
+#     related_check_op= get_related_check_op(logic_for_check)
+#     logger.info(f"相关的Check Op建议:\n{related_check_op}")
+#     for c in related_check_op:
+#         class_struct_suggest_string += c + "\n" 
+#     related_ast_api= get_related_ast_api(logic_for_check)
+#     logger.info(f"相关的AST API建议:\n{related_ast_api}")
+#     for d in related_ast_api:
+#         class_struct_suggest_string += d + "\n" 
+#     return astMatch_suggest_string,class_struct_suggest_string
+
+
 def parse_cpp_h_code_from_answer(answer: str):
     """返回第一个 ```cpp ... ``` 中的纯代码，若无则 None。"""
     # 定义正则表达式模式

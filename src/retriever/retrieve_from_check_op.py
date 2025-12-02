@@ -5,20 +5,31 @@ import torch
 import os
 import time
 from retriever.bge_embedding import parallel_encode,sequential_encode,top_k_per_query
-
+import numpy as np
 check_op_db_path = "src/embedding_db/check_op_db.pt"
 check_op_database=[]
 
+# def get_data(file_path: str):
+#     documents = []
+#     with open(file_path, 'r', encoding='utf-8') as f:
+#         check_op_json = json.load(f)
+#     filter_rule = config['arguments']['filter_rule']
+#     for op_info in check_op_json:
+#         if filter_rule in op_info['reference_path']:
+#             continue
+#         documents.append(str(op_info['meta_op']))
+#     return documents
+
 def get_data(file_path: str):
-    documents = []
+    documents_dict = {}
     with open(file_path, 'r', encoding='utf-8') as f:
         check_op_json = json.load(f)
     filter_rule = config['arguments']['filter_rule']
     for op_info in check_op_json:
         if filter_rule in op_info['reference_path']:
             continue
-        documents.append(str(op_info['check_op']))
-    return documents
+        documents_dict[str(op_info['meta_op'])]=str(op_info['meta_impl'])
+    return documents_dict
 
 def embedding_check_op():
     if os.path.exists(check_op_db_path):
@@ -31,13 +42,16 @@ def embedding_check_op():
 
         # 提取嵌入向量列表
         sentence_embeddings = [item['embedding'] for item in check_op_database]
-        return check_op_documents , sentence_embeddings
+        check_op_documents_array = np.array(check_op_documents)
+        sentence_embeddings_array = np.array(sentence_embeddings)
+        return check_op_documents_array , sentence_embeddings_array
     logger.info("Starting embedding of Check Op...")
     # 清空知识库
     check_op_database.clear()
     # 获取知识库
     check_op_documents=[]
-    check_op_documents= get_data(config['knowledge_base']['check_operation_path'])
+    check_op_documents_dict= get_data(config['knowledge_base']['check_op_path'])
+    check_op_documents = list(check_op_documents_dict.keys())
     
 
     embedding_start_time = time.perf_counter()
@@ -60,13 +74,14 @@ def embedding_check_op():
 
 def get_related_check_op(logic_query):
     check_op_documents , sentence_embeddings = embedding_check_op()
-    query_embeddings = sequential_encode(logic_query, model_path=config['embedding_model']['bge_model_path'], batch_size=1)
+    query_embeddings = sequential_encode(logic_query, model_path=config['embedding_model']['bge_model_path'], batch_size=4)
     topk = top_k_per_query(query_embeddings, sentence_embeddings, k=config['arguments']['top_key'])
     results = []
+    check_op_documents_dict= get_data(config['knowledge_base']['check_op_path'])
     for qi,row in enumerate(topk):
         logger.info(f"Query: {logic_query[qi]}")
-        for rk,score_idx in enumerate(row):
-            score, idx = score_idx
-            results.append(check_op_documents[idx])
-            logger.info(f"Top {rk+1} Check Op (Score: {score:.4f}):\n{check_op_documents[idx]}")
-    return results
+        for doc_idx , score in row:
+            logger.info(f"doc_idx: {doc_idx}, score: {score:.4f}: {check_op_documents[doc_idx]}")
+            results.append(check_op_documents_dict[check_op_documents[doc_idx]])                                  
+    unique_list = list(set(results))
+    return unique_list

@@ -5,10 +5,10 @@ import torch
 import os
 import time
 from retriever.bge_embedding import parallel_encode,sequential_encode,top_k_per_query
-
+import numpy as np
 ast_api_db_path = "src/embedding_db/ast_api_db.pt"
 ast_matcher_database=[]
-
+apilist_path = "src/embedding_db/api_list.pt"
 def split_camel_case(method_name: str):
     words = []
     start_index = 0
@@ -21,6 +21,11 @@ def split_camel_case(method_name: str):
     return words
 
 def get_data(file_path: str):
+    if os.path.exists(apilist_path):
+        logger.info(f"API list already exists at {apilist_path}. Loading existing data.")
+        apilist = {}
+        apilist = torch.load(apilist_path, weights_only=False)
+        return apilist
     documents = []
     with open(file_path, 'r', encoding='utf-8') as f:
         ast_api_json = json.load(f)
@@ -60,21 +65,28 @@ def get_data(file_path: str):
                 api_context =f"{method_name} of {struct_name}"
                 documents.append(api_context)
                 apilist[api_context]=str(method['method_signature'])
+    torch.save(apilist, apilist_path)
     return apilist
 
-# 待考虑
+
 def embedding_ast_api():
     if os.path.exists(ast_api_db_path):
         logger.info(f"AST API embedding database already exists at {ast_api_db_path}. Skipping embedding.")
         saved =  torch.load(ast_api_db_path, weights_only=False)
         ast_matcher_database.clear()
         ast_matcher_database.extend(saved)
+        ast_api_documents = []
         # 提取文档列表
+        # for item in ast_matcher_database:
+        #     doc_string = item['document']+"\n"+item['api_signature']
+        #     ast_api_documents.append(doc_string)
         ast_api_documents = [item['document'] for item in ast_matcher_database]
-
         # 提取嵌入向量列表
         sentence_embeddings = [item['embedding'] for item in ast_matcher_database]
-        return ast_api_documents , sentence_embeddings
+        # 转换为 NumPy 数组
+        ast_api_documents_array = np.array(ast_api_documents)
+        sentence_embeddings_array = np.array(sentence_embeddings)
+        return ast_api_documents_array , sentence_embeddings_array,ast_matcher_database
     logger.info("Starting embedding of AST API...")
     # 清空知识库
     ast_matcher_database.clear()
@@ -104,18 +116,31 @@ def embedding_ast_api():
 
 
     torch.save(ast_matcher_database, ast_api_db_path)
+    return ast_api_documents , sentence_embeddings,ast_matcher_database
 
 def get_related_ast_api(logic_for_ast_api:list):
-    ast_api_documents , sentence_embeddings = embedding_ast_api()
+    ast_api_documents , sentence_embeddings,ast_matcher_database = embedding_ast_api()
+    logger.info("开始计算logics的嵌入")
+    logics_embeddings = parallel_encode(
+        texts=logic_for_ast_api,
+        model_path=config['embedding_model']['bge_model_path'],
+        num_workers=4,
+        batch_size=64,
+    )
+    ast_api_dict= get_data(config['knowledge_base']['ast_api_path'])
     related_ast_api = []
-    for query in logic_for_ast_api:
-        top_k_results = top_k_per_query(
-            query=query,
-            documents=ast_api_documents,
-            document_embeddings=sentence_embeddings,
-            top_k=3,
-            model_path=config['embedding_model']['bge_model_path'],
+    top_k_results =  top_k_per_query(
+            query_emb=logics_embeddings,
+            doc_emb=sentence_embeddings,
+            k  = config['arguments']['top_key']
         )
-        for doc, score in top_k_results:
-            related_ast_api.append(f"AST API建议: {doc} , 方法签名: {get_data(config['knowledge_base']['ast_api_path'])[doc]} , 相似度得分: {score:.4f}")
-    return related_ast_api
+  
+    for qi, row in enumerate(top_k_results):
+        logger.info(f"Logic Query: {logic_for_ast_api[qi]}")
+        for doc_idx, score in row:
+            logger.info(f"  doc {doc_idx} (score={score:.4f}): {ast_api_documents[doc_idx]}")
+            logger.info(f"function signature: {ast_api_dict[ast_api_documents[doc_idx]]}")
+            related_ast_api.append(ast_api_dict[ast_api_documents[doc_idx]])
+
+    unique_list = list(set(related_ast_api))
+    return unique_list

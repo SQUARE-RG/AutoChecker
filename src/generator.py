@@ -1,6 +1,6 @@
 from entity.abstractProduct import AbstractCase,AbstractRule
 from typing import List
-from help.clang_tidy_utils import get_camel_check_name,count_negative_cases,select_negative_case,get_Case_AST,get_most_similar_astMatcher_and_class_struct,parse_cpp_h_code_from_answer,save_checker_code,get_checker_code
+from help.clang_tidy_utils import get_camel_check_name,count_negative_cases,select_negative_case,get_Case_AST,get_most_similar_astMatcher_and_class_struct,parse_cpp_h_code_from_answer,save_checker_code,get_checker_code,get_suggest_string_from_hint
 from config import global_config as config
 from loguru import logger
 import re
@@ -190,7 +190,7 @@ class Clang_tidy_CheckerGenerator(object):
             repair_steps = data.get("repair_steps", [])
             wait_retrieve_code_snippet = data.get("wait_retrieve_code_snippet", [])
             # 检索代码片段
-            # TODO:检索
+            suggestions = get_suggest_string_from_hint(wait_retrieve_code_snippet)
         return repair_steps,suggestions
                              
         
