@@ -12,6 +12,8 @@ linux-db/
 llvm-project/
 src/embedding_db/
 logs/
+
+commit_to_test_cases/kparser/tree-sitter-cpp
 ## build目录
 llvm-project/build/
 src/retriever/embedding_model/

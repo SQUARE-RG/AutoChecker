@@ -1,1 +1,2 @@
 loguru
+tree-sitter==0.21.3
