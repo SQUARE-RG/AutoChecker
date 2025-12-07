@@ -79,9 +79,9 @@ def get_related_check_op(logic_query):
     results = []
     check_op_documents_dict= get_data(config['knowledge_base']['check_op_path'])
     for qi,row in enumerate(topk):
-        logger.info(f"Query: {logic_query[qi]}")
+        # logger.info(f"Query: {logic_query[qi]}")
         for doc_idx , score in row:
-            logger.info(f"doc_idx: {doc_idx}, score: {score:.4f}: {check_op_documents[doc_idx]}")
+            # logger.info(f"doc_idx: {doc_idx}, score: {score:.4f}: {check_op_documents[doc_idx]}")
             results.append(check_op_documents_dict[check_op_documents[doc_idx]])                                  
     unique_list = list(set(results))
     return unique_list

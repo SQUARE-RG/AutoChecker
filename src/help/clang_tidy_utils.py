@@ -1,3 +1,4 @@
+import os
 from typing import List
 from entity.abstractProduct import AbstractCase
 from loguru import logger
@@ -26,11 +27,12 @@ def count_negative_cases(Case_list: List[AbstractCase]=None):
     negative_cases = [case for case in Case_list if not case.get_flag()]
     return len(negative_cases)
 
-def select_negative_case(cases: list[AbstractCase], skipped_cases: list[AbstractCase]) -> AbstractCase:
+def select_negative_case(cases: List[AbstractCase], skipped_cases: List[AbstractCase]):
         logger.info("Selecting a negative test case...")
-        logger.info(f"当前skipped list 数量：{len(skipped_cases)}")
+        
         if skipped_cases is None:
             skipped_cases = []
+        logger.info(f"当前skipped list 数量：{len(skipped_cases)}")
         for case in cases:
             flag = case.get_flag()
             if not flag and case not in skipped_cases:
@@ -142,15 +144,15 @@ def get_logic_json(logics_json):
     return logic_for_registerMatchers,logic_for_check
 
 
-def get_most_similar_astMatcher_and_class_struct(self, node:list, logics_json):
+def get_most_similar_astMatcher_and_class_struct(node:list, logics_json):
     astMatch_suggest_string= '' 
     class_struct_suggest_string = ''
     logic_for_registerMatchers,logic_for_check = get_logic_json(logics_json)
 
     related_astMatchers= get_related_astMatchers(logic_for_registerMatchers)
-    logger.info(f"相关的AST Matchers建议:\n{related_astMatchers}")
+    # logger.info(f"相关的AST Matchers建议:\n{related_astMatchers}")
     related_astMatchers_meta_op= get_related_astMatchers_meta_op(logic_for_registerMatchers)
-    logger.info(f"相关的AST Matchers Meta Op建议:\n{related_astMatchers_meta_op}")
+    # logger.info(f"相关的AST Matchers Meta Op建议:\n{related_astMatchers_meta_op}")
     for a in related_astMatchers:
         astMatch_suggest_string += a + "\n"
     for b in related_astMatchers_meta_op:
@@ -158,11 +160,11 @@ def get_most_similar_astMatcher_and_class_struct(self, node:list, logics_json):
 
 
     related_check_op= get_related_check_op(logic_for_check)
-    logger.info(f"相关的Check Op建议:\n{related_check_op}")
+    # logger.info(f"相关的Check Op建议:\n{related_check_op}")
     for c in related_check_op:
         class_struct_suggest_string += c + "\n" 
     related_ast_api= get_related_ast_api(logic_for_check)
-    logger.info(f"相关的AST API建议:\n{related_ast_api}")
+    # logger.info(f"相关的AST API建议:\n{related_ast_api}")
     for d in related_ast_api:
         class_struct_suggest_string += d + "\n" 
     return astMatch_suggest_string,class_struct_suggest_string
@@ -170,9 +172,9 @@ def get_most_similar_astMatcher_and_class_struct(self, node:list, logics_json):
 def get_suggest_string_from_hint(hint):
     result = ''
     related_astMatchers= get_related_astMatchers(hint)
-    logger.info(f"相关的AST Matchers建议:\n{related_astMatchers}")
+    # logger.info(f"相关的AST Matchers建议:\n{related_astMatchers}")
     related_astMatchers_meta_op= get_related_astMatchers_meta_op(hint)
-    logger.info(f"相关的AST Matchers Meta Op建议:\n{related_astMatchers_meta_op}")
+    # logger.info(f"相关的AST Matchers Meta Op建议:\n{related_astMatchers_meta_op}")
     for a in related_astMatchers:
         result += a + "\n"
     for b in related_astMatchers_meta_op:
@@ -180,11 +182,11 @@ def get_suggest_string_from_hint(hint):
 
 
     related_check_op= get_related_check_op(hint)
-    logger.info(f"相关的Check Op建议:\n{related_check_op}")
+    # logger.info(f"相关的Check Op建议:\n{related_check_op}")
     for c in related_check_op:
         result += c + "\n" 
     related_ast_api= get_related_ast_api(hint)
-    logger.info(f"相关的AST API建议:\n{related_ast_api}")
+    # logger.info(f"相关的AST API建议:\n{related_ast_api}")
     for d in related_ast_api:
         result += d + "\n" 
     return result
@@ -246,3 +248,13 @@ def get_checker_code(rule_name: str):
     with open(ruler_checker_h, 'r', encoding='utf-8') as file:
         checker_h = file.read()
     return checker_code,checker_h
+
+def save_middle_check(checker_cpp: str, checker_h:str,round_dir: str):
+    """将生成的中间检查器代码保存到指定路径。"""
+    ruler_checker_cpp = os.path.join(round_dir, "checker.cpp")
+    with open(ruler_checker_cpp, 'w', encoding='utf-8') as file:
+        file.write(checker_cpp)
+    ruler_checker_h = os.path.join(round_dir, "checker.h")
+    with open(ruler_checker_h, 'w', encoding='utf-8') as file:
+        file.write(checker_h)
+    return ""

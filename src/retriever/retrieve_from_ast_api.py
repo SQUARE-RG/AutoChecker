@@ -136,10 +136,10 @@ def get_related_ast_api(logic_for_ast_api:list):
         )
   
     for qi, row in enumerate(top_k_results):
-        logger.info(f"Logic Query: {logic_for_ast_api[qi]}")
+        # logger.info(f"Logic Query: {logic_for_ast_api[qi]}")
         for doc_idx, score in row:
-            logger.info(f"  doc {doc_idx} (score={score:.4f}): {ast_api_documents[doc_idx]}")
-            logger.info(f"function signature: {ast_api_dict[ast_api_documents[doc_idx]]}")
+            # logger.info(f"  doc {doc_idx} (score={score:.4f}): {ast_api_documents[doc_idx]}")
+            # logger.info(f"function signature: {ast_api_dict[ast_api_documents[doc_idx]]}")
             related_ast_api.append(ast_api_dict[ast_api_documents[doc_idx]])
 
     unique_list = list(set(related_ast_api))

@@ -115,10 +115,10 @@ def run_Checker_with_Check_clang_tidy(
     full_output = proc.stdout
     # 同时打印 & 写日志
     
-    # Path(log_name).write_text(full_output, encoding="utf-8")
-    # #成功就是返回码为0
+    Path(log_name).write_text(full_output, encoding="utf-8")
+    #成功就是返回码为0
     
-    # print("输出日志已保存到:", log_name)
+    print("输出日志已保存到:", log_name)
     if proc.returncode != 0:
         print(f"运行 {test_case_path} 时发生错误，返回码: {proc.returncode}")
        
@@ -169,16 +169,23 @@ if __name__ == "__main__":
     # compiler_clang_tidy()
     # pre_Generate_Checker_Template(checker_name="readability-named-parameter")
     # compiler_clang_tidy()
+
+
     # remove_Checker_Template(checker_name="readability-named-parameter")
     # compiler_clang_tidy()
+
+
+
+    remove_Checker_Template(checker_name="readability-redundant-declaration")
+    compiler_clang_tidy()
     # end = time.time()
     # print(f"总共耗时: {end - start} 秒")
 
-    run_Checker_with_Check_clang_tidy(test_case_path="/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/named-parameter.cpp",
-    rule_name="readability-named-parameter",
-    temp_dir="/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/tmp/tmp-readability-named-parameter",
-    include_dir="/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability"
-    )
+    # run_Checker_with_Check_clang_tidy(test_case_path="/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/named-parameter.cpp",
+    # rule_name="readability-named-parameter",
+    # temp_dir="/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/tmp/tmp-readability-named-parameter",
+    # include_dir="/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability"
+    # )
 
     # remove_Checker_Template(checker_name="readability-string-compare")
     # remove_Checker_Template(checker_name="clang-tidy-metaOperation-sample")  # 如果需要删除模板，可以取消注释这一行

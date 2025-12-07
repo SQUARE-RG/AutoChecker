@@ -15,7 +15,7 @@ def auto_gen_test_case(test_case_name: str, num_cases: int, test_case_path: str)
             pass
 
 if __name__ == "__main__":
-    test_case_name = "named_parameter"
-    num_cases = 20
-    test_case_path = "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/named-parameter"
+    test_case_name = "redundant_declaration"
+    num_cases = 18
+    test_case_path = "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/redundant-declaration"
     auto_gen_test_case(test_case_name, num_cases, test_case_path)

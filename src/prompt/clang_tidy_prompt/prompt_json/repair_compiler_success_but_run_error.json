@@ -1,0 +1,5 @@
+{
+    "_type": "prompt",
+    "input_variables": [],
+    "template_path": "/root/code_check/src/prompt/clang_tidy_prompt/prompt_txt/repair_compiler_success_but_run_error.txt"
+}

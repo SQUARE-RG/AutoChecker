@@ -1,0 +1,43 @@
+{
+    "data": {
+        "readability": [
+            {
+                "title": "clang-tidy - readability-named-parameter",
+                "main_title": "readability-named-parameter",
+                "description": "Find functions with unnamed arguments.All parameters should be named, with identical names in the declaration and implementation.",
+                "code_blocks": [],
+                "category": "readability",
+                "file_path": "/root/code_check/llvm-project/clang-tools-extra/docs/clang-tidy/checks/readability/named-parameter.rst",
+                "rule_test_path": "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/named-parameter",
+                "negative_case_amount": 7,
+                "positive_case_amount": 13,
+                "issuccess": "True",
+                "performance": "14/20",
+                "success_case_list": [
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/named-parameter/named_parameter_case_18.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/named-parameter/named_parameter_case_1.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/named-parameter/named_parameter_case_17.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/named-parameter/named_parameter_case_12.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/named-parameter/named_parameter_case_13.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/named-parameter/named_parameter_case_14.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/named-parameter/named_parameter_case_11.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/named-parameter/named_parameter_case_2.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/named-parameter/named_parameter_case_6.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/named-parameter/named_parameter_case_5.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/named-parameter/named_parameter_case_7.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/named-parameter/named_parameter_case_15.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/named-parameter/named_parameter_case_3.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/named-parameter/named_parameter_case_19.cpp"
+                ],
+                "failed_case_list": [
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/named-parameter/named_parameter_case_8.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/named-parameter/named_parameter_case_20.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/named-parameter/named_parameter_case_10.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/named-parameter/named_parameter_case_16.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/named-parameter/named_parameter_case_9.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/named-parameter/named_parameter_case_4.cpp"
+                ]
+            }
+        ]
+    }
+}

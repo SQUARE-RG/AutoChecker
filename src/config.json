@@ -38,10 +38,10 @@
         "ast_matcher_meta_operation_path":"/root/code_check/clang_tidy_collect/collect_clang_tidy_astMatchers_op/astMatchers_meta_op.json"
     },
     "arguments":{
-        "max_round": 5,
+        "max_round": 2,
         "max_compiler_trys": 2,
         "max_llm_tries": 3,
         "top_key":1,
-        "filter_rule":"NamedParameterCheck"
+        "filter_rule":"RedundantDeclarationCheck"
     }
 }

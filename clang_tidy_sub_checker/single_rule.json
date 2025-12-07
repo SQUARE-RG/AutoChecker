@@ -2,17 +2,17 @@
     "data": {
         "readability": [
             {
-                "title": "clang-tidy - readability-named-parameter",
-                "main_title": "readability-named-parameter",
-                "description": "Find functions with unnamed arguments.All parameters should be named, with identical names in the declaration and implementation.",
-                "code_blocks": [],
+                "title": "clang-tidy - readability-redundant-declaration",
+                "main_title": "readability-redundant-declaration",
+                "description": "Finds redundant variable and function declarations.\n\n.. code-block:: c++\n\n  extern int X;\n  extern int X;\n\nbecomes\n\n.. code-block:: c++\n\n  extern int X;\n\nSuch redundant declarations can be removed without changing program behavior.\nThey can for instance be unintentional left overs from previous refactorings\nwhen code has been moved around. Having redundant declarations could in worst\ncase mean that there are typos in the code that cause bugs.\n\nNormally the code can be automatically fixed, :program:`clang-tidy` can remove\nthe second declaration. However there are 2 cases when you need to fix the code\nmanually:\n\n* When the declarations are in different header files;\n* When multiple variables are declared together.\n",
+                "code_blocks": "code_blocks",
                 "category": "readability",
-                "file_path": "/root/code_check/llvm-project/clang-tools-extra/docs/clang-tidy/checks/readability/named-parameter.rst",
-                "rule_test_path": "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/named-parameter",
-                "negative_case_amount": 7,
-                "positive_case_amount": 13,
+                "file_path": "/root/code_check/llvm-project/clang-tools-extra/docs/clang-tidy/checks/readability/redundant-declaration.rst",
+                "rule_test_path": "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/redundant-declaration",
+                "negative_case_amount": 11,
+                "positive_case_amount": 6,
                 "issuccess": "True",
-                "performance": "15/20"
+                "performance": "15/17"
             }
         ]
     }

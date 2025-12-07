@@ -85,7 +85,7 @@ def get_related_astMatchers(logic_query):
     topk = top_k_per_query(query_embeddings, sentence_embeddings, k=config['arguments']['top_key'])
     results = []
     for qi,row in enumerate(topk):
-        logger.info(f"Query {qi}: '{logic_query[qi]}' top {config['arguments']['top_key']} AST Matchers:")
+        # logger.info(f"Query {qi}: '{logic_query[qi]}' top {config['arguments']['top_key']} AST Matchers:")
         for doc_idx, score in row:
             results.append(ast_matchers_documents[doc_idx])
     unique_list = list(set(results))

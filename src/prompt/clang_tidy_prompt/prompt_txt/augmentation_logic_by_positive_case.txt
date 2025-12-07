@@ -45,6 +45,7 @@ This test case should not report an issue, but the current checker code reports 
 {failed_test_cases}
 ```
 
+
 ---
 
 # Output Formatting Requirements

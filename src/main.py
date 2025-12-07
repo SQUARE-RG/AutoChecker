@@ -8,26 +8,13 @@ import shutil
 from dotenv import load_dotenv
 import loguru
 from entity.factory import Factory_Clang_Tidy, Factory_CodeQL
+from entity.abstractProduct import AbstractRule
 from plateform.clang_tidy import compiler_clang_tidy,pre_Generate_Checker_Template,remove_Checker_Template
 from help.clang_tidy_utils import get_camel_check_name
 from entity.abstractProduct import AbstractCase
 from generator import Clang_tidy_CheckerGenerator
 from typing import List
 logger = loguru.logger
-
-
-load_dotenv()
-
-# API_KEY = os.getenv("DEEPSEEK_API_KEY", "your_default_api_key_here")
-# BASE_URL = os.getenv("BASE_URL", "https://api.deepseek.com")
-
-
-
-
-# def init_config():
-#     init_logger()
-#     logger.info("Configuration and logger initialized.")
-#     logger.debug(f"Config file:"+ global_config['file'])
 def init_logger(log_dir: str = "./logs", result_name: str = "result"):
     """Initialize the logger settings."""
     if not os.path.exists(log_dir):
@@ -53,8 +40,8 @@ def get_entity(factory):
     rule = factory.create_rule()
     return case, checker, rule
 def get_rule_entity(factory):
-    case = factory.create_case()
-    return case
+    rule = factory.create_rule()
+    return rule
 
 def get_case_entity(factory):
     case = factory.create_case()
@@ -125,24 +112,24 @@ def process_rule_info(rule_info,plateform: str):
                 
     return rule,Case_List
 
-def get_checker_generator(plateform: str,rule,all_Test_Case_List: List[AbstractCase]=None,skipped_Test_Cases: List[AbstractCase]=None):
+def get_checker_generator(plateform: str,rule:AbstractRule,all_Test_Case_List: List[AbstractCase]=None,skipped_Test_Cases: List[AbstractCase]=None,rule_result_dir:str=""):
     if plateform == "clang-tidy":
-        checker_generator = Clang_tidy_CheckerGenerator(rule, all_Test_Case_List, skipped_Test_Cases)
-    
-    return checker_generator
+        checker_generator = Clang_tidy_CheckerGenerator(rule, all_Test_Case_List, skipped_Test_Cases, rule_result_dir)
+        return checker_generator
+    return None
 
 def main(plateform: str = "clang-tidy"):
     # 初始化日志
     init_logger()
     result_dir = global_config['result']['result_dir']
-    os.makedirs(result_dir, exist_ok=True)
+    # os.makedirs(result_dir, exist_ok=True)
     with open("/root/code_check/clang_tidy_sub_checker/single_rule.json", 'r') as f:
         rule_data = json.load(f)
     for rule_package,rule_list in rule_data['data'].items():
         for rule_info in rule_list:
             rule ,Case_List = process_rule_info(rule_info,plateform)
             # 创建针对这个rule的结果目录
-            rule_result_dir = result_dir + rule.get_rule_name() + "/"
+            rule_result_dir = result_dir + rule.rule_name + "/"
             # 清理之前的结果
             if os.path.exists(rule_result_dir):
                 shutil.rmtree(rule_result_dir)
@@ -159,7 +146,8 @@ def main(plateform: str = "clang-tidy"):
             logger.info(f"成功生成Checker模板，规则名：{rule.get_rule_name()}")
             # 开启生成checker的流程
             start = time.perf_counter()
-            checker_generator = get_checker_generator(plateform,rule,all_Test_Case_List=Case_List,skipped_Test_Cases=None)
+            
+            checker_generator = get_checker_generator(plateform,rule,all_Test_Case_List=Case_List,skipped_Test_Cases=None,rule_result_dir= rule_result_dir)
             checkers_list = checker_generator.generate_checker()
 
             save_final_checkers(rule.get_rule_name(),rule_result_dir,plateform)
@@ -188,6 +176,9 @@ def main(plateform: str = "clang-tidy"):
             logger.info("Checker生成完毕，结果已保存")
             end = time.perf_counter()
             logger.info(f"规则 {rule.get_rule_name()} 的Checker生成总共耗时: {end - start:.2f} 秒")
+            #再次编译clang tidy
+            compiler_clang_tidy()
+        
     # 将结果保存到JSON文件
     result_file_path = rule_result_dir + "checker_generation_result.json"
     with open(result_file_path, 'w') as f:
