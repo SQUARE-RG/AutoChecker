@@ -478,3 +478,12 @@ class Clang_tidy_CheckerGenerator(object):
         return ""
 # if __name__ == "__main__":
 #     get_Case_AST("/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/abseil/duration-conversion-cast.cpp")
+
+class CodeQL_CheckerGenerator(object):
+    def __init__(self,rule:AbstractRule,all_Test_Case_List: List[AbstractCase]=None,skipped_Test_Cases: List[AbstractCase]=None,rule_result_dir:str=""):
+
+        self.all_Test_Case_List = all_Test_Case_List
+        self.skipped_Test_Cases = skipped_Test_Cases if skipped_Test_Cases is not None else []
+        self.RULE = rule
+        self.result_dir = rule_result_dir
+
