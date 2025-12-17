@@ -76,7 +76,12 @@ def validate_official_checker(plateform: str,rule_test_path,rule_name: str):
 if __name__ == "__main__":
     # test_case_dir = "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/named-parameter"
 
-    test_case_dir = "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/redundant-declaration"
+    # test_case_dir = "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/redundant-declaration"
+
+    # test_case_dir = "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/dependent_call_in_expr"
+    # test_case_dir = "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/use_uncheck_pointer_after_malloc"
+     
+    test_case_dir = "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/declare_anonymous_struct"
     validate_official_checker(
         plateform="clang-tidy",
         rule_test_path=test_case_dir,

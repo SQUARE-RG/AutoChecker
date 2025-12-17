@@ -15,7 +15,17 @@ def auto_gen_test_case(test_case_name: str, num_cases: int, test_case_path: str)
             pass
 
 if __name__ == "__main__":
-    test_case_name = "redundant_declaration"
-    num_cases = 18
-    test_case_path = "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/redundant-declaration"
+    # test_case_name = "dependent_call_in_expr"
+    # num_cases = 20
+    # test_case_path = "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/dependent_call_in_expr"
+    # auto_gen_test_case(test_case_name, num_cases, test_case_path)
+
+    # test_case_name = "use_uncheck_pointer_after_malloc"
+    # num_cases = 20
+    # test_case_path = "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/use_uncheck_pointer_after_malloc"
+    # auto_gen_test_case(test_case_name, num_cases, test_case_path)
+
+    test_case_name = "declare_anonymous_struct"
+    num_cases = 20
+    test_case_path = "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/declare_anonymous_struct"
     auto_gen_test_case(test_case_name, num_cases, test_case_path)

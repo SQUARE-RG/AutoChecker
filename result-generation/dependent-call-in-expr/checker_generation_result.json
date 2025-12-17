@@ -1,0 +1,42 @@
+{
+    "data": {
+        "ucassaat": [
+            {
+                "title": "clang-tidy - dependent-call-in-expr",
+                "main_title": "dependent-call-in-expr",
+                "description": "Multiple related functions cannot be called in the same expression.Related functions refer to functions called in the same expression that have a data dependency relationship, which will result in undefined behavior.Scenario: Reporting multiple related function calls\n    Given a source code file \"test.c\" with the following content:\n        \"\"\"\n        int inc(int *x)\n        {\n            *x += 1;\n            return *x;\n        }\n\n        int square(int *x)\n        {\n            *x *= *x;\n            return *x;\n        }\n\n        void foo(void)\n        {\n            int x = 3;\n            int y = inc(&x) + square(&x);\n        }\n        \"\"\"\n    When running clang-tidy with the gjb8114 plugin to check \"gjb8114-r-1-7-14\" on \"test.c\"\n    Then it should report \"test.c:16:21: warning: \u7981\u6b62\u540c\u4e00\u8868\u8fbe\u5f0f\u4e2d\u8c03\u7528\u591a\u4e2a\u76f8\u5173\u51fd\u6570 [gjb8114-r-1-7-14]\"\n    And a total of 1 warning should be reported\n\nScenario: Do not report multiple related function calls that are not in the same expression\n    Given a source code file \"test.c\" with the following content:\n        \"\"\"\n        int inc(int *x)\n        {\n            *x += 1;\n            return *x;\n        }\n\n        int square(int *x)\n        {\n            *x *= *x;\n            return *x;\n        }\n\n        void foo(void)\n        {\n            int x = 3;\n            x = inc(&x);\n            int y = x + square(&x);\n        }\n        \"\"\"\n    When running clang-tidy with the gjb8114 plugin to check \"gjb8114-r-1-7-14\" on \"test.c\"\n    Then no warnings should be reported",
+                "category": "ucassaat",
+                "rule_test_path": "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/dependent_call_in_expr",
+                "negative_case_amount": 10,
+                "positive_case_amount": 10,
+                "issuccess": "True",
+                "performance": "14/20",
+                "success_case_list": [
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/dependent_call_in_expr/dependent_call_in_expr_case_3.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/dependent_call_in_expr/dependent_call_in_expr_case_17.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/dependent_call_in_expr/dependent_call_in_expr_case_4.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/dependent_call_in_expr/dependent_call_in_expr_case_6.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/dependent_call_in_expr/dependent_call_in_expr_case_13.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/dependent_call_in_expr/dependent_call_in_expr_case_18.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/dependent_call_in_expr/dependent_call_in_expr_case_5.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/dependent_call_in_expr/dependent_call_in_expr_case_15.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/dependent_call_in_expr/dependent_call_in_expr_case_9.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/dependent_call_in_expr/dependent_call_in_expr_case_1.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/dependent_call_in_expr/dependent_call_in_expr_case_12.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/dependent_call_in_expr/dependent_call_in_expr_case_11.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/dependent_call_in_expr/dependent_call_in_expr_case_2.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/dependent_call_in_expr/dependent_call_in_expr_case_16.cpp"
+                ],
+                "failed_case_list": [
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/dependent_call_in_expr/dependent_call_in_expr_case_8.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/dependent_call_in_expr/dependent_call_in_expr_case_19.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/dependent_call_in_expr/dependent_call_in_expr_case_10.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/dependent_call_in_expr/dependent_call_in_expr_case_14.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/dependent_call_in_expr/dependent_call_in_expr_case_7.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/dependent_call_in_expr/dependent_call_in_expr_case_20.cpp"
+                ],
+                "total_cost": "0.867961"
+            }
+        ]
+    }
+}

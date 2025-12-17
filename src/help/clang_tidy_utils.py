@@ -142,8 +142,20 @@ def get_logic_json(logics_json):
     for step in logics_json[0]["logic_check"]:
         logic_for_check.append(remove_number_prefix(step))
     return logic_for_registerMatchers,logic_for_check
-
-
+def get_repair_steps_string(repair_steps):
+    repair_steps_string =""
+    # 每个step前加一个序号
+    for i, step in enumerate(repair_steps, 1):
+        repair_steps_string += f"{i}. {step}\n" 
+    return repair_steps_string
+def get_logic_string(logics_json):
+    logic_string= '**logic for registerMatchers**:\n'
+    for step in logics_json[0]["logic_registerMatchers"]:
+        logic_string += step + "\n"
+    logic_string += "**logic for check**:\n"
+    for step in logics_json[0]["logic_check"]:
+        logic_string += step + "\n"
+    return logic_string
 def get_most_similar_astMatcher_and_class_struct(node:list, logics_json):
     astMatch_suggest_string= '' 
     class_struct_suggest_string = ''

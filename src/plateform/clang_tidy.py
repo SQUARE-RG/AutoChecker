@@ -176,7 +176,11 @@ if __name__ == "__main__":
 
 
 
-    remove_Checker_Template(checker_name="readability-redundant-declaration")
+    # remove_Checker_Template(checker_name="dependent-call-in-expr")
+    # compiler_clang_tidy()
+
+
+    remove_Checker_Template(checker_name="use-uncheck-pointer-after-malloc")
     compiler_clang_tidy()
     # end = time.time()
     # print(f"总共耗时: {end - start} 秒")

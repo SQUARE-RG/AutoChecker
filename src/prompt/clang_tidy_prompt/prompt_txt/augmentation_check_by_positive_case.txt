@@ -55,7 +55,8 @@ This test case should not report an issue, but the current checker code reports 
     -Please modify based on the current checker code above.Namespace content such as "namespace clang::tidy::ucassaat", please do not modify to prevent prevent compilation error.
     -In the check() function, all extracted nodes must be checked for non-null and isValid() to avoid direct usage
 
-    **Example Output Format:**
+## **Example Output Format:**
+
     checker_cpp:
     ```cpp
         ....(source code)....

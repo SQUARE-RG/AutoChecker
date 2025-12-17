@@ -1,0 +1,113 @@
+{
+    "data": {
+        "ucassaat": [
+            {
+                "title": "clang-tidy - dependent-call-in-expr",
+                "main_title": "dependent-call-in-expr",
+                "description": "Multiple related functions cannot be called in the same expression.Related functions refer to functions called in the same expression that have a data dependency relationship, which will result in undefined behavior.Scenario: Reporting multiple related function calls\n    Given a source code file \"test.c\" with the following content:\n        \"\"\"\n        int inc(int *x)\n        {\n            *x += 1;\n            return *x;\n        }\n\n        int square(int *x)\n        {\n            *x *= *x;\n            return *x;\n        }\n\n        void foo(void)\n        {\n            int x = 3;\n            int y = inc(&x) + square(&x);\n        }\n        \"\"\"\n    When running clang-tidy with the gjb8114 plugin to check \"gjb8114-r-1-7-14\" on \"test.c\"\n    Then it should report \"test.c:16:21: warning: 禁止同一表达式中调用多个相关函数 [gjb8114-r-1-7-14]\"\n    And a total of 1 warning should be reported\n\nScenario: Do not report multiple related function calls that are not in the same expression\n    Given a source code file \"test.c\" with the following content:\n        \"\"\"\n        int inc(int *x)\n        {\n            *x += 1;\n            return *x;\n        }\n\n        int square(int *x)\n        {\n            *x *= *x;\n            return *x;\n        }\n\n        void foo(void)\n        {\n            int x = 3;\n            x = inc(&x);\n            int y = x + square(&x);\n        }\n        \"\"\"\n    When running clang-tidy with the gjb8114 plugin to check \"gjb8114-r-1-7-14\" on \"test.c\"\n    Then no warnings should be reported",
+                "category": "ucassaat",
+                "rule_test_path": "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/dependent_call_in_expr",
+                "negative_case_amount": 10,
+                "positive_case_amount": 10,
+                "issuccess": "True",
+                "performance": "14/20",
+                "success_case_list": [
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/dependent_call_in_expr/dependent_call_in_expr_case_3.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/dependent_call_in_expr/dependent_call_in_expr_case_17.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/dependent_call_in_expr/dependent_call_in_expr_case_4.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/dependent_call_in_expr/dependent_call_in_expr_case_6.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/dependent_call_in_expr/dependent_call_in_expr_case_13.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/dependent_call_in_expr/dependent_call_in_expr_case_18.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/dependent_call_in_expr/dependent_call_in_expr_case_5.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/dependent_call_in_expr/dependent_call_in_expr_case_15.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/dependent_call_in_expr/dependent_call_in_expr_case_9.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/dependent_call_in_expr/dependent_call_in_expr_case_1.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/dependent_call_in_expr/dependent_call_in_expr_case_12.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/dependent_call_in_expr/dependent_call_in_expr_case_11.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/dependent_call_in_expr/dependent_call_in_expr_case_2.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/dependent_call_in_expr/dependent_call_in_expr_case_16.cpp"
+                ],
+                "failed_case_list": [
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/dependent_call_in_expr/dependent_call_in_expr_case_8.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/dependent_call_in_expr/dependent_call_in_expr_case_19.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/dependent_call_in_expr/dependent_call_in_expr_case_10.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/dependent_call_in_expr/dependent_call_in_expr_case_14.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/dependent_call_in_expr/dependent_call_in_expr_case_7.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/dependent_call_in_expr/dependent_call_in_expr_case_20.cpp"
+                ],
+                "total_cost": "0.867961"
+            },
+            {
+                "title": "clang-tidy - use_uncheck_pointer_after_malloc",
+                "main_title": "use-uncheck-pointer-after-malloc",
+                "description": "The rule requires that any pointer obtained through dynamic memory allocation functions (such as malloc, calloc, or realloc) must be checked for non-null before its first use. This check must occur before the pointer is used; performing the check after use is considered a violation. Acceptable check methods include explicit or implicit null pointer comparisons like if (ptr != NULL), if (ptr), or if (!ptr). If a dynamically allocated pointer is never used, it does not violate this rule. If a pointer is reallocated, it must be checked again before any subsequent use. This rule applies equally to global and local variables. Only one warning should be reported per violating pointer variable.\nScenarios that should be reported include: using a dynamically allocated pointer directly without any null check, performing a null check only after the pointer has been used, using a global variable after dynamic allocation without a check, and using pointers from calloc or realloc without a prior check.\nCorrect scenarios include: performing a null check immediately after allocation and using the pointer only after the check passes, not using the pointer after allocation, or not using a pointer after it has been reallocated. Various forms of null pointer checks, including shorthand forms, are acceptable.",
+                "category": "ucassaat",
+                "rule_test_path": "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/use_uncheck_pointer_after_malloc",
+                "negative_case_amount": 6,
+                "positive_case_amount": 5,
+                "issuccess": "True",
+                "performance": "11/11",
+                "success_case_list": [
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/use_uncheck_pointer_after_malloc/use_uncheck_pointer_after_malloc_case_2.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/use_uncheck_pointer_after_malloc/use_uncheck_pointer_after_malloc_case_4.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/use_uncheck_pointer_after_malloc/use_uncheck_pointer_after_malloc_case_11.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/use_uncheck_pointer_after_malloc/use_uncheck_pointer_after_malloc_case_6.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/use_uncheck_pointer_after_malloc/use_uncheck_pointer_after_malloc_case_8.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/use_uncheck_pointer_after_malloc/use_uncheck_pointer_after_malloc_case_1.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/use_uncheck_pointer_after_malloc/use_uncheck_pointer_after_malloc_case_9.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/use_uncheck_pointer_after_malloc/use_uncheck_pointer_after_malloc_case_10.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/use_uncheck_pointer_after_malloc/use_uncheck_pointer_after_malloc_case_5.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/use_uncheck_pointer_after_malloc/use_uncheck_pointer_after_malloc_case_3.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/use_uncheck_pointer_after_malloc/use_uncheck_pointer_after_malloc_case_7.cpp"
+                ],
+                "failed_case_list": [],
+                "total_cost": "0.551530",
+                "negative_case_analysis": {
+                    "check_success_negative": 6,
+                    "check_failed_negative": 0
+                },
+                "time": "2475.02"
+            },
+            {
+                "title": "clang-tidy - declare-anonymous-struct",
+                "main_title": "declare-anonymous-struct",
+                "description": "This rule prohibits the inclusion of anonymous structs (i.e., nested struct types without a variable name) within struct definitions. An anonymous struct refers to a type that is directly embedded inside an outer struct but lacks an explicit variable name identifier. If a nested struct is assigned a specific variable name, it complies with the rule. This rule applies to all levels of struct nesting, including multi-level scenarios, and covers direct members of structs regardless of their scope (global or local).\nScenarios that should be reported include: structs containing directly defined anonymous structs (without a variable name), anonymous unions within structs, multi-level nested structs with anonymous structs at any level, and anonymous structs appearing as members of other structs.\nCorrect scenarios include: nested structs having explicit variable names, structs defined and used normally without any nested anonymous structs, named structs appearing as members within an outer struct, and struct types defined via typedef.\nNote: The term \"anonymous struct\" specifically denotes a nested struct that is defined inline without a named identifier, distinguishing it from standalone unnamed structs which are not covered by this rule.",
+                "category": "ucassaat",
+                "rule_test_path": "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/declare_anonymous_struct",
+                "negative_case_amount": 10,
+                "positive_case_amount": 10,
+                "issuccess": "True",
+                "performance": "20/20",
+                "success_case_list": [
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/declare_anonymous_struct/declare_anonymous_struct_case_18.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/declare_anonymous_struct/declare_anonymous_struct_case_3.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/declare_anonymous_struct/declare_anonymous_struct_case_6.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/declare_anonymous_struct/declare_anonymous_struct_case_13.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/declare_anonymous_struct/declare_anonymous_struct_case_4.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/declare_anonymous_struct/declare_anonymous_struct_case_11.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/declare_anonymous_struct/declare_anonymous_struct_case_1.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/declare_anonymous_struct/declare_anonymous_struct_case_20.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/declare_anonymous_struct/declare_anonymous_struct_case_8.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/declare_anonymous_struct/declare_anonymous_struct_case_2.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/declare_anonymous_struct/declare_anonymous_struct_case_19.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/declare_anonymous_struct/declare_anonymous_struct_case_10.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/declare_anonymous_struct/declare_anonymous_struct_case_17.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/declare_anonymous_struct/declare_anonymous_struct_case_16.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/declare_anonymous_struct/declare_anonymous_struct_case_9.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/declare_anonymous_struct/declare_anonymous_struct_case_7.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/declare_anonymous_struct/declare_anonymous_struct_case_5.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/declare_anonymous_struct/declare_anonymous_struct_case_12.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/declare_anonymous_struct/declare_anonymous_struct_case_14.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/declare_anonymous_struct/declare_anonymous_struct_case_15.cpp"
+                ],
+                "failed_case_list": [],
+                "total_cost": "0.049582",
+                "negative_case_analysis": {
+                    "check_success_negative": 10,
+                    "check_failed_negative": 0
+                },
+                "time": "330.61"
+            }
+        ]
+    }
+}

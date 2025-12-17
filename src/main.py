@@ -111,7 +111,19 @@ def process_rule_info(rule_info,plateform: str):
     print(f"负例数量： {negative_case_count}")
                 
     return rule,Case_List
-
+def analyze(success_case_list: List[AbstractCase], all_case_list: List[AbstractCase]):
+    check_success_negative =0
+    check_failed_negative =0
+    for case in all_case_list:
+        if case in success_case_list:
+            if case.get_flag() == False:
+                check_success_negative +=1
+        else:
+            if case.get_flag() == False:
+                check_failed_negative +=1
+    return check_success_negative,check_failed_negative
+        
+    
 def get_checker_generator(plateform: str,rule:AbstractRule,all_Test_Case_List: List[AbstractCase]=None,skipped_Test_Cases: List[AbstractCase]=None,rule_result_dir:str=""):
     if plateform == "clang-tidy":
         checker_generator = Clang_tidy_CheckerGenerator(rule, all_Test_Case_List, skipped_Test_Cases, rule_result_dir)
@@ -123,7 +135,7 @@ def main(plateform: str = "clang-tidy"):
     init_logger()
     result_dir = global_config['result']['result_dir']
     # os.makedirs(result_dir, exist_ok=True)
-    with open("/root/code_check/clang_tidy_sub_checker/single_rule.json", 'r') as f:
+    with open("/root/code_check/clang_tidy_sub_checker/jgb8114_single_rules.json", 'r') as f:
         rule_data = json.load(f)
     for rule_package,rule_list in rule_data['data'].items():
         for rule_info in rule_list:
@@ -156,6 +168,7 @@ def main(plateform: str = "clang-tidy"):
                 rule_info['issuccess'] = "False"
                 rule_info['performance']=f"0/{len(Case_List)}"
                 remove_Checker_Template(checker_name=rule.get_rule_name())
+                rule_info['total_cost'] = f"{checker_generator.get_total_cost():.6f}"
                 logger.info(f"已删除Clang仓库中的Checker，规则名：{rule.get_rule_name()}")
             else:
                 logger.info(f"生成了 {len(checkers_list)} 个Checker，规则名：{rule.get_rule_name()}")
@@ -173,9 +186,16 @@ def main(plateform: str = "clang-tidy"):
                 failed_case_list = [case for case in Case_List if case.get_case_path() not in sucess_case_path_list]
                 failed_case_path_list = [case.get_case_path() for case in failed_case_list]
                 rule_info['failed_case_list'] = failed_case_path_list
+                rule_info['total_cost'] = f"{checker_generator.get_total_cost():.6f}"
+                check_success_negative,check_failed_negative = analyze(sucess_case_list,Case_List)
+                rule_info['negative_case_analysis'] = {
+                    "check_success_negative": check_success_negative,
+                    "check_failed_negative": check_failed_negative
+                }
             logger.info("Checker生成完毕，结果已保存")
             end = time.perf_counter()
             logger.info(f"规则 {rule.get_rule_name()} 的Checker生成总共耗时: {end - start:.2f} 秒")
+            rule_info['time'] = f"{end - start:.2f}"
             #再次编译clang tidy
             compiler_clang_tidy()
         

@@ -46,15 +46,30 @@
                 "category": "readability",
                 "file_path": "/root/code_check/llvm-project/clang-tools-extra/docs/clang-tidy/checks/readability/redundant-declaration.rst",
                 "rule_test_path": "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/redundant-declaration",
-                "negative_case_amount": 12,
+                "negative_case_amount": 11,
                 "positive_case_amount": 6,
                 "issuccess": "True",
-                "performance": "15/18",
+                "performance": "14/17",
                 "success_case_list": [
-                    
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/redundant-declaration/redundant_declaration_case_2.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/redundant-declaration/redundant_declaration_case_14.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/redundant-declaration/redundant_declaration_case_15.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/redundant-declaration/redundant_declaration_case_17.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/redundant-declaration/redundant_declaration_case_7.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/redundant-declaration/redundant_declaration_case_18.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/redundant-declaration/redundant_declaration_case_4.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/redundant-declaration/redundant_declaration_case_9.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/redundant-declaration/redundant_declaration_case_1.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/redundant-declaration/redundant_declaration_case_6.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/redundant-declaration/redundant_declaration_case_16.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/redundant-declaration/redundant_declaration_case_3.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/redundant-declaration/redundant_declaration_case_13.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/redundant-declaration/redundant_declaration_case_8.cpp"
                 ],
                 "failed_case_list": [
-                  
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/redundant-declaration/redundant_declaration_case_5.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/redundant-declaration/redundant_declaration_case_12.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/redundant-declaration/redundant_declaration_case_11.cpp"
                 ]
             },
             {

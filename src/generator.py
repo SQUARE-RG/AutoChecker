@@ -1,13 +1,14 @@
 import os
+import time
 from entity.abstractProduct import AbstractCase,AbstractRule
 from typing import List
-from help.clang_tidy_utils import get_camel_check_name,count_negative_cases,select_negative_case,get_Case_AST,get_most_similar_astMatcher_and_class_struct,parse_cpp_h_code_from_answer,save_checker_code,get_checker_code,get_suggest_string_from_hint,save_middle_check
+from help.clang_tidy_utils import get_camel_check_name,count_negative_cases,select_negative_case,get_Case_AST,get_most_similar_astMatcher_and_class_struct,parse_cpp_h_code_from_answer,save_checker_code,get_checker_code,get_suggest_string_from_hint,save_middle_check,get_logic_string,get_repair_steps_string
 from config import global_config as config
 from loguru import logger
 import re
 import json
 from prompt.clang_tidy_prompt.build_prompt import get_prompt_for_clang_tidy
-from llm_interface.llm_provider import llm_client,llm_invoke
+from llm_interface.llm_provider import llm_client,llm_invoke,calculate_deepseek_cost
 from plateform.clang_tidy import compiler_clang_tidy,run_Checker_with_Check_clang_tidy
 from entity.concreteProduct_Clang_Tidy import AbstractChecker, Checker_Clang_Tidy
 
@@ -24,8 +25,12 @@ class Clang_tidy_CheckerGenerator(object):
         self.RULER_CHECKER_H = config['checker']['checker_path'] + get_camel_check_name(rule.get_rule_name()) + ".h"
         self.EMBEDDED_AST_NODES = []
         self.result_dir = rule_result_dir
-
+        self.total_cost =0.0
+        self.debug_prompt_dir = self.result_dir + "debug_prompt/"
+    def get_total_cost(self):
+        return self.total_cost
     def generate_checker(self):
+        os.makedirs(self.debug_prompt_dir, exist_ok=True)
         success, init_checker = self.first_checker_generation()
         if not success:
             print(f"Failed to generate initial checker for rule: {self.RULE.get_rule_name()}")
@@ -45,7 +50,10 @@ class Clang_tidy_CheckerGenerator(object):
             negative_test_case = testcase
         )
         for attempt in range(1,config['arguments']['max_llm_tries'] + 1):
-            answer = llm_invoke(llm_client, logic_query)
+            answer,cb = llm_invoke(llm_client, logic_query)
+            cost = calculate_deepseek_cost(cb, model_name="deepseek-chat")
+            self.total_cost += cost['total_cost']
+            # print(f"估算成本 (元): ¥{cost['total_cost']:.6f}")
             logger.debug(f"LLM logic for negative case attempt {attempt}:\n {answer}")
             cleaned = re.sub(r'```json|```', '', answer).strip()
             try:
@@ -63,7 +71,9 @@ class Clang_tidy_CheckerGenerator(object):
             failed_test_cases = failed_test_cases
         )
         for attempt in range(1,config['arguments']['max_llm_tries'] + 1):
-            answer = llm_invoke(llm_client, augmentation_query)
+            answer,cb = llm_invoke(llm_client, augmentation_query)
+            cost = calculate_deepseek_cost(cb, model_name="deepseek-chat")
+            self.total_cost += cost['total_cost']
             logger.debug(f"LLM augmentation logic by negative case attempt {attempt}: {answer}")
             cleaned = re.sub(r'```json|```', '', answer).strip()
             try:
@@ -83,7 +93,9 @@ class Clang_tidy_CheckerGenerator(object):
           
         )
         for attempt in range(1,config['arguments']['max_llm_tries'] + 1):
-            answer = llm_invoke(llm_client, augmentation_query)
+            answer,cb = llm_invoke(llm_client, augmentation_query)
+            cost = calculate_deepseek_cost(cb, model_name="deepseek-chat")
+            self.total_cost += cost['total_cost']
             logger.debug(f"LLM augmentation logic by positive case attempt {attempt}: {answer}")
             cleaned = re.sub(r'```json|```', '', answer).strip()
             try:
@@ -96,6 +108,7 @@ class Clang_tidy_CheckerGenerator(object):
         logics = self.run_logic_for_negative_case(self.RULE.get_rule_description(), current_case.get_case_code())
         
         astMatch_suggest_string , class_struct_suggest_string =get_most_similar_astMatcher_and_class_struct(case_ast_node_list,logics_json=logics)
+        logger.info("相关API上下文检索完成")
         ruler_checker_cpp = config['checker']['checker_path'] + get_camel_check_name(self.RULE.get_rule_name()) + ".cpp"
         with open(ruler_checker_cpp, 'r',encoding="utf-8") as file:
             content_cpp = file.read()
@@ -109,7 +122,7 @@ class Clang_tidy_CheckerGenerator(object):
                 rule_description = self.RULE.get_rule_description(),
                 test_code = current_case.get_case_code(),
                 ast_txt = current_case_ast_txt,
-                logics = logics,
+                logics = get_logic_string(logics),
                 reference_astMatchers = astMatch_suggest_string,
                 renference_check_api = class_struct_suggest_string,
                 ruler_checker_cpp_name = ruler_checker_cpp,
@@ -117,7 +130,12 @@ class Clang_tidy_CheckerGenerator(object):
                 ruler_checker_h_name = ruler_checker_h,
                 content_of_ruler_checker_h = content_h,
             )
-            answer = llm_invoke(llm_client, generation_query)
+
+            with open(self.debug_prompt_dir + "generate_checker_with_single_case.md", 'w',encoding="utf-8") as f:
+                f.write(f"针对负例{current_case.get_case_path()}生成first checker\n"+generation_query)
+            answer,cb = llm_invoke(llm_client, generation_query)
+            cost = calculate_deepseek_cost(cb, model_name="deepseek-chat")
+            self.total_cost += cost['total_cost']
             logger.debug(f"LLM checker generation attempt {attempt}: \n{answer}")
             # 提取代码块
             generator_cpp_code,generator_h_code = parse_cpp_h_code_from_answer(answer)
@@ -133,10 +151,11 @@ class Clang_tidy_CheckerGenerator(object):
             # 负例
             logics = self.augmentation_logic_by_negative_case(checker_cpp,checker_h,current_checker.get_passed_cases(),[current_case])
             astMatch_suggest_string , class_struct_suggest_string =get_most_similar_astMatcher_and_class_struct(case_ast_node_list,logics)
+            logger.info("相关API上下文检索完成")
             repair_negative_case_prompt = get_prompt_for_clang_tidy("augmentation_check_by_negative_case").format(
                 rule_description = self.RULE.get_rule_description(),
                 ast_txt = current_case_ast_txt,
-                logics = logics,
+                logics = get_logic_string(logics),
                 reference_astMatchers = astMatch_suggest_string,
                 renference_check_api = class_struct_suggest_string,
                 content_of_ruler_checker_cpp = checker_cpp,
@@ -144,7 +163,10 @@ class Clang_tidy_CheckerGenerator(object):
                 passed_test_cases = "\n".join([case.get_case_code() for case in current_checker.get_passed_cases()]),
                 failed_test_cases = current_case.get_case_code()
             )
+            with open(self.debug_prompt_dir + "augmentation_check_by_negative_case.md", 'w',encoding="utf-8") as f:
+                f.write(f"针对负例{current_case.get_case_path()}增强checker\n"+repair_negative_case_prompt)
             logger.info(f"针对负例{current_case.get_case_path()}开始使用增强逻辑生成checker代码")
+            # time.sleep(3)
             checker_cpp,checker_h = self.generate_checker_with_query(repair_negative_case_prompt)
             return checker_cpp,checker_h,logics 
         elif current_case.get_flag() == True:
@@ -155,7 +177,7 @@ class Clang_tidy_CheckerGenerator(object):
             repair_positive_case_prompt = get_prompt_for_clang_tidy("augmentation_check_by_positive_case").format(
                 rule_description = self.RULE.get_rule_description(),
                 ast_txt = current_case_ast_txt,
-                logics = logics,
+                logics = get_logic_string(logics),
                 reference_astMatchers = astMatch_suggest_string,
                 renference_check_api = class_struct_suggest_string, 
                 content_of_ruler_checker_cpp = checker_cpp,
@@ -164,6 +186,8 @@ class Clang_tidy_CheckerGenerator(object):
                 failed_test_cases = current_case.get_case_code()
                
             )
+            with open(self.debug_prompt_dir + "augmentation_check_by_positive_case.md", 'w',encoding="utf-8") as f:
+                f.write(f"针对正例{current_case.get_case_path()}增强checker\n"+repair_positive_case_prompt)
             logger.info(f"针对正例\n{current_case.get_case_path()}\n开始使用增强逻辑生成checker代码")
             checker_cpp,checker_h = self.generate_checker_with_query(repair_positive_case_prompt)
             return checker_cpp,checker_h,logics 
@@ -172,9 +196,26 @@ class Clang_tidy_CheckerGenerator(object):
     def generate_checker_with_query(self, query: str):
         checker_cpp =""
         checker_h = ""
-        while(checker_cpp == "" or checker_h =="" or checker_cpp is None or checker_h is None):
-            checker = llm_invoke(llm_client, query)
+        for attempt in range(1,config['arguments']['max_llm_tries'] + 1):
+            logger.info(f"使用增强逻辑生成checker代码，尝试第{attempt}次")
+            checker,cb = llm_invoke(llm_client, query)
+            cost = calculate_deepseek_cost(cb, model_name="deepseek-chat")
+            self.total_cost += cost['total_cost']
+            with open(self.debug_prompt_dir + "generate_checker_with_query.md", 'w',encoding="utf-8") as f:
+                f.write(f"使用增强逻辑生成checker代码，原始回答:\n"+checker)
             checker_cpp,checker_h = parse_cpp_h_code_from_answer(checker)
+            if checker_cpp == "" or checker_h =="" or checker_cpp is None or checker_h is None:
+                logger.debug("未能从回答中提取到完整的checker代码。尝试重新生成...")
+                continue
+            if checker_cpp and checker_h:
+                break
+        # while(checker_cpp == "" or checker_h =="" or checker_cpp is None or checker_h is None):
+        #     checker,cb = llm_invoke(llm_client, query)
+        #     cost = calculate_deepseek_cost(cb, model_name="deepseek-chat")
+        #     self.total_cost += cost['total_cost']
+        #     checker_cpp,checker_h = parse_cpp_h_code_from_answer(checker)
+        #     if checker_cpp == "" or checker_h =="" or checker_cpp is None or checker_h is None:
+        #         logger.debug("未能从回答中提取到完整的checker代码。尝试重新生成...")
         return checker_cpp,checker_h
 
     def analyze_compiler_error(self, compiler_output: str, cpp_temp: str, h_temp: str) :
@@ -188,7 +229,9 @@ class Clang_tidy_CheckerGenerator(object):
         suggestions = []
         repair_steps= []
         for attempt in range(1,config['arguments']['max_llm_tries'] + 1):
-            answer = llm_invoke(llm_client, analyze_query)
+            answer,cb = llm_invoke(llm_client, analyze_query)
+            cost = calculate_deepseek_cost(cb, model_name="deepseek-chat")
+            self.total_cost += cost['total_cost']
             logger.debug(f"LLM analyze compiler error attempt {attempt}: \n{answer}")
             cleaned = re.sub(r'```json|```', '', answer).strip()
             try:
@@ -283,13 +326,17 @@ class Clang_tidy_CheckerGenerator(object):
                         break
                     cpp_temp,h_temp = get_checker_code(self.RULE.get_rule_name())
                     repair_steps,suggestions = self.analyze_compiler_error(str(compiler_return_stdout),cpp_temp,h_temp)
+                    logger.info(f"编译错误分析完成")
+
                     repair_query = get_prompt_for_clang_tidy("repair_compiler_error_code").format(
                         check_cpp_code = cpp_temp,
                         check_h_code = h_temp,
                         compiler_error_info = str(compiler_return_stdout),
-                        repair_steps = repair_steps,
+                        repair_steps = get_repair_steps_string(repair_steps),
                         repair_suggestions = suggestions
                     )
+                    with open(self.debug_prompt_dir + "repair_compiler_error_code.md", 'w',encoding="utf-8") as f:
+                        f.write(f"第{round}轮生成的checker编译失败，开始第{current_try_compiler_count}次重试\n"+repair_query)
                     wait_compiler_checker_cpp,wait_compiler_checker_h = self.generate_checker_with_query(repair_query)
                     current_try_compiler_count += 1
                     save_checker_code(wait_compiler_checker_cpp, wait_compiler_checker_h,self.RULE.get_rule_name())
@@ -402,6 +449,12 @@ class Clang_tidy_CheckerGenerator(object):
                     # )
 
                     wait_compiler_checker_cpp,wait_compiler_checker_h,logics  = self.generate_checker_with_single_case_and_checker(failed_case,current_case_ast_txt,case_ast_node_list,current_checker)
+                    if wait_compiler_checker_cpp =="" or wait_compiler_checker_h =="" or wait_compiler_checker_cpp is None or wait_compiler_checker_h is None:
+                        logger.info("增强阶段LLM多次未能生成有效的checker代码，跳过当前测试用例")
+                        failed_case_list.remove(failed_case)
+                        self.skipped_Test_Cases.append(failed_case)
+                       
+                        break
                     save_checker_code(wait_compiler_checker_cpp,wait_compiler_checker_h, self.RULE.get_rule_name())
                     # round += 1
                     logger.info("增强阶段，开始编译")
@@ -417,11 +470,12 @@ class Clang_tidy_CheckerGenerator(object):
                             break
                         cpp_temp,h_temp = get_checker_code(self.RULE.get_rule_name())
                         repair_steps,suggestions = self.analyze_compiler_error(str(compiler_return_stdout),cpp_temp,h_temp)
+                        logger.info(f"增强阶段，编译错误分析完成")
                         repair_query = get_prompt_for_clang_tidy("repair_compiler_error_code").format(
                             check_cpp_code = cpp_temp,
                             check_h_code = h_temp,
                             compiler_error_info = str(compiler_return_stdout),
-                            repair_steps = repair_steps,
+                            repair_steps = get_repair_steps_string(repair_steps),
                             repair_suggestions = suggestions
                         )
                         wait_compiler_checker_cpp,wait_compiler_checker_h = self.generate_checker_with_query(repair_query)

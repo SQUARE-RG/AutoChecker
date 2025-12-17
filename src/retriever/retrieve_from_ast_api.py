@@ -121,12 +121,13 @@ def embedding_ast_api():
 def get_related_ast_api(logic_for_ast_api:list):
     ast_api_documents , sentence_embeddings,ast_matcher_database = embedding_ast_api()
     logger.info("开始计算logics的嵌入")
-    logics_embeddings = parallel_encode(
-        texts=logic_for_ast_api,
-        model_path=config['embedding_model']['bge_model_path'],
-        num_workers=4,
-        batch_size=64,
-    )
+    # logics_embeddings = parallel_encode(
+    #     texts=logic_for_ast_api,
+    #     model_path=config['embedding_model']['bge_model_path'],
+    #     num_workers=4,
+    #     batch_size=64,
+    # )
+    logics_embeddings = sequential_encode(logic_for_ast_api, model_path=config['embedding_model']['bge_model_path'], batch_size=4)
     ast_api_dict= get_data(config['knowledge_base']['ast_api_path'])
     related_ast_api = []
     top_k_results =  top_k_per_query(
