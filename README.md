@@ -83,7 +83,7 @@ mkdir MyQL
 touch test.ql
 ## 编写ql
 
-odeql database analyze ../linux-db/spi-pci1xxx-db/ --format=csv --output=../result.csv ../codeql/cpp/ql/src/MyQL/test.ql
+codeql database analyze ../linux-db/spi-pci1xxx-db/ --format=csv --output=../result.csv ../codeql/cpp/ql/src/MyQL/test.ql
 ```
 执行结果
 ```txt

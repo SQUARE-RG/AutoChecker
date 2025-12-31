@@ -107,6 +107,291 @@
                     "check_failed_negative": 0
                 },
                 "time": "330.61"
+            },
+            {
+                "title": "clang-tidy - realse-pointer-not-set-null",
+                "main_title": "realse-pointer-not-set-null",
+                "description": "Prohibition of Failing to Set Pointers to Null After Release.This rule mandates that after a pointer variable is freed using free() (in C) or delete/delete[] (in C++), it must be immediately set to a null value. In C, NULL should be used, while in C++, nullptr is recommended (though NULL is acceptable). The nullification must occur within the same scope as the deallocation, without being split across conditional branches. Even if a pointer is about to go out of scope, it should be set to null first to foster good programming habits. This rule applies to all pointer types, including basic type pointers, array pointers, and structure pointers. For pointers that undergo multiple allocations and deallocations, nullification is required after each release.\nScenarios that should be reported include: failing to set a pointer to null immediately after free() or delete; separating the deallocation and nullification into different code paths (e.g., conditional branches); and incorrect handling of the original pointer after realloc() (although realloc manages memory, explicitly setting the original pointer to null is considered good practice). \n Correct practices encompass: immediate nullification after release (e.g., free(p); p = NULL;), using nullptr in C++ (e.g., delete p; p = nullptr;), and performing deallocation and nullification only after ensuring the pointer is valid through conditional checks .",
+                "category": "ucassaat",
+                "rule_test_path": "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/realse_pointer_not_set_null",
+                "negative_case_amount": 10,
+                "positive_case_amount": 10,
+                "issuccess": "True",
+                "performance": "20/20",
+                "success_case_list": [
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/realse_pointer_not_set_null/realse_pointer_not_set_null_case_6.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/realse_pointer_not_set_null/realse_pointer_not_set_null_case_17.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/realse_pointer_not_set_null/realse_pointer_not_set_null_case_19.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/realse_pointer_not_set_null/realse_pointer_not_set_null_case_13.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/realse_pointer_not_set_null/realse_pointer_not_set_null_case_12.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/realse_pointer_not_set_null/realse_pointer_not_set_null_case_4.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/realse_pointer_not_set_null/realse_pointer_not_set_null_case_15.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/realse_pointer_not_set_null/realse_pointer_not_set_null_case_20.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/realse_pointer_not_set_null/realse_pointer_not_set_null_case_2.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/realse_pointer_not_set_null/realse_pointer_not_set_null_case_18.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/realse_pointer_not_set_null/realse_pointer_not_set_null_case_7.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/realse_pointer_not_set_null/realse_pointer_not_set_null_case_14.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/realse_pointer_not_set_null/realse_pointer_not_set_null_case_10.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/realse_pointer_not_set_null/realse_pointer_not_set_null_case_16.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/realse_pointer_not_set_null/realse_pointer_not_set_null_case_11.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/realse_pointer_not_set_null/realse_pointer_not_set_null_case_9.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/realse_pointer_not_set_null/realse_pointer_not_set_null_case_1.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/realse_pointer_not_set_null/realse_pointer_not_set_null_case_3.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/realse_pointer_not_set_null/realse_pointer_not_set_null_case_8.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/realse_pointer_not_set_null/realse_pointer_not_set_null_case_5.cpp"
+                ],
+                "failed_case_list": [],
+                "total_cost": "0.420984",
+                "negative_case_analysis": {
+                    "check_success_negative": 10,
+                    "check_failed_negative": 0
+                },
+                "time": "1693.46"
+            },
+            {
+                "title": "clang-tidy - misuse-compare-expr",
+                "main_title": "misuse-compare-expr",
+                "description": "In all comparison expressions involving multiple operators that may cause ambiguity due to operator precedence (especially when bitwise operators, arithmetic operators, and comparison operators are mixed), parentheses must\u200b be used to explicitly define the order of operations and prevent incorrect logical evaluations. This rule specifically targets error-prone combinations, such as mixing bitwise operators (&, |, ^, <<, >>) with comparison operators (==, !=, <, >, <=, >=), or arithmetic operators (+, -, *, /, %) with comparison operators.\nA compliant scenario\u200b occurs when parentheses are used to clearly group operands (e.g., (x & y) == z), thereby eliminating ambiguity. A non-compliant scenario\u200b arises when parentheses are omitted (e.g., x & y == z). In the latter case, due to the higher precedence of ==over &, the expression is parsed as x & (y == z), which may deviate from the programmer\u2019s intent (e.g., (x & y) == z) and introduce potential logical errors.",
+                "category": "ucassaat",
+                "rule_test_path": "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/misuse_compare_expr",
+                "negative_case_amount": 10,
+                "positive_case_amount": 10,
+                "issuccess": "True",
+                "performance": "13/20",
+                "success_case_list": [
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/misuse_compare_expr/misuse_compare_expr_case_10.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/misuse_compare_expr/misuse_compare_expr_case_1.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/misuse_compare_expr/misuse_compare_expr_case_9.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/misuse_compare_expr/misuse_compare_expr_case_17.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/misuse_compare_expr/misuse_compare_expr_case_7.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/misuse_compare_expr/misuse_compare_expr_case_4.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/misuse_compare_expr/misuse_compare_expr_case_3.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/misuse_compare_expr/misuse_compare_expr_case_2.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/misuse_compare_expr/misuse_compare_expr_case_8.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/misuse_compare_expr/misuse_compare_expr_case_5.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/misuse_compare_expr/misuse_compare_expr_case_14.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/misuse_compare_expr/misuse_compare_expr_case_20.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/misuse_compare_expr/misuse_compare_expr_case_6.cpp"
+                ],
+                "failed_case_list": [
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/misuse_compare_expr/misuse_compare_expr_case_12.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/misuse_compare_expr/misuse_compare_expr_case_15.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/misuse_compare_expr/misuse_compare_expr_case_16.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/misuse_compare_expr/misuse_compare_expr_case_11.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/misuse_compare_expr/misuse_compare_expr_case_19.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/misuse_compare_expr/misuse_compare_expr_case_13.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/misuse_compare_expr/misuse_compare_expr_case_18.cpp"
+                ],
+                "total_cost": "0.533794",
+                "negative_case_analysis": {
+                    "check_success_negative": 10,
+                    "check_failed_negative": 0
+                },
+                "time": "1655.71"
+            },
+            {
+                "title": "clang-tidy - prohibit-float-convert-int",
+                "main_title": "prohibit-float-convert-int",
+                "description": "This rule prohibits the direct assignment of a floating-point variable to an integer variable without using an explicit cast. It aims to prevent data precision loss and potential errors caused by implicit type conversions. When a floating-point variable (including types such as floatand double) is assigned to an integer variable (e.g., int, short, long, etc.), an explicit cast (e.g., (int)x) must be used to clearly convey the developer's intent. This avoids ambiguity and risks arising from the compiler automatically truncating the fractional part of the floating-point number.\nA compliant scenario is when the assignment operation uses an explicit cast (e.g., i = (int)x;) or involves only integer variables. A violation occurs when a floating-point variable is directly assigned to an integer variable without a cast (e.g., i = x;) .\nThis rule specifically checks assignments between variables and does not apply to constant assignments. Furthermore, the explicit cast must correctly encompass the entire expression or variable",
+                "category": "ucassaat",
+                "rule_test_path": "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/prohibit_float_convert_int",
+                "negative_case_amount": 10,
+                "positive_case_amount": 10,
+                "issuccess": "True",
+                "performance": "19/20",
+                "success_case_list": [
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/prohibit_float_convert_int/prohibit_float_convert_int_case_15.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/prohibit_float_convert_int/prohibit_float_convert_int_case_18.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/prohibit_float_convert_int/prohibit_float_convert_int_case_20.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/prohibit_float_convert_int/prohibit_float_convert_int_case_13.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/prohibit_float_convert_int/prohibit_float_convert_int_case_1.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/prohibit_float_convert_int/prohibit_float_convert_int_case_5.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/prohibit_float_convert_int/prohibit_float_convert_int_case_17.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/prohibit_float_convert_int/prohibit_float_convert_int_case_12.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/prohibit_float_convert_int/prohibit_float_convert_int_case_16.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/prohibit_float_convert_int/prohibit_float_convert_int_case_19.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/prohibit_float_convert_int/prohibit_float_convert_int_case_2.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/prohibit_float_convert_int/prohibit_float_convert_int_case_4.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/prohibit_float_convert_int/prohibit_float_convert_int_case_3.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/prohibit_float_convert_int/prohibit_float_convert_int_case_11.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/prohibit_float_convert_int/prohibit_float_convert_int_case_9.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/prohibit_float_convert_int/prohibit_float_convert_int_case_6.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/prohibit_float_convert_int/prohibit_float_convert_int_case_14.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/prohibit_float_convert_int/prohibit_float_convert_int_case_7.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/prohibit_float_convert_int/prohibit_float_convert_int_case_10.cpp"
+                ],
+                "failed_case_list": [
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/prohibit_float_convert_int/prohibit_float_convert_int_case_8.cpp"
+                ],
+                "total_cost": "0.236466",
+                "negative_case_analysis": {
+                    "check_success_negative": 9,
+                    "check_failed_negative": 1
+                },
+                "time": "1039.06"
+            },
+            {
+                "title": "clang-tidy - no-else-branch",
+                "main_title": "no-else-branch",
+                "description": "Prohibit omitting the else branch of if-else if statements. In all if-else if statement structures, the final else branch must be included, even if it does not perform any operations, and must be explicitly written. This is to ensure the logical integrity of the code and prevent undefined behavior due to omitted conditions. This rule applies to any conditional statement chain that contains one or more else if branches; the final else branch must exist to handle all uncovered condition scenarios. If the else branch is empty, it should include appropriate comments (e.g.,  Other cases not handled ). Compliant scenarios include if-else if statements that contain an else branch (whether empty or not), while non-compliant scenarios involve omitting the final else branch. The rule checks the structural integrity of conditional statements, not whether the else branch contains specific logic.",
+                "category": "ucassaat",
+                "rule_test_path": "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_else_branch",
+                "negative_case_amount": 10,
+                "positive_case_amount": 10,
+                "issuccess": "True",
+                "performance": "17/20",
+                "success_case_list": [
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_else_branch/no_else_branch_case_5.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_else_branch/no_else_branch_case_8.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_else_branch/no_else_branch_case_20.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_else_branch/no_else_branch_case_12.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_else_branch/no_else_branch_case_7.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_else_branch/no_else_branch_case_3.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_else_branch/no_else_branch_case_2.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_else_branch/no_else_branch_case_19.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_else_branch/no_else_branch_case_16.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_else_branch/no_else_branch_case_10.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_else_branch/no_else_branch_case_14.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_else_branch/no_else_branch_case_11.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_else_branch/no_else_branch_case_17.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_else_branch/no_else_branch_case_18.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_else_branch/no_else_branch_case_13.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_else_branch/no_else_branch_case_9.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_else_branch/no_else_branch_case_15.cpp"
+                ],
+                "failed_case_list": [
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_else_branch/no_else_branch_case_4.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_else_branch/no_else_branch_case_6.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_else_branch/no_else_branch_case_1.cpp"
+                ],
+                "total_cost": "0.155202",
+                "negative_case_analysis": {
+                    "check_success_negative": 7,
+                    "check_failed_negative": 3
+                },
+                "time": "497.95"
+            },
+            {
+                "title": "clang-tidy - no-same-name-as-global-variable",
+                "main_title": "no-same-name-as-global-variable",
+                "description": "It is prohibited to use local variables with the same name as global variables in the code. This rule aims to prevent program logic errors and issues with code readability caused by variable name conflicts. When a local variable has the same name as a global variable, it will shadow the global variable within its local scope, which may lead developers to accidentally modify the wrong variable or misunderstand the scope of the variable, thereby introducing hard-to-debug defects. This rule applies to all naming conflicts between local variables defined within a function (including function parameters, variables defined inside the function, and variables defined within code blocks) and any global variables. Compliant scenarios involve using different names for local and global variables, while non-compliant scenarios occur when local variables have exactly the same name as global variables. The rule checks for direct name conflicts and does not consider whether the variable types are the same.",
+                "category": "ucassaat",
+                "rule_test_path": "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_same_name_as_global_variable",
+                "negative_case_amount": 10,
+                "positive_case_amount": 10,
+                "issuccess": "True",
+                "performance": "19/20",
+                "success_case_list": [
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_same_name_as_global_variable/no_same_name_as_global_variable_case_15.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_same_name_as_global_variable/no_same_name_as_global_variable_case_12.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_same_name_as_global_variable/no_same_name_as_global_variable_case_17.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_same_name_as_global_variable/no_same_name_as_global_variable_case_10.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_same_name_as_global_variable/no_same_name_as_global_variable_case_13.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_same_name_as_global_variable/no_same_name_as_global_variable_case_2.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_same_name_as_global_variable/no_same_name_as_global_variable_case_3.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_same_name_as_global_variable/no_same_name_as_global_variable_case_7.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_same_name_as_global_variable/no_same_name_as_global_variable_case_8.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_same_name_as_global_variable/no_same_name_as_global_variable_case_19.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_same_name_as_global_variable/no_same_name_as_global_variable_case_1.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_same_name_as_global_variable/no_same_name_as_global_variable_case_18.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_same_name_as_global_variable/no_same_name_as_global_variable_case_4.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_same_name_as_global_variable/no_same_name_as_global_variable_case_20.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_same_name_as_global_variable/no_same_name_as_global_variable_case_16.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_same_name_as_global_variable/no_same_name_as_global_variable_case_11.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_same_name_as_global_variable/no_same_name_as_global_variable_case_5.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_same_name_as_global_variable/no_same_name_as_global_variable_case_9.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_same_name_as_global_variable/no_same_name_as_global_variable_case_14.cpp"
+                ],
+                "failed_case_list": [
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_same_name_as_global_variable/no_same_name_as_global_variable_case_6.cpp"
+                ],
+                "total_cost": "0.083968",
+                "negative_case_analysis": {
+                    "check_success_negative": 9,
+                    "check_failed_negative": 1
+                },
+                "time": "315.65"
+            },
+            {
+                "title": "clang-tidy - prohibit-non-local-variable-in-for-loop",
+                "main_title": "prohibit-non-local-variable-in-for-loop",
+                "description": "Forbidden to use non-local variables for loop control variables. The rule requires that the control variable of a for loop must be a local variable, and non-local variables (such as global variables, static global variables, or external-scope variables) must not be used as loop control variables. This rule aims to ensure that the control variable of the loop has a clear scope and lifetime, preventing unintended modifications and logical errors in code caused by the spread of variable scope. When the control variable of a for loop is a non-local variable, the variable may be unintentionally modified outside the loop, affecting the expected behavior of the loop and reducing the maintainability and readability of the code. Compliant scenarios are for loops using local variables defined within functions or block scopes as control variables; non-compliant scenarios are for loops using any non-local variables (including global variables, static variables, or external variables) as control variables. The rule checks the scope of the control variable in the initialization part of the for loop, not the use of the variable within the loop body.",
+                "category": "ucassaat",
+                "rule_test_path": "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/prohibit_non_local_variable_in_for_loop",
+                "negative_case_amount": 10,
+                "positive_case_amount": 10,
+                "issuccess": "True",
+                "performance": "18/20",
+                "success_case_list": [
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/prohibit_non_local_variable_in_for_loop/prohibit_non_local_variable_in_for_loop_case_12.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/prohibit_non_local_variable_in_for_loop/prohibit_non_local_variable_in_for_loop_case_8.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/prohibit_non_local_variable_in_for_loop/prohibit_non_local_variable_in_for_loop_case_4.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/prohibit_non_local_variable_in_for_loop/prohibit_non_local_variable_in_for_loop_case_17.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/prohibit_non_local_variable_in_for_loop/prohibit_non_local_variable_in_for_loop_case_10.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/prohibit_non_local_variable_in_for_loop/prohibit_non_local_variable_in_for_loop_case_14.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/prohibit_non_local_variable_in_for_loop/prohibit_non_local_variable_in_for_loop_case_1.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/prohibit_non_local_variable_in_for_loop/prohibit_non_local_variable_in_for_loop_case_5.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/prohibit_non_local_variable_in_for_loop/prohibit_non_local_variable_in_for_loop_case_15.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/prohibit_non_local_variable_in_for_loop/prohibit_non_local_variable_in_for_loop_case_13.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/prohibit_non_local_variable_in_for_loop/prohibit_non_local_variable_in_for_loop_case_9.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/prohibit_non_local_variable_in_for_loop/prohibit_non_local_variable_in_for_loop_case_3.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/prohibit_non_local_variable_in_for_loop/prohibit_non_local_variable_in_for_loop_case_2.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/prohibit_non_local_variable_in_for_loop/prohibit_non_local_variable_in_for_loop_case_16.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/prohibit_non_local_variable_in_for_loop/prohibit_non_local_variable_in_for_loop_case_20.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/prohibit_non_local_variable_in_for_loop/prohibit_non_local_variable_in_for_loop_case_11.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/prohibit_non_local_variable_in_for_loop/prohibit_non_local_variable_in_for_loop_case_18.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/prohibit_non_local_variable_in_for_loop/prohibit_non_local_variable_in_for_loop_case_19.cpp"
+                ],
+                "failed_case_list": [
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/prohibit_non_local_variable_in_for_loop/prohibit_non_local_variable_in_for_loop_case_6.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/prohibit_non_local_variable_in_for_loop/prohibit_non_local_variable_in_for_loop_case_7.cpp"
+                ],
+                "total_cost": "0.322147",
+                "negative_case_analysis": {
+                    "check_success_negative": 8,
+                    "check_failed_negative": 2
+                },
+                "time": "1111.47"
+            },
+            {
+                "title": "clang-tidy - no-assignment-in-condition",
+                "main_title": "no-assignment-in-condition",
+                "description": "Prohibited is the direct use of assignment statements in logical expressions (such as conditional statements like if, while, for), aimed at preventing logical errors caused by mistakenly using the assignment operator (=) instead of the comparison operator (==). When an assignment statement is used in a logical expression, the assignment operation itself returns a value, which is implicitly converted to a boolean value for conditional evaluation. This may cause the conditional evaluation to deviate from the expected logic (such as non-zero values being converted to true, and zero values to false), potentially leading to hard-to-detect program errors. This rule requires that assignment operations must be separated from conditional evaluations, meaning that assignment should be performed first, followed by conditional evaluation using a comparison operator. Compliant scenarios include using only comparison operators (such as ==, !=) in conditions, assigning first and then comparing, or using boolean variables to store the result; non-compliant scenarios involve directly using the assignment operator in conditions (such as if (x = y)), regardless of whether the assignment is combined with a comparison operation.",
+                "category": "ucassaat",
+                "rule_test_path": "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_assignment_in_condition",
+                "negative_case_amount": 10,
+                "positive_case_amount": 10,
+                "issuccess": "True",
+                "performance": "20/20",
+                "success_case_list": [
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_assignment_in_condition/no_assignment_in_condition_case_7.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_assignment_in_condition/no_assignment_in_condition_case_13.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_assignment_in_condition/no_assignment_in_condition_case_5.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_assignment_in_condition/no_assignment_in_condition_case_10.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_assignment_in_condition/no_assignment_in_condition_case_8.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_assignment_in_condition/no_assignment_in_condition_case_18.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_assignment_in_condition/no_assignment_in_condition_case_11.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_assignment_in_condition/no_assignment_in_condition_case_1.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_assignment_in_condition/no_assignment_in_condition_case_20.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_assignment_in_condition/no_assignment_in_condition_case_3.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_assignment_in_condition/no_assignment_in_condition_case_16.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_assignment_in_condition/no_assignment_in_condition_case_2.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_assignment_in_condition/no_assignment_in_condition_case_14.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_assignment_in_condition/no_assignment_in_condition_case_15.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_assignment_in_condition/no_assignment_in_condition_case_19.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_assignment_in_condition/no_assignment_in_condition_case_9.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_assignment_in_condition/no_assignment_in_condition_case_4.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_assignment_in_condition/no_assignment_in_condition_case_12.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_assignment_in_condition/no_assignment_in_condition_case_17.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_assignment_in_condition/no_assignment_in_condition_case_6.cpp"
+                ],
+                "failed_case_list": [],
+                "total_cost": "0.021296",
+                "negative_case_analysis": {
+                    "check_success_negative": 10,
+                    "check_failed_negative": 0
+                },
+                "time": "88.13"
             }
         ]
     }

@@ -1,16 +1,11 @@
-#include <stdio.h>
-
-struct ArrayContainer {
-    int numbers[5];
-    struct Element {
-        int id;
-        char type;
-    } elements[10];  // 符合：结构体数组成员
+// File: negative_struct_member.c
+#include <stdlib.h>
+struct Container {
+    int *data_ptr;
 };
-
-int main(void) {
-    struct ArrayContainer ac;
-    ac.numbers[0] = 1;
-    ac.elements[0].id = 100;
-    return 0;
+void test_struct(void) {
+    struct Container c;
+    c.data_ptr = (int*)malloc(sizeof(int));
+    *(c.data_ptr) = 42; 
+    //
 }

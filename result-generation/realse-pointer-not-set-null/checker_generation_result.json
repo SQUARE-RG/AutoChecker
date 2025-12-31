@@ -1,0 +1,46 @@
+{
+    "data": {
+        "ucassaat": [
+            {
+                "title": "clang-tidy - realse-pointer-not-set-null",
+                "main_title": "realse-pointer-not-set-null",
+                "description": "Prohibition of Failing to Set Pointers to Null After Release.This rule mandates that after a pointer variable is freed using free() (in C) or delete/delete[] (in C++), it must be immediately set to a null value. In C, NULL should be used, while in C++, nullptr is recommended (though NULL is acceptable). The nullification must occur within the same scope as the deallocation, without being split across conditional branches. Even if a pointer is about to go out of scope, it should be set to null first to foster good programming habits. This rule applies to all pointer types, including basic type pointers, array pointers, and structure pointers. For pointers that undergo multiple allocations and deallocations, nullification is required after each release.\nScenarios that should be reported include: failing to set a pointer to null immediately after free() or delete; separating the deallocation and nullification into different code paths (e.g., conditional branches); and incorrect handling of the original pointer after realloc() (although realloc manages memory, explicitly setting the original pointer to null is considered good practice). \n Correct practices encompass: immediate nullification after release (e.g., free(p); p = NULL;), using nullptr in C++ (e.g., delete p; p = nullptr;), and performing deallocation and nullification only after ensuring the pointer is valid through conditional checks .",
+                "category": "ucassaat",
+                "rule_test_path": "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/realse_pointer_not_set_null",
+                "negative_case_amount": 10,
+                "positive_case_amount": 10,
+                "issuccess": "True",
+                "performance": "20/20",
+                "success_case_list": [
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/realse_pointer_not_set_null/realse_pointer_not_set_null_case_6.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/realse_pointer_not_set_null/realse_pointer_not_set_null_case_17.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/realse_pointer_not_set_null/realse_pointer_not_set_null_case_19.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/realse_pointer_not_set_null/realse_pointer_not_set_null_case_13.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/realse_pointer_not_set_null/realse_pointer_not_set_null_case_12.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/realse_pointer_not_set_null/realse_pointer_not_set_null_case_4.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/realse_pointer_not_set_null/realse_pointer_not_set_null_case_15.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/realse_pointer_not_set_null/realse_pointer_not_set_null_case_20.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/realse_pointer_not_set_null/realse_pointer_not_set_null_case_2.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/realse_pointer_not_set_null/realse_pointer_not_set_null_case_18.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/realse_pointer_not_set_null/realse_pointer_not_set_null_case_7.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/realse_pointer_not_set_null/realse_pointer_not_set_null_case_14.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/realse_pointer_not_set_null/realse_pointer_not_set_null_case_10.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/realse_pointer_not_set_null/realse_pointer_not_set_null_case_16.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/realse_pointer_not_set_null/realse_pointer_not_set_null_case_11.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/realse_pointer_not_set_null/realse_pointer_not_set_null_case_9.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/realse_pointer_not_set_null/realse_pointer_not_set_null_case_1.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/realse_pointer_not_set_null/realse_pointer_not_set_null_case_3.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/realse_pointer_not_set_null/realse_pointer_not_set_null_case_8.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/realse_pointer_not_set_null/realse_pointer_not_set_null_case_5.cpp"
+                ],
+                "failed_case_list": [],
+                "total_cost": "0.420984",
+                "negative_case_analysis": {
+                    "check_success_negative": 10,
+                    "check_failed_negative": 0
+                },
+                "time": "1693.46"
+            }
+        ]
+    }
+}

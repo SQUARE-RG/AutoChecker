@@ -5786,7 +5786,7 @@
   },
   {
     "meta_op": "Match allocation functions (malloc, alloca, calloc, realloc)",
-    "meta_impl": "const auto AllocFunc = functionDecl(hasAnyName(\"::malloc\", \"std::malloc\", \"::alloca\", \"::calloc\", \"std::calloc\", \"::realloc\", \"std::realloc\"));",
+    "meta_impl": "const auto AllocFunc = functionDecl(hasAnyName(\"malloc\",\"::malloc\", \"std::malloc\",\"alloca\", \"::alloca\", \"calloc\",\"::calloc\", \"std::calloc\", \"::realloc\", \"realloc\",\"std::realloc\"));",
     "reference_path": "/root/cw-base/clang-tools-extra/clang-tidy/bugprone/MisplacedPointerArithmeticInAllocCheck.cpp"
   },
   {

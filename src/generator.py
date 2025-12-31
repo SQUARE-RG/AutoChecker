@@ -338,6 +338,12 @@ class Clang_tidy_CheckerGenerator(object):
                     with open(self.debug_prompt_dir + "repair_compiler_error_code.md", 'w',encoding="utf-8") as f:
                         f.write(f"第{round}轮生成的checker编译失败，开始第{current_try_compiler_count}次重试\n"+repair_query)
                     wait_compiler_checker_cpp,wait_compiler_checker_h = self.generate_checker_with_query(repair_query)
+                    # 
+                    # if wait_compiler_checker_cpp is None or wait_compiler_checker_h is None or wait_compiler_checker_cpp =="" or wait_compiler_checker_h =="" :
+                    #     logger.info("编译修复未完成")
+                    #     single_success =False
+                    #     compiler_success = False
+                    #     break
                     current_try_compiler_count += 1
                     save_checker_code(wait_compiler_checker_cpp, wait_compiler_checker_h,self.RULE.get_rule_name())
 
@@ -371,6 +377,9 @@ class Clang_tidy_CheckerGenerator(object):
                     elif warning_count < 0:
                         logger.info(f"运行测试用例{current_case.get_case_path()}发生错误，重新尝试")
                         # TODO 运行修复功能 -- 编译 -- 如果编译不通过直接跳过 -- 编译通过后运行测试用例  -- 不通过测试用例直接放弃
+                    else:
+                        logger.info(f"生成的checker未能通过测试用例验证，进行下一轮生成尝试")
+                    
                 round += 1
         return False, None
     def runAllTestCase(self,init_checker: AbstractChecker):    

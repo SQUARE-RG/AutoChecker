@@ -1,12 +1,6 @@
+// File: positive_free_no_use.c
 #include <stdlib.h>
-
-void foo(void)
-{
-    int *p = (int*) malloc(sizeof(int));
-    *p = 1;
-    //
-    if (p == nullptr)
-    {
-        return;
-    }
+void test_free(void) {
+    int *p = (int*)malloc(sizeof(int));
+    free(p); // 释放前未使用
 }

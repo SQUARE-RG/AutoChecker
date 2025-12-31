@@ -226,19 +226,47 @@ def get_suggest_string_from_hint(hint):
 #     return astMatch_suggest_string,class_struct_suggest_string
 
 
-def parse_cpp_h_code_from_answer(answer: str):
-    """返回第一个 ```cpp ... ``` 中的纯代码，若无则 None。"""
-    # 定义正则表达式模式
-    cpp_pattern = r"checker_cpp:\s*```cpp\s*(.*?)\s*```"
-    h_pattern = r"checker_h:\s*```cpp\s*(.*?)\s*```"
-    # 使用 re.DOTALL 使 . 匹配包括换行符在内的所有字符
-    cpp_match = re.search(cpp_pattern, answer, re.DOTALL)
-    h_match = re.search(h_pattern, answer, re.DOTALL)
+# def parse_cpp_h_code_from_answer(answer: str):
+#     """返回第一个 ```cpp ... ``` 中的纯代码，若无则 None。"""
+#     # 定义正则表达式模式
+#     cpp_pattern = r"checker_cpp:\s*```cpp\s*(.*?)\s*```"
+#     h_pattern = r"checker_h:\s*```cpp\s*(.*?)\s*```"
+#     # 使用 re.DOTALL 使 . 匹配包括换行符在内的所有字符
+#     cpp_match = re.search(cpp_pattern, answer, re.DOTALL)
+#     h_match = re.search(h_pattern, answer, re.DOTALL)
     
-    # 提取代码内容
+#     # 提取代码内容
+#     checker_cpp_code = cpp_match.group(1).strip() if cpp_match else None
+#     checker_h_code = h_match.group(1).strip() if h_match else None
+#     return checker_cpp_code,checker_h_code
+
+
+# ...existing code...
+def parse_cpp_h_code_from_answer(answer: str):
+    """
+    更鲁棒的解析：优先按标签匹配 `checker_cpp:` / `checker_h:` 后的 ```cpp``` 代码块；
+    若未命中则退化为取回答中出现的前两个 ```cpp``` 代码块作为 cpp 和 h。
+    """
+    # 优先按带标签的 code fence 提取（支持 cpp 或 c++）
+    cpp_pattern = r"checker_cpp\s*:\s*```(?:cpp|c\+\+)\s*(.*?)\s*```"
+    h_pattern = r"checker_h\s*:\s*```(?:cpp|c\+\+)\s*(.*?)\s*```"
+    cpp_match = re.search(cpp_pattern, answer, re.IGNORECASE | re.DOTALL)
+    h_match = re.search(h_pattern, answer, re.IGNORECASE | re.DOTALL)
+
     checker_cpp_code = cpp_match.group(1).strip() if cpp_match else None
     checker_h_code = h_match.group(1).strip() if h_match else None
-    return checker_cpp_code,checker_h_code
+
+    # 回退：如果没有按标签找到，尝试抓取所有 ```cpp``` code block，并用前两个作为 cpp/h
+    if not checker_cpp_code or not checker_h_code:
+        blocks = re.findall(r"```(?:cpp|c\+\+)\s*(.*?)\s*```", answer, re.IGNORECASE | re.DOTALL)
+        if blocks:
+            if not checker_cpp_code and len(blocks) >= 1:
+                checker_cpp_code = blocks[0].strip()
+            if not checker_h_code and len(blocks) >= 2:
+                checker_h_code = blocks[1].strip()
+
+    return checker_cpp_code, checker_h_code
+# ...existing code...
 
 def save_checker_code(checker_cpp: str, checker_h:str,rule_name: str):
     """将生成的检查器代码保存到指定路径。"""

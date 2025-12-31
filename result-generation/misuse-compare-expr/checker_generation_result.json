@@ -1,0 +1,47 @@
+{
+    "data": {
+        "ucassaat": [
+            {
+                "title": "clang-tidy - misuse-compare-expr",
+                "main_title": "misuse-compare-expr",
+                "description": "In all comparison expressions involving multiple operators that may cause ambiguity due to operator precedence (especially when bitwise operators, arithmetic operators, and comparison operators are mixed), parentheses must\u200b be used to explicitly define the order of operations and prevent incorrect logical evaluations. This rule specifically targets error-prone combinations, such as mixing bitwise operators (&, |, ^, <<, >>) with comparison operators (==, !=, <, >, <=, >=), or arithmetic operators (+, -, *, /, %) with comparison operators.\nA compliant scenario\u200b occurs when parentheses are used to clearly group operands (e.g., (x & y) == z), thereby eliminating ambiguity. A non-compliant scenario\u200b arises when parentheses are omitted (e.g., x & y == z). In the latter case, due to the higher precedence of ==over &, the expression is parsed as x & (y == z), which may deviate from the programmer\u2019s intent (e.g., (x & y) == z) and introduce potential logical errors.",
+                "category": "ucassaat",
+                "rule_test_path": "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/misuse_compare_expr",
+                "negative_case_amount": 10,
+                "positive_case_amount": 10,
+                "issuccess": "True",
+                "performance": "13/20",
+                "success_case_list": [
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/misuse_compare_expr/misuse_compare_expr_case_10.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/misuse_compare_expr/misuse_compare_expr_case_1.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/misuse_compare_expr/misuse_compare_expr_case_9.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/misuse_compare_expr/misuse_compare_expr_case_17.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/misuse_compare_expr/misuse_compare_expr_case_7.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/misuse_compare_expr/misuse_compare_expr_case_4.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/misuse_compare_expr/misuse_compare_expr_case_3.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/misuse_compare_expr/misuse_compare_expr_case_2.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/misuse_compare_expr/misuse_compare_expr_case_8.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/misuse_compare_expr/misuse_compare_expr_case_5.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/misuse_compare_expr/misuse_compare_expr_case_14.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/misuse_compare_expr/misuse_compare_expr_case_20.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/misuse_compare_expr/misuse_compare_expr_case_6.cpp"
+                ],
+                "failed_case_list": [
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/misuse_compare_expr/misuse_compare_expr_case_12.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/misuse_compare_expr/misuse_compare_expr_case_15.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/misuse_compare_expr/misuse_compare_expr_case_16.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/misuse_compare_expr/misuse_compare_expr_case_11.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/misuse_compare_expr/misuse_compare_expr_case_19.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/misuse_compare_expr/misuse_compare_expr_case_13.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/misuse_compare_expr/misuse_compare_expr_case_18.cpp"
+                ],
+                "total_cost": "0.533794",
+                "negative_case_analysis": {
+                    "check_success_negative": 10,
+                    "check_failed_negative": 0
+                },
+                "time": "1655.71"
+            }
+        ]
+    }
+}

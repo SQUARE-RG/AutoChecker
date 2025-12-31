@@ -9,302 +9,307 @@
 #include "UseUncheckPointerAfterMallocCheck.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/ASTMatchers/ASTMatchFinder.h"
-#include "clang/Lex/Lexer.h"
+#include "clang/AST/RecursiveASTVisitor.h"
 #include "clang/AST/Stmt.h"
+#include "clang/AST/Decl.h"
 #include "clang/AST/Expr.h"
 #include "clang/AST/OperationKinds.h"
 #include "clang/AST/Type.h"
-#include "llvm/ADT/SmallPtrSet.h"
-#include <string>
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Basic/SourceManager.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/DenseSet.h"
+#include <algorithm>
+#include <vector>
 
 using namespace clang::ast_matchers;
 
 namespace clang::tidy::ucassaat {
 
 namespace {
+// Helper to check if an expression is a null pointer constant
+bool isNullPointerConstant(const Expr *E, ASTContext &Context) {
+  return E->isNullPointerConstant(Context, Expr::NPC_ValueDependentIsNotNull);
+}
 
-// Matcher for dynamic memory allocation functions
-const auto AllocFuncMatcher = functionDecl(
-    hasAnyName("::malloc", "::calloc", "::realloc", "std::malloc", 
-               "std::calloc", "std::realloc"));
+// Helper to check if a binary operator is a null check
+bool isNullCheckBinary(const BinaryOperator *BO, const VarDecl *Var,
+                       ASTContext &Context) {
+  if (BO->getOpcode() != BO_EQ && BO->getOpcode() != BO_NE)
+    return false;
 
-// Matcher for allocation calls
-const auto AllocCallMatcher = callExpr(
-    callee(AllocFuncMatcher),
-    unless(hasAncestor(callExpr()))).bind("allocCall");
+  const Expr *LHS = BO->getLHS()->IgnoreParenImpCasts();
+  const Expr *RHS = BO->getRHS()->IgnoreParenImpCasts();
 
-// Matcher for pointer variable declaration or assignment from allocation
-const auto AllocVarMatcher = varDecl(
-    hasInitializer(anyOf(
-        AllocCallMatcher,
-        castExpr(hasSourceExpression(AllocCallMatcher)),
-        binaryOperator(hasOperatorName("="),
-                       hasRHS(anyOf(
-                           AllocCallMatcher,
-                           castExpr(hasSourceExpression(AllocCallMatcher))))))))
-    .bind("allocVar");
+  // Check if one side is a reference to our variable
+  const DeclRefExpr *VarRef = nullptr;
+  const Expr *Other = nullptr;
 
-// Matcher for assignment of allocation result to existing pointer
-const auto AllocAssignMatcher = binaryOperator(
-    hasOperatorName("="),
-    hasLHS(declRefExpr(to(varDecl().bind("assignVar")))),
-    hasRHS(anyOf(
-        AllocCallMatcher,
-        castExpr(hasSourceExpression(AllocCallMatcher)))))
-    .bind("allocAssign");
+  if (const auto *DRE = dyn_cast<DeclRefExpr>(LHS)) {
+    if (DRE->getDecl() == Var) {
+      VarRef = DRE;
+      Other = RHS;
+    }
+  }
+  if (!VarRef && (VarRef = dyn_cast<DeclRefExpr>(RHS))) {
+    if (VarRef->getDecl() == Var) {
+      Other = LHS;
+    } else {
+      VarRef = nullptr;
+    }
+  }
 
-// Matcher for pointer usage (dereference, array subscript, etc.)
-const auto PointerUseMatcher = expr(
-    anyOf(
-        unaryOperator(hasOperatorName("*"), 
-                      hasUnaryOperand(ignoringParenImpCasts(
-                          declRefExpr(to(varDecl(equalsBoundNode("allocVar"))))))),
-        arraySubscriptExpr(
-            hasBase(ignoringParenImpCasts(
-                declRefExpr(to(varDecl(equalsBoundNode("allocVar"))))))),
-        memberExpr(hasObjectExpression(ignoringParenImpCasts(
-            declRefExpr(to(varDecl(equalsBoundNode("allocVar")))))))))
-    .bind("pointerUse");
+  if (!VarRef)
+    return false;
 
-// Matcher for null pointer checks
-const auto NullCheckMatcher = stmt(
-    anyOf(
-        // Explicit comparisons: ptr == NULL, ptr != NULL
-        binaryOperator(anyOf(hasOperatorName("=="), hasOperatorName("!=")),
-            hasLHS(ignoringParenImpCasts(
-                declRefExpr(to(varDecl(equalsBoundNode("allocVar")))))),
-            hasRHS(nullPointerConstant())),
-        binaryOperator(anyOf(hasOperatorName("=="), hasOperatorName("!=")),
-            hasLHS(nullPointerConstant()),
-            hasRHS(ignoringParenImpCasts(
-                declRefExpr(to(varDecl(equalsBoundNode("allocVar"))))))),
-        // Implicit checks: if (ptr), if (!ptr)
-        implicitCastExpr(hasImplicitDestinationType(booleanType()),
-            hasSourceExpression(ignoringParenImpCasts(
-                declRefExpr(to(varDecl(equalsBoundNode("allocVar"))))))),
-        unaryOperator(hasOperatorName("!"),
-            hasUnaryOperand(ignoringParenImpCasts(
-                declRefExpr(to(varDecl(equalsBoundNode("allocVar")))))))))
-    .bind("nullCheck");
+  // Check if the other side is a null pointer constant
+  return isNullPointerConstant(Other, Context);
+}
+
+// Helper to check if a unary operator is a null check (like !ptr)
+bool isNullCheckUnary(const UnaryOperator *UO, const VarDecl *Var) {
+  if (UO->getOpcode() != UO_LNot)
+    return false;
+
+  const Expr *SubExpr = UO->getSubExpr()->IgnoreParenImpCasts();
+  if (const auto *DRE = dyn_cast<DeclRefExpr>(SubExpr)) {
+    return DRE->getDecl() == Var;
+  }
+  return false;
+}
+
+// Helper to check if an implicit cast to bool is a null check (like if(ptr))
+bool isImplicitBoolCast(const ImplicitCastExpr *ICE, const VarDecl *Var) {
+  if (ICE->getCastKind() != CK_PointerToBoolean)
+    return false;
+
+  const Expr *SubExpr = ICE->getSubExpr()->IgnoreParenImpCasts();
+  if (const auto *DRE = dyn_cast<DeclRefExpr>(SubExpr)) {
+    return DRE->getDecl() == Var;
+  }
+  return false;
+}
+
+// Check if a statement is a null check for the given variable
+bool isNullCheck(const Stmt *S, const VarDecl *Var, ASTContext &Context) {
+  if (!S)
+    return false;
+
+  // Handle binary operator (ptr == NULL, ptr != NULL)
+  if (const auto *BO = dyn_cast<BinaryOperator>(S)) {
+    return isNullCheckBinary(BO, Var, Context);
+  }
+
+  // Handle unary operator (!ptr)
+  if (const auto *UO = dyn_cast<UnaryOperator>(S)) {
+    return isNullCheckUnary(UO, Var);
+  }
+
+  // Handle implicit cast to bool (if(ptr))
+  if (const auto *ICE = dyn_cast<ImplicitCastExpr>(S)) {
+    return isImplicitBoolCast(ICE, Var);
+  }
+
+  // For conditional operators, check the condition
+  if (const auto *Cond = dyn_cast<ConditionalOperator>(S)) {
+    return isNullCheck(Cond->getCond(), Var, Context);
+  }
+
+  // For IfStmt, WhileStmt, DoStmt, ForStmt - check their condition
+  if (const auto *If = dyn_cast<IfStmt>(S)) {
+    return isNullCheck(If->getCond(), Var, Context);
+  }
+  if (const auto *While = dyn_cast<WhileStmt>(S)) {
+    return isNullCheck(While->getCond(), Var, Context);
+  }
+  if (const auto *Do = dyn_cast<DoStmt>(S)) {
+    return isNullCheck(Do->getCond(), Var, Context);
+  }
+  if (const auto *For = dyn_cast<ForStmt>(S)) {
+    return isNullCheck(For->getCond(), Var, Context);
+  }
+
+  return false;
+}
+
+// Check if a statement is a use of the variable (dereference or subscript)
+[[maybe_unused]] bool isPointerUse(const Stmt *S, const VarDecl *Var) {
+  if (!S)
+    return false;
+
+  // Dereference operator (*ptr)
+  if (const auto *UO = dyn_cast<UnaryOperator>(S)) {
+    if (UO->getOpcode() == UO_Deref) {
+      const Expr *SubExpr = UO->getSubExpr()->IgnoreParenImpCasts();
+      if (const auto *DRE = dyn_cast<DeclRefExpr>(SubExpr)) {
+        return DRE->getDecl() == Var;
+      }
+    }
+    return false;
+  }
+
+  // Array subscript (ptr[...])
+  if (const auto *ASE = dyn_cast<ArraySubscriptExpr>(S)) {
+    const Expr *Base = ASE->getBase()->IgnoreParenImpCasts();
+    if (const auto *DRE = dyn_cast<DeclRefExpr>(Base)) {
+      return DRE->getDecl() == Var;
+    }
+    return false;
+  }
+
+  // Passing as argument to a function (could be a use, but we'll be conservative)
+  // For now, we only check dereference and subscript
+  return false;
+}
+
+// Get all statements related to a variable in a function body
+void collectVarStatements(const VarDecl *Var, const Stmt *FunctionBody,
+                          ASTContext &Context,
+                          llvm::SmallVectorImpl<const Stmt *> &AllocStmts,
+                          llvm::SmallVectorImpl<const Stmt *> &UseStmts,
+                          llvm::SmallVectorImpl<const Stmt *> &CheckStmts) {
+  struct Collector : public RecursiveASTVisitor<Collector> {
+    const VarDecl *Var;
+    ASTContext &Context;
+    llvm::SmallVectorImpl<const Stmt *> &AllocStmts;
+    llvm::SmallVectorImpl<const Stmt *> &UseStmts;
+    llvm::SmallVectorImpl<const Stmt *> &CheckStmts;
+
+    Collector(const VarDecl *Var, ASTContext &Context,
+              llvm::SmallVectorImpl<const Stmt *> &AllocStmts,
+              llvm::SmallVectorImpl<const Stmt *> &UseStmts,
+              llvm::SmallVectorImpl<const Stmt *> &CheckStmts)
+        : Var(Var), Context(Context), AllocStmts(AllocStmts),
+          UseStmts(UseStmts), CheckStmts(CheckStmts) {}
+
+    bool VisitCallExpr(CallExpr *CE) {
+      // Check if this is an allocation call that initializes our variable
+      // This is simplified - a full implementation would track assignments
+      return true;
+    }
+
+    bool VisitStmt(Stmt *S) {
+      if (isPointerUse(S, Var)) {
+        UseStmts.push_back(S);
+      } else if (isNullCheck(S, Var, Context)) {
+        CheckStmts.push_back(S);
+      }
+      return true;
+    }
+  };
+
+  Collector collector(Var, Context, AllocStmts, UseStmts, CheckStmts);
+  collector.TraverseStmt(const_cast<Stmt *>(FunctionBody));
+}
 
 } // namespace
 
 void UseUncheckPointerAfterMallocCheck::registerMatchers(MatchFinder *Finder) {
-  // Match allocation to variable declaration
+  // Matcher for dynamic memory allocation functions
+  const auto AllocFunc = functionDecl(
+      hasAnyName("::malloc", "malloc", "::calloc", "calloc", "::realloc", "realloc"),
+      unless(hasAttr(attr::NoThrow)) // Standard allocation functions don't throw
+  );
+
+  // Matcher for calls to allocation functions
+  const auto AllocCall = callExpr(callee(AllocFunc)).bind("allocCall");
+
+  // Matcher for variable declarations initialized with allocation result
+  const auto AllocVarDecl = varDecl(
+      hasType(pointerType()),
+      hasInitializer(anyOf(
+          castExpr(has(AllocCall)),
+          AllocCall
+      ))
+  ).bind("allocVar");
+
+  // Matcher for pointer uses (dereference or array subscript)
+  const auto PointerUse = stmt(anyOf(
+      unaryOperator(hasOperatorName("*"),
+          has(ignoringParenImpCasts(declRefExpr(to(varDecl(equalsBoundNode("allocVar"))))))
+      ).bind("derefUse"),
+      arraySubscriptExpr(
+          hasBase(ignoringParenImpCasts(declRefExpr(to(varDecl(equalsBoundNode("allocVar"))))))
+      ).bind("subscriptUse")
+  )).bind("firstBadUse");
+
+  // Combine: find a variable from allocation, then a use of that variable
+  // We'll check in the callback whether there was a null check before the use
   Finder->addMatcher(
       traverse(TK_AsIs,
-          declStmt(
-              hasSingleDecl(AllocVarMatcher),
-              forEachDescendant(PointerUseMatcher))),
-      this);
-  
-  // Match assignment of allocation result
-  Finder->addMatcher(
-      traverse(TK_AsIs,
-          AllocAssignMatcher),
-      this);
+          stmt(hasDescendant(AllocVarDecl), hasDescendant(PointerUse))
+      ),
+      this
+  );
 }
 
 void UseUncheckPointerAfterMallocCheck::check(const MatchFinder::MatchResult &Result) {
-  ASTContext *Context = Result.Context;
-  const SourceManager &SM = *Result.SourceManager;
-  
-  // Handle allocation in variable declaration
-  if (const auto *AllocVar = Result.Nodes.getNodeAs<VarDecl>("allocVar")) {
-    if (!AllocVar || !AllocVar->getLocation().isValid()) return;
+  const auto *AllocVar = Result.Nodes.getNodeAs<VarDecl>("allocVar");
+  const auto *FirstBadUse = Result.Nodes.getNodeAs<Stmt>("firstBadUse");
+  const auto *AllocCall = Result.Nodes.getNodeAs<CallExpr>("allocCall");
+
+  if (!AllocVar || !FirstBadUse || !AllocCall)
+    return;
+
+  // Get the function body containing the variable
+  const DeclContext *DC = AllocVar->getDeclContext();
+  const FunctionDecl *Func = dyn_cast<FunctionDecl>(DC);
+  if (!Func || !Func->hasBody())
+    return;
+
+  const Stmt *Body = Func->getBody();
+  if (!Body)
+    return;
+
+  SourceManager &SM = *Result.SourceManager;
+  ASTContext &Context = *Result.Context;
+
+  // Collect all statements related to this variable
+  llvm::SmallVector<const Stmt *, 8> AllocStmts;
+  llvm::SmallVector<const Stmt *, 16> UseStmts;
+  llvm::SmallVector<const Stmt *, 8> CheckStmts;
+
+  collectVarStatements(AllocVar, Body, Context, AllocStmts, UseStmts, CheckStmts);
+
+  // If no uses, no violation
+  if (UseStmts.empty())
+    return;
+
+  // Sort all statements by source location
+  auto compareSourceLoc = [&SM](const Stmt *A, const Stmt *B) {
+    return SM.isBeforeInTranslationUnit(A->getBeginLoc(), B->getBeginLoc());
+  };
+
+  std::sort(UseStmts.begin(), UseStmts.end(), compareSourceLoc);
+  std::sort(CheckStmts.begin(), CheckStmts.end(), compareSourceLoc);
+
+  // Find the allocation statement (simplified - use the actual allocation call)
+  const Stmt *AllocStmt = AllocCall;
+  if (!AllocStmt)
+    return;
+
+  // Check each use to see if there's a null check before it
+  for (const Stmt *Use : UseStmts) {
+    // Skip if use is before allocation (shouldn't happen for this variable)
+    if (SM.isBeforeInTranslationUnit(Use->getBeginLoc(), AllocStmt->getBeginLoc()))
+      continue;
+
+    bool hasCheckBeforeUse = false;
     
-    const auto *PointerUse = Result.Nodes.getNodeAs<Expr>("pointerUse");
-    if (!PointerUse || !PointerUse->getBeginLoc().isValid()) return;
-    
-    // Check if there's a null check before this usage
-    bool foundCheck = false;
-    
-    // Traverse from allocation to usage to find null checks
-    const Stmt *Body = nullptr;
-    if (const DeclContext *DC = AllocVar->getDeclContext()) {
-      if (const FunctionDecl *FD = dyn_cast<FunctionDecl>(DC)) {
-        Body = FD->getBody();
+    // Check if any null check occurs before this use
+    for (const Stmt *Check : CheckStmts) {
+      if (SM.isBeforeInTranslationUnit(Check->getBeginLoc(), Use->getBeginLoc())) {
+        hasCheckBeforeUse = true;
+        break;
       }
     }
-    
-    if (Body) {
-      // Simple traversal to find null checks between allocation and usage
-      std::function<void(const Stmt *)> traverse = [&](const Stmt *S) {
-        if (!S) return;
-        
-        // Check if this is a null check involving our variable
-        if (const auto *BinOp = dyn_cast<BinaryOperator>(S)) {
-          if (BinOp->getOpcode() == BO_EQ || BinOp->getOpcode() == BO_NE) {
-            // Check if it involves our variable and a null constant
-            const Expr *LHS = BinOp->getLHS()->IgnoreParenImpCasts();
-            const Expr *RHS = BinOp->getRHS()->IgnoreParenImpCasts();
-            
-            const DeclRefExpr *DRE = nullptr;
-            if (const auto *D = dyn_cast<DeclRefExpr>(LHS)) {
-              DRE = D;
-            } else if (const auto *D = dyn_cast<DeclRefExpr>(RHS)) {
-              DRE = D;
-            }
-            
-            if (DRE && DRE->getDecl() == AllocVar) {
-              // Check if other side is null
-              if (RHS->isNullPointerConstant(*Context, Expr::NPC_ValueDependentIsNotNull) ||
-                  LHS->isNullPointerConstant(*Context, Expr::NPC_ValueDependentIsNotNull)) {
-                if (SM.isBeforeInTranslationUnit(BinOp->getBeginLoc(), 
-                                                 PointerUse->getBeginLoc())) {
-                  foundCheck = true;
-                }
-              }
-            }
-          }
-        }
-        // Also check for implicit checks: if (ptr), if (!ptr)
-        else if (const auto *UnaryOp = dyn_cast<UnaryOperator>(S)) {
-          if (UnaryOp->getOpcode() == UO_LNot) {
-            const Expr *SubExpr = UnaryOp->getSubExpr()->IgnoreParenImpCasts();
-            if (const auto *DRE = dyn_cast<DeclRefExpr>(SubExpr)) {
-              if (DRE->getDecl() == AllocVar) {
-                if (SM.isBeforeInTranslationUnit(UnaryOp->getBeginLoc(),
-                                                 PointerUse->getBeginLoc())) {
-                  foundCheck = true;
-                }
-              }
-            }
-          }
-        }
-        else if (const auto *DRE = dyn_cast<DeclRefExpr>(S)) {
-          // Check for implicit conversion to bool in if/while conditions
-          if (DRE->getDecl() == AllocVar) {
-            // Check if parent is an implicit cast to bool
-            if (const Stmt *Parent = Result.Nodes.getNodeAs<Stmt>("")) {
-              if (const auto *ICE = dyn_cast<ImplicitCastExpr>(Parent)) {
-                if (ICE->getCastKind() == CK_PointerToBoolean) {
-                  if (SM.isBeforeInTranslationUnit(ICE->getBeginLoc(),
-                                                   PointerUse->getBeginLoc())) {
-                    foundCheck = true;
-                  }
-                }
-              }
-            }
-          }
-        }
-        
-        // Recurse
-        for (const Stmt *Child : S->children()) {
-          traverse(Child);
-        }
-      };
-      
-      traverse(Body);
-    }
-    
-    if (!foundCheck) {
-      // Emit warning for unchecked usage
-      diag(PointerUse->getBeginLoc(), 
+
+    if (!hasCheckBeforeUse) {
+      // Found a violation - emit diagnostic at the first violating use
+      diag(Use->getBeginLoc(),
            "禁止动态分配的指针变量未检查即使用 [gjb8114-r-1-3-8]")
-          << FixItHint::CreateInsertion(PointerUse->getBeginLoc(), 
-                                        "// Check pointer before use");
-    }
-  }
-  
-  // Handle assignment case (realloc, etc.)
-  if (const auto *AssignVar = Result.Nodes.getNodeAs<VarDecl>("assignVar")) {
-    if (!AssignVar || !AssignVar->getLocation().isValid()) return;
-    
-    const auto *AllocAssign = Result.Nodes.getNodeAs<BinaryOperator>("allocAssign");
-    if (!AllocAssign || !AllocAssign->getBeginLoc().isValid()) return;
-    
-    // Find the next usage of this variable after assignment
-    const Stmt *Body = nullptr;
-    if (const DeclContext *DC = AssignVar->getDeclContext()) {
-      if (const FunctionDecl *FD = dyn_cast<FunctionDecl>(DC)) {
-        Body = FD->getBody();
-      }
-    }
-    
-    if (Body) {
-      const Expr *FirstUseAfterAssign = nullptr;
-      
-      std::function<void(const Stmt *)> findUsage = [&](const Stmt *S) {
-        if (!S) return;
-        
-        // Check if this is a usage of our variable
-        if (const auto *DRE = dyn_cast<DeclRefExpr>(S)) {
-          if (DRE->getDecl() == AssignVar) {
-            // Check if it's a usage (not the assignment itself)
-            if (SM.isBeforeInTranslationUnit(AllocAssign->getEndLoc(),
-                                             DRE->getBeginLoc())) {
-              // Check parent to see if it's a real usage
-              if (const Stmt *Parent = Result.Nodes.getNodeAs<Stmt>("")) {
-                if (isa<UnaryOperator>(Parent) || 
-                    isa<ArraySubscriptExpr>(Parent) ||
-                    isa<MemberExpr>(Parent) ||
-                    isa<CallExpr>(Parent)) {
-                  if (!FirstUseAfterAssign || 
-                      SM.isBeforeInTranslationUnit(DRE->getBeginLoc(),
-                                                   FirstUseAfterAssign->getBeginLoc())) {
-                    FirstUseAfterAssign = DRE;
-                  }
-                }
-              }
-            }
-          }
-        }
-        
-        for (const Stmt *Child : S->children()) {
-          findUsage(Child);
-        }
-      };
-      
-      findUsage(Body);
-      
-      if (FirstUseAfterAssign) {
-        // Check for null check between assignment and usage
-        bool foundCheck = false;
-        
-        std::function<void(const Stmt *)> checkForNull = [&](const Stmt *S) {
-          if (!S) return;
-          
-          if (const auto *BinOp = dyn_cast<BinaryOperator>(S)) {
-            if (BinOp->getOpcode() == BO_EQ || BinOp->getOpcode() == BO_NE) {
-              const Expr *LHS = BinOp->getLHS()->IgnoreParenImpCasts();
-              const Expr *RHS = BinOp->getRHS()->IgnoreParenImpCasts();
-              
-              const DeclRefExpr *DRE = nullptr;
-              if (const auto *D = dyn_cast<DeclRefExpr>(LHS)) {
-                DRE = D;
-              } else if (const auto *D = dyn_cast<DeclRefExpr>(RHS)) {
-                DRE = D;
-              }
-              
-              if (DRE && DRE->getDecl() == AssignVar) {
-                if (RHS->isNullPointerConstant(*Context, Expr::NPC_ValueDependentIsNotNull) ||
-                    LHS->isNullPointerConstant(*Context, Expr::NPC_ValueDependentIsNotNull)) {
-                  if (SM.isBeforeInTranslationUnit(AllocAssign->getEndLoc(),
-                                                   BinOp->getBeginLoc()) &&
-                      SM.isBeforeInTranslationUnit(BinOp->getBeginLoc(),
-                                                   FirstUseAfterAssign->getBeginLoc())) {
-                    foundCheck = true;
-                  }
-                }
-              }
-            }
-          }
-          
-          for (const Stmt *Child : S->children()) {
-            checkForNull(Child);
-          }
-        };
-        
-        checkForNull(Body);
-        
-        if (!foundCheck) {
-          diag(FirstUseAfterAssign->getBeginLoc(),
-               "禁止动态分配的指针变量未检查即使用 [gjb8114-r-1-3-8]")
-              << FixItHint::CreateInsertion(FirstUseAfterAssign->getBeginLoc(),
-                                            "// Check pointer before use");
-        }
-      }
+          << AllocVar;
+      return; // Only report one warning per variable
     }
   }
 }

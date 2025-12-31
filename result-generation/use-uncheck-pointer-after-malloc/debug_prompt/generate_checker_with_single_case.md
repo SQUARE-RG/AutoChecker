@@ -1,4 +1,4 @@
-针对负例/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/use_uncheck_pointer_after_malloc/use_uncheck_pointer_after_malloc_case_8.cpp生成first checker
+针对负例/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/use_uncheck_pointer_after_malloc/use_uncheck_pointer_after_malloc_case_2.cpp生成first checker
 # Instruction
 You are a clang-tidy expert, proficient in LLVM/Clang AST analysis and static checker development.
 Your task is to generate a complete, compilable clang-tidy checker by integrating:
@@ -26,77 +26,68 @@ Correct scenarios include: performing a null check immediately after allocation 
 ```cpp
 #include <stdlib.h>
 
-int *p = NULL;
 void foo(void)
 {
-    p = (int*) malloc(sizeof(int));
+    int *p = (int*) malloc(sizeof(int));
     *p = 1;
-    // CHECK-MESSAGES: 禁止动态分配的指针变量未检查即使用 [gjb8114-r-1-3-8]
+    // CHECK-MESSAGES: :[[@LINE]]:9: warning: 禁止动态分配的指针变量未检查即使用 [gjb8114-r-1-3-8]
+    if (p == nullptr)
+    {
+        return;
+    }
 }
 ```
 
 ## AST
-TranslationUnitDecl 0x565264daa1c8 <<invalid sloc>> <invalid sloc>
-`-FunctionDecl 0x565264ed0000 </root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/use_uncheck_pointer_after_malloc/use_uncheck_pointer_after_malloc_case_8.cpp:4:1, line:9:1> line:4:6 foo 'void ()'
-  `-CompoundStmt 0x565264ed02f8 <line:5:1, line:9:1>
-    |-BinaryOperator 0x565264ed0248 <line:6:5, col:34> 'int *' lvalue '='
-    | |-DeclRefExpr 0x565264ed00a8 <col:5> 'int *' lvalue Var 0x565264ecfe78 'p' 'int *'
-    | `-CStyleCastExpr 0x565264ed0220 <col:9, col:34> 'int *' <BitCast>
-    |   `-CallExpr 0x565264ed01e0 <col:16, col:34> 'void *'
-    |     |-ImplicitCastExpr 0x565264ed01c8 <col:16> 'void *(*)(size_t) noexcept(true)' <FunctionToPointerDecay>
-    |     | `-DeclRefExpr 0x565264ed0148 <col:16> 'void *(size_t) noexcept(true)' lvalue Function 0x565264eb17d0 'malloc' 'void *(size_t) noexcept(true)' (UsingShadow 0x565264ecf358 'malloc')
-    |     `-UnaryExprOrTypeTraitExpr 0x565264ed0128 <col:23, col:33> 'unsigned long' sizeof 'int'
-    `-BinaryOperator 0x565264ed02d8 <line:7:5, col:10> 'int' lvalue '='
-      |-UnaryOperator 0x565264ed02a0 <col:5, col:6> 'int' lvalue prefix '*' cannot overflow
-      | `-ImplicitCastExpr 0x565264ed0288 <col:6> 'int *' <LValueToRValue>
-      |   `-DeclRefExpr 0x565264ed0268 <col:6> 'int *' lvalue Var 0x565264ecfe78 'p' 'int *'
-      `-IntegerLiteral 0x565264ed02b8 <col:10> 'int' 1
+TranslationUnitDecl 0x55c120c441c8 <<invalid sloc>> <invalid sloc>
+`-FunctionDecl 0x55c120d69ef8 </root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/use_uncheck_pointer_after_malloc/use_uncheck_pointer_after_malloc_case_2.cpp:3:1, line:12:1> line:3:6 foo 'void ()'
+  `-CompoundStmt 0x55c120d6a318 <line:4:1, line:12:1>
+    |-DeclStmt 0x55c120d6a1a8 <line:5:5, col:40>
+    | `-VarDecl 0x55c120d69fb8 <col:5, col:39> col:10 used p 'int *' cinit
+    |   `-CStyleCastExpr 0x55c120d6a180 <col:14, col:39> 'int *' <BitCast>
+    |     `-CallExpr 0x55c120d6a140 <col:21, col:39> 'void *'
+    |       |-ImplicitCastExpr 0x55c120d6a128 <col:21> 'void *(*)(size_t) noexcept(true)' <FunctionToPointerDecay>
+    |       | `-DeclRefExpr 0x55c120d6a0a0 <col:21> 'void *(size_t) noexcept(true)' lvalue Function 0x55c120d4b7d0 'malloc' 'void *(size_t) noexcept(true)' (UsingShadow 0x55c120d69358 'malloc')
+    |       `-UnaryExprOrTypeTraitExpr 0x55c120d6a080 <col:28, col:38> 'unsigned long' sizeof 'int'
+    |-BinaryOperator 0x55c120d6a230 <line:6:5, col:10> 'int' lvalue '='
+    | |-UnaryOperator 0x55c120d6a1f8 <col:5, col:6> 'int' lvalue prefix '*' cannot overflow
+    | | `-ImplicitCastExpr 0x55c120d6a1e0 <col:6> 'int *' <LValueToRValue>
+    | |   `-DeclRefExpr 0x55c120d6a1c0 <col:6> 'int *' lvalue Var 0x55c120d69fb8 'p' 'int *'
+    | `-IntegerLiteral 0x55c120d6a210 <col:10> 'int' 1
+    `-IfStmt 0x55c120d6a2f8 <line:8:5, line:11:5>
+      |-BinaryOperator 0x55c120d6a2b0 <line:8:9, col:14> 'bool' '=='
+      | |-ImplicitCastExpr 0x55c120d6a280 <col:9> 'int *' <LValueToRValue>
+      | | `-DeclRefExpr 0x55c120d6a250 <col:9> 'int *' lvalue Var 0x55c120d69fb8 'p' 'int *'
+      | `-ImplicitCastExpr 0x55c120d6a298 <col:14> 'int *' <NullToPointer>
+      |   `-CXXNullPtrLiteralExpr 0x55c120d6a270 <col:14> 'std::nullptr_t'
+      `-CompoundStmt 0x55c120d6a2e0 <line:9:5, line:11:5>
+        `-ReturnStmt 0x55c120d6a2d0 <line:10:9>
 
 
 ## reference logic step
-[{'logic_registerMatchers': ["1. Define a matcher for calls to dynamic memory allocation functions (malloc, calloc, realloc) and bind the CallExpr as 'allocCall' and the resulting pointer variable as 'allocatedVar'", "2. Create a matcher to capture all uses (dereferences, array subscript, member access via pointer, etc.) of a variable that holds a dynamically allocated pointer, binding the use as 'pointerUse' and the variable as 'usedVar'", '3. For each allocation, track the order of events: match the allocation statement, then find all subsequent uses of that variable before a null check', "4. Match null check patterns (if statements, ternary operators, logical AND/OR with null comparisons) on the allocated variable, binding the check as 'nullCheck' and the variable as 'checkedVar'", "5. Ensure the matcher only triggers when a 'pointerUse' occurs and there is no preceding 'nullCheck' for the same variable along any execution path from allocation to use", '6. Handle global variables by matching allocations and uses across the entire translation unit, not limited to a single function scope', '7. Handle reallocations by treating a realloc call as a new allocation that requires a fresh null check before subsequent uses'], 'logic_check': ["1. Retrieve the bound 'allocatedVar' and 'pointerUse' nodes from the match result", "2. Verify that the variable in 'allocatedVar' and 'usedVar' refers to the same pointer variable", '3. Determine the source location of the allocation and the first use after allocation', '4. Check if there exists any null check on the variable between the allocation and the first use by analyzing the AST context and control flow', '5. If no null check is found before the first use, emit a diagnostic warning at the location of the first use, indicating the pointer was used without a prior null check', '6. Ensure only one warning is emitted per variable by keeping track of already reported variables within the check callback', '7. For reallocated pointers, treat the realloc call as a new allocation point and repeat the check for uses after that point']}]
+**logic for registerMatchers**:
+1. Define a list of dynamic memory allocation functions (malloc, calloc, realloc) using known names and user-configurable options.
+2. Create a matcher for calls to these allocation functions and bind the CallExpr as 'allocCall'.
+3. Create a matcher for VarDecl nodes that are initialized with the result of such a call (or have their value later assigned from such a call) and bind the VarDecl as 'allocVar'.
+4. Create a matcher for DeclRefExpr nodes that reference the 'allocVar' to track all uses of the pointer.
+5. Create a matcher for UnaryOperator nodes of dereference type (*) or ArraySubscriptExpr nodes where the base is a DeclRefExpr referencing 'allocVar', to identify pointer uses.
+6. Create a matcher for BinaryOperator nodes that represent comparisons (==, !=) between a DeclRefExpr of 'allocVar' and a null pointer constant, to identify null checks.
+7. Create a matcher for IfStmt, WhileStmt, DoStmt, ForStmt, or ConditionalOperator nodes whose condition contains an implicit or explicit null check on 'allocVar' (e.g., if(ptr), if(!ptr), if(ptr != NULL)).
+8. Combine the above matchers to find sequences where a 'use' of 'allocVar' occurs before any 'nullCheck' on that same variable within the same function scope.
+9. Ensure the matcher binds the first violating 'use' node as 'firstBadUse' and the associated 'allocVar'.
+**logic for check**:
+1. Retrieve the bound VarDecl node 'allocVar' and the Stmt node 'firstBadUse' from the match result.
+2. Traverse the AST subtree of the function containing 'allocVar' to collect all Stmts related to this variable: its allocation, all its uses (dereferences, subscript, passing as argument requiring non-null), and all its null checks.
+3. Order these collected Stmts by their source location (source order).
+4. Determine the location of the allocation statement for this variable.
+5. Iterate through the ordered list. For each 'use' statement, check if a null check statement for this variable exists before it in the order. If not, this is a violation.
+6. If a violation is found, emit a diagnostic at the location of 'firstBadUse' (or the first violating use) pointing to the variable name and the rule.
+7. Ensure that for each variable, only one warning is emitted (for its first violating use).
+8. Handle special cases: if the variable is never used, no warning; if reallocated, treat the new allocation as a new allocation point and restart checking for subsequent uses.
+9. Consider control flow: a null check must dominate the use in the CFG. For simplicity, initial implementation may assume linear order, but note that advanced implementation would require CFG analysis.
+
 
 ## reference astMatchers
-Narrowing Matcher: hasStaticStorageDuration
- Parameters;
- return type Matcher<VarDecl>
- Description: Matches a variable declaration that has static storage duration.
-It includes the variable declared at namespace scope and those declared
-with "static" and "extern" storage class specifiers.
-
-void f() {
-  int x;
-  static int y;
-  thread_local int z;
-}
-int a;
-static int b;
-extern int c;
-varDecl(hasStaticStorageDuration())
-  matches the function declaration y, a, b and c.
-
-Node Matcher: nullStmt
- Parameters;Matcher<NullStmt>...
- return type Matcher<Stmt>
- Description: Matches null statements.
-
-  foo();;
-nullStmt()
-  matches the second ';'
-
-Narrowing Matcher: hasLocalStorage
- Parameters;
- return type Matcher<VarDecl>
- Description: Matches a variable declaration that has function scope and is a
-non-static local variable.
-
-Example matches x (matcher = varDecl(hasLocalStorage())
-void f() {
-  int x;
-  static int y;
-}
-int z;
-
 Narrowing Matcher: argumentCountAtLeast
  Parameters;unsigned N
  return type Matcher<CallExpr>
@@ -109,6 +100,38 @@ Example matches f(0, 0) and g(0, 0, 0)
   void g(int x, int y, int z);
   f(0, 0);
   g(0, 0, 0);
+
+Narrowing Matcher: mapAnyOf
+ Parameters;nodeMatcherFunction...
+ return type unspecified
+ Description: Matches any of the NodeMatchers with InnerMatchers nested within
+
+Given
+  if (true);
+  for (; true; );
+with the matcher
+  mapAnyOf(ifStmt, forStmt).with(
+    hasCondition(cxxBoolLiteralExpr(equals(true)))
+    ).bind("trueCond")
+matches the if and the for. It is equivalent to:
+  auto trueCond = hasCondition(cxxBoolLiteralExpr(equals(true)));
+  anyOf(
+    ifStmt(trueCond).bind("trueCond"),
+    forStmt(trueCond).bind("trueCond")
+    );
+
+The with() chain-call accepts zero or more matchers which are combined
+as-if with allOf() in each of the node matchers.
+Usable as: Any Matcher
+
+Node Matcher: declRefExpr
+ Parameters;Matcher<DeclRefExpr>...
+ return type Matcher<Stmt>
+ Description: Matches expressions that refer to declarations.
+
+Example matches x in if (x)
+  bool x;
+  if (x) {}
 
 Narrowing Matcher: nullPointerConstant
  Parameters;
@@ -127,55 +150,69 @@ expr(nullPointerConstant())
   matches the initializer for v1, v2, v3, cp, and ip. Does not match the
   initializer for i.
 
-Narrowing Matcher: hasGlobalStorage
+Narrowing Matcher: hasDynamicExceptionSpec
  Parameters;
- return type Matcher<VarDecl>
- Description: Matches a variable declaration that does not have local storage.
+ return type Matcher<FunctionDecl>
+ Description: Matches functions that have a dynamic exception specification.
 
-Example matches y and z (matcher = varDecl(hasGlobalStorage())
-void f() {
-  int x;
-  static int y;
-}
-int z;
+Given:
+  void f();
+  void g() noexcept;
+  void h() noexcept(true);
+  void i() noexcept(false);
+  void j() throw();
+  void k() throw(int);
+  void l() throw(...);
+functionDecl(hasDynamicExceptionSpec()) and
+  functionProtoType(hasDynamicExceptionSpec())
+  match the declarations of j, k, and l, but not f, g, h, or i.
 
-Finder->addMatcher(
-      binaryOperator(hasAnyOperatorName("==", "!="),
-                     hasOperands(anyOf(cxxNullPtrLiteralExpr(), gnuNullExpr(),
-                                       integerLiteral(equals(0))),
-                                 callToGet(knownSmartptr()))),
-      Callback);
-anyOf(declRefExpr(to(decl().bind("deletedPointer"))), memberExpr(hasDeclaration(fieldDecl().bind("deletedMemberPointer"))))
-Finder->addMatcher(unaryOperator(hasAnyOperatorName("++", "--"), hasType(pointerType())).bind("expr"), this);
-const auto AllocFunc = functionDecl(hasAnyName("::malloc", "std::malloc", "::alloca", "::calloc", "std::calloc", "::realloc", "std::realloc"));
+Node Matcher: unaryOperator
+ Parameters;Matcher<UnaryOperator>...
+ return type Matcher<Stmt>
+ Description: Matches unary operator expressions.
+
+Example matches !a
+  !a || b
+
+Node Matcher: varDecl
+ Parameters;Matcher<VarDecl>...
+ return type Matcher<Decl>
+ Description: Matches variable declarations.
+
+Note: this does not match declarations of member variables, which are
+"field" declarations in Clang parlance.
+
+Example matches a
+  int a;
+
+Node Matcher: cxxNullPtrLiteralExpr
+ Parameters;Matcher<CXXNullPtrLiteralExpr>...
+ return type Matcher<Stmt>
+ Description: Matches nullptr literal.
+
+Finder->addMatcher(functionDecl(isDefinition(), hasBody(stmt()), hasAnyParameter(decl()), unless(hasAttr(attr::Kind::Naked))).bind("function"), this);
+AST_POLYMORPHIC_MATCHER_P(boolean, AST_POLYMORPHIC_SUPPORTED_TYPES(Stmt, Decl), bool, Boolean) { return Boolean; }
+varDecl(isStaticLocal())
+binaryOperator(hasOperands(anyOf(cxxNullPtrLiteralExpr(), integerLiteral(equals(0))), PointerExpr))
+unaryOperator(hasOperatorName("*"), has(implicitCastExpr(hasCastKind(CK_FunctionToPointerDecay))))
+Finder->addMatcher(cxxOperatorCallExpr(anyOf(AssignOperator, PlusOperator)), this);
+Finder->addMatcher(declRefExpr(to(functionDecl().bind("func"))).bind("use-site"), this);
+const auto AllocFunc = functionDecl(hasAnyName("malloc","::malloc", "std::malloc","alloca", "::alloca", "calloc","::calloc", "std::calloc", "::realloc", "realloc","std::realloc"));
 const auto AllocCall = callExpr(callee(decl(anyOf(AllocFunc, AllocFuncPtr))));
-binaryOperator(hasOperatorName("="), hasLHS(expr().bind("ptr_result")), hasRHS(ignoringParenCasts(callExpr(callee(functionDecl(hasName("::realloc"), parameterCountIs(2), hasParameter(0, hasType(pointerType(pointee(voidType())))), hasParameter(1, hasType(isInteger()))).bind("realloc")), hasArgument(0, expr().bind("ptr_input")), hasAncestor(functionDecl().bind("parent_function"))).bind("call"))))
-varDecl(isGlobalStatic())
 
 
 ## reference api  
-const auto *DeleteStmt = Nodes.getNodeAs<CXXDeleteExpr>("delete_expr");
-const auto *DeletedVariable = Nodes.getNodeAs<DeclRefExpr>("deleted_variable");
-if (DeleteStmt) {
-  diag(DeleteStmt->getBeginLoc(),
-       "deleting a pointer through a type that is "
-       "not marked 'gsl::owner<>'; consider using a "
-       "smart pointer instead")
-      << DeletedVariable->getSourceRange();
-  const ValueDecl *Decl = DeletedVariable->getDecl();
-  diag(Decl->getBeginLoc(), "variable declared here", DiagnosticIDs::Note)
-      << Decl->getSourceRange();
-  return true;
-}
-return false;
-const SourceRange OldRParen = SourceRange(PtrArith->getLHS()->getEndLoc());
-const StringRef RParen =
-    Lexer::getSourceText(CharSourceRange::getTokenRange(OldRParen),
-                         *Result.SourceManager, getLangOpts());
-const auto *LoopVar = Nodes.getNodeAs<VarDecl>(InitVarName);
-const auto *EndVar = Nodes.getNodeAs<VarDecl>(EndVarName);
-const auto *EndCall = Nodes.getNodeAs<CXXMemberCallExpr>(EndCallName);
-const auto *BoundExpr = Nodes.getNodeAs<Expr>(ConditionBoundName);
+SourceManager &SM = *Result.SourceManager;
+const auto *FirstDecl = cast<CXXMethodDecl>(MatchedDecl->getFirstDecl());
+const SourceLocation FirstDeclEnd = utils::lexer::findNextTerminator(
+    FirstDecl->getEndLoc(), SM, getLangOpts());
+const CharSourceRange SecondDeclRange = CharSourceRange::getTokenRange(
+    MatchedDecl->getBeginLoc(),
+    utils::lexer::findNextTerminator(MatchedDecl->getEndLoc(), SM,
+                                     getLangOpts()));
+if (FirstDeclEnd.isInvalid() || SecondDeclRange.isInvalid())
+  return;
 llvm::SmallPtrSet<const DeclRefExpr *, 16> AllVarRefs =
     utils::decl_ref_expr::allDeclRefExprs(*TargetVarDecl, *LoopParent,
                                           *Context);
@@ -185,64 +222,42 @@ for (const auto *Ref : AllVarRefs) {
     return;
   }
 }
-else if (const auto *VD = Result.Nodes.getNodeAs<VarDecl>("Mark")) {
-  const QualType T = VD->getType();
-  if ((T->isPointerType() && !T->getPointeeType().isConstQualified()) ||
-      T->isArrayType())
-    markCanNotBeConst(VD->getInit(), true);
-  else if (T->isLValueReferenceType() &&
-           !T->getPointeeType().isConstQualified())
-    markCanNotBeConst(VD->getInit(), false);
+const auto *Var = Result.Nodes.getNodeAs<VarDecl>("vardecl");
+const auto *CtorCall = Result.Nodes.getNodeAs<Expr>("ctor_call");
+if (!Var || !CtorCall)
+  return;
+static const char *UseUsingWarning = "use 'using' instead of 'typedef'";
+if (MatchedDecl->getUnderlyingType()->isArrayType() || StartLoc.isMacroID()) {
+  diag(StartLoc, UseUsingWarning);
+  return;
 }
-std::string CallName;
-if (const auto *Call = dyn_cast<CallExpr>(AllocExpr)) {
-  const NamedDecl *Func = Call->getDirectCallee();
-  if (!Func) {
-    Func = cast<NamedDecl>(Call->getCalleeDecl());
-  }
-  CallName = Func->getName().str();
-} else {
-  const auto *New = cast<CXXNewExpr>(AllocExpr);
-  if (New->isArray()) {
-    CallName = "operator new[]";
-  } else {
-    const auto *CtrE = New->getConstructExpr();
-    if (!CtrE || !CtrE->getArg(CtrE->getNumArgs() - 1)
-                       ->getType()
-                       ->isIntegralOrEnumerationType())
-      return;
-    CallName = "operator new";
-  }
+bool FindAssignToVarBefore::isAccessForVar(const Expr *E) const {
+  if (const auto *DeclRef = dyn_cast<DeclRefExpr>(E->IgnoreParenCasts()))
+    return DeclRef->getDecl() &&
+           DeclRef->getDecl()->getCanonicalDecl() == Var &&
+           SM.isBeforeInTranslationUnit(E->getBeginLoc(),
+                                        VarRef->getBeginLoc());
+  return false;
 }
-auto EmitValueWarning = [this, &Result](const NestedNameSpecifierLoc &QualLoc,
-                                      SourceLocation EndLoc) {
-  SourceLocation TemplateNameEndLoc;
-  if (auto TSTL = QualLoc.getTypeLoc().getAs<TemplateSpecializationTypeLoc>();
-      !TSTL.isNull())
-    TemplateNameEndLoc = Lexer::getLocForEndOfToken(
-        TSTL.getTemplateNameLoc(), 0, *Result.SourceManager,
-        Result.Context->getLangOpts());
-  else
-    return;
-
-  if (EndLoc.isMacroID() || QualLoc.getEndLoc().isMacroID() ||
-      TemplateNameEndLoc.isMacroID()) {
-    if (IgnoreMacros)
-      return;
-    diag(QualLoc.getBeginLoc(), "use c++17 style variable templates");
-    return;
-  }
-  diag(QualLoc.getBeginLoc(), "use c++17 style variable templates")
-      << FixItHint::CreateInsertion(TemplateNameEndLoc, "_v")
-      << FixItHint::CreateRemoval({QualLoc.getEndLoc(), EndLoc});
-};
-bool clang::CXXNewExpr::shouldNullCheckAllocation() const
-bool clang::WhileStmt::hasVarStorage() const
-void clang::SourceLocation::dump(const SourceManager & SM) const
-void clang::PPChainedCallbacks::PragmaWarning(SourceLocation Loc, PragmaWarningSpecifier WarningSpec, ArrayRef<int> Ids)
-bool clang::APValue::isNullPointer() const
-void llvm::MallocAllocator::Deallocate(const void * Ptr, int Size, int Alignment)
-DeclarationName clang::DeclarationName::getFromOpaquePtr(void * P)
+if (std::optional<std::vector<SourceLocation>> Errors =
+        analyzeFunction(*FuncDecl, *Result.Context, ModelOptions))
+  for (const SourceLocation &Loc : *Errors)
+    diag(Loc, "unchecked access to optional value");
+const Expr *AllocExpr = PtrArith->getLHS()->IgnoreParenCasts();
+if (!isExprValueStored(NewExpr1, *Result.Context) &&
+    !isExprValueStored(NewExpr2, *Result.Context))
+  return;
+diag(S->getUsedLocation(),
+     "calling a function that uses a default argument is disallowed");
+SourceRange clang::StmtSequence::getSourceRange() const
+SourceLocation clang::OMPDestroyClause::getVarLoc() const
+bool clang::MacroInfo::isWarnIfUnused() const
+StringRef clang::DiagnosticIDs::getWarningOptionForGroup(diag::Group)
+ArrayRef<Expr *> clang::MSAsmStmt::getAllExprs() const
+void clang::PartialDiagnostic::EmitToString(DiagnosticsEngine & Diags, SmallVectorImpl<char> & Buf) const
+bool clang::TypeLoc::isNull() const
+Expr * clang::OMPAllocatorClause::getAllocator() const
+bool clang::StoredDeclsList::isNull() const
 
 
 ## checker code template
@@ -260,353 +275,29 @@ The content of /root/code_check/llvm-project/clang-tools-extra/clang-tidy/ucassa
 #include "UseUncheckPointerAfterMallocCheck.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/ASTMatchers/ASTMatchFinder.h"
-#include "clang/Lex/Lexer.h"
-#include "clang/AST/Stmt.h"
-#include "clang/AST/Expr.h"
-#include "clang/AST/OperationKinds.h"
-#include "clang/AST/Type.h"
-#include "llvm/ADT/SmallPtrSet.h"
-#include <string>
 
 using namespace clang::ast_matchers;
 
 namespace clang::tidy::ucassaat {
 
-namespace {
-
-// Matcher for dynamic memory allocation functions
-const auto AllocFuncMatcher = functionDecl(
-    hasAnyName("::malloc", "::calloc", "::realloc", "std::malloc", 
-               "std::calloc", "std::realloc"));
-
-// Matcher for allocation calls
-const auto AllocCallMatcher = callExpr(
-    callee(AllocFuncMatcher),
-    unless(hasAncestor(callExpr()))).bind("allocCall");
-
-// Helper matcher to find the pointer variable from allocation - fixed version
-const auto PointerVarFromAllocMatcher = stmt(anyOf(
-    // Direct assignment: p = malloc()
-    binaryOperator(hasOperatorName("="),
-        hasLHS(declRefExpr(to(varDecl().bind("ptrVar")))),
-        hasRHS(anyOf(
-            AllocCallMatcher,
-            castExpr(hasSourceExpression(AllocCallMatcher))))),
-    // Variable declaration with initialization: int *p = malloc()
-    declStmt(hasSingleDecl(varDecl(
-        hasInitializer(anyOf(
-            AllocCallMatcher,
-            castExpr(hasSourceExpression(AllocCallMatcher))))
-        .bind("ptrVarDecl"))))
-)).bind("allocExpr");
-
-// Matcher for pointer usage
-const auto PointerUseMatcher = expr(
-    anyOf(
-        // Dereference: *p
-        unaryOperator(hasOperatorName("*"),
-            hasUnaryOperand(ignoringParenImpCasts(
-                declRefExpr(to(varDecl().bind("useVar")))))),
-        // Array subscript: p[0]
-        arraySubscriptExpr(
-            hasBase(ignoringParenImpCasts(
-                declRefExpr(to(varDecl().bind("useVar")))))),
-        // Member access through pointer: p->field
-        memberExpr(hasObjectExpression(ignoringParenImpCasts(
-            declRefExpr(to(varDecl().bind("useVar")))))),
-        // Function call through pointer: p()
-        callExpr(has(ignoringParenImpCasts(
-            declRefExpr(to(varDecl().bind("useVar"))))))
-    )).bind("pointerUse");
-
-// Matcher for null pointer checks
-const auto NullCheckMatcher = stmt(
-    anyOf(
-        // Explicit comparisons: ptr == NULL, ptr != NULL
-        binaryOperator(anyOf(hasOperatorName("=="), hasOperatorName("!=")),
-            hasLHS(ignoringParenImpCasts(
-                declRefExpr(to(varDecl().bind("checkVar"))))),
-            hasRHS(anyOf(cxxNullPtrLiteralExpr(), gnuNullExpr(),
-                         integerLiteral(equals(0))))),
-        binaryOperator(anyOf(hasOperatorName("=="), hasOperatorName("!=")),
-            hasLHS(anyOf(cxxNullPtrLiteralExpr(), gnuNullExpr(),
-                         integerLiteral(equals(0)))),
-            hasRHS(ignoringParenImpCasts(
-                declRefExpr(to(varDecl().bind("checkVar")))))),
-        // Implicit checks: if (ptr), while (ptr)
-        implicitCastExpr(hasImplicitDestinationType(booleanType()),
-            hasSourceExpression(ignoringParenImpCasts(
-                declRefExpr(to(varDecl().bind("checkVar")))))),
-        // Negated checks: if (!ptr)
-        unaryOperator(hasOperatorName("!"),
-            hasUnaryOperand(ignoringParenImpCasts(
-                declRefExpr(to(varDecl().bind("checkVar"))))))
-    )).bind("nullCheck");
-
-} // namespace
-
 void UseUncheckPointerAfterMallocCheck::registerMatchers(MatchFinder *Finder) {
-  // Register separate matchers for allocation and pointer use
-  Finder->addMatcher(
-      traverse(TK_AsIs, PointerVarFromAllocMatcher),
-      this);
-  
-  Finder->addMatcher(
-      traverse(TK_AsIs, PointerUseMatcher),
-      this);
+  // FIXME: Add matchers.
+  Finder->addMatcher(functionDecl().bind("x"), this);
 }
 
 void UseUncheckPointerAfterMallocCheck::check(const MatchFinder::MatchResult &Result) {
-  ASTContext *Context = Result.Context;
-  const SourceManager &SM = *Result.SourceManager;
-  
-  // Check if this is an allocation expression
-  const Stmt *AllocExpr = Result.Nodes.getNodeAs<Stmt>("allocExpr");
-  const VarDecl *PtrVar = nullptr;
-  const VarDecl *PtrVarDecl = Result.Nodes.getNodeAs<VarDecl>("ptrVarDecl");
-  
-  if (AllocExpr && AllocExpr->getBeginLoc().isValid()) {
-    // Get the pointer variable from the allocation
-    if (PtrVarDecl && PtrVarDecl->getLocation().isValid()) {
-      PtrVar = PtrVarDecl;
-    } else {
-      PtrVar = Result.Nodes.getNodeAs<VarDecl>("ptrVar");
-    }
-    
-    if (!PtrVar || !PtrVar->getLocation().isValid()) return;
-    
-    // Store allocation information for this variable
-    // We'll track allocations and their locations
-    // This is a simplified approach - in a real checker, you'd want to
-    // maintain state across multiple matches
-  }
-  
-  // Check if this is a pointer usage
-  const Expr *PointerUse = Result.Nodes.getNodeAs<Expr>("pointerUse");
-  const VarDecl *UseVar = Result.Nodes.getNodeAs<VarDecl>("useVar");
-  
-  if (PointerUse && PointerUse->getBeginLoc().isValid() && 
-      UseVar && UseVar->getLocation().isValid()) {
-    
-    // Get the function containing this statement
-    const FunctionDecl *Func = nullptr;
-    auto Parents = Context->getParents(*PointerUse);
-    while (!Parents.empty()) {
-      if (const auto *FD = Parents[0].get<FunctionDecl>()) {
-        Func = FD;
-        break;
-      }
-      Parents = Context->getParents(Parents[0]);
-    }
-    
-    if (!Func || !Func->hasBody()) return;
-    
-    const Stmt *FuncBody = Func->getBody();
-    if (!FuncBody) return;
-    
-    // Find the most recent allocation for this variable before the use
-    SourceLocation LastAllocLoc;
-    bool IsRealloc = false;
-    
-    // Traverse the function body to find allocations of this variable
-    std::function<void(const Stmt *)> findAllocations = [&](const Stmt *S) {
-      if (!S) return;
-      
-      // Check if this is an allocation of our variable
-      if (const auto *BinOp = dyn_cast<BinaryOperator>(S)) {
-        if (BinOp->getOpcode() == BO_Assign) {
-          const Expr *LHS = BinOp->getLHS()->IgnoreParenImpCasts();
-          if (const auto *DRE = dyn_cast<DeclRefExpr>(LHS)) {
-            if (DRE->getDecl() == UseVar) {
-              const Expr *RHS = BinOp->getRHS()->IgnoreParenImpCasts();
-              // Check if RHS is a call to allocation function
-              const CallExpr *CE = nullptr;
-              if (const auto *Cast = dyn_cast<CastExpr>(RHS)) {
-                CE = dyn_cast<CallExpr>(Cast->getSubExpr()->IgnoreParenImpCasts());
-              } else {
-                CE = dyn_cast<CallExpr>(RHS);
-              }
-              
-              if (CE) {
-                const FunctionDecl *FD = CE->getDirectCallee();
-                if (FD) {
-                  StringRef Name = FD->getName();
-                  if (Name == "malloc" || Name == "calloc" || Name == "realloc" ||
-                      Name == "std::malloc" || Name == "std::calloc" || Name == "std::realloc") {
-                    if (SM.isBeforeInTranslationUnit(CE->getBeginLoc(), 
-                                                     PointerUse->getBeginLoc())) {
-                      LastAllocLoc = CE->getBeginLoc();
-                      IsRealloc = (Name == "realloc" || Name == "std::realloc");
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-      
-      // Check variable declarations with initializers
-      if (const auto *DS = dyn_cast<DeclStmt>(S)) {
-        for (const Decl *D : DS->decls()) {
-          if (const auto *VD = dyn_cast<VarDecl>(D)) {
-            if (VD == UseVar && VD->hasInit()) {
-              const Expr *Init = VD->getInit()->IgnoreParenImpCasts();
-              const CallExpr *CE = nullptr;
-              if (const auto *Cast = dyn_cast<CastExpr>(Init)) {
-                CE = dyn_cast<CallExpr>(Cast->getSubExpr()->IgnoreParenImpCasts());
-              } else {
-                CE = dyn_cast<CallExpr>(Init);
-              }
-              
-              if (CE) {
-                const FunctionDecl *FD = CE->getDirectCallee();
-                if (FD) {
-                  StringRef Name = FD->getName();
-                  if (Name == "malloc" || Name == "calloc" || Name == "realloc" ||
-                      Name == "std::malloc" || Name == "std::calloc" || Name == "std::realloc") {
-                    if (SM.isBeforeInTranslationUnit(CE->getBeginLoc(),
-                                                     PointerUse->getBeginLoc())) {
-                      LastAllocLoc = CE->getBeginLoc();
-                      IsRealloc = (Name == "realloc" || Name == "std::realloc");
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-      
-      for (const Stmt *Child : S->children()) {
-        findAllocations(Child);
-      }
-    };
-    
-    findAllocations(FuncBody);
-    
-    // If no allocation found before this use, it's not from dynamic allocation
-    if (LastAllocLoc.isInvalid()) return;
-    
-    // Now check if there's a null check between the allocation and the use
-    bool FoundNullCheck = false;
-    
-    std::function<void(const Stmt *)> findNullChecks = [&](const Stmt *S) {
-      if (!S || FoundNullCheck) return;
-      
-      // Check binary operators for explicit null comparisons
-      if (const auto *BinOp = dyn_cast<BinaryOperator>(S)) {
-        if (BinOp->getOpcode() == BO_EQ || BinOp->getOpcode() == BO_NE) {
-          const Expr *LHS = BinOp->getLHS()->IgnoreParenImpCasts();
-          const Expr *RHS = BinOp->getRHS()->IgnoreParenImpCasts();
-          
-          // Check if one side is our variable
-          const DeclRefExpr *VarDRE = nullptr;
-          if (const auto *DRE = dyn_cast<DeclRefExpr>(LHS)) {
-            if (DRE->getDecl() == UseVar) VarDRE = DRE;
-          } else if (const auto *DRE = dyn_cast<DeclRefExpr>(RHS)) {
-            if (DRE->getDecl() == UseVar) VarDRE = DRE;
-          }
-          
-          if (VarDRE) {
-            // Check if the other side is a null pointer constant
-            const Expr *OtherSide = (VarDRE == dyn_cast<DeclRefExpr>(LHS)) ? RHS : LHS;
-            if (OtherSide->isNullPointerConstant(*Context, 
-                                                 Expr::NPC_ValueDependentIsNull)) {
-              // Check if this null check is between allocation and use
-              if (SM.isBeforeInTranslationUnit(LastAllocLoc, BinOp->getBeginLoc()) &&
-                  SM.isBeforeInTranslationUnit(BinOp->getBeginLoc(), 
-                                               PointerUse->getBeginLoc())) {
-                FoundNullCheck = true;
-                return;
-              }
-            }
-          }
-        }
-      }
-      
-      // Check for implicit checks (if (ptr), while (ptr))
-      if (const auto *DRE = dyn_cast<DeclRefExpr>(S)) {
-        if (DRE->getDecl() == UseVar) {
-          // Check parent nodes to see if this is in a condition context
-          auto DREParents = Context->getParents(*DRE);
-          while (!DREParents.empty()) {
-            if (const auto *ICE = DREParents[0].get<ImplicitCastExpr>()) {
-              if (ICE->getCastKind() == CK_PointerToBoolean ||
-                  ICE->getCastKind() == CK_IntegralToBoolean) {
-                // Check if this is in a condition context
-                auto ICEParents = Context->getParents(*ICE);
-                while (!ICEParents.empty()) {
-                  const Stmt *ParentStmt = ICEParents[0].get<Stmt>();
-                  if (ParentStmt) {
-                    if (isa<IfStmt>(ParentStmt) || isa<WhileStmt>(ParentStmt) ||
-                        isa<DoStmt>(ParentStmt) || isa<ForStmt>(ParentStmt) ||
-                        isa<ConditionalOperator>(ParentStmt)) {
-                      if (SM.isBeforeInTranslationUnit(LastAllocLoc, 
-                                                       ICE->getBeginLoc()) &&
-                          SM.isBeforeInTranslationUnit(ICE->getBeginLoc(),
-                                                       PointerUse->getBeginLoc())) {
-                        FoundNullCheck = true;
-                        return;
-                      }
-                    }
-                  }
-                  ICEParents = Context->getParents(ICEParents[0]);
-                }
-              }
-            }
-            DREParents = Context->getParents(DREParents[0]);
-          }
-        }
-      }
-      
-      // Check for negated checks (if (!ptr))
-      if (const auto *UnaryOp = dyn_cast<UnaryOperator>(S)) {
-        if (UnaryOp->getOpcode() == UO_LNot) {
-          const Expr *SubExpr = UnaryOp->getSubExpr()->IgnoreParenImpCasts();
-          if (const auto *DRE = dyn_cast<DeclRefExpr>(SubExpr)) {
-            if (DRE->getDecl() == UseVar) {
-              // Check if this is in a condition context
-              auto UnaryParents = Context->getParents(*UnaryOp);
-              while (!UnaryParents.empty()) {
-                const Stmt *ParentStmt = UnaryParents[0].get<Stmt>();
-                if (ParentStmt) {
-                  if (isa<IfStmt>(ParentStmt) || isa<WhileStmt>(ParentStmt) ||
-                      isa<DoStmt>(ParentStmt) || isa<ForStmt>(ParentStmt) ||
-                      isa<ConditionalOperator>(ParentStmt)) {
-                    if (SM.isBeforeInTranslationUnit(LastAllocLoc,
-                                                     UnaryOp->getBeginLoc()) &&
-                        SM.isBeforeInTranslationUnit(UnaryOp->getBeginLoc(),
-                                                     PointerUse->getBeginLoc())) {
-                      FoundNullCheck = true;
-                      return;
-                    }
-                  }
-                }
-                UnaryParents = Context->getParents(UnaryParents[0]);
-              }
-            }
-          }
-        }
-      }
-      
-      for (const Stmt *Child : S->children()) {
-        findNullChecks(Child);
-      }
-    };
-    
-    findNullChecks(FuncBody);
-    
-    // If no null check found, emit diagnostic
-    if (!FoundNullCheck) {
-      diag(PointerUse->getBeginLoc(), 
-           "禁止动态分配的指针变量未检查即使用 [gjb8114-r-1-3-8]")
-          << PointerUse->getSourceRange();
-    }
-  }
+  // FIXME: Add callback implementation.
+  const auto *MatchedDecl = Result.Nodes.getNodeAs<FunctionDecl>("x");
+  if (!MatchedDecl->getIdentifier() || MatchedDecl->getName().startswith("awesome_"))
+    return;
+  diag(MatchedDecl->getLocation(), "function %0 is insufficiently awesome")
+      << MatchedDecl
+      << FixItHint::CreateInsertion(MatchedDecl->getLocation(), "awesome_");
+  diag(MatchedDecl->getLocation(), "insert 'awesome'", DiagnosticIDs::Note);
 }
 
 } // namespace clang::tidy::ucassaat
+
 ```
 The content of /root/code_check/llvm-project/clang-tools-extra/clang-tidy/ucassaat/UseUncheckPointerAfterMallocCheck.h :
 ```cpp
@@ -625,8 +316,7 @@ The content of /root/code_check/llvm-project/clang-tools-extra/clang-tidy/ucassa
 
 namespace clang::tidy::ucassaat {
 
-/// Checks that pointers obtained through dynamic memory allocation functions
-/// (malloc, calloc, realloc) are checked for null before their first use.
+/// FIXME: Write a short description.
 ///
 /// For the user-facing documentation see:
 /// http://clang.llvm.org/extra/clang-tidy/checks/ucassaat/use-uncheck-pointer-after-malloc.html
@@ -641,6 +331,7 @@ public:
 } // namespace clang::tidy::ucassaat
 
 #endif // LLVM_CLANG_TOOLS_EXTRA_CLANG_TIDY_UCASSAAT_USEUNCHECKPOINTERAFTERMALLOCCHECK_H
+
 ```
 
 # Output Formatting Requirements
@@ -649,8 +340,10 @@ public:
     -Strictly output according to the format below, do not add any additional explanations or text, code blocks are marked with ```cpp and include the complete source code.
     -Ensure that the source code is complete and compilable.
     -Please modify based on the checker code template above.Namespace content such as "namespace clang::tidy::ucassaat", please do not modify to prevent prevent compilation error.
-    -In the check() function, all extracted nodes must be checked for non-null and isValid() to avoid direct usage
-    **Example Output Format:**
+    -In the check() function, all extracted nodes must be checked for non-null to avoid direct usage
+    
+## **Example Output Format:**
+
     checker_cpp:
     ```cpp
         ....(source code)....

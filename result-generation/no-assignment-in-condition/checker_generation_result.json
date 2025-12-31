@@ -1,0 +1,46 @@
+{
+    "data": {
+        "ucassaat": [
+            {
+                "title": "clang-tidy - no-assignment-in-condition",
+                "main_title": "no-assignment-in-condition",
+                "description": "Prohibited is the direct use of assignment statements in logical expressions (such as conditional statements like if, while, for), aimed at preventing logical errors caused by mistakenly using the assignment operator (=) instead of the comparison operator (==). When an assignment statement is used in a logical expression, the assignment operation itself returns a value, which is implicitly converted to a boolean value for conditional evaluation. This may cause the conditional evaluation to deviate from the expected logic (such as non-zero values being converted to true, and zero values to false), potentially leading to hard-to-detect program errors. This rule requires that assignment operations must be separated from conditional evaluations, meaning that assignment should be performed first, followed by conditional evaluation using a comparison operator. Compliant scenarios include using only comparison operators (such as ==, !=) in conditions, assigning first and then comparing, or using boolean variables to store the result; non-compliant scenarios involve directly using the assignment operator in conditions (such as if (x = y)), regardless of whether the assignment is combined with a comparison operation.",
+                "category": "ucassaat",
+                "rule_test_path": "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_assignment_in_condition",
+                "negative_case_amount": 10,
+                "positive_case_amount": 10,
+                "issuccess": "True",
+                "performance": "20/20",
+                "success_case_list": [
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_assignment_in_condition/no_assignment_in_condition_case_7.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_assignment_in_condition/no_assignment_in_condition_case_13.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_assignment_in_condition/no_assignment_in_condition_case_5.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_assignment_in_condition/no_assignment_in_condition_case_10.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_assignment_in_condition/no_assignment_in_condition_case_8.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_assignment_in_condition/no_assignment_in_condition_case_18.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_assignment_in_condition/no_assignment_in_condition_case_11.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_assignment_in_condition/no_assignment_in_condition_case_1.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_assignment_in_condition/no_assignment_in_condition_case_20.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_assignment_in_condition/no_assignment_in_condition_case_3.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_assignment_in_condition/no_assignment_in_condition_case_16.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_assignment_in_condition/no_assignment_in_condition_case_2.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_assignment_in_condition/no_assignment_in_condition_case_14.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_assignment_in_condition/no_assignment_in_condition_case_15.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_assignment_in_condition/no_assignment_in_condition_case_19.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_assignment_in_condition/no_assignment_in_condition_case_9.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_assignment_in_condition/no_assignment_in_condition_case_4.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_assignment_in_condition/no_assignment_in_condition_case_12.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_assignment_in_condition/no_assignment_in_condition_case_17.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/ucassaat/no_assignment_in_condition/no_assignment_in_condition_case_6.cpp"
+                ],
+                "failed_case_list": [],
+                "total_cost": "0.021296",
+                "negative_case_analysis": {
+                    "check_success_negative": 10,
+                    "check_failed_negative": 0
+                },
+                "time": "88.13"
+            }
+        ]
+    }
+}

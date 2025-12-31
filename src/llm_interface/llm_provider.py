@@ -10,10 +10,15 @@ def get_llm_client():
     if model_name == "deepseek":
         API_KEY = os.getenv("DEEPSEEK_API_KEY", "your_default_api_key_here")
         BASE_URL = os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com")
+        # client  = ChatOpenAI(
+        #     model="deepseek-chat",
+        #     openai_api_key=API_KEY,
+        #     openai_api_base=BASE_URL,
+        #     temperature=0.7)
         client  = ChatOpenAI(
-            model_name="deepseek-chat",
-            openai_api_key=API_KEY,
-            openai_api_base=BASE_URL,
+            model="deepseek-chat",
+            api_key=API_KEY,
+            base_url=BASE_URL,
             temperature=0.7)
         return client
     

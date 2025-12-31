@@ -182,6 +182,21 @@ if __name__ == "__main__":
 
     remove_Checker_Template(checker_name="use-uncheck-pointer-after-malloc")
     compiler_clang_tidy()
+
+
+
+
+
+    # remove_Checker_Template(checker_name="realse-pointer-not-set-null")
+    # compiler_clang_tidy()
+
+    # remove_Checker_Template(checker_name="misuse-compare-expr")
+    # compiler_clang_tidy()
+
+
+
+    # remove_Checker_Template(checker_name="no-else-branch")
+    # compiler_clang_tidy()
     # end = time.time()
     # print(f"总共耗时: {end - start} 秒")
 
