@@ -9,8 +9,8 @@
       "status": "modified",
       "old_path": "drivers/spi/spi-pci1xxxx.c",
       "new_path": "drivers/spi/spi-pci1xxxx.c",
-      "before_file": "before/drivers/spi/spi-pci1xxxx.c",
-      "after_file": "after/drivers/spi/spi-pci1xxxx.c"
+      "before_file": "before/spi-pci1xxxx.c",
+      "after_file": "after/spi-pci1xxxx.c"
     }
   ]
 }

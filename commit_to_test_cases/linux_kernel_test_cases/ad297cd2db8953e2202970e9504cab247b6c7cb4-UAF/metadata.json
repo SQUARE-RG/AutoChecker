@@ -9,8 +9,8 @@
       "status": "modified",
       "old_path": "drivers/net/ethernet/qualcomm/emac/emac.c",
       "new_path": "drivers/net/ethernet/qualcomm/emac/emac.c",
-      "before_file": "before/drivers/net/ethernet/qualcomm/emac/emac.c",
-      "after_file": "after/drivers/net/ethernet/qualcomm/emac/emac.c"
+      "before_file": "before/emac.c",
+      "after_file": "after/emac.c"
     }
   ]
 }

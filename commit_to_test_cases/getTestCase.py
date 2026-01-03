@@ -36,12 +36,15 @@ def is_supported_source(path: Optional[str]) -> bool:
 
 
 def write_text_file(root: Path, relative_path: str, content: str) -> Path:
-    target = root / relative_path
+    # target = root / relative_path
+    # print("Writing file:", root, relative_path)
+    # relative_path =  drivers/spi/spi-pci1xxxx.c  截取获得spi-pci1xxxx.c
+    target = root / Path(relative_path).name
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text(content)
     return target
 
-
+# 获取指定修订版中文件的内容快照
 def get_file_snapshot(repo, revision: str, file_path: str) -> Optional[str]:
     try:
         return repo.git.show(f"{revision}:{file_path}")

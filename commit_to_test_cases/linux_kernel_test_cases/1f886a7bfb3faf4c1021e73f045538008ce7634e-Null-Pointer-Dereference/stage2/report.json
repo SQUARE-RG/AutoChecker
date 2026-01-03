@@ -1,0 +1,5 @@
+{
+  "pattern": "当devm_kzalloc分配内存失败时，spi_bus->spi_int[iter]为空指针，后续代码直接使用该指针会导致解引用错误。",
+  "buggy": [],
+  "fixed": []
+}
