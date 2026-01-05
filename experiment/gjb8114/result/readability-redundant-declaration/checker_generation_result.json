@@ -1,0 +1,40 @@
+{
+    "data": {
+        "readability": [
+            {
+                "title": "clang-tidy - readability-redundant-declaration",
+                "main_title": "readability-redundant-declaration",
+                "description": "Finds redundant variable and function declarations.\n\n.. code-block:: c++\n\n  extern int X;\n  extern int X;\n\nbecomes\n\n.. code-block:: c++\n\n  extern int X;\n\nSuch redundant declarations can be removed without changing program behavior.\nThey can for instance be unintentional left overs from previous refactorings\nwhen code has been moved around. Having redundant declarations could in worst\ncase mean that there are typos in the code that cause bugs.\n\nNormally the code can be automatically fixed, :program:`clang-tidy` can remove\nthe second declaration. However there are 2 cases when you need to fix the code\nmanually:\n\n* When the declarations are in different header files;\n* When multiple variables are declared together.\n",
+                "code_blocks": "code_blocks",
+                "category": "readability",
+                "file_path": "/root/code_check/llvm-project/clang-tools-extra/docs/clang-tidy/checks/readability/redundant-declaration.rst",
+                "rule_test_path": "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/redundant-declaration",
+                "negative_case_amount": 11,
+                "positive_case_amount": 6,
+                "issuccess": "True",
+                "performance": "14/17",
+                "success_case_list": [
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/redundant-declaration/redundant_declaration_case_2.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/redundant-declaration/redundant_declaration_case_14.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/redundant-declaration/redundant_declaration_case_15.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/redundant-declaration/redundant_declaration_case_17.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/redundant-declaration/redundant_declaration_case_7.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/redundant-declaration/redundant_declaration_case_18.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/redundant-declaration/redundant_declaration_case_4.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/redundant-declaration/redundant_declaration_case_9.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/redundant-declaration/redundant_declaration_case_1.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/redundant-declaration/redundant_declaration_case_6.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/redundant-declaration/redundant_declaration_case_16.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/redundant-declaration/redundant_declaration_case_3.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/redundant-declaration/redundant_declaration_case_13.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/redundant-declaration/redundant_declaration_case_8.cpp"
+                ],
+                "failed_case_list": [
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/redundant-declaration/redundant_declaration_case_5.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/redundant-declaration/redundant_declaration_case_12.cpp",
+                    "/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy/checkers/readability/redundant-declaration/redundant_declaration_case_11.cpp"
+                ]
+            }
+        ]
+    }
+}
