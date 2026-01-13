@@ -117,7 +117,7 @@ def get_checker_generator(plateform: str,rule:AbstractRule,all_Test_Case_List: L
         checker_generator = Clang_tidy_CheckerGenerator(rule, all_Test_Case_List, skipped_Test_Cases, rule_result_dir)
         return checker_generator
     elif plateform == "codeql":
-        checker_generator = CodeQL_CheckerGenerator()
+        checker_generator = CodeQL_CheckerGenerator(rule, all_Test_Case_List, skipped_Test_Cases, rule_result_dir)
         return checker_generator
     return None
 

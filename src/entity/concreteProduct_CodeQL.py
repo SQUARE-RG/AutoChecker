@@ -3,7 +3,7 @@ from entity.abstractProduct import AbstractCase
 from entity.abstractProduct import AbstractRule
 from typing import List, Optional
 class Case_CodeQL(AbstractCase):
-    def __init__(self, case_code: str = "", case_description: str ="", case_flag: bool = False):
+    def __init__(self, case_code: str = "", case_description: str ="", case_flag: bool = False,case_path: str = ""):
         """
         init a test case
         :param case_code:

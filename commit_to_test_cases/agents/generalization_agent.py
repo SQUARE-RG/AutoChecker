@@ -103,8 +103,9 @@ class TestCaseGeneralizationAgent:
                 "extra_requirements": extra_requirements,
             }
         )
+        print("generation response:", response)
         if isinstance(response, dict):
-            cases_payload = response.get("cases", [])
+            cases_payload = response.get("test_cases", [])
         else:
             cases_payload = response.cases
         results: List[GeneratedCase] = []

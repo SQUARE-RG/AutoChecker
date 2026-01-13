@@ -1,0 +1,23 @@
+{
+  "commit": "e651faa2fba4d387aa00b3c02e9c10232852d2ef",
+  "parent": "727e08b1a56a60ee9b68ae5c7539cbcfe2cfe552",
+  "summary": "drivers/tty/vt: use standard array-copy-functions",
+  "message": "drivers/tty/vt: use standard array-copy-functions\n\ntty/vt currently uses memdup_user() and vmemdup_array_user() to copy\nuserspace arrays.\n\nWhereas there is no danger of overflowing, the call to vmemdup_user()\ncurrently utilizes array_size() to calculate the array size\nnevertheless. This is not useful because array_size() would return\nSIZE_MAX and pass it to vmemdup_user() in case of (the impossible)\noverflow.\n\nstring.h from the core-API now provides the wrappers memdup_array_user()\nand vmemdup_array_user() to copy userspace arrays in a standardized\nmanner. Additionally, they also perform generic overflow-checks.\n\nUse these wrappers to make it more obvious and readable that arrays are\nbeing copied.\n\nAs we are at it, remove two unnecessary empty lines.\n\nSuggested-by: Dave Airlie <airlied@redhat.com>\nSigned-off-by: Philipp Stanner <pstanner@redhat.com>\nLink: https://lore.kernel.org/r/20231103111207.74621-2-pstanner@redhat.com\nSigned-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>",
+  "bug_type": "Misuse",
+  "files": [
+    {
+      "status": "modified",
+      "old_path": "drivers/tty/vt/consolemap.c",
+      "new_path": "drivers/tty/vt/consolemap.c",
+      "before_file": "before/consolemap.c",
+      "after_file": "after/consolemap.c"
+    },
+    {
+      "status": "modified",
+      "old_path": "drivers/tty/vt/keyboard.c",
+      "new_path": "drivers/tty/vt/keyboard.c",
+      "before_file": "before/keyboard.c",
+      "after_file": "after/keyboard.c"
+    }
+  ]
+}

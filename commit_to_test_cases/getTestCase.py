@@ -23,7 +23,8 @@ SUPPORTED_EXTENSIONS = {
 }
 
 DEFAULT_COMMIT_FILE = (
-    Path(__file__).resolve().parents[1] / "commits" / "commits-debug.txt"
+    # Path(__file__).resolve().parents[1] / "commits" / "commits-debug.txt"
+    Path(__file__).resolve().parents[1] / "commits" / "commits-sample.txt"
 )
 TARGET_REPO_PATH = Path("/root/code_check/linux")
 target = Linux(repo_path=TARGET_REPO_PATH)
@@ -250,7 +251,7 @@ def main():
         logger.warning("No commits found in {}", commit_file)
         return
 
-    default_output = "/root/code_check/commit_to_test_cases/linux_kernel_test_cases"
+    default_output = "/root/code_check/commit_to_test_cases/commit_sample_test_cases"
     output_root = Path(args.output_dir) if args.output_dir else Path(default_output)
     output_root.mkdir(parents=True, exist_ok=True)
 

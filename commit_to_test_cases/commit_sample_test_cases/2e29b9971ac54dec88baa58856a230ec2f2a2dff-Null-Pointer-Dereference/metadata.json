@@ -1,0 +1,16 @@
+{
+  "commit": "2e29b9971ac54dec88baa58856a230ec2f2a2dff",
+  "parent": "8a58bcd00e2e8d46afce468adc09fcd7968f514c",
+  "summary": "arm64/sme: Fix NULL check after kzalloc",
+  "message": "arm64/sme: Fix NULL check after kzalloc\n\nFix following coccicheck error:\n./arch/arm64/kernel/process.c:322:2-23: alloc with no test, possible model on line 326\n\nHere should be dst->thread.sve_state.\n\nFixes: 8bd7f91c03d8 (\"arm64/sme: Implement traps and syscall handling for SME\")\nSigned-off-by: Wan Jiabing <wanjiabing@vivo.com>\nReviwed-by: Mark Brown <broonie@kernel.org>\nLink: https://lore.kernel.org/r/20220426113054.630983-1-wanjiabing@vivo.com\nSigned-off-by: Catalin Marinas <catalin.marinas@arm.com>",
+  "bug_type": "Null-Pointer-Dereference",
+  "files": [
+    {
+      "status": "modified",
+      "old_path": "arch/arm64/kernel/process.c",
+      "new_path": "arch/arm64/kernel/process.c",
+      "before_file": "before/process.c",
+      "after_file": "after/process.c"
+    }
+  ]
+}

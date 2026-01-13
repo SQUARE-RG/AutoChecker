@@ -1,0 +1,19 @@
+diff --git a/drivers/net/ethernet/qualcomm/emac/emac.c b/drivers/net/ethernet/qualcomm/emac/emac.c
+index 8543bf3c3484..ad655f0a4965 100644
+--- a/drivers/net/ethernet/qualcomm/emac/emac.c
++++ b/drivers/net/ethernet/qualcomm/emac/emac.c
+@@ -735,12 +735,13 @@ static int emac_remove(struct platform_device *pdev)
+ 
+ 	put_device(&adpt->phydev->mdio.dev);
+ 	mdiobus_unregister(adpt->mii_bus);
+-	free_netdev(netdev);
+ 
+ 	if (adpt->phy.digital)
+ 		iounmap(adpt->phy.digital);
+ 	iounmap(adpt->phy.base);
+ 
++	free_netdev(netdev);
++
+ 	return 0;
+ }
+ 

@@ -1,0 +1,16 @@
+{
+  "commit": "b58b1b883b9b702e25204dbe2b221eecc8ecd159",
+  "parent": "204f45140faa0772d2ca1b3de96d1c0fb3db8e77",
+  "summary": "bcachefs: fix iov_iter count underflow on sub-block dio read",
+  "message": "bcachefs: fix iov_iter count underflow on sub-block dio read\n\nbch2_direct_IO_read() checks the request offset and size for sector\nalignment and then falls through to a couple calculations to shrink\nthe size of the request based on the inode size. The problem is that\nthese checks round up to the fs block size, which runs the risk of\nunderflowing iter->count if the block size happens to be large\nenough. This is triggered by fstest generic/361 with a 4k block\nsize, which subsequently leads to a crash. To avoid this crash,\ncheck that the shorten length doesn't exceed the overall length of\nthe iter.\n\nFixes:\nSigned-off-by: Brian Foster <bfoster@redhat.com>\nReviewed-by: Su Yue <glass.su@suse.com>\nSigned-off-by: Kent Overstreet <kent.overstreet@linux.dev>",
+  "bug_type": "Buffer-Overflow",
+  "files": [
+    {
+      "status": "modified",
+      "old_path": "fs/bcachefs/fs-io-direct.c",
+      "new_path": "fs/bcachefs/fs-io-direct.c",
+      "before_file": "before/fs-io-direct.c",
+      "after_file": "after/fs-io-direct.c"
+    }
+  ]
+}

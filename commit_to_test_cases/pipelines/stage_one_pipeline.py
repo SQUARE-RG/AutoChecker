@@ -30,10 +30,13 @@ class StageOnePipeline:
         self.max_attempts = max_attempts
 
     def run(self, commit_dir: Path, file_filters: Optional[List[str]] = None) -> Dict:
+        # 读取patch.md
         commit_dir = commit_dir.resolve()
         patch_md = (commit_dir / "patch.md").read_text(encoding="utf-8")
+        # 读取metadata.json
         metadata_path = commit_dir / "metadata.json"
         metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+        # 分析补丁，提取漏洞模式
         pattern = self.patch_agent.analyze(patch_md)
 
         stage1_dir = commit_dir / "stage1"
@@ -52,24 +55,29 @@ class StageOnePipeline:
                 continue
             if Path(rel_path).suffix.lower() not in _SUPPORTED_EXTENSIONS:
                 continue
+            # 这个before_rel和after_rel是相对于commit_dir的路径
             before_rel = file_meta.get("before_file")
             after_rel = file_meta.get("after_file")
             if not before_rel or not after_rel:
                 continue
             before_path = commit_dir / before_rel
             after_path = commit_dir / after_rel
+            # 确保文件存在
             if not before_path.exists() or not after_path.exists():
                 continue
+            # 命名问题暂时不修改
             suffix = Path(rel_path).suffix or ".c"
             safe_base = rel_path.replace("/", "__").replace("\\", "__")
             buggy_output = buggy_dir / f"{safe_base}_bug{suffix}"
             fixed_output = fixed_dir / f"{safe_base}_fix{suffix}"
-            patch_file = file_meta.get("patch_file")
-            diff_text = ""
-            if patch_file:
-                diff_path = commit_dir / patch_file
-                if diff_path.exists():
-                    diff_text = diff_path.read_text(encoding="utf-8")
+            # 读取补丁文件内容
+            diff_text = patch_md
+            # patch_file = file_meta.get("patch_file")
+            # diff_text = ""
+            # if patch_file:
+            #     diff_path = commit_dir / patch_file
+            #     if diff_path.exists():
+            #         diff_text = diff_path.read_text(encoding="utf-8")
 
             buggy_info = self._generate_buggy_case(
                 pattern,

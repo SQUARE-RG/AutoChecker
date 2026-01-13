@@ -87,18 +87,25 @@ class StageTwoPipeline:
     ) -> List[Dict]:
         variant_suffix = "bug" if variant == "buggy" else "fix"
         processed: List[Dict] = []
+        success_counter = 0
         for idx, case in enumerate(cases, start=1):
             safe_name = self._slugify(case.name or f"case_{idx}")
             target_path = output_dir / f"{safe_name}_{variant_suffix}.c"
             current_code = case.code
             compile_success = False
             compile_log: Optional[str] = None
+            final_path = target_path
             for attempt in range(self.max_repairs + 1):
                 target_path.write_text(current_code, encoding="utf-8")
                 verification = self.verification_agent.verify(target_path)
                 compile_log = verification.log
                 if verification.success:
                     compile_success = True
+                    success_counter += 1
+                    final_path = output_dir / f"case_{variant_suffix}_{success_counter}.c"
+                    final_path.write_text(current_code, encoding="utf-8")
+                    if final_path != target_path and target_path.exists():
+                        target_path.unlink()
                     break
                 if attempt >= self.max_repairs:
                     break
@@ -112,7 +119,7 @@ class StageTwoPipeline:
                 {
                     "name": case.name,
                     "rationale": case.rationale,
-                    "path": str(target_path.relative_to(commit_dir)),
+                    "path": str(final_path.relative_to(commit_dir)),
                     "variant": variant,
                     "success": compile_success,
                     "compile_log": compile_log or "",

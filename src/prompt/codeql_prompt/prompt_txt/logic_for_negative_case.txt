@@ -1,0 +1,115 @@
+# Instruction
+You are a static code analysis expert proficient in CodeQL.
+你的任务是 依据**rule** and **test case code**生成**step-by-step implementation logic** for Codeql query 代码
+
+---
+
+# Example
+## Example 1
+**rule**:
+Certain casts in C and C++ place no restrictions on the target type. For example, C style casts such as (MyClass*)p allows the programmer
+to cast any pointer p  to an expression of type MyClass* .If the runtime type of p turns out to be a type that's incompatible with  MyClass, this results in undefined behavior.
+
+**test_code**: 
+```c
+struct Shape {
+  virtual ~Shape();
+
+  virtual void draw() = 0;
+};
+
+struct Circle : public Shape {
+  Circle();
+
+  void draw() override {
+    /* ... */
+  }
+
+  int getRadius();
+};
+
+struct Square : public Shape {
+  Square();
+
+  void draw() override {
+    /* ... */
+  }
+
+  int getLength();
+};
+
+void allocate_and_draw_bad() {
+  Shape* shape = new Circle;
+  // ...
+  // BAD: Assumes that shape is always a Square
+  Square* square = static_cast<Square*>(shape);
+  int length = square->getLength();
+  // CHECKE-MESSAGES: undefined behavior
+}
+
+```
+
+**Output logics**:
+[
+  {{
+    "logic_query": [
+      "1. Define structural helper predicates to reason about class layouts, including identifying the last field of a class and checking whether two fields at the same byte offset are size-compatible, excluding bit-fields.",
+      "2. Define a predicate to determine whether one class layout is a prefix of another by comparing all (or some, in the case of unions) fields of the first class against compatible fields at the same offsets in the second class, while excluding polymorphic classes.",
+      "3. Define an UnsafeCast class that models explicit non-dynamic casts (C-style, static_cast, reinterpret_cast), extracts the target class type of the cast, and excludes implicit casts and types from uninstantiated templates.",
+      "4. Define detailed compatibility rules for UnsafeCast results, considering exact type matches, subtype/supertype relationships, and prefix relationships between class layouts in both directions.",
+      "5. Define allocation sources as heap allocations (new / new[]) that allocate a concrete class type, excluding placement new and types without valid definitions or from uninstantiated templates.",
+      "6. Configure a global dataflow analysis where sources are allocations, sinks are the unconverted expressions of UnsafeCast instances, and barriers block flow through global variables or types without concrete definitions.",
+      "7. Compute dataflow paths from allocation sources to unsafe cast sinks, limiting field-sensitive branching and disabling incremental diff-based behavior.",
+      "8. For each sink, identify the allocated source type that reaches it and determine whether the cast is compatible or incompatible according to the UnsafeCast compatibility predicate.",
+      "9. Filter to only those cases where there exists a dataflow path from an allocation to an unsafe cast that is incompatible with the allocated type.",
+      "10. Suppress reports if there exists any alternative dataflow path from a different allocation type to the same sink where the cast would be compatible, reducing false positives from infeasible paths.",
+      "11. Report a path-problem result for each remaining incompatible flow, selecting the sink node and the corresponding source-to-sink path, and emit a message indicating an invalid conversion from the allocated source type to the cast target type."
+    ]
+  }}
+]
+
+
+---
+
+# Inputs
+## rule
+**Rule Description:**
+{rule_description}
+
+## test case code
+
+**Test Case Code:**
+```c
+{negative_test_case}
+```
+
+
+---
+
+# Output Formatting Requirements
+
+Return **only** a JSON array containing exactly one object with the following keys:
+
+* `"logic_query"` — an ordered list of reasoning steps describing how to implement the query logic.
+
+**Do NOT:**
+
+* include explanations, comments, or markdown
+* include code fences
+* add extra fields
+* wrap output in text outside the JSON
+
+## Example Output Format
+
+```json
+[
+    {{
+        "logic_query": [
+            "1. ...",
+            "2. ...",
+            "3. ...",
+            "4. ..."
+        ]
+    }}
+]
+```

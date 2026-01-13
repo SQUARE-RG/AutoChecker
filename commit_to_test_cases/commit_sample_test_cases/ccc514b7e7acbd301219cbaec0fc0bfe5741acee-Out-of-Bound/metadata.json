@@ -1,0 +1,16 @@
+{
+  "commit": "ccc514b7e7acbd301219cbaec0fc0bfe5741acee",
+  "parent": "88c6d84dd8f70e498f89972449e6ebb7aa1309c0",
+  "summary": "drm/amd/display: Fix possible buffer overflow in 'find_dcfclk_for_voltage()'",
+  "message": "drm/amd/display: Fix possible buffer overflow in 'find_dcfclk_for_voltage()'\n\nwhen 'find_dcfclk_for_voltage()' function is looping over\nVG_NUM_SOC_VOLTAGE_LEVELS (which is 8), but the size of the DcfClocks\narray is VG_NUM_DCFCLK_DPM_LEVELS (which is 7).\n\nWhen the loop variable i reaches 7, the function tries to access\nclock_table->DcfClocks[7]. However, since the size of the DcfClocks\narray is 7, the valid indices are 0 to 6. Index 7 is beyond the size of\nthe array, leading to a buffer overflow.\n\nReported by smatch & thus fixing the below:\ndrivers/gpu/drm/amd/amdgpu/../display/dc/clk_mgr/dcn301/vg_clk_mgr.c:550 find_dcfclk_for_voltage() error: buffer overflow 'clock_table->DcfClocks' 7 <= 7\n\nFixes: 3a83e4e64bb1 (\"drm/amd/display: Add dcn3.01 support to DC (v2)\")\nCc: Roman Li <Roman.Li@amd.com>\nCc: Rodrigo Siqueira <Rodrigo.Siqueira@amd.com>\nCc: Aurabindo Pillai <aurabindo.pillai@amd.com>\nSigned-off-by: Srinivasan Shanmugam <srinivasan.shanmugam@amd.com>\nReviewed-by: Roman Li <roman.li@amd.com>\nSigned-off-by: Alex Deucher <alexander.deucher@amd.com>",
+  "bug_type": "Out-of-Bound",
+  "files": [
+    {
+      "status": "modified",
+      "old_path": "drivers/gpu/drm/amd/display/dc/clk_mgr/dcn301/vg_clk_mgr.c",
+      "new_path": "drivers/gpu/drm/amd/display/dc/clk_mgr/dcn301/vg_clk_mgr.c",
+      "before_file": "before/vg_clk_mgr.c",
+      "after_file": "after/vg_clk_mgr.c"
+    }
+  ]
+}

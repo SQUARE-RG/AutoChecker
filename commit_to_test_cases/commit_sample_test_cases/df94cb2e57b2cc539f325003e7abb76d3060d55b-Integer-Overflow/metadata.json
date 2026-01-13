@@ -1,0 +1,30 @@
+{
+  "commit": "df94cb2e57b2cc539f325003e7abb76d3060d55b",
+  "parent": "be9e782df3cb557715630a61dc79d9f966737859",
+  "summary": "bcachefs: Fix an integer overflow",
+  "message": "bcachefs: Fix an integer overflow\n\nFixes:\n\nbcachefs (e7fdc10e-54a3-49d9-bd0c-390370889d84): disk usage increased 4294967296 more than 2823707312 sectors reserved)\ntransaction updates for __bchfs_fallocate journal seq 467859\n  update: btree=extents cached=0 bch2_trans_update+0x4e8/0x540\n    old u64s 5 type deleted 536925940:3559337304:4294967283 len 0 ver 0\n    new u64s 6 type reservation 536925940:3559337304:4294967283 len 3559337304 ver 0: generation 0 replicas 2\n  update: btree=inodes cached=1 bch2_extent_update_i_size_sectors+0x305/0x3b0\n    old u64s 19 type inode_v3 0:536925940:4294967283 len 0 ver 0: mode 100600 flags 15300000 journal_seq 467859 bi_size 0 bi_sectors 0 bi_version 0 bi_atime 40905301656446 bi_ctime 40905301656446 bi_mtime 40905301656446 bi_otime 40905301656446 bi_uid 0 bi_gid 0 bi_nlink 0 bi_generation 0 bi_dev 0 bi_data_checksum 0 bi_compression 0 bi_project 0 bi_background_compression 0 bi_data_replicas 0 bi_promote_target 0 bi_foreground_target 0 bi_background_target 0 bi_erasure_code 0 bi_fields_set 0 bi_dir 1879048193 bi_dir_offset 3384856038735393365 bi_subvol 0 bi_parent_subvol 0 bi_nocow 0\n    new u64s 19 type inode_v3 0:536925940:4294967283 len 0 ver 0: mode 100600 flags 15300000 journal_seq 467859 bi_size 0 bi_sectors 3559337304 bi_version 0 bi_atime 40905301656446 bi_ctime 40905301656446 bi_mtime 40905301656446 bi_otime 40905301656446 bi_uid 0 bi_gid 0 bi_nlink 0 bi_generation 0 bi_dev 0 bi_data_checksum 0 bi_compression 0 bi_project 0 bi_background_compression 0 bi_data_replicas 0 bi_promote_target 0 bi_foreground_target 0 bi_background_target 0 bi_erasure_code 0 bi_fields_set 0 bi_dir 1879048193 bi_dir_offset 3384856038735393365 bi_subvol 0 bi_parent_subvol 0 bi_nocow 0\n\nKernel panic - not syncing: bcachefs (e7fdc10e-54a3-49d9-bd0c-390370889d84): panic after error\nCPU: 4 PID: 5154 Comm: rsync Not tainted 6.5.9-gateway-gca1614174cc0-dirty #1\nHardware name: To Be Filled By O.E.M. To Be Filled By O.E.M./X570 Phantom Gaming 4, BIOS P4.20 08/02/2021\nCall Trace:\n <TASK>\n dump_stack_lvl+0x5a/0x90\n panic+0x105/0x300\n ? console_unlock+0xf1/0x130\n ? bch2_printbuf_exit+0x16/0x30\n ? srso_return_thunk+0x5/0x10\n bch2_inconsistent_error+0x6f/0x80\n bch2_trans_fs_usage_apply+0x279/0x3d0\n __bch2_trans_commit+0x112a/0x1df0\n ? bch2_extent_update+0x13a/0x1d0\n bch2_extent_update+0x13a/0x1d0\n bch2_extent_fallocate+0x58e/0x740\n bch2_fallocate_dispatch+0xb7c/0x1030\n ? do_filp_open+0xa0/0x140\n vfs_fallocate+0x18e/0x1d0\n __x64_sys_fallocate+0x46/0x70\n do_syscall_64+0x48/0xa0\n ? exit_to_user_mode_prepare+0x4d/0xa0\n entry_SYSCALL_64_after_hwframe+0x6e/0xd8\nRIP: 0033:0x7fc85d91bbb3\nCode: 64 89 02 b8 ff ff ff ff eb bd 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 00 80 3d 31 da 0d 00 00 49 89 ca 74 14 b8 1d 01 00 00 0f 05 <48> 3d 00 f0 ff ff 77 5d c3 0f 1f 40 00 48 83 ec 28 48 89 54 24 10\n\nSigned-off-by: Kent Overstreet <kent.overstreet@linux.dev>",
+  "bug_type": "Integer-Overflow",
+  "files": [
+    {
+      "status": "modified",
+      "old_path": "fs/bcachefs/buckets.c",
+      "new_path": "fs/bcachefs/buckets.c",
+      "before_file": "before/buckets.c",
+      "after_file": "after/buckets.c"
+    },
+    {
+      "status": "modified",
+      "old_path": "fs/bcachefs/io_misc.c",
+      "new_path": "fs/bcachefs/io_misc.c",
+      "before_file": "before/io_misc.c",
+      "after_file": "after/io_misc.c"
+    },
+    {
+      "status": "modified",
+      "old_path": "fs/bcachefs/io_misc.h",
+      "new_path": "fs/bcachefs/io_misc.h",
+      "before_file": "before/io_misc.h",
+      "after_file": "after/io_misc.h"
+    }
+  ]
+}

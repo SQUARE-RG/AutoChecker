@@ -1,0 +1,16 @@
+{
+  "commit": "b1ba8bcb2d1ffce11b308ce166c9cc28d989e3b9",
+  "parent": "7774f3d1dd3822e938e236df67766436c0debd11",
+  "summary": "backlight: hx8357: Fix potential NULL pointer dereference",
+  "message": "backlight: hx8357: Fix potential NULL pointer dereference\n\nThe \"im\" pins are optional. Add missing check in the hx8357_probe().\n\nReported-by: Dan Carpenter <dan.carpenter@linaro.org>\nCloses: https://lore.kernel.org/r/642e1230-3358-4006-a17f-3f297897ae74@moroto.mountain\nFixes: 7d84a63a39b7 (\"backlight: hx8357: Convert to agnostic GPIO API\")\nSigned-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>\nReviewed-by: Daniel Thompson <daniel.thompson@linaro.org>\nLink: https://lore.kernel.org/r/20240114143921.550736-1-andriy.shevchenko@linux.intel.com\nSigned-off-by: Lee Jones <lee@kernel.org>",
+  "bug_type": "Null-Pointer-Dereference",
+  "files": [
+    {
+      "status": "modified",
+      "old_path": "drivers/video/backlight/hx8357.c",
+      "new_path": "drivers/video/backlight/hx8357.c",
+      "before_file": "before/hx8357.c",
+      "after_file": "after/hx8357.c"
+    }
+  ]
+}

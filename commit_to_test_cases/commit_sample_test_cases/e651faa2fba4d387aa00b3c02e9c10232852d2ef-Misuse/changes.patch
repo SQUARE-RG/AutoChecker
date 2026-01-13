@@ -1,0 +1,43 @@
+diff --git a/drivers/tty/vt/consolemap.c b/drivers/tty/vt/consolemap.c
+index 5e39a4f430ee..82d70083fead 100644
+--- a/drivers/tty/vt/consolemap.c
++++ b/drivers/tty/vt/consolemap.c
+@@ -644,7 +644,7 @@ int con_set_unimap(struct vc_data *vc, ushort ct, struct unipair __user *list)
+ 	if (!ct)
+ 		return 0;
+ 
+-	unilist = vmemdup_user(list, array_size(sizeof(*unilist), ct));
++	unilist = vmemdup_array_user(list, ct, sizeof(*unilist));
+ 	if (IS_ERR(unilist))
+ 		return PTR_ERR(unilist);
+ 
+diff --git a/drivers/tty/vt/keyboard.c b/drivers/tty/vt/keyboard.c
+index 12a192e1196b..a2116e135a82 100644
+--- a/drivers/tty/vt/keyboard.c
++++ b/drivers/tty/vt/keyboard.c
+@@ -1772,12 +1772,10 @@ int vt_do_diacrit(unsigned int cmd, void __user *udp, int perm)
+ 			return -EINVAL;
+ 
+ 		if (ct) {
+-
+-			dia = memdup_user(a->kbdiacr,
+-					sizeof(struct kbdiacr) * ct);
++			dia = memdup_array_user(a->kbdiacr,
++						ct, sizeof(struct kbdiacr));
+ 			if (IS_ERR(dia))
+ 				return PTR_ERR(dia);
+-
+ 		}
+ 
+ 		spin_lock_irqsave(&kbd_event_lock, flags);
+@@ -1811,8 +1809,8 @@ int vt_do_diacrit(unsigned int cmd, void __user *udp, int perm)
+ 			return -EINVAL;
+ 
+ 		if (ct) {
+-			buf = memdup_user(a->kbdiacruc,
+-					  ct * sizeof(struct kbdiacruc));
++			buf = memdup_array_user(a->kbdiacruc,
++						ct, sizeof(struct kbdiacruc));
+ 			if (IS_ERR(buf))
+ 				return PTR_ERR(buf);
+ 		} 

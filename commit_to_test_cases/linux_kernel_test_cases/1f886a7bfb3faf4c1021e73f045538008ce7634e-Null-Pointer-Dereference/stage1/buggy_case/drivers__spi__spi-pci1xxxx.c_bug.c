@@ -3,7 +3,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <stdint.h>
-
+#include "global.h"
 // Stub for devm_kzalloc
 static void *devm_kzalloc(size_t size) {
     return calloc(1, size);

@@ -1,0 +1,57 @@
+diff --git a/fs/bcachefs/buckets.c b/fs/bcachefs/buckets.c
+index 2acd727d3f9b..58d8c6ffd955 100644
+--- a/fs/bcachefs/buckets.c
++++ b/fs/bcachefs/buckets.c
+@@ -1322,7 +1322,7 @@ int bch2_trans_fs_usage_apply(struct btree_trans *trans,
+ 	struct bch_fs *c = trans->c;
+ 	static int warned_disk_usage = 0;
+ 	bool warn = false;
+-	unsigned disk_res_sectors = trans->disk_res ? trans->disk_res->sectors : 0;
++	u64 disk_res_sectors = trans->disk_res ? trans->disk_res->sectors : 0;
+ 	struct replicas_delta *d, *d2;
+ 	struct replicas_delta *top = (void *) deltas->d + deltas->used;
+ 	struct bch_fs_usage *dst;
+@@ -1381,7 +1381,7 @@ int bch2_trans_fs_usage_apply(struct btree_trans *trans,
+ 
+ 	if (unlikely(warn) && !xchg(&warned_disk_usage, 1))
+ 		bch2_trans_inconsistent(trans,
+-					"disk usage increased %lli more than %u sectors reserved)",
++					"disk usage increased %lli more than %llu sectors reserved)",
+ 					should_not_have_added, disk_res_sectors);
+ 	return 0;
+ need_mark:
+diff --git a/fs/bcachefs/io_misc.c b/fs/bcachefs/io_misc.c
+index 0979d5e05713..bebc11444ef5 100644
+--- a/fs/bcachefs/io_misc.c
++++ b/fs/bcachefs/io_misc.c
+@@ -23,7 +23,7 @@
+ int bch2_extent_fallocate(struct btree_trans *trans,
+ 			  subvol_inum inum,
+ 			  struct btree_iter *iter,
+-			  unsigned sectors,
++			  u64 sectors,
+ 			  struct bch_io_opts opts,
+ 			  s64 *i_sectors_delta,
+ 			  struct write_point_specifier write_point)
+@@ -105,7 +105,7 @@ int bch2_extent_fallocate(struct btree_trans *trans,
+ 		if (ret)
+ 			goto err;
+ 
+-		sectors = min(sectors, wp->sectors_free);
++		sectors = min_t(u64, sectors, wp->sectors_free);
+ 		sectors_allocated = sectors;
+ 
+ 		bch2_key_resize(&e->k, sectors);
+diff --git a/fs/bcachefs/io_misc.h b/fs/bcachefs/io_misc.h
+index c9e6ed40e1b8..9cb44a7c43c1 100644
+--- a/fs/bcachefs/io_misc.h
++++ b/fs/bcachefs/io_misc.h
+@@ -3,7 +3,7 @@
+ #define _BCACHEFS_IO_MISC_H
+ 
+ int bch2_extent_fallocate(struct btree_trans *, subvol_inum, struct btree_iter *,
+-			  unsigned, struct bch_io_opts, s64 *,
++			  u64, struct bch_io_opts, s64 *,
+ 			  struct write_point_specifier);
+ int bch2_fpunch_at(struct btree_trans *, struct btree_iter *,
+ 		   subvol_inum, u64, s64 *);
