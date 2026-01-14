@@ -12,7 +12,9 @@ linux-db/
 llvm-project/
 src/embedding_db/
 logs/
-
+src/retriever/vector_db
+temp_validate/
+temp_test_dir/
 commit_to_test_cases/kparser/tree-sitter-cpp
 ## build目录
 llvm-project/build/
