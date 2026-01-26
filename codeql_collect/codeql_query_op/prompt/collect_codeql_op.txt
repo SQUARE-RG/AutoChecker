@@ -1,0 +1,106 @@
+You are a compiler expert proficient in the Codeql static analysis framework, skilled in code analysis and logical decomposition. Your task is to perform an in-depth analysis of the given codeql query source code and decompose the core logic of the query into reusable sub-steps.
+
+# **Your Task**
+First analyze the source code of the codeql query,
+Then decompose the query logic into several sub-steps. Break down the complex query logic into several small sub-steps.
+for each sub-step, it should include the following content:
+
+## **1. `"meta_op"`**
+
+* A clear description of the Sub-step.
+
+## **2. `"meta_impl"`**
+
+
+* Must reflect the Sub-step exactly.
+* Preserve the implementation logic within each atomic unit.
+* If a custom  function is used in check function, please place the custom function and its usage in the code in the meta_impl field.
+---
+
+# **Input**
+
+**Checker source code:**
+
+```cpp
+{query_code}
+```
+---
+
+# Example
+checker code:
+```cpp
+
+```
+
+output:
+
+```json
+[
+    {{
+        "meta_op": "Retrieve the matched CXXMethodDecl from MatchResult and return if not present",
+        "meta_impl": "const auto *Definition = Result.Nodes.getNodeAs<CXXMethodDecl>(\"x\");\nif (!Definition)\n  return;"
+    }},
+    {{
+        "meta_op": "Abort early if the method has volatile or restrict qualifiers or a non-none ref-qualifier (not safe to convert)",
+        "meta_impl": "if (Definition->getMethodQualifiers().hasVolatile() ||\n    Definition->getMethodQualifiers().hasRestrict() ||\n    Definition->getRefQualifier() != RQ_None)\n  return;"
+    }},
+    {{
+        "meta_op": "Obtain the canonical declaration corresponding to the matched definition",
+        "meta_impl": "const CXXMethodDecl *Declaration = Definition->getCanonicalDecl();"
+    }},
+    {{
+        "meta_op": "If method is const: compute SourceRange of 'const' in the definition and bail out if not found",
+        "meta_impl": "if (Definition->isConst()) {{\n  SourceRange DefConst = getLocationOfConst(Definition->getTypeSourceInfo(),\n                                            *Result.SourceManager,\n                                            Result.Context->getLangOpts());\n  if (DefConst.isInvalid())\n    return;\n\n  // ... (further const-handling follows)\n}}"
+    }},
+    {{
+        "meta_op": "If declaration differs from definition and definition is const: compute 'const' location in declaration and bail out if not found; if found, emit FixIt to remove it",
+        "meta_impl": "if (Declaration != Definition) {{\n  SourceRange DeclConst = getLocationOfConst(Declaration->getTypeSourceInfo(),\n                                             *Result.SourceManager,\n                                             Result.Context->getLangOpts());\n  if (DeclConst.isInvalid())\n    return;\n  Diag << FixItHint::CreateRemoval(DeclConst);\n}}\n\n// Then remove 'const' from definition (handled in previous step or next step)"
+    }},
+    {{
+        "meta_op": "Helper: obtain source text for a SourceRange (used by getLocationOfConst)",
+        "meta_impl": "static StringRef getStringFromRange(SourceManager &SourceMgr,\n                                    const LangOptions &LangOpts,\n                                    SourceRange Range) {{\n  if (SourceMgr.getFileID(Range.getBegin()) !=\n      SourceMgr.getFileID(Range.getEnd()))\n    return {{}};\n\n  return Lexer::getSourceText(CharSourceRange(Range, true), SourceMgr,\n                              LangOpts);\n}}"
+    }},
+    {{
+        "meta_op": "Helper: locate the exact SourceRange covering the 'const' qualifier for a function type in a TypeSourceInfo (returns invalid if not found)",
+        "meta_impl": "static SourceRange getLocationOfConst(const TypeSourceInfo *TSI,\n                                      SourceManager &SourceMgr,\n                                      const LangOptions &LangOpts) {{\n  assert(TSI);\n  const auto FTL = TSI->getTypeLoc().IgnoreParens().getAs<FunctionTypeLoc>();\n  assert(FTL);\n\n  SourceRange Range{{FTL.getRParenLoc().getLocWithOffset(1),\n                    FTL.getLocalRangeEnd()}};\n  StringRef Text = getStringFromRange(SourceMgr, LangOpts, Range);\n  size_t Offset = Text.find(\"const\");\n  if (Offset == StringRef::npos)\n    return {{}};\n\n  SourceLocation Start = Range.getBegin().getLocWithOffset(Offset);\n  return {{Start, Start.getLocWithOffset(strlen(\"const\") - 1)}};\n}}"
+    }}
+]
+
+```
+
+
+# **Output Format Requirements**
+
+Return **ONLY** a JSON array, where each element is an object containing the **exact** keys:
+
+* `"meta_op"`
+* `"meta_impl"`
+
+**Do NOT:**
+
+* include explanations
+* include markdown code fences
+* include extra fields or comments
+* wrap the JSON in any additional text
+
+## **Example Output Format**
+
+```json
+[
+    {{
+        "meta_op": "Resolve the actual moving expression: if moving-call is invalid, fallback to call-move",
+        "meta_impl": "if (!MovingCall || !MovingCall->getExprLoc().isValid())\n  MovingCall = CallMove;"
+    }},
+    {{
+        "meta_op": "Ignore std::move calls on variables that are not local to a function or method",
+        "meta_impl": "if (!Arg->getDecl()->getDeclContext()->isFunctionOrMethod())\n  return;"
+    }},
+    {{
+        "meta_op": "Iterate over all collected code blocks and perform use-after-move analysis",
+        "meta_impl": "for (Stmt *CodeBlock : CodeBlocks) {{\n  UseAfterMoveFinder Finder(Result.Context);\n  UseAfterMove Use;\n  if (Finder.find(CodeBlock, MovingCall, Arg->getDecl(), &Use))\n    emitDiagnostic(MovingCall, Arg, Use, this, Result.Context);\n}}"
+    }},
+    {{
+        "meta_op": "Extract all relevant matched AST nodes from MatchResult",
+        "meta_impl": "const auto *ContainingCtor = Result.Nodes.getNodeAs<CXXConstructorDecl>(\"containing-ctor\");\nconst auto *ContainingCtorInit = Result.Nodes.getNodeAs<Expr>(\"containing-ctor-init\");\nconst auto *ContainingLambda = Result.Nodes.getNodeAs<LambdaExpr>(\"containing-lambda\");\nconst auto *ContainingFunc = Result.Nodes.getNodeAs<FunctionDecl>(\"containing-func\");\nconst auto *CallMove = Result.Nodes.getNodeAs<CallExpr>(\"call-move\");\nconst auto *MovingCall = Result.Nodes.getNodeAs<Expr>(\"moving-call\");\nconst auto *Arg = Result.Nodes.getNodeAs<DeclRefExpr>(\"arg\");"
+    }}
+]
