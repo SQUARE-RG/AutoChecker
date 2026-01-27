@@ -1,3 +1,8 @@
+# AutoChecker
+AutoChecker是一个静态代码检查器自动生成工具，以规则描述和测试套件作为输入，借助LLM的代码生成功能，生成指定的静态检查器代码，目前支持生成Clang-Tidy的checker代码（针对C/C++语言）、PMD的checker代码（针对JAVA语言）、Codeql的query代码（针对多语言）。
+
+**Overview**:
+![Overview](overview.png)
 # 软件部署流程
 ## 目录树
 使用如下命令将软件克隆到本地：
@@ -34,7 +39,7 @@ cd AutoChecker
 
 软件运行需要依赖python环境并提前编译clang-tidy等工具，做好准备工作后，需要按照要求修改输入文件rule.json并提供相关测试用例套件。
 ## 环境准备
-准备软件运行需要的python环境，并且提前编译clang-tidy。
+准备软件运行需要的python环境，并且提前编译clang-tidy，软件未来会支持生成Codeql的query文件，所以也需要提前准备Codeql的环境。
 ### python 环境准备
 推荐使用Anaconda创建虚拟环境，请依次执行如下命令完成创建虚拟环境和依赖包一键安装。
 ```shell
