@@ -1,0 +1,58 @@
+You are a compiler expert proficient in the Codeql static analysis framework, skilled in code analysis and logical decomposition. Your task is to perform an in-depth analysis of the given codeql query source code and decompose the core logic of the query into reusable sub-steps.
+
+# **Your Task**
+First analyze the source code of the codeql query,
+Then decompose the query logic into several sub-steps. Break down the complex query logic into several small sub-steps.
+for each sub-step, it should include the following content:
+
+## **1. `"meta_op"`**
+
+* A clear description of the Sub-step.
+
+## **2. `"meta_impl"`**
+
+
+* Must reflect the Sub-step exactly.
+* Preserve the implementation logic within each atomic unit.
+* If a custom  function is used in check function, please place the custom function and its usage in the code in the meta_impl field.
+---
+
+# **Input**
+
+**Codeql query source code:**
+
+```query
+{query_code}
+```
+
+
+# **Output Format Requirements**
+
+Return **ONLY** a JSON array, where each element is an object containing the **exact** keys:
+
+* `"meta_op"`
+* `"meta_impl"`
+
+**Do NOT:**
+
+* include explanations
+* include markdown code fences
+* include extra fields or comments
+* wrap the JSON in any additional text
+
+
+** The contents of the `meta_impl` and `meta_op` fields must be in standard JSON format, and any double quotes in the string values must be escaped with "\" **
+
+## **Example Output Format**
+
+```json
+[
+    {{
+        "meta_op": "...",
+        "meta_impl": "..."
+    }},
+    {{
+        "meta_op": "...",
+        "meta_impl": "..."
+    }}
+]
