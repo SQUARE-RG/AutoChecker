@@ -68,3 +68,17 @@ def parse_cpp_h_code_from_answer(answer: str):
                 checker_h_code = blocks[1].strip()
 
     return checker_cpp_code, checker_h_code
+
+def get_most_similer_api_doc_query_op(logics_json):
+    """
+    根据逻辑描述，从本地API文档和查询操作库中检索最相似的内容。
+    """
+    # 这里假设有一个本地的API文档和查询操作库，可以根据逻辑描述进行相似度匹配
+    # 具体实现可以使用向量化检索、关键词匹配等方法
+    # 目前返回占位符字符串
+
+    api_suggest_string = "最相似的API文档内容"
+    doc_suggest_string = "最相似的文档内容"
+    query_op_suggest_string = "最相似的查询操作内容"
+
+    return api_suggest_string, doc_suggest_string, query_op_suggest_string

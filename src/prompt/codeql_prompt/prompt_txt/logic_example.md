@@ -1,78 +1,111 @@
-# Instruction
-You are a static code analysis expert proficient in CodeQL, skilled in using CodeQL for vulnerability pattern recognition and code security auditing.
-
-Your task is to generate step-by-step implementation logic for a CodeQL query code used to detect violation patterns, based on the provided **Rule Description** and **test case code**.
-
-# Your Task
-1.  Carefully read and understand the code violation patterns or security vulnerability types defined in the rule description. Identify the key characteristics of the rule, such as the vulnerability pattern, dangerous functions, data flow paths, etc., to determine the code pattern features that need to be detected.
-2.  Examine the test case code for clearly marked violation locations (usually indicated by comments or specific identifiers). Identify the specific code patterns that violate the rule, such as specific function calls, data flow paths, or code structures.
-3.  Based on the above analysis, provide step-by-step implementation logic for writing the CodeQL query.
----
-
 # Example
-## Inputs
+## Example 1
+/root/code_check/codeql/cpp/ql/src/Security/CWE/CWE-014/MemsetMayBeDeleted.ql
 
-### Rule Description:
+
+Rule Description:
+
+The rule describes a security vulnerability where using memset or bzero to clear a buffer containing sensitive data (like passwords or keys) can be optimized away by the compiler through "dead store elimination" if the buffer is not used afterward. This optimization leaves the sensitive data exposed in memory, risking retrieval by an attacker. The rule recommends using secure alternatives like memset_s (from C11), platform-specific functions such as SecureZeroMemory, or compiler flags like -fno-builtin-memset to ensure the clearing operation is not removed.
+
+
+test cese code:
+```cpp
+char password[MAX_PASSWORD_LENGTH];
+// read and verify password
+memset(password, 0, MAX_PASSWORD_LENGTH);
+// CHECK-MESSAGES: violate the rule
+
+char password[MAX_PASSWORD_LENGTH];
+// read and verify password
+memset_s(password, MAX_PASSWORD_LENGTH, 0, MAX_PASSWORD_LENGTH);
+
+```
+
+logic:
+
+```json
+[
+    {
+        "logic_query": [
+            "1. Identify calls to memory-clearing functions by matching FunctionCall nodes whose target name is \"memset\" or \"bzero\", and explicitly exclude secure alternatives such as \"memset_s\" and platform-specific secure APIs (for example \"SecureZeroMemory\").",
+            "2. For each matched call, extract the destination buffer expression (first argument) and ensure it refers to a stack or heap buffer (for example, a local variable or allocated memory) rather than a constant or global read-only region.",
+            "3. Verify that the clearing value corresponds to zeroing semantics (for example, the fill argument is literal 0 or equivalent), confirming that the intent is to erase the buffer contents.",
+            "4. Perform a local control-flow/data-flow check to ensure that the destination buffer is not subsequently read or used after the memset/bzero call within the same scope or basic block region, indicating that the store may be considered dead by the compiler.",
+            "5. Optionally strengthen the signal by checking that the buffer has been written or used prior to the memset/bzero call (for example, via assignments or function calls), suggesting it may contain sensitive data such as passwords or keys.",
+            "6. Exclude cases where compiler-guaranteed clearing APIs are used (for example memset_s) or where additional mechanisms prevent optimization (such as explicit volatile accesses, inline assembly barriers, or known secure wrappers).",
+            "7. Report the remaining memset/bzero calls as potential violations, emitting a result at the call site with a message explaining that the memory clear may be optimized away and recommending secure alternatives like memset_s or platform-specific secure zeroing functions."
+        ]
+    }
+]
+
+
+```
+
+
+## Example2
+
+/root/code_check/codeql/cpp/ql/src/Security/CWE/CWE-843/TypeConfusion.ql
+
 The rule describes a type confusion vulnerability in C/C++ where unsafe C-style casts (e.g., (MyClass*)p) allow arbitrary pointer conversions without runtime checks, leading to undefined behavior if the runtime type of the pointer is incompatible with the target type. To mitigate this, the rule recommends using dynamic_cast for safe conversions between polymorphic types, as it performs runtime checks and returns nullptr on failure. If dynamic_cast is unavailable, static_cast should be used to restrict permissible conversions, and if neither is feasible, all casts must be manually verified for safety .
 
 
-### test cese code:
 ```cpp
-void allocate_and_draw_bad() {{
+void allocate_and_draw_bad() {
   Shape* shape = new Circle;
   // ...
   // BAD: Assumes that shape is always a Square
   Square* square = static_cast<Square*>(shape);
   int length = square->getLength();
-}}
+}
 
 
-struct Shape {{
+struct Shape {
   virtual ~Shape();
 
   virtual void draw() = 0;
-}};
+};
 
-struct Circle : public Shape {{
+struct Circle : public Shape {
   Circle();
 
-  void draw() override {{
+  void draw() override {
     /* ... */
-  }}
+  }
 
   int getRadius();
-}};
+};
 
-struct Square : public Shape {{
+struct Square : public Shape {
   Square();
 
-  void draw() override {{
+  void draw() override {
     /* ... */
-  }}
+  }
 
   int getLength();
-}};
+};
 
 
 
-void allocate_and_draw_good() {{
+void allocate_and_draw_good() {
   Shape* shape = new Circle;
   // ...
   // GOOD: Dynamically checks if shape is a Square
   Square* square = dynamic_cast<Square*>(shape);
-  if(square) {{
+  if(square) {
     int length = square->getLength();
-  }} else {{
+  } else {
     // handle error
-  }}
-}}
+  }
+}
+
 ```
 
-## output:
+
 
 ```json
 [
-  {{
+  {
     "logic_query": [
       "1. Define `lastField(f)` to determine whether a field `f` is the final field in its declaring class by selecting the field with the maximum byte offset among all fields of that class.",
       "2. Define `hasCompatibleFieldAtOffset(f1, offset, c2)` to check whether class `c2` has a field at the same offset as `f1` that is layout-compatible: either the target field is a bit-field, or both fields have equal size, or `f1` is the last field and its size is less than or equal to the target field size.",
@@ -89,48 +122,6 @@ void allocate_and_draw_good() {{
       "13. Suppress reports if there exists any alternative source (`goodSourceType`) that can also flow to the same sink where the cast would be compatible, to reduce false positives from infeasible paths.",
       "14. For each remaining violating path, report the sink expression with the full source-to-sink path and emit a diagnostic stating that conversion from the allocated source type to the cast destination type is invalid."
     ]
-  }}
-]
-```
-
----
-
-# Inputs
-## Rule Description
-
-{rule_description}
-
-## test case code
-```c
-{negative_test_case}
-```
-
----
-
-# Output Formatting Requirements
-
-Return **only** a JSON array containing exactly one object with the following keys:
-
-* `"logic_query"` — an ordered list of reasoning steps describing how to implement the query logic.
-
-**Do NOT:**
-
-* include explanations, comments, or markdown
-* include code fences
-* add extra fields
-* wrap output in text outside the JSON
-
-## Example Output Format
-
-```json
-[
-    {{
-        "logic_query": [
-            "1. ...",
-            "2. ...",
-            "3. ...",
-            "4. ..."
-        ]
-    }}
+  }
 ]
 ```

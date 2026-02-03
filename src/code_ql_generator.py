@@ -36,17 +36,29 @@ class CodeQL_CheckerGenerator(object):
         print("初始checker生成成功")
 
         self.RULE.add_checker(init_checker)
-        # 初始checker生成成功后，重新洗牌
+        # 初始checker生成成功后，重新洗牌z
         self.skipped_Test_Cases = []
         self.checker_augmentation(init_checker)
         return self.RULE.get_checkers()
     def run_logic_for_negative_case(self,rule_description:str,case_code:str):
-        
-        pass
-   
+        prompt = get_prompt_for_Codeql("logic_for_negative_case")
+        logic_query = prompt.format(rule_description=rule_description,negative_test_case=case_code)
+        for attempt in range(1,config['arguments']['max_llm_tries'] + 1):
+            answer,cb = llm_invoke(llm_client,logic_query)
+            cost = calculate_deepseek_cost(cb, model_name="deepseek-chat")
+            self.total_cost += cost['total_cost']
+            logger.debug(f"LLM logic for negative case attempt {attempt}:\n {answer}")
+            cleaned = re.sub(r'```json|```', '', answer).strip()
+            try:
+                json_logic = json.loads(cleaned)
+                return json_logic
+            except json.JSONDecodeError as e:
+                logger.debug(f"JSON解析错误: {e}. 尝试重新生成...")
+        return []
     def generate_checker_with_single_case(self,current_case:AbstractCase):
         logics = self.run_logic_for_negative_case(self.RULE.get_rule_description(),current_case.get_case_code())
-        pass
+        api_suggest_string,doc_suggest_string,query_op_suggest_string = get_most_similer_api_doc_query_op(logics)
+        logger.info("相关API上下文检索完成")
     def analyze_compiler_error(self, compiler_output: str, ql_content: str, qll_content: str) :
         pass
     def first_checker_generation(self):
