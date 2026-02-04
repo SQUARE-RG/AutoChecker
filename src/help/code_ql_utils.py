@@ -8,7 +8,9 @@ import subprocess
 from collections import OrderedDict
 import re
 import json
-
+from retriever.retrieve_from_codeql_api import get_related_api
+from retriever.retrieve_from_codeql_query_op import get_related_query_op    
+from retriever.retrieve_from_codeql_doc import get_related_doc
 
 def count_negative_cases(Case_list: List[AbstractCase]=None):
     if Case_list is None:
@@ -68,8 +70,16 @@ def parse_cpp_h_code_from_answer(answer: str):
                 checker_h_code = blocks[1].strip()
 
     return checker_cpp_code, checker_h_code
+def remove_number_prefix(text):
+    return re.sub(r'^\d+\.\s*', '', text)
+def get_logic_json(logics_json):
+  
+    logic_for_codeql_query = []
+    for step in logics_json[0]["logic_query"]:
+        logic_for_codeql_query.append(remove_number_prefix(step))
+    return logic_for_codeql_query
 
-def get_most_similer_api_doc_query_op(logics_json):
+def get_most_similar_api_doc_query_op(logics_json):
     """
     根据逻辑描述，从本地API文档和查询操作库中检索最相似的内容。
     """
@@ -77,8 +87,19 @@ def get_most_similer_api_doc_query_op(logics_json):
     # 具体实现可以使用向量化检索、关键词匹配等方法
     # 目前返回占位符字符串
 
-    api_suggest_string = "最相似的API文档内容"
-    doc_suggest_string = "最相似的文档内容"
-    query_op_suggest_string = "最相似的查询操作内容"
+    api_suggest_string = "最相似的API文档内容:\n"
+    doc_suggest_string = "最相似的文档内容:\n"
+    query_op_suggest_string = "最相似的查询操作内容:\n"
+
+    logics_for_codeql_query = get_logic_json(logics_json)
+    related_api= get_related_api(logics_for_codeql_query)
+    related_doc= get_related_doc(logics_for_codeql_query)
+    related_query_op= get_related_query_op(logics_for_codeql_query)
+    for a in related_api:
+        api_suggest_string += a + "\n"
+    for d in related_doc:
+        doc_suggest_string += d + "\n"
+    for q in related_query_op:
+        query_op_suggest_string += q + "\n"
 
     return api_suggest_string, doc_suggest_string, query_op_suggest_string

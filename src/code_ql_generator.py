@@ -8,7 +8,7 @@ from loguru import logger
 import re
 import json
 from llm_interface.llm_provider import llm_client,llm_invoke,calculate_deepseek_cost
-from help.code_ql_utils import count_negative_cases,select_negative_case,save_checker_code,save_middle_check,get_checker_code
+from help.code_ql_utils import count_negative_cases,select_negative_case,save_checker_code,save_middle_check,get_checker_code,get_most_similar_api_doc_query_op
 from prompt.codeql_prompt.build_codeql_prompt import get_prompt_for_Codeql
 from plateform.code_ql import run_code_ql_with_query,compiler_code_ql,run_code_ql
 
@@ -57,7 +57,7 @@ class CodeQL_CheckerGenerator(object):
         return []
     def generate_checker_with_single_case(self,current_case:AbstractCase):
         logics = self.run_logic_for_negative_case(self.RULE.get_rule_description(),current_case.get_case_code())
-        api_suggest_string,doc_suggest_string,query_op_suggest_string = get_most_similer_api_doc_query_op(logics)
+        api_suggest_string,doc_suggest_string,query_op_suggest_string = get_most_similar_api_doc_query_op(logics)
         logger.info("相关API上下文检索完成")
     def analyze_compiler_error(self, compiler_output: str, ql_content: str, qll_content: str) :
         pass

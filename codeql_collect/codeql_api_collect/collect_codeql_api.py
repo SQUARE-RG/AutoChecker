@@ -125,6 +125,38 @@ class QLApiCollector:
 			classes.extend(module.classes)
 		return {"predicate": predicates, "class": classes}
 
+	def _build_signature(
+		self,
+		name: str,
+		args: List[Dict[str, str]],
+		return_type: Optional[str] = None,
+		class_name: Optional[str] = None,
+	) -> str:
+		"""Construct a human-readable signature for predicates and methods.
+
+		Examples:
+		- predicate topLevel(int x, string y)
+		- predicate MyClass::holds(int x)
+		- ResultType MyClass::getResult(int x)
+		"""
+		params: List[str] = []
+		for p in args:
+			t = p.get("type", "").strip()
+			n = p.get("name", "").strip()
+			if t and n:
+				params.append(f"{t} {n}")
+			elif t:
+				params.append(t)
+			elif n:
+				params.append(n)
+		params_text = ", ".join(params)
+		base = f"{name}({params_text})"
+		if class_name:
+			base = f"{class_name}::{base}"
+		if return_type:
+			return f"{return_type} {base}"
+		return base
+
 	def _extract_module(self, qll_path: Path) -> ModuleExtraction:
 		source = qll_path.read_text(encoding="utf-8")
 		tree = self.parser.parse(source.encode("utf-8"))
@@ -162,6 +194,7 @@ class QLApiCollector:
 			"args": params,
 			"body": body_text(body_node, source),
 			"comments": doc or "",
+			"signature": self._build_signature(name, params, return_type="predicate"),
 		}
 
 	def _build_class(self, node: Node, source: str, doc: Optional[str]) -> Dict[str, Any]:
@@ -184,7 +217,7 @@ class QLApiCollector:
 			member_doc = doc_text or pending_doc
 			pending_doc = None
 			if definition.type == "memberPredicate":
-				entry, is_pred = self._build_member_predicate(definition, source, member_doc)
+				entry, is_pred = self._build_member_predicate(definition, source, member_doc, class_name)
 				if is_private(annotations):
 					continue
 				if is_pred:
@@ -194,7 +227,7 @@ class QLApiCollector:
 			elif definition.type == "charpred":
 				if is_private(annotations):
 					continue
-				predicates.append(self._build_charpred(definition, source, member_doc))
+				predicates.append(self._build_charpred(definition, source, member_doc, class_name))
 		return {
 			"className": class_name,
 			"extends": extends,
@@ -218,7 +251,11 @@ class QLApiCollector:
 		return results
 
 	def _build_member_predicate(
-		self, node: Node, source: str, doc: Optional[str]
+		self,
+		node: Node,
+		source: str,
+		doc: Optional[str],
+		class_name: Optional[str] = None,
 	) -> tuple[Dict[str, Any], bool]:
 		name = normalize_ws(node_text(node.child_by_field_name("name"), source))
 		return_type = normalize_ws(node_text(node.child_by_field_name("returnType"), source))
@@ -229,21 +266,30 @@ class QLApiCollector:
 			"args": params,
 			"body": body_text(body_node, source),
 			"comments": doc or "",
+			"signature": self._build_signature(name, params, return_type=return_type, class_name=class_name),
 		}
 		if return_type == "predicate":
 			return entry, True
 		entry["type"] = return_type
 		return entry, False
 
-	def _build_charpred(self, node: Node, source: str, doc: Optional[str]) -> Dict[str, Any]:
+	def _build_charpred(
+		self,
+		node: Node,
+		source: str,
+		doc: Optional[str],
+		class_name: Optional[str] = None,
+	) -> Dict[str, Any]:
 		name_node = next((c for c in node.children if c.type == "className"), None)
 		params = collect_params(node, source)
 		body_node = node.child_by_field_name("body") or find_child(node, "body")
+		pred_name = normalize_ws(node_text(name_node, source)) if name_node is not None else ""
 		return {
-			"name": normalize_ws(node_text(name_node, source)),
+			"name": pred_name,
 			"args": params,
 			"body": body_text(body_node, source),
 			"comments": doc or "",
+			"signature": self._build_signature(pred_name, params, class_name=class_name),
 		}
 
 

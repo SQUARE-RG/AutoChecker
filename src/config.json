@@ -37,6 +37,11 @@
         "check_op_path":"/root/code_check/clang_tidy_collect/collect_check_op/clang_tidy_check_op_dedup.json",
         "ast_matcher_meta_operation_path":"/root/code_check/clang_tidy_collect/collect_clang_tidy_astMatchers_op/astMatchers_meta_op.json"
     },
+    "codeql_knowledge_base":{
+        "codeql_api_path":"/root/code_check/codeql_collect/codeql_api_collect/cpp_api.json",
+        "codeql_query_op_path":"/root/code_check/codeql_collect/codeql_query_op/codeql_query_op.json"
+       
+    },
     "arguments":{
         "max_round": 2,
         "max_compiler_trys": 2,

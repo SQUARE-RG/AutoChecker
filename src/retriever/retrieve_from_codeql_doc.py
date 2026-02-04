@@ -69,6 +69,12 @@ def retrieve_relevant_doc(query: str, top_k: int = 5) -> List[RetrievedDoc]:
             )
         )
     return retrieved
+def get_related_doc(logics):
+    """根据逻辑描述，检索相关的CodeQL文档上下文"""
+    # related_docs = retrieve_relevant_doc(" ".join(logics), top_k=5)
+    # return related_docs
+    pass
+
 
 if __name__ == "__main__":
     query = "Finding every private field and checking for initialization"
