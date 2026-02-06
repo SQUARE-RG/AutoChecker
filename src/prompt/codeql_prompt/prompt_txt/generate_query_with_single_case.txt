@@ -1,0 +1,71 @@
+# Instruction
+You are a static code analysis expert proficient in CodeQL, skilled in using CodeQL for vulnerability pattern recognition and code security auditing.
+Your task is to generate a complete, compilable CodeQL query by integrating:
+
+* the rule description
+* the test case code
+* the query template code
+* the reference logic steps
+* the reference CodeQL api
+* the reference CodeQL document
+* the reference CodeQL query code
+
+
+Your output must fully implement the new query by modifying the provided template.
+# Inputs
+
+## Rule Description
+{rule_description}
+
+## Test Case Code
+```cpp
+{test_code}
+```
+
+## Query Template Code
+This is the standard query template for CodeQL. Please understand its code structure to facilitate subsequent modifications.
+```query
+{query_content}
+```
+
+## Reference Logic steps
+To implement a CodeQL query for detecting issues in test cases, the following implementation logic can be referenced：
+```json
+{logics}
+```
+
+## reference CodeQL api
+Please refer to the API information below：
+{reference_api}
+
+## reference CodeQL document
+Please refer to the documnents below：
+{reference_doc}
+
+## reference CodeQL query code
+You can refer to some official query code snippets for reference only. Please make certain modifications before adopting them to ensure the generated query code can be compiled successfully.
+{reference_query_op}
+
+
+# Output Formatting Requirements
+
+**Output Format Requirements:**
+    -Strictly output according to the format below, do not add any additional explanations or text, code blocks are marked with ```query and include the complete source code.
+    -Ensure that the source code is complete and compilable.
+    
+## **Example Output Format:**
+
+    query_code:
+    ```query
+        ....(source code)....
+    ```
+
+Please follow the process below for analysis and implementation:
+1. Understand the Rule and Test Code: Begin by accurately understanding the rule description that needs detection, in conjunction with the provided test case code .
+2. Learn the Query Template Structure: Carefully analyze the provided query template code to grasp the standard format and core components of a CodeQL query .
+3. Design the Detection Logic: Based on the understanding from the previous steps, contemplate how to design a query to identify the target issues in the test cases. Throughout this process, fully leverage the provided reference implementation logic .
+4. Implement the Complete Query: Once the implementation approach is clear, proceed to generate the query code. During writing, be sure to consult the provided:
+        reference CodeQL api
+        reference CodeQL document
+        reference CodeQL query Codee
+5. Ensure Code Quality: The final generated code must constitute a complete file that adheres to CodeQL query syntax specifications, and it must be guaranteed to compile successfully

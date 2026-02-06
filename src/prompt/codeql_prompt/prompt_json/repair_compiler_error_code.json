@@ -1,0 +1,5 @@
+{
+    "_type": "prompt",
+    "input_variables": ["query_code",  "compiler_error_info","repair_steps","api_suggest_string","doc_suggest_string","query_op_suggest_string"],
+    "template_path": "/root/code_check/src/prompt/codeql_prompt/prompt_txt/repair_compiler_error_code.txt"
+}

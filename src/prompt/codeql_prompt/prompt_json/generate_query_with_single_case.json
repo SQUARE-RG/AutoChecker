@@ -1,0 +1,5 @@
+{
+    "_type": "prompt",
+    "input_variables": ["rule_description", "test_code","logics","reference_api","reference_doc","reference_query_op","query_content"],
+    "template_path": "/root/code_check/src/prompt/codeql_prompt/prompt_txt/generate_query_with_single_case.txt"
+}

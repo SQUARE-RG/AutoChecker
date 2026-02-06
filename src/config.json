@@ -4,7 +4,8 @@
         "autoChecker":"/root/cw-base/AutoChecker",
         "genChecker":"/root/cw-base/AutoChecker/genChecker",
         "clang-tidy":"/root/code_check/llvm-project/clang-tools-extra/clang-tidy/",
-        "python_env":"/root/anaconda3/envs/code_check/bin/python"
+        "python_env":"/root/anaconda3/envs/code_check/bin/python",
+        "codeql":"/root/code_check/codeql"
     },
     "check":{
         "module":"ucassaat",
@@ -42,6 +43,7 @@
         "codeql_query_op_path":"/root/code_check/codeql_collect/codeql_query_op/codeql_query_op.json"
        
     },
+    
     "arguments":{
         "max_round": 2,
         "max_compiler_trys": 2,

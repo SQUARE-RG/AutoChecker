@@ -3,7 +3,7 @@
 # Chroma 向量库: /root/code_check/src/retriever/vector_db/codeql_doc_vector_db
 
 from __future__ import annotations
-
+from config import global_config as config
 from bge_embedding import sequential_encode
 from typing import List, Dict, Any
 from pathlib import Path
@@ -73,7 +73,13 @@ def get_related_doc(logics):
     """根据逻辑描述，检索相关的CodeQL文档上下文"""
     # related_docs = retrieve_relevant_doc(" ".join(logics), top_k=5)
     # return related_docs
-    pass
+    related_doc = []
+    for logic in logics:
+        relevant_docs = retrieve_relevant_doc(logic, top_k=config['arguments']['top_key'])
+        for doc in relevant_docs:
+            related_doc.append(doc.text)
+    return related_doc
+    
 
 
 if __name__ == "__main__":

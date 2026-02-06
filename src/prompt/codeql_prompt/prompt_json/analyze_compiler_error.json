@@ -1,0 +1,5 @@
+{
+    "_type": "prompt",
+    "input_variables": [ "query_code", "compiler_error_info"],
+    "template_path": "/root/code_check/src/prompt/codeql_prompt/prompt_txt/analyze_compiler_error.txt"
+}
