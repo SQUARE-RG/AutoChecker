@@ -1,0 +1,5 @@
+{
+    "_type": "prompt",
+    "input_variables": ["rule_description", "logics","query_check_code","reference_api","reference_doc","reference_query_op","passed_test_cases","failed_test_cases"],
+    "template_path": "/root/code_check/src/prompt/codeql_prompt/prompt_txt/augmentation_check_by_positive_case.txt"
+}

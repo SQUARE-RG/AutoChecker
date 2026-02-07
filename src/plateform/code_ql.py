@@ -61,7 +61,12 @@ def run_code_ql_with_query(query_path, database_path, output_path):
     if proc.returncode != 0:
         print(f"运行 {database_path} 时发生错误，返回码: {proc.returncode}")
         return  full_output, -1
-    warning_count = full_output.count("warning:")
+    with open(output_path, 'r') as f:
+        output_content = f.read()
+    print(f"CodeQL运行成功，输出内容:\n{output_content}")
+    # 统计输出内容中的行数，作为告警数量
+    warning_count = len(output_content.strip().split('\n')) 
+
     return full_output, warning_count
 
 def pre_Generate_Query_Template(checker_name):
@@ -167,7 +172,11 @@ def database_path_to_case_path(database_path):
    
 if __name__ == "__main__":
     # pre_Generate_Query_Template("test_query")
-    # compiler_code_ql("/root/code_check/codeql/cpp/ql/src/MyQL/test_query.ql")
-    # create_database("/root/code_check/temp_validate/drivers__spi__spi-pci1xxxx.c_bug.c")
-    print(case_path_to_database_path("/root/code_check/temp_validate/drivers__spi__spi-pci1xxxx.c_bug.c"))
+    compiler_code_ql("/root/code_check/codeql/cpp/ql/src/MyQL/test_query.ql")
+    database_path = create_database("/root/code_check/temp_validate/test_unused_parameter.cpp")
+    print(f"生成的database路径为: {database_path}")
+    # print(case_path_to_database_path("/root/code_check/temp_validate/drivers__spi__spi-pci1xxxx.c_bug.c"))
     # run_code_ql("/root/code_check/codeql/cpp/ql/src/MyQL/test.ql","/root/code_check/linux-db/spi-pci1xxx-db","/root/code_check/result.csv")
+    full_output,wraning_count = run_code_ql_with_query("/root/code_check/codeql/cpp/ql/src/MyQL/test_query.ql",database_path,"/root/code_check/temp_validate/result.csv")
+    print("输出\n"+full_output)
+    print(wraning_count)

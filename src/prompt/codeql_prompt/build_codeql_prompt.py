@@ -22,3 +22,24 @@ def get_prompt_for_Codeql(key: str):
             "/root/code_check/src/prompt/codeql_prompt/prompt_json/repair_compiler_error_code.json"
         )
         return prompt
+    elif key == "augmentation_logic_by_negative_case":
+        prompt = load_prompt(
+            "/root/code_check/src/prompt/codeql_prompt/prompt_json/augmentation_logic_by_negative_case.json"
+        )
+        return prompt
+    elif key == "augmentation_check_by_negative_case":
+        prompt = load_prompt(
+            "/root/code_check/src/prompt/codeql_prompt/prompt_json/augmentation_check_by_negative_case.json"
+        )
+        return prompt
+    elif key == "augmentation_logic_by_positive_case":
+        prompt = load_prompt(
+            "/root/code_check/src/prompt/codeql_prompt/prompt_json/augmentation_logic_by_positive_case.json"
+        )
+        return prompt
+    elif key == "augmentation_check_by_positive_case":
+        prompt = load_prompt(
+            "/root/code_check/src/prompt/codeql_prompt/prompt_json/augmentation_check_by_positive_case.json"
+        )
+        return prompt
+    

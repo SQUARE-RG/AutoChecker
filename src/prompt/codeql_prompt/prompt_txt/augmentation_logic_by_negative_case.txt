@@ -1,0 +1,77 @@
+# Instruction
+You are a static code analysis expert proficient in CodeQL, skilled in using CodeQL for vulnerability pattern recognition and code security auditing.
+
+Your task is to improve the **step-by-step implementation logic** based on the current CodeQL query code, as well as the passed and failed test case.
+
+
+
+
+# Inputs
+
+## current CodeQL query code
+
+```query
+{query_check_code}
+```
+
+
+## passed test cases code
+
+```cpp
+{passed_test_cases}
+```
+
+## failed test cases code
+This test case should report an issue, but the current checker code cannot detect this code's problem.
+```cpp
+{failed_test_cases}
+```
+
+---
+
+# Output Formatting Requirements
+
+Return **only** a JSON array containing exactly one object with the following keys:
+
+* `"logic_query"` — an ordered list of reasoning steps describing how to implement the query logic.
+
+
+**Do NOT:**
+
+* include explanations, comments, or markdown
+* include code fences
+* add extra fields
+* wrap output in text outside the JSON
+
+## Example Output Format
+
+```json
+[
+  {{
+    "logic_query": [
+      "1. Define `lastField(f)` to determine whether a field `f` is the final field in its declaring class by selecting the field with the maximum byte offset among all fields of that class.",
+      "2. Define `hasCompatibleFieldAtOffset(f1, offset, c2)` to check whether class `c2` has a field at the same offset as `f1` that is layout-compatible: either the target field is a bit-field, or both fields have equal size, or `f1` is the last field and its size is less than or equal to the target field size.",
+      "3. Define `prefix(c1, c2)` to model structural prefix compatibility between two non-polymorphic classes: if `c1` is a union, require existence of at least one compatible field mapping into `c2`; otherwise require that for every non–bit-field in `c1`, the corresponding offset in `c2` has a compatible field.",
+      "4. Define class `UnsafeCast` to represent explicit C-style, static_cast, or reinterpret_cast operations (excluding implicit casts and dynamic_cast), whose destination type is a concrete, non–uninstantiated-template class; expose this destination as `getConvertedType()`.",
+      "5. Inside `UnsafeCast`, define `compatibleWith(t)` to determine whether the cast result can be safely interpreted as type `t` using five rules: exact type match; destination is a prefix of `t`; `t` is a prefix of destination; `t` is a base-class subtype of destination; or destination is a base-class subtype of `t`.",
+      "6. Define `isSourceImpl(source, type)` to recognize allocation expressions (`new` / `new[]` without placement arguments) whose allocated element type is `type`, and ensure `type` has a concrete definition not coming from an uninstantiated template.",
+      "7. Configure a global dataflow (`Config`) where sources are allocations (`isSourceImpl`), sinks are the unconverted operands of `UnsafeCast`, and barriers block flow through variables or through nodes whose class type is undefined or comes from uninstantiated templates; additionally disable field-flow branching and enable diff-informed mode hooks.",
+      "8. Instantiate `Flow` as `DataFlow::Global<Config>` to compute interprocedural dataflow paths from allocation sources to unsafe-cast sinks.",
+      "9. Define `relevantType(sink, allocatedType)` to require that there exists at least one dataflow path from some allocation of `allocatedType` to the given sink node.",
+      "10. Define `isSinkImpl(sink, allocatedType, convertedType, compatible)` to bind a sink node to its enclosing `UnsafeCast`, extract the cast destination type, and compute whether that destination is compatible with the allocated source type using `UnsafeCast.compatibleWith`.",
+      "11. Enumerate all dataflow paths (`Flow::flowPath`) from a source allocation node to a sink node, binding the allocated source type (`badSourceType`) and the cast destination type (`sinkType`).",
+      "12. Retain only those paths where the source is an allocation of `badSourceType`, the sink corresponds to an `UnsafeCast`, and `compatible` is false, meaning the cast destination is incompatible with the allocated type.",
+      "13. Suppress reports if there exists any alternative source (`goodSourceType`) that can also flow to the same sink where the cast would be compatible, to reduce false positives from infeasible paths.",
+      "14. For each remaining violating path, report the sink expression with the full source-to-sink path and emit a diagnostic stating that conversion from the allocated source type to the cast destination type is invalid."
+    ]
+  }}
+]
+```
+
+You can proceed with the analysis according to the following steps:
+
+1.  Read the provided current CodeQL query code and analyze its implementation logic.
+2.  Analyze the passed test cases code to understand how the checker correctly identifies issues in the code without generating false positives; retain this effective logic.
+3.  Analyze the failed test cases code to determine why the checker fails to detect the issues in these cases, and generate improved logic that can successfully identify them.
+4.  Synthesize the insights from the above analyses to formulate a comprehensive implementation logic capable of detecting all issues present in the test cases while avoiding false positives.
+5.  Output the final logic strictly adhering to the specified output format requirements.

@@ -1,0 +1,5 @@
+{
+    "_type": "prompt",
+    "input_variables": ["query_check_code","passed_test_cases","failed_test_cases"],
+    "template_path": "/root/code_check/src/prompt/codeql_prompt/prompt_txt/augmentation_logic_by_negative_case.txt"
+}
