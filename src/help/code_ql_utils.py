@@ -15,7 +15,7 @@ from retriever.retrieve_from_codeql_doc import get_related_doc
 
 
 def get_logic_string(logics_json):
-    logic_string += "**logic for query**:\n"
+    logic_string = "**logic for query**:\n"
     for step in logics_json[0]["logic_query"]:
         logic_string += step + "\n"
     return logic_string

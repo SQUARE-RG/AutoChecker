@@ -137,9 +137,13 @@ class CodeQL_CheckerGenerator(object):
         if data:
             logger.info("成功解析编译错误分析结果")
             repair_steps = data[0].get('repair_step', []) # 使用 get 方法提供默认值
+            repair_steps_string=""
+            for step in repair_steps:
+                repair_steps_string+= str(step) + "\n"
+
             wait_retrieve_code_snippet = data[1].get('wait_retrieve_code_snippet', [])
             api_suggest_string, doc_suggest_string, query_op_suggest_string = get_suggest_string_from_hint(wait_retrieve_code_snippet)
-        return repair_steps, api_suggest_string, doc_suggest_string, query_op_suggest_string
+        return repair_steps_string, api_suggest_string, doc_suggest_string, query_op_suggest_string
          
     def augmentation_logic_by_negative_case(self,query_check_code,passed_test_cases,failed_test_cases):
         prompt = get_prompt_for_Codeql("augmentation_logic_by_negative_case")
@@ -280,6 +284,7 @@ class CodeQL_CheckerGenerator(object):
 
 
                 compiler_return_code,compiler_return_stdout,compiler_return_stderr,compiler_success =compiler_code_ql(query_checker_path)
+                logger.debug(f"编译返回码: {compiler_return_code}\n编译标准输出: {compiler_return_stdout}\n编译错误输出: {compiler_return_stderr}")
                 while not compiler_success:
                     logger.info(f"第{round}轮生成的checker编译失败，使用编译修复功能，开始第{current_try_compiler_count}次重试")
 
@@ -294,12 +299,12 @@ class CodeQL_CheckerGenerator(object):
                         break 
 
                     ql_temp = get_checker_code(self.RULE.get_rule_name())
-                    repair_steps, api_suggest_string, doc_suggest_string, query_op_suggest_string = self.analyze_compiler_error(str(compiler_return_stdout),ql_temp)
+                    repair_steps, api_suggest_string, doc_suggest_string, query_op_suggest_string = self.analyze_compiler_error(str(compiler_return_stdout+compiler_return_stderr),ql_temp)
                     logger.info(f"编译错误分析完成")
 
                     repair_query = get_prompt_for_Codeql("repair_compiler_error_code").format(
                         query_code=query_code,
-                        compiler_error_info=str(compiler_return_stdout),
+                        compiler_error_info=str(compiler_return_stdout+compiler_return_stderr),
                         repair_steps=repair_steps,
                         api_suggest_string=api_suggest_string,
                         doc_suggest_string=doc_suggest_string,
@@ -314,7 +319,9 @@ class CodeQL_CheckerGenerator(object):
                     save_checker_code(wait_compiler_checker_ql, self.RULE.get_rule_name())
                     save_middle_check(wait_compiler_checker_ql,repair_compiler_failed_dir)
 
-                    _,_,_ ,compiler_success = compiler_code_ql(query_checker_path)
+                    compiler_return_code,compiler_return_stdout,compiler_return_stderr,compiler_success = compiler_code_ql(query_checker_path)
+                    logger.debug(f"编译返回码: {compiler_return_code}\n编译标准输出: {compiler_return_stdout}\n编译错误输出: {compiler_return_stderr}")
+                
                 if compiler_success:
                     logger.info(f"第{round}轮生成的checker编译成功，下面运行测试用例进行验证")
 
@@ -420,11 +427,11 @@ class CodeQL_CheckerGenerator(object):
                            
                             break
                         query_check_code = get_checker_code(self.RULE.get_rule_name())
-                        repair_steps, api_suggest_string, doc_suggest_string, query_op_suggest_string = self.analyze_compiler_error(str(compiler_return_stdout),query_check_code)
+                        repair_steps, api_suggest_string, doc_suggest_string, query_op_suggest_string = self.analyze_compiler_error(str(compiler_return_stdout+compiler_return_stderr),query_check_code)
                         logger.info(f"增强阶段，编译错误分析完成")
                         repair_query = get_prompt_for_Codeql("repair_compiler_error_code").format(
                             query_code=query_check_code,
-                            compiler_error_info=str(compiler_return_stdout),
+                            compiler_error_info=str(compiler_return_stdout+compiler_return_stderr),
                             repair_steps=repair_steps,
                             api_suggest_string=api_suggest_string,
                             doc_suggest_string=doc_suggest_string,

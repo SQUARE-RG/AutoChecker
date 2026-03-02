@@ -14,7 +14,11 @@ def compiler_code_ql(query_path):
         "query",
         'compile',
         query_path
-    ])
+    ],
+    stdout=subprocess.PIPE,
+    stderr=subprocess.PIPE,
+    text=True
+    )
     if result.returncode == 0:
         print("CodeQL编译成功")
         compiler_success= True
@@ -34,7 +38,11 @@ def run_code_ql(query_path, database_path, output_path):
         '--output=' + output_path,
         query_path,
         '--rerun'
-    ])
+    ],
+    stdout=subprocess.PIPE,
+    stderr=subprocess.PIPE,
+    text=True
+    )
     if result.returncode == 0:
         print("CodeQL运行成功")
         run_success= True
@@ -95,6 +103,10 @@ def create_databases_for_test_cases(test_case_list):
         case_dir, case_file = os.path.split(case_path)
         case_name, _ = os.path.splitext(case_file)
         database_path = os.path.join(case_dir, case_name + "_db")
+        if os.path.exists(database_path):
+            print(f"Database already exists, skipping creation: {database_path}")
+            database_path_list.append(database_path)
+            continue
         build_command = f"gcc -c {case_path}"
         # 创建CodeQL database
         cmd = [

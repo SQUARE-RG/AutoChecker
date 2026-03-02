@@ -123,12 +123,12 @@ def get_checker_generator(plateform: str,rule:AbstractRule,all_Test_Case_List: L
         return checker_generator
     return None
 
-def main(plateform: str = "clang-tidy"):
+def main(plateform: str = "codeql"):
     # 初始化日志
     init_logger()
     result_dir = global_config['result']['result_dir']
     # os.makedirs(result_dir, exist_ok=True)
-    with open("/root/code_check/clang_tidy_sub_checker/single_rule.json", 'r') as f:
+    with open("/root/code_check/experiment/gjb8114/rule_codeql/jgb8114_single_rules.json", 'r') as f:
         rule_data = json.load(f)
     for rule_package,rule_list in rule_data['data'].items():
         for rule_info in rule_list:
@@ -201,7 +201,8 @@ def main(plateform: str = "clang-tidy"):
     result_file_path = rule_result_dir + "checker_generation_result.json"
     with open(result_file_path, 'w') as f:
         json.dump(rule_data, f, indent=4)
-                    
+
+# from retriever.retrieve_from_codeql_api import embedding_ast_api,get_data                   
 if __name__ == "__main__":
-    main()
+    main(plateform="codeql")
     

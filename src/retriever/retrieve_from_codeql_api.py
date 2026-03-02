@@ -47,7 +47,7 @@ def get_data(file_path: str):
 
     class_list = codeql_api_json['class']
     for cls in class_list:
-        class_name = cls['name']
+        class_name = cls['className']
         class_comment = cls['comments']
         class_predicate_list = cls['predicate']
         class_method_list = cls['method']
@@ -124,4 +124,3 @@ def get_related_api(logic_for_ast_api:list):
             related_api.append( codeql_api_list[api_documents[doc_idx]] )
     unique_list = list(set(related_api))
     return unique_list
-  

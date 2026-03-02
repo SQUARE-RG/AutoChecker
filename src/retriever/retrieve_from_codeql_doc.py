@@ -4,7 +4,7 @@
 
 from __future__ import annotations
 from config import global_config as config
-from bge_embedding import sequential_encode
+from retriever.bge_embedding import sequential_encode
 from typing import List, Dict, Any
 from pathlib import Path
 import chromadb
