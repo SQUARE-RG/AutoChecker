@@ -7,7 +7,7 @@ set -euo pipefail
 REPO_DIR_CANDIDATE1=/root/code_check
 REPO_DIR_CANDIDATE2=/root/code_cehck
 LLVM_DIR=llvm-project
-LLVM_BRANCH=release/17.0.x
+LLVM_BRANCH=release/17.x
 MAKE_JOBS=${MAKE_JOBS:-56}
 
 echo "Starting clang/clang-tidy preparation script"
@@ -35,17 +35,17 @@ apt-get install -y openssh-server python3 libreadline-dev libgmp-dev pkg-config
 apt-get install -y libdebuginfod-dev python-is-python3 libexpat-dev libmpfr-dev
 apt-get install -y file source-highlight libsource-highlight-dev liblzma-dev
 
-# if [[ ! -d "$LLVM_DIR" ]]; then
-# 	echo "Cloning llvm-project repository (this may take a long time)..."
-# 	git clone https://github.com/llvm/llvm-project --recursive "$LLVM_DIR"
-# else
-# 	echo "Directory $LLVM_DIR already exists; updating..."
-# 	pushd "$LLVM_DIR" >/dev/null
-# 	git fetch --all
-# 	git submodule sync --recursive
-# 	git submodule update --init --recursive
-# 	popd >/dev/null
-# fi
+if [[ ! -d "$LLVM_DIR" ]]; then
+	echo "Cloning llvm-project repository (this may take a long time)..."
+	git clone https://github.com/llvm/llvm-project --recursive "$LLVM_DIR"
+else
+	echo "Directory $LLVM_DIR already exists; updating..."
+	pushd "$LLVM_DIR" >/dev/null
+	git fetch --all
+	git submodule sync --recursive
+	git submodule update --init --recursive
+	popd >/dev/null
+fi
 
 cd "$LLVM_DIR"
 echo "Checking out branch $LLVM_BRANCH"

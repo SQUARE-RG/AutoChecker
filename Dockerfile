@@ -22,11 +22,14 @@ WORKDIR /root
 RUN git clone https://github.com/Carlson-JLQ/code_check.git \
  && cd code_check \
  && git checkout web-release \
- && chmod +x scripts/install.sh \
- && bash scripts/install.sh
+ && true
 
 # Override llvm-project inside the container with the local copy from build context
 COPY llvm-project /root/code_check/llvm-project
+
+RUN cd /root/code_check \
+ && chmod +x scripts/install.sh \
+ && bash scripts/install.sh
 
 # Ensure Miniconda installed to /root/anaconda3 by the project's script.
 ENV PATH=/root/anaconda3/bin:${PATH}
