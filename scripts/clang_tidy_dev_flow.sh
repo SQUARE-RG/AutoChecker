@@ -23,6 +23,22 @@ fi
 mkdir -p "$MODULE_DIR"
 mkdir -p "$TEST_CHECKERS_DIR"
 
+# Copy helper scripts from workflow dir into llvm-project locations
+echo "Copying helper workflow scripts into clang-tidy tree"
+if [[ -f "$WORKFLOW_SRC_DIR/remove_clang_tidy_check.py" ]]; then
+  cp -v "$WORKFLOW_SRC_DIR/remove_clang_tidy_check.py" "$CLANG_TIDY_DIR/"
+else
+  echo "Warning: remove_clang_tidy_check.py not found in $WORKFLOW_SRC_DIR" >&2
+fi
+
+TEST_DIR_PARENT="$REPO_ROOT/clang-tools-extra/test/clang-tidy"
+mkdir -p "$TEST_DIR_PARENT"
+if [[ -f "$WORKFLOW_SRC_DIR/test_check_clang_tidy.py" ]]; then
+  cp -v "$WORKFLOW_SRC_DIR/test_check_clang_tidy.py" "$TEST_DIR_PARENT/"
+else
+  echo "Warning: test_check_clang_tidy.py not found in $WORKFLOW_SRC_DIR" >&2
+fi
+
 echo "Patching CMakeLists.txt in $CLANG_TIDY_DIR"
 CMAKELISTS="$CLANG_TIDY_DIR/CMakeLists.txt"
 if [[ ! -f "$CMAKELISTS" ]]; then
