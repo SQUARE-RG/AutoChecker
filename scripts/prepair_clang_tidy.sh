@@ -34,7 +34,7 @@ apt-get install -y cmake ninja-build gcc g++ zlib1g-dev git libxml2 libedit-dev
 apt-get install -y openssh-server python3 libreadline-dev libgmp-dev pkg-config
 apt-get install -y libdebuginfod-dev python-is-python3 libexpat-dev libmpfr-dev
 apt-get install -y file source-highlight libsource-highlight-dev liblzma-dev
-
+apt-get install -y ccache
 # if [[ ! -d "$LLVM_DIR" ]]; then
 # 	echo "Cloning llvm-project repository (this may take a long time)..."
 # 	git clone https://github.com/llvm/llvm-project --recursive "$LLVM_DIR"
