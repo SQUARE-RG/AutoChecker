@@ -162,7 +162,7 @@ threadpoolctl==3.6.0
 tiktoken==0.12.0
 tokenizers==0.22.1
 tomli==2.3.0
-torch==2.9.1+cpu
+torch==2.9.1
 tqdm==4.67.1
 transformers==4.57.3
 trec-car-tools==2.6
