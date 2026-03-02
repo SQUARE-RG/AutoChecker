@@ -60,6 +60,19 @@ fi
 echo "Ensuring conda base is initialized..."
 conda activate base >/dev/null 2>&1 || true
 
+echo "Accepting Anaconda Terms of Service for default channels..."
+accept_channel_tos() {
+  local channel_url=$1
+  if conda tos accept --override-channels --channel "$channel_url" >/dev/null 2>&1; then
+    echo "Accepted TOS for $channel_url"
+  else
+    echo "TOS for $channel_url was already accepted or command failed; continuing" >&2
+  fi
+}
+
+accept_channel_tos "https://repo.anaconda.com/pkgs/main"
+accept_channel_tos "https://repo.anaconda.com/pkgs/r"
+
 if conda env list | awk '{print $1}' | grep -qx "$CONDA_ENV_NAME"; then
   echo "Conda env '$CONDA_ENV_NAME' already exists; skipping creation."
 else
