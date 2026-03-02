@@ -11,7 +11,8 @@ from prompt.clang_tidy_prompt.build_prompt import get_prompt_for_clang_tidy
 from llm_interface.llm_provider import llm_client,llm_invoke,calculate_deepseek_cost
 from plateform.clang_tidy import compiler_clang_tidy,run_Checker_with_Check_clang_tidy
 from entity.concreteProduct_Clang_Tidy import AbstractChecker, Checker_Clang_Tidy
-
+from main import AutoCheckerClient, autoCheckerClient
+from types import LogLevel
 max_round = config['arguments']['max_round']
 max_compiler_trys = config['arguments']['max_compiler_trys']
 class Clang_tidy_CheckerGenerator(object):
@@ -31,16 +32,22 @@ class Clang_tidy_CheckerGenerator(object):
         return self.total_cost
     def generate_checker(self):
         os.makedirs(self.debug_prompt_dir, exist_ok=True)
+        autoCheckerClient.report_progress(stage="Generating initial checker")
+
         success, init_checker = self.first_checker_generation()
         if not success:
-            print(f"Failed to generate initial checker for rule: {self.RULE.get_rule_name()}")
+            # print(f"Failed to generate initial checker for rule: {self.RULE.get_rule_name()}")
+            autoCheckerClient.log(f"Failed to generate initial checker for rule: {self.RULE.get_rule_name()}", level=LogLevel.ERROR)
             return None
-        print("初始checker生成成功")
-
+        # print("初始checker生成成功")
+        autoCheckerClient.log(f"Initial checker generated successfully for rule: {self.RULE.get_rule_name()}", level=LogLevel.INFO)
         self.RULE.add_checker(init_checker)
         # 初始checker生成成功后，重新洗牌
         self.skipped_Test_Cases = []
+        autoCheckerClient.report_progress(stage="Augmenting checker with all test cases")
         self.checker_augmentation(init_checker)
+        autoCheckerClient.report_progress(stage="Checker generation completed")
+        autoCheckerClient.log(f"Checker augmentation completed for rule: {self.RULE.get_rule_name()}", level=LogLevel.INFO)
         return self.RULE.get_checkers()
         
     def run_logic_for_negative_case(self, query, testcase):
@@ -54,13 +61,15 @@ class Clang_tidy_CheckerGenerator(object):
             cost = calculate_deepseek_cost(cb, model_name="deepseek-chat")
             self.total_cost += cost['total_cost']
             # print(f"估算成本 (元): ¥{cost['total_cost']:.6f}")
-            logger.debug(f"LLM logic for negative case attempt {attempt}:\n {answer}")
+            # logger.debug(f"LLM logic for negative case attempt {attempt}:\n {answer}")
+           
             cleaned = re.sub(r'```json|```', '', answer).strip()
             try:
                 json_logic = json.loads(cleaned)
                 return json_logic
             except json.JSONDecodeError as e:
-                logger.debug(f"JSON解析错误: {e}. 尝试重新生成...")
+                # logger.debug(f"JSON解析错误: {e}. 尝试重新生成...")
+                autoCheckerClient.log(f"JSON parsing error in logic for negative case: {str(e)}. Retrying...", level=LogLevel.WARNING)
         return []
     def augmentation_logic_by_negative_case(self,check_cpp_code,check_h_code,passed_test_cases,failed_test_cases):
         prompt = get_prompt_for_clang_tidy("augmentation_logic_by_negative_case")   
@@ -74,13 +83,14 @@ class Clang_tidy_CheckerGenerator(object):
             answer,cb = llm_invoke(llm_client, augmentation_query)
             cost = calculate_deepseek_cost(cb, model_name="deepseek-chat")
             self.total_cost += cost['total_cost']
-            logger.debug(f"LLM augmentation logic by negative case attempt {attempt}: {answer}")
+            # logger.debug(f"LLM augmentation logic by negative case attempt {attempt}: {answer}")
             cleaned = re.sub(r'```json|```', '', answer).strip()
             try:
                 json_logic = json.loads(cleaned)
                 return json_logic
             except json.JSONDecodeError as e:
-                logger.debug(f"JSON解析错误: {e}. 尝试重新生成...")
+                # logger.debug(f"JSON解析错误: {e}. 尝试重新生成...")
+                autoCheckerClient.log(f"JSON parsing error in augmentation logic by negative case: {str(e)}. Retrying...", level=LogLevel.WARNING)
         return []
     
     def augmentation_logic_by_positive_case(self,check_cpp_code,check_h_code,passed_test_cases,failed_test_cases):
@@ -96,19 +106,22 @@ class Clang_tidy_CheckerGenerator(object):
             answer,cb = llm_invoke(llm_client, augmentation_query)
             cost = calculate_deepseek_cost(cb, model_name="deepseek-chat")
             self.total_cost += cost['total_cost']
-            logger.debug(f"LLM augmentation logic by positive case attempt {attempt}: {answer}")
+            # logger.debug(f"LLM augmentation logic by positive case attempt {attempt}: {answer}")
             cleaned = re.sub(r'```json|```', '', answer).strip()
             try:
                 json_logic = json.loads(cleaned)
                 return json_logic
             except json.JSONDecodeError as e:
-                logger.debug(f"JSON解析错误: {e}. 尝试重新生成...")
+                # logger.debug(f"JSON解析错误: {e}. 尝试重新生成...")
+                autoCheckerClient.log(f"JSON parsing error in augmentation logic by positive case: {str(e)}. Retrying...", level=LogLevel.WARNING)
         return []
     def generate_checker_with_single_case(self,current_case:AbstractCase,current_case_ast_txt,case_ast_node_list):
         logics = self.run_logic_for_negative_case(self.RULE.get_rule_description(), current_case.get_case_code())
         
         astMatch_suggest_string , class_struct_suggest_string =get_most_similar_astMatcher_and_class_struct(case_ast_node_list,logics_json=logics)
-        logger.info("相关API上下文检索完成")
+        # logger.info("相关API上下文检索完成")
+        autoCheckerClient.log(f"Retrieved relevant API context Completed", level=LogLevel.INFO)
+
         ruler_checker_cpp = config['checker']['checker_path'] + get_camel_check_name(self.RULE.get_rule_name()) + ".cpp"
         with open(ruler_checker_cpp, 'r',encoding="utf-8") as file:
             content_cpp = file.read()
@@ -136,13 +149,16 @@ class Clang_tidy_CheckerGenerator(object):
             answer,cb = llm_invoke(llm_client, generation_query)
             cost = calculate_deepseek_cost(cb, model_name="deepseek-chat")
             self.total_cost += cost['total_cost']
-            logger.debug(f"LLM checker generation attempt {attempt}: \n{answer}")
+            # logger.debug(f"LLM checker generation attempt {attempt}: \n{answer}")
+
             # 提取代码块
             generator_cpp_code,generator_h_code = parse_cpp_h_code_from_answer(answer)
             if generator_cpp_code and generator_h_code:
+                
                 return generator_cpp_code,generator_h_code,logics
             else:
-                logger.debug("未能从回答中提取到完整的checker代码。尝试重新生成...")
+                # logger.debug("未能从回答中提取到完整的checker代码。尝试重新生成...")
+                autoCheckerClient.log(f"Failed to extract complete checker code from answer. Retrying...", level=LogLevel.WARNING)
         
         return None,None,logics
     def generate_checker_with_single_case_and_checker(self,current_case:AbstractCase,current_case_ast_txt,case_ast_node_list,current_checker:AbstractChecker):
@@ -151,7 +167,8 @@ class Clang_tidy_CheckerGenerator(object):
             # 负例
             logics = self.augmentation_logic_by_negative_case(checker_cpp,checker_h,current_checker.get_passed_cases(),[current_case])
             astMatch_suggest_string , class_struct_suggest_string =get_most_similar_astMatcher_and_class_struct(case_ast_node_list,logics)
-            logger.info("相关API上下文检索完成")
+            # logger.info("相关API上下文检索完成")
+            autoCheckerClient.log(f"Retrieved relevant API context Completed", level=LogLevel.INFO)
             repair_negative_case_prompt = get_prompt_for_clang_tidy("augmentation_check_by_negative_case").format(
                 rule_description = self.RULE.get_rule_description(),
                 ast_txt = current_case_ast_txt,
@@ -165,7 +182,7 @@ class Clang_tidy_CheckerGenerator(object):
             )
             with open(self.debug_prompt_dir + "augmentation_check_by_negative_case.md", 'w',encoding="utf-8") as f:
                 f.write(f"针对负例{current_case.get_case_path()}增强checker\n"+repair_negative_case_prompt)
-            logger.info(f"针对负例{current_case.get_case_path()}开始使用增强逻辑生成checker代码")
+            # logger.info(f"针对负例{current_case.get_case_path()}开始使用增强逻辑生成checker代码")
             # time.sleep(3)
             checker_cpp,checker_h = self.generate_checker_with_query(repair_negative_case_prompt)
             return checker_cpp,checker_h,logics 
@@ -188,7 +205,7 @@ class Clang_tidy_CheckerGenerator(object):
             )
             with open(self.debug_prompt_dir + "augmentation_check_by_positive_case.md", 'w',encoding="utf-8") as f:
                 f.write(f"针对正例{current_case.get_case_path()}增强checker\n"+repair_positive_case_prompt)
-            logger.info(f"针对正例\n{current_case.get_case_path()}\n开始使用增强逻辑生成checker代码")
+            # logger.info(f"针对正例\n{current_case.get_case_path()}\n开始使用增强逻辑生成checker代码")
             checker_cpp,checker_h = self.generate_checker_with_query(repair_positive_case_prompt)
             return checker_cpp,checker_h,logics 
   
@@ -197,7 +214,7 @@ class Clang_tidy_CheckerGenerator(object):
         checker_cpp =""
         checker_h = ""
         for attempt in range(1,config['arguments']['max_llm_tries'] + 1):
-            logger.info(f"使用增强逻辑生成checker代码，尝试第{attempt}次")
+            # logger.info(f"使用增强逻辑生成checker代码，尝试第{attempt}次")
             checker,cb = llm_invoke(llm_client, query)
             cost = calculate_deepseek_cost(cb, model_name="deepseek-chat")
             self.total_cost += cost['total_cost']
@@ -205,7 +222,7 @@ class Clang_tidy_CheckerGenerator(object):
                 f.write(f"使用增强逻辑生成checker代码，原始回答:\n"+checker)
             checker_cpp,checker_h = parse_cpp_h_code_from_answer(checker)
             if checker_cpp == "" or checker_h =="" or checker_cpp is None or checker_h is None:
-                logger.debug("未能从回答中提取到完整的checker代码。尝试重新生成...")
+                # logger.debug("未能从回答中提取到完整的checker代码。尝试重新生成...")
                 continue
             if checker_cpp and checker_h:
                 break
@@ -232,7 +249,7 @@ class Clang_tidy_CheckerGenerator(object):
             answer,cb = llm_invoke(llm_client, analyze_query)
             cost = calculate_deepseek_cost(cb, model_name="deepseek-chat")
             self.total_cost += cost['total_cost']
-            logger.debug(f"LLM analyze compiler error attempt {attempt}: \n{answer}")
+            # logger.debug(f"LLM analyze compiler error attempt {attempt}: \n{answer}")
             cleaned = re.sub(r'```json|```', '', answer).strip()
             try:
                 data = json.loads(cleaned)
@@ -241,7 +258,7 @@ class Clang_tidy_CheckerGenerator(object):
                 logger.debug(f"JSON解析错误: {e}. 尝试重新生成...")
         
         if data is not None:
-            logger.info("成功解析编译错误分析结果")
+            # logger.info("成功解析编译错误分析结果")
             repair_steps = data[0].get('repair_step', []) # 使用 get 方法提供默认值
             wait_retrieve_code_snippet = data[1].get('wait_retrieve_code_snippet', [])
             # 检索代码片段
@@ -268,7 +285,7 @@ class Clang_tidy_CheckerGenerator(object):
             if current_case is None:
                 logger.debug("No more negative test cases available.")
                 break
-            logger.info(f"当前选择的负例测试用例路径为：  \n {current_case.get_case_path()}")
+            # logger.info(f"当前选择的负例测试用例路径为：  \n {current_case.get_case_path()}")
 
             # 获取测试用例对应的抽象语法树
             current_case_ast_txt,current_case_ast_json,case_ast_node_list = get_Case_AST(current_case.get_case_path())
@@ -280,7 +297,7 @@ class Clang_tidy_CheckerGenerator(object):
             round = 1
             while not single_success:
                 logger.info(f"选择测试用例：\n {current_case.get_case_path()}\n第{round}轮生成尝试开始")
-                
+                autoCheckerClient.log(f"Selected test case:\n {current_case.get_case_path()}\nStarting generation attempt {round}", level=LogLevel.INFO)
 
                 if round > max_round:
                     logger.info(f"达到最大生成轮数{max_round}，停止当前测试用例的生成尝试")
@@ -304,29 +321,31 @@ class Clang_tidy_CheckerGenerator(object):
                 os.makedirs(round_dir_first_generation, exist_ok=True)
                 save_middle_check(checker_cpp,checker_h,round_dir_first_generation)
 
+            
 
-
-                logger.info("开始编译")
+                # logger.info("开始编译")
                 current_try_compiler_count = 1
                 compiler_return_code,compiler_return_stdout,compiler_return_stderr,compiler_success =compiler_clang_tidy()
                 # round += 1
                 while not compiler_success:
-                    logger.info(f"第{round}轮生成的checker编译失败，使用编译修复功能，开始第{current_try_compiler_count}次重试")
-
+                    # logger.info(f"第{round}轮生成的checker编译失败，使用编译修复功能，开始第{current_try_compiler_count}次重试")
+                    autoCheckerClient.log(f"Checker compilation failed for generation attempt {round}. Starting compiler repair attempt {current_try_compiler_count}", level=LogLevel.WARNING)
 
                     repair_compiler_failed_dir = os.path.join(round_dir, f"compiler_failed_try_{current_try_compiler_count}")
                     os.makedirs(repair_compiler_failed_dir, exist_ok=True)
 
                     single_success = False
                     if current_try_compiler_count > config['arguments']['max_compiler_trys']:
-                        logger.info(f"达到最大编译修复尝试次数{config['arguments']['max_compiler_trys']}，停止当前测试用例的生成尝试")
+                        # logger.info(f"达到最大编译修复尝试次数{config['arguments']['max_compiler_trys']}，停止当前测试用例的生成尝试")
+                        autoCheckerClient.log(f"Reached maximum compiler repair attempts {config['arguments']['max_compiler_trys']}. Stopping generation attempts for current test case.", level=LogLevel.WARNING)
                         single_success =False
                         compiler_success = False
                         
                         break
                     cpp_temp,h_temp = get_checker_code(self.RULE.get_rule_name())
                     repair_steps,suggestions = self.analyze_compiler_error(str(compiler_return_stdout),cpp_temp,h_temp)
-                    logger.info(f"编译错误分析完成")
+                    # logger.info(f"编译错误分析完成")
+                    autoCheckerClient.log(f"Compiler error analysis completed", level=LogLevel.INFO)
 
                     repair_query = get_prompt_for_clang_tidy("repair_compiler_error_code").format(
                         check_cpp_code = cpp_temp,
@@ -351,7 +370,8 @@ class Clang_tidy_CheckerGenerator(object):
 
                     _,_,_ ,compiler_success=compiler_clang_tidy()
                 if compiler_success:
-                    logger.info(f"第{round}轮生成的checker编译成功，下面运行测试用例进行验证")
+                    # logger.info(f"第{round}轮生成的checker编译成功，下面运行测试用例进行验证")
+                    autoCheckerClient.log(f"Checker compiled successfully for generation attempt {round}. Running test case for validation.", level=LogLevel.INFO)
                     BASE = config['test']['base']
                     full_output, warning_count = run_Checker_with_Check_clang_tidy(
                         test_case_path=current_case.get_case_path(),
@@ -359,7 +379,7 @@ class Clang_tidy_CheckerGenerator(object):
                         temp_dir=f"{config['checker']['temp_test_dir']}tmp_{self.RULE.get_rule_name()}",
                         include_dir=f"{BASE}/checkers/{self.RULE.get_rule_category()}"
                     )
-                    logger.info(f"测试用例运行完成,warning数量为:{warning_count}")
+                    # logger.info(f"测试用例运行完成,warning数量为:{warning_count}")
 
                     round_final_checker_dir = os.path.join(round_dir, "final_checker")
                     os.makedirs(round_final_checker_dir, exist_ok=True)
@@ -372,13 +392,15 @@ class Clang_tidy_CheckerGenerator(object):
                         tmp_checker_cpp,tmp_checker_h = get_checker_code(self.RULE.get_rule_name())
                         source_code ="check.cpp:\n"+ tmp_checker_cpp + "\n" +"check.h:\n"+ tmp_checker_h
                         init_checker = Checker_Clang_Tidy(source_code,passed_cases)
-                        logger.info(f"规则{self.RULE.get_rule_name()}的Checker在第{round}轮生成成功")
+                        # logger.info(f"规则{self.RULE.get_rule_name()}的Checker在第{round}轮生成成功")
                         return single_success,init_checker
                     elif warning_count < 0:
-                        logger.info(f"运行测试用例{current_case.get_case_path()}发生错误，重新尝试")
+                        # logger.info(f"运行测试用例{current_case.get_case_path()}发生错误，重新尝试")
+                        autoCheckerClient.log(f"Error occurred while running test case {current_case.get_case_path()}. Retrying...", level=LogLevel.WARNING)
                         # TODO 运行修复功能 -- 编译 -- 如果编译不通过直接跳过 -- 编译通过后运行测试用例  -- 不通过测试用例直接放弃
                     else:
-                        logger.info(f"生成的checker未能通过测试用例验证，进行下一轮生成尝试")
+                        # logger.info(f"生成的checker未能通过测试用例验证，进行下一轮生成尝试")
+                        autoCheckerClient.log(f"Generated checker failed to pass test case validation. Proceeding to next generation attempt.", level=LogLevel.INFO)
                     
                 round += 1
         return False, None
@@ -435,7 +457,7 @@ class Clang_tidy_CheckerGenerator(object):
                 break
             round = 1
             for failed_case in failed_case_list:
-                logger.info(f"增强阶段，当前选择的失败测试用例路径为：{failed_case.get_case_path()}")
+                # logger.info(f"增强阶段，当前选择的失败测试用例路径为：{failed_case.get_case_path()}")
                 current_case_ast_txt,current_case_ast_json,case_ast_node_list = get_Case_AST(failed_case.get_case_path())
                 # for ast_node in case_ast_node_list:
                 #     if ast_node not in self.EMBEDDED_AST_NODES:
@@ -444,7 +466,8 @@ class Clang_tidy_CheckerGenerator(object):
                 current_case_success =False
                 while not current_case_success:
                     if round > config['arguments']['max_round']:
-                        logger.info(f"增强阶段，达到最大生成轮数{max_round}，停止当前测试用例的生成尝试")
+                        # logger.info(f"增强阶段，达到最大生成轮数{max_round}，停止当前测试用例的生成尝试")
+                        autoCheckerClient.log(f"Augmentation stage: Reached maximum generation attempts {max_round}. Stopping generation attempts for current test case.", level=LogLevel.WARNING)
                         failed_case_list.remove(failed_case)
                         self.skipped_Test_Cases.append(failed_case)
                         break
@@ -459,27 +482,32 @@ class Clang_tidy_CheckerGenerator(object):
 
                     wait_compiler_checker_cpp,wait_compiler_checker_h,logics  = self.generate_checker_with_single_case_and_checker(failed_case,current_case_ast_txt,case_ast_node_list,current_checker)
                     if wait_compiler_checker_cpp =="" or wait_compiler_checker_h =="" or wait_compiler_checker_cpp is None or wait_compiler_checker_h is None:
-                        logger.info("增强阶段LLM多次未能生成有效的checker代码，跳过当前测试用例")
+                        # logger.info("增强阶段LLM多次未能生成有效的checker代码，跳过当前测试用例")
+                        autoCheckerClient.log(f"Augmentation stage: LLM failed to generate valid checker code after multiple attempts. Skipping current test case.", level=LogLevel.WARNING)
                         failed_case_list.remove(failed_case)
                         self.skipped_Test_Cases.append(failed_case)
                        
                         break
                     save_checker_code(wait_compiler_checker_cpp,wait_compiler_checker_h, self.RULE.get_rule_name())
                     # round += 1
-                    logger.info("增强阶段，开始编译")
+                    # logger.info("增强阶段，开始编译")
+                    # autoCheckerClient.log(f"Augmentation stage: Starting compilation for generation attempt {round}.", level=LogLevel.INFO)
                     current_try_compiler_count = 1
                     compiler_return_code,compiler_return_stdout,compiler_return_stderr,compiler_success =compiler_clang_tidy()
                     while not compiler_success:
-                        logger.info(f"增强阶段，第{round}轮生成的checker编译失败，使用编译修复功能，开始第{current_try_compiler_count}次重试")
+                        # logger.info(f"增强阶段，第{round}轮生成的checker编译失败，使用编译修复功能，开始第{current_try_compiler_count}次重试")
+                        autoCheckerClient.log(f"Augmentation stage: Checker compilation failed for generation attempt {round}. Starting compiler repair attempt {current_try_compiler_count}", level=LogLevel.WARNING)
                         if current_try_compiler_count > config['arguments']['max_compiler_trys']:
-                            logger.info(f"增强阶段，达到最大编译修复尝试次数{config['arguments']['max_compiler_trys']}，停止当前测试用例的生成尝试")
+                            # logger.info(f"增强阶段，达到最大编译修复尝试次数{config['arguments']['max_compiler_trys']}，停止当前测试用例的生成尝试")
+                            autoCheckerClient.log(f"Augmentation stage: Reached maximum compiler repair attempts {config['arguments']['max_compiler_trys']}. Stopping generation attempts for current test case.", level=LogLevel.WARNING)
                             current_case_success =False
                             compiler_success = False
                            
                             break
                         cpp_temp,h_temp = get_checker_code(self.RULE.get_rule_name())
                         repair_steps,suggestions = self.analyze_compiler_error(str(compiler_return_stdout),cpp_temp,h_temp)
-                        logger.info(f"增强阶段，编译错误分析完成")
+                        # logger.info(f"增强阶段，编译错误分析完成")
+                        autoCheckerClient.log(f"Augmentation stage: Compiler error analysis completed", level=LogLevel.INFO)
                         repair_query = get_prompt_for_clang_tidy("repair_compiler_error_code").format(
                             check_cpp_code = cpp_temp,
                             check_h_code = h_temp,
@@ -492,7 +520,7 @@ class Clang_tidy_CheckerGenerator(object):
                         save_checker_code(wait_compiler_checker_cpp, wait_compiler_checker_h,self.RULE.get_rule_name())
                         _,_,_ ,compiler_success=compiler_clang_tidy()
                     if compiler_success:
-                        logger.info(f"增强阶段，第{round}轮生成的checker编译成功，下面运行测试用例进行验证")
+                        # logger.info(f"增强阶段，第{round}轮生成的checker编译成功，下面运行测试用例进行验证")
                         BASE = config['test']['base']
                         full_output, warning_count = run_Checker_with_Check_clang_tidy(
                             test_case_path=failed_case.get_case_path(),
@@ -500,7 +528,7 @@ class Clang_tidy_CheckerGenerator(object):
                             temp_dir=f"{config['checker']['temp_test_dir']}tmp_{self.RULE.get_rule_name()}",
                             include_dir=f"{BASE}/checkers/{self.RULE.get_rule_category()}"
                         )
-                        logger.info(f"增强阶段，测试用例运行完成,warning数量为:{warning_count}")
+                        # logger.info(f"增强阶段，测试用例运行完成,warning数量为:{warning_count}")
                         if failed_case.get_flag():
                             # 这是一个正例，应该通过测试,CHECK-MESSAGES不在代码注释中,符合规则
                             if warning_count ==0:
@@ -525,7 +553,7 @@ class Clang_tidy_CheckerGenerator(object):
                     source_code ="check.cpp:\n"+ tmp_checker_cpp + "\n" +"check.h:\n"+ tmp_checker_h
                     current_checker.set_checker_code(source_code)
                     current_checker_success_case_list, current_checker_failed_case_list,_= self.runAllTestCase(current_checker)
-                    
+                    # checker_files,test_result=
                     current_checker.set_passed_cases(current_checker_success_case_list)
                     tmp_cpp,tmp_h = get_checker_code(self.RULE.get_rule_name())
                     code = "check.cpp:\n"+ tmp_cpp + "\n" +"check.h:\n"+ tmp_h

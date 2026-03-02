@@ -14,6 +14,9 @@ from help.clang_tidy_utils import get_camel_check_name
 from entity.abstractProduct import AbstractCase
 from generator import Clang_tidy_CheckerGenerator
 from typing import List
+from client import AutoCheckerClient
+from types import GeneratorStatus, LogLevel
+autoCheckerClient= AutoCheckerClient()
 logger = loguru.logger
 def init_logger(log_dir: str = "./logs", result_name: str = "result"):
     """Initialize the logger settings."""
@@ -58,7 +61,7 @@ def save_final_checkers(rule_name,rule_result_dir,plateform: str):
         os.makedirs(final_checker_result_dir, exist_ok=True)
         shutil.copy(ruler_checker_cpp,final_checker_result_dir)
         shutil.copy(ruler_checker_h,final_checker_result_dir)
-        logger.info(f"最终checker已保存到: {final_checker_result_dir}")
+        # logger.info(f"最终checker已保存到: {final_checker_result_dir}")
 
 def process_rule_info(rule_info,plateform: str):
     Case_List = []
@@ -72,17 +75,12 @@ def process_rule_info(rule_info,plateform: str):
 
     factory = factory_class()
 
-    logger.info(f"Using factory: {factory_class.__name__}")
-
     rule =get_rule_entity(factory)
 
-    logger.info(f"Using rule: {rule.__class__.__name__}")
 
     rule_name = rule_info['main_title']
     rule_description = rule_info['description']
     rule_test_path = rule_info['rule_test_path']
-
-    print(rule_name)
 
     rule.rule_name = rule_name
     rule.rule_description = rule_description
@@ -108,7 +106,7 @@ def process_rule_info(rule_info,plateform: str):
         Case_List.append(case)
     rule_info['negative_case_amount'] = negative_case_count
     rule_info['positive_case_amount'] = positive_case_count
-    print(f"负例数量： {negative_case_count}")
+    # print(f"负例数量： {negative_case_count}")
                 
     return rule,Case_List
 def analyze(success_case_list: List[AbstractCase], all_case_list: List[AbstractCase]):
@@ -134,12 +132,16 @@ def main(plateform: str = "clang-tidy"):
     # 初始化日志
     init_logger()
     result_dir = global_config['result']['result_dir']
+   
     # os.makedirs(result_dir, exist_ok=True)
     with open("/root/code_check/clang_tidy_sub_checker/jgb8114_single_rules.json", 'r') as f:
         rule_data = json.load(f)
     for rule_package,rule_list in rule_data['data'].items():
         for rule_info in rule_list:
+            autoCheckerClient.report_progress(stage=f"Processing rule: {rule_info['main_title']}")
+            autoCheckerClient.log(f"Starting processing for rule: {rule_info['main_title']}", level=LogLevel.INFO)
             rule ,Case_List = process_rule_info(rule_info,plateform)
+
             # 创建针对这个rule的结果目录
             rule_result_dir = result_dir + rule.rule_name + "/"
             # 清理之前的结果
@@ -149,13 +151,16 @@ def main(plateform: str = "clang-tidy"):
             #事先编译clang tidy
             pre_compiler_returncode = pre_compiler_clang_tidy()
             if pre_compiler_returncode !=0:
-                logger.error("预编译clang-tidy失败，终止执行")
+                # logger.error("预编译clang-tidy失败，终止执行")
+                autoCheckerClient.log("Pre-compilation of clang-tidy failed. Terminating execution.", level=LogLevel.ERROR)
                 sys.exit(1)
             pre_generate_returncode = pre_Generate_Checker_Template(checker_name=rule.get_rule_name())
             if pre_generate_returncode !=0: 
-                logger.error(f"生成Checker模板失败，终止执行，规则名：{rule.get_rule_name()}")
+                # logger.error(f"生成Checker模板失败，终止执行，规则名：{rule.get_rule_name()}")
+                autoCheckerClient.log(f"Pre-generation of Checker template failed for rule: {rule.get_rule_name()}. Terminating execution.", level=LogLevel.ERROR)
                 sys.exit(1)
-            logger.info(f"成功生成Checker模板，规则名：{rule.get_rule_name()}")
+            # logger.info(f"成功生成Checker模板，规则名：{rule.get_rule_name()}")
+            # autoCheckerClient.log(f"Successfully generated Checker template for rule: {rule.get_rule_name()}", level=LogLevel.INFO)
             # 开启生成checker的流程
             start = time.perf_counter()
             
@@ -164,21 +169,24 @@ def main(plateform: str = "clang-tidy"):
 
             save_final_checkers(rule.get_rule_name(),rule_result_dir,plateform)
             if checkers_list is None:
-                logger.error(f"Checker生成失败，规则名：{rule.get_rule_name()}")
+                # logger.error(f"Checker生成失败，规则名：{rule.get_rule_name()}")
+                autoCheckerClient.log(f"Checker generation failed for rule: {rule.get_rule_name()}", level=LogLevel.ERROR)
                 rule_info['issuccess'] = "False"
                 rule_info['performance']=f"0/{len(Case_List)}"
                 remove_Checker_Template(checker_name=rule.get_rule_name())
                 rule_info['total_cost'] = f"{checker_generator.get_total_cost():.6f}"
-                logger.info(f"已删除Clang仓库中的Checker，规则名：{rule.get_rule_name()}")
+                # logger.info(f"已删除Clang仓库中的Checker，规则名：{rule.get_rule_name()}")
+
             else:
-                logger.info(f"生成了 {len(checkers_list)} 个Checker，规则名：{rule.get_rule_name()}")
+                # logger.info(f"生成了 {len(checkers_list)} 个Checker，规则名：{rule.get_rule_name()}")
+                
                 final_checker = checkers_list[-1]
-                logger.info(f"最终生成的Checker通过的测试用例数量:{len(final_checker.get_passed_cases())}/{len(Case_List)}")
-              
+                # logger.info(f"最终生成的Checker通过的测试用例数量:{len(final_checker.get_passed_cases())}/{len(Case_List)}")
+                autoCheckerClient.log(f"Final generated Checker passed {len(final_checker.get_passed_cases())}/{len(Case_List)} test cases for rule: {rule.get_rule_name()}", level=LogLevel.INFO)
                 rule_info['issuccess'] = "True"
                 rule_info['performance']=f"{len(final_checker.get_passed_cases())}/{len(Case_List)}"
                 remove_Checker_Template(checker_name=rule.get_rule_name())
-                logger.info(f"已删除Clang仓库中的Checker，规则名：{rule.get_rule_name()}")
+                # logger.info(f"已删除Clang仓库中的Checker，规则名：{rule.get_rule_name()}")
                
                 sucess_case_list = final_checker.get_passed_cases()
                 sucess_case_path_list = [case.get_case_path() for case in sucess_case_list]
@@ -192,9 +200,12 @@ def main(plateform: str = "clang-tidy"):
                     "check_success_negative": check_success_negative,
                     "check_failed_negative": check_failed_negative
                 }
-            logger.info("Checker生成完毕，结果已保存")
+            # logger.info("Checker生成完毕，结果已保存")
+            autoCheckerClient.log(f"Checker generation completed for rule: {rule.get_rule_name()}. Results saved.", level=LogLevel.INFO)
+            autoCheckerClient.send_status(status=GeneratorStatus.COMPLETED)
             end = time.perf_counter()
-            logger.info(f"规则 {rule.get_rule_name()} 的Checker生成总共耗时: {end - start:.2f} 秒")
+            # logger.info(f"规则 {rule.get_rule_name()} 的Checker生成总共耗时: {end - start:.2f} 秒")
+            autoCheckerClient.log(f"Total time taken for Checker generation for rule: {rule.get_rule_name()}: {end - start:.2f} seconds", level=LogLevel.INFO)
             rule_info['time'] = f"{end - start:.2f}"
             #再次编译clang tidy
             compiler_clang_tidy()

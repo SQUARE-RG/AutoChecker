@@ -2,7 +2,7 @@ import json
 import sys
 from typing import List, Optional
 
-from .types import (
+from types import (
     PROTOCOL_VERSION,
     ArtifactMessage,
     CheckerFile,
