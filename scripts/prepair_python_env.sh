@@ -87,7 +87,7 @@ if [[ -f "$REQUIREMENTS" ]]; then
   echo "Installing Python requirements from $REQUIREMENTS..."
   pip install --upgrade pip
   echo "当前 pip 路径: $(which pip)"
-  pip install -r "$REQUIREMENTS" -i https://pypi.tuna.tsinghua.edu.cn/simple
+  pip install -r "$REQUIREMENTS" -i https://pypi.mirrors.ustc.edu.cn/simple
 else
   echo "Requirements file not found at $REQUIREMENTS" >&2
   exit 1
