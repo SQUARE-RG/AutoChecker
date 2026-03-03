@@ -180,7 +180,7 @@ if __name__ == "__main__":
     # compiler_clang_tidy()
 
 
-    remove_Checker_Template(checker_name="use-uncheck-pointer-after-malloc")
+    # remove_Checker_Template(checker_name="use-uncheck-pointer-after-malloc")
     compiler_clang_tidy()
 
 
