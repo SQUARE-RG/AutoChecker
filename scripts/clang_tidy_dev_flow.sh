@@ -77,7 +77,7 @@ fi
 
 "$CMAKE_BUILD_BIN" --build "$BUILD_DIR" --target clang-tidy -j || { echo "Build failed" >&2; exit 1; }
 
-CLANG_TIDY_BIN="$BUILD_DIR/clang-tidy"
+CLANG_TIDY_BIN="$BUILD_DIR/bin/clang-tidy"
 if [[ ! -x "$CLANG_TIDY_BIN" ]]; then
   echo "clang-tidy binary not found at $CLANG_TIDY_BIN" >&2
   exit 1
