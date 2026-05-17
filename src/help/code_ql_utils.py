@@ -15,7 +15,7 @@ from retriever.retrieve_from_codeql_doc import get_related_doc
 
 
 def get_logic_string(logics_json):
-    logic_string = "**logic for query**:\n"
+    logic_string = ""
     for step in logics_json[0]["logic_query"]:
         logic_string += step + "\n"
     return logic_string
@@ -118,7 +118,22 @@ def get_most_similar_api_doc_query_op(logics_json):
         query_op_suggest_string += q + "\n"
 
     return api_suggest_string, doc_suggest_string, query_op_suggest_string
+def get_suggest_api_string(hint):
+    api_suggest_string = '' #"最相似的API内容:\n"
+    doc_suggest_string = '' #"最相似的文档内容:\n"
+    query_op_suggest_string = '' #"最相似的查询操作内容:\n"
 
+    related_api= get_related_api(hint)
+    related_doc= get_related_doc(hint)
+    related_query_op= get_related_codeql_query_op(hint)
+    for a in related_api:
+        api_suggest_string += a + "\n"
+    for d in related_doc:
+        api_suggest_string += d + "\n"
+    for q in related_query_op:
+        api_suggest_string += q + "\n"
+    
+    return api_suggest_string
 def get_suggest_string_from_hint(hint):
     api_suggest_string = '' #"最相似的API内容:\n"
     doc_suggest_string = '' #"最相似的文档内容:\n"

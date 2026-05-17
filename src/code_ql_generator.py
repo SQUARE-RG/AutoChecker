@@ -9,7 +9,7 @@ from loguru import logger
 import re
 import json
 from llm_interface.llm_provider import llm_client,llm_invoke,calculate_deepseek_cost
-from help.code_ql_utils import count_negative_cases,select_negative_case,save_checker_code,save_middle_check,get_checker_code,get_most_similar_api_doc_query_op,get_logic_string,parse_query_code_from_answer,get_suggest_string_from_hint
+from help.code_ql_utils import count_negative_cases, get_suggest_api_string,select_negative_case,save_checker_code,save_middle_check,get_checker_code,get_most_similar_api_doc_query_op,get_logic_string,parse_query_code_from_answer,get_suggest_string_from_hint
 from prompt.codeql_prompt.build_codeql_prompt import get_prompt_for_Codeql
 from plateform.code_ql import run_code_ql_with_query,compiler_code_ql,run_code_ql,pre_Generate_Query_Template,case_path_to_database_path
 
@@ -109,8 +109,44 @@ class CodeQL_CheckerGenerator(object):
             else:
                 logger.debug("未能从回答中提取到有效的checker代码，尝试重新生成...")
         return None, logics
+    def extract_compiler_error_info(self,compiler_output:str):
+        # 提取所有类型和模块的正则表达式
+        type_patterns = [
+            r'could not resolve type (\w+(?:::[\w:]+)?)',  # 匹配类型
+            r'cannot be resolved for type (\w+(?:::[\w:]+)?)'  # 匹配方法无法解析的类型
+        ]
+
+        module_pattern = r'could not resolve module (\w+)'  # 匹配模块
+
+        # 存储提取的结果
+        problem_items = {
+            'types': set(),  # 使用set自动去重
+            'modules': set()  # 使用set自动去重
+        }
+        # 从compiler_output中提取错误信息
+        for pattern in type_patterns:
+            matches = re.findall(pattern, compiler_output)
+            for match in matches:
+                problem_items['types'].add(match)
+        module_matches = re.findall(module_pattern, compiler_output)
+        for match in module_matches:
+            problem_items['modules'].add(match)
+        # 将set转换为list返回
+        problem_items['types'] = list(problem_items['types'])
+        problem_items['modules'] = list(problem_items['modules'])
+        ans =[]
+        for t in problem_items['types']:
+            ans.append(t)
+        for m in problem_items['modules']:
+            ans.append(m)
+        logger.info(f"从编译错误信息中提取到的相关类型和模块: {ans}")
+        return ans
+
 
     def analyze_compiler_error(self, compiler_output: str, ql_content: str) :
+        # 去除compiler_output中WARNING: 开头的行
+        compiler_output = "\n".join([line for line in compiler_output.splitlines() if not line.startswith("WARNING:")])
+        # logger.info(f"筛选后的编译错误信息:\n{compiler_output}")
         analyze_prompt = get_prompt_for_Codeql("analyze_compiler_error")
         analyze_query = analyze_prompt.format(
             query_code=ql_content,
@@ -142,7 +178,12 @@ class CodeQL_CheckerGenerator(object):
                 repair_steps_string+= str(step) + "\n"
 
             wait_retrieve_code_snippet = data[1].get('wait_retrieve_code_snippet', [])
+            wait_retrieve_code_snippet = wait_retrieve_code_snippet+ self.extract_compiler_error_info(compiler_output)
+            logger.info(f"等待检索的代码片段和相关类型/模块: {wait_retrieve_code_snippet}")
             api_suggest_string, doc_suggest_string, query_op_suggest_string = get_suggest_string_from_hint(wait_retrieve_code_snippet)
+        
+        # more_api_string = get_suggest_api_string(self.extract_compiler_error_info(compiler_output))
+
         return repair_steps_string, api_suggest_string, doc_suggest_string, query_op_suggest_string
          
     def augmentation_logic_by_negative_case(self,query_check_code,passed_test_cases,failed_test_cases):
@@ -301,10 +342,11 @@ class CodeQL_CheckerGenerator(object):
                     ql_temp = get_checker_code(self.RULE.get_rule_name())
                     repair_steps, api_suggest_string, doc_suggest_string, query_op_suggest_string = self.analyze_compiler_error(str(compiler_return_stdout+compiler_return_stderr),ql_temp)
                     logger.info(f"编译错误分析完成")
-
+                    compiler_output= compiler_return_stdout+compiler_return_stderr
+                    compiler_output = "\n".join([line for line in compiler_output.splitlines() if not line.startswith("WARNING:")])
                     repair_query = get_prompt_for_Codeql("repair_compiler_error_code").format(
                         query_code=query_code,
-                        compiler_error_info=str(compiler_return_stdout+compiler_return_stderr),
+                        compiler_error_info=compiler_output,
                         repair_steps=repair_steps,
                         api_suggest_string=api_suggest_string,
                         doc_suggest_string=doc_suggest_string,
@@ -329,6 +371,7 @@ class CodeQL_CheckerGenerator(object):
                     output_path = os.path.join(os.path.dirname(current_case.get_case_path()), f"{self.RULE.get_rule_name()}_output.csv")
 
                     full_output, warning_count = run_code_ql_with_query(query_checker_path,case_path_to_database_path(current_case.get_case_path()),output_path)
+                    logger.debug(f"CodeQL运行返回的完整输出:\n{full_output}")
                     logger.info(f"测试用例运行完成,warning数量为:{warning_count}")
 
                     round_final_checker_dir = os.path.join(round_dir, "final_checker")
@@ -418,6 +461,7 @@ class CodeQL_CheckerGenerator(object):
                     logger.info("增强阶段，开始编译")
                     current_try_compiler_count = 1
                     compiler_return_code,compiler_return_stdout,compiler_return_stderr,compiler_success =compiler_code_ql(query_checker_path)
+                    logger.debug(f"编译返回码: {compiler_return_code}\n编译标准输出: {compiler_return_stdout}\n编译错误输出: {compiler_return_stderr}")
                     while not compiler_success:
                         logger.info(f"增强阶段，第{round}轮生成的checker编译失败，使用编译修复功能，开始第{current_try_compiler_count}次重试")
                         if current_try_compiler_count > config['arguments']['max_compiler_trys']:
@@ -429,23 +473,28 @@ class CodeQL_CheckerGenerator(object):
                         query_check_code = get_checker_code(self.RULE.get_rule_name())
                         repair_steps, api_suggest_string, doc_suggest_string, query_op_suggest_string = self.analyze_compiler_error(str(compiler_return_stdout+compiler_return_stderr),query_check_code)
                         logger.info(f"增强阶段，编译错误分析完成")
+                        compiler_output= compiler_return_stdout+compiler_return_stderr
+                        compiler_output = "\n".join([line for line in compiler_output.splitlines() if not line.startswith("WARNING:")])
                         repair_query = get_prompt_for_Codeql("repair_compiler_error_code").format(
                             query_code=query_check_code,
-                            compiler_error_info=str(compiler_return_stdout+compiler_return_stderr),
+                            compiler_error_info=compiler_output,
                             repair_steps=repair_steps,
                             api_suggest_string=api_suggest_string,
                             doc_suggest_string=doc_suggest_string,
                             query_op_suggest_string=query_op_suggest_string
                         )
-                        wait_compiler_checker_cpp,wait_compiler_checker_h = self.generate_checker_with_query(repair_query)
+                        wait_compiler_checker_ql = self.generate_checker_with_query(repair_query)
                         current_try_compiler_count += 1
-                        save_checker_code(wait_compiler_checker_cpp, wait_compiler_checker_h,self.RULE.get_rule_name())
-                        _,_,_ ,compiler_success = compiler_code_ql(query_checker_path)
+                        save_checker_code(wait_compiler_checker_ql,self.RULE.get_rule_name())
+                        compiler_return_code,compiler_return_stdout,compiler_return_stderr,compiler_success = compiler_code_ql(query_checker_path)
+                        logger.debug(f"编译返回码: {compiler_return_code}\n编译标准输出: {compiler_return_stdout}\n编译错误输出: {compiler_return_stderr}")
                     if compiler_success:
                         logger.info(f"增强阶段，第{round}轮生成的checker编译成功，下面运行测试用例进行验证")
                         output_path = os.path.join(os.path.dirname(failed_case.get_case_path()), f"{self.RULE.get_rule_name()}_output.csv")
 
                         full_output, warning_count = run_code_ql_with_query(query_checker_path,case_path_to_database_path(failed_case.get_case_path()),output_path)
+
+                        logger.debug(f"CodeQL运行返回的完整输出:\n{full_output}")
                         logger.info(f"增强阶段，测试用例运行完成,warning数量为:{warning_count}")
                         if failed_case.get_flag():
                             # 这是一个正例，应该通过测试,CHECK-MESSAGES不在代码注释中,符合规则

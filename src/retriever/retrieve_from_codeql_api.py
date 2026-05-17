@@ -119,8 +119,11 @@ def get_related_api(logic_for_ast_api:list):
         doc_emb=api_embeddings,
         k  = config['arguments']['top_key']
     )
+    logger.info(f"Top-K results for related API retrieval:")
     for qi,row in enumerate(top_k_results):
+        logger.info(f"Logic: {logic_for_ast_api[qi]}")
         for doc_idx,score in row:
+            logger.info(f"doc_idx: {doc_idx}, score: {score:.4f}: {api_documents[doc_idx]}")
             related_api.append( codeql_api_list[api_documents[doc_idx]] )
     unique_list = list(set(related_api))
     return unique_list

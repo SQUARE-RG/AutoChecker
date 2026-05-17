@@ -72,9 +72,16 @@ def run_code_ql_with_query(query_path, database_path, output_path):
     with open(output_path, 'r') as f:
         output_content = f.read()
     print(f"CodeQL运行成功，输出内容:\n{output_content}")
-    # 统计输出内容中的行数，作为告警数量
-    warning_count = len(output_content.strip().split('\n')) 
+    if not output_content.strip():
+        print("输出内容为空，告警数量为0")
+        return full_output, 0
+    
 
+    # 统计输出内容中的行数，作为告警数量
+    warning_count = len(output_content.strip().split('\n'))
+    
+
+    print(f"CodeQL运行成功，告警数量: {warning_count}")
     return full_output, warning_count
 
 def pre_Generate_Query_Template(checker_name):

@@ -69,9 +69,12 @@ def get_related_codeql_query_op(logic:str):
     )
     results = []
     codeql_query_op_documents_dict= get_data(config['codeql_knowledge_base']['codeql_query_op_path'])
+    logger.info(f"Top-K results for related CodeQL Query Op retrieval:")
     for qi,row in enumerate(topk):
+        logger.info(f"Logic: {logic[qi]}")
         # logger.info(f"Query: {logic_query[qi]}")
         for doc_idx , score in row:
+            logger.info(f"doc_idx: {doc_idx}, score: {score:.4f}: {codeql_query_op_documents_dict[codeql_query_op_doc[doc_idx]]}")
             # logger.info(f"doc_idx: {doc_idx}, score: {score:.4f}: {check_op_documents[doc_idx]}")
             results.append(codeql_query_op_documents_dict[codeql_query_op_doc[doc_idx]])
 

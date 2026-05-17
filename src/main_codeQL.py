@@ -11,7 +11,7 @@ from entity.factory import Factory_Clang_Tidy, Factory_CodeQL
 from entity.abstractProduct import AbstractRule
 from plateform.clang_tidy import compiler_clang_tidy,pre_Generate_Checker_Template,remove_Checker_Template
 from plateform.code_ql import run_code_ql_with_query,compiler_code_ql,run_code_ql,pre_Generate_Query_Template,create_databases_for_test_cases
-from help.clang_tidy_utils import get_camel_check_name
+from help.clang_tidy_utils import  get_camel_check_name
 from entity.abstractProduct import AbstractCase
 from generator import Clang_tidy_CheckerGenerator
 from code_ql_generator import CodeQL_CheckerGenerator
@@ -60,6 +60,12 @@ def save_final_checkers(rule_name,rule_result_dir,plateform: str):
         os.makedirs(final_checker_result_dir, exist_ok=True)
         shutil.copy(ruler_checker_cpp,final_checker_result_dir)
         shutil.copy(ruler_checker_h,final_checker_result_dir)
+        logger.info(f"最终checker已保存到: {final_checker_result_dir}")
+    if(plateform == "codeql"):
+        source_checker_path = global_config['file_paths']['codeql']+"/cpp/ql/src/MyQL/" + rule_name + ".ql"
+        final_checker_result_dir = rule_result_dir + "final_checker/"
+        os.makedirs(final_checker_result_dir, exist_ok=True)
+        shutil.copy(source_checker_path,final_checker_result_dir)
         logger.info(f"最终checker已保存到: {final_checker_result_dir}")
 
 def process_rule_info(rule_info,plateform: str):
@@ -195,6 +201,28 @@ def main(plateform: str = "codeql"):
                 start = time.perf_counter()
                 checker_generator = get_checker_generator(plateform,rule,all_Test_Case_List=Case_List,skipped_Test_Cases=None,rule_result_dir= rule_result_dir)
                 checkers_list = checker_generator.generate_checker()
+                save_final_checkers(rule.get_rule_name(),rule_result_dir,plateform)
+                if checkers_list is None:
+                    logger.error(f"Checker生成失败，规则名：{rule.get_rule_name()}")
+                    rule_info['issuccess'] = "False"
+                    rule_info['performance']=f"0/{len(Case_List)}"
+                else:
+                    logger.info(f"生成了 {len(checkers_list)} 个Checker，规则名：{rule.get_rule_name()}")
+                    final_checker = checkers_list[-1]
+                    logger.info(f"最终生成的Checker通过的测试用例数量:{len(final_checker.get_passed_cases())}/{len(Case_List)}")
+                    rule_info['issuccess'] = "True"
+                    rule_info['performance']=f"{len(final_checker.get_passed_cases())}/{len(Case_List)}"
+                    sucess_case_list = final_checker.get_passed_cases()
+                    sucess_case_path_list = [case.get_case_path() for case in sucess_case_list]
+                    rule_info['success_case_list'] = sucess_case_path_list
+                    failed_case_list = [case for case in Case_List if case.get_case_path() not in sucess_case_path_list]
+                    failed_case_path_list = [case.get_case_path() for case in failed_case_list]
+                    rule_info['failed_case_list'] = failed_case_path_list
+                logger.info("Checker生成完毕，结果已保存")
+                end = time.perf_counter()
+                logger.info(f"规则 {rule.get_rule_name()} 的Checker生成总共耗时: {end - start:.2f} 秒")
+                
+                
 
                 
     # 将结果保存到JSON文件

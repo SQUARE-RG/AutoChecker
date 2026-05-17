@@ -46,9 +46,9 @@
     
     "arguments":{
         "max_round": 2,
-        "max_compiler_trys": 2,
+        "max_compiler_trys": 5,
         "max_llm_tries": 3,
-        "top_key":1,
+        "top_key":2,
         "filter_rule":"RedundantDeclarationCheck"
     }
 }

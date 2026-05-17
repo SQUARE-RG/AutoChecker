@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
 from torch import lu
-from config import global_config as config  
+# from config import global_config as config  
 from langchain_openai import ChatOpenAI
 from langchain_community.callbacks import get_openai_callback
 load_dotenv()
@@ -17,6 +17,15 @@ def get_llm_client():
         #     temperature=0.7)
         client  = ChatOpenAI(
             model="deepseek-chat",
+            api_key=API_KEY,
+            base_url=BASE_URL,
+            temperature=0.7)
+        return client
+    if model_name == "gpt-5.4-mini":
+        API_KEY = os.getenv("DEEPSEEK_API_KEY", "your_default_api_key_here")
+        BASE_URL = os.getenv("DEEPSEEK_BASE_URL", "https://api.ifopen.ai/v1")
+        client  = ChatOpenAI(
+            model="gpt-5.4-mini",
             api_key=API_KEY,
             base_url=BASE_URL,
             temperature=0.7)
@@ -89,4 +98,7 @@ def build_messages(prompt: str):
     messages = []
     messages.append({"role": "user", "content": prompt})
     return messages
+
 llm_client = get_llm_client()
+
+# print(llm_invoke(llm_client, "Hello, how are you?"))
