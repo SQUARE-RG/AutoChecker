@@ -29,33 +29,29 @@ AutoChecker 通过 Docker 一键部署，自动配置好所有依赖环境和工
 | **Docker** | 建议 28.1.1 或以上版本 |
 | **操作系统** | Ubuntu 22.04（推荐），其他 Linux 发行版也可运行 |
 | **LLM API 密钥** | 需要一个大语言模型的 API Key（如 DeepSeek、OpenAI 等） |
-
-### 第一步：克隆项目
-
+### Native (Linux)
+#### Step1 环境准备
+克隆仓库：
 ```bash
 git clone https://github.com/SQUARE-RG/AutoChecker.git
+```
+创建虚拟环境：
+```shell
+# 创建虚拟环境
+conda create -n autochecker python=3.10
+conda activate autochecker 
+# 进入软件根目录
 cd AutoChecker
+pip install -r requirements.txt
 ```
+#### Step2 安装静态分析引擎
 
-### 第二步：构建 Docker 镜像
+PMD:
+![deploy pmd](/doc/pmd_install_cn.md)
+![deploy clang-tidy](/doc/clang_tidy_install_cn.md)
+![deploy codeql](/doc/codeql_deploy_cn.md)
 
-镜像构建过程会自动完成以下工作：安装 Python 运行环境、配置 conda 虚拟环境、下载嵌入模型、编译各静态分析工具的工具链，整个过程约需 10 分钟。
-
-```bash
-docker build -t autochecker:1.0 .
-```
-
-> 构建过程中会执行各项依赖的安装和编译，请耐心等待。看到 `Successfully tagged autochecker:1.0` 即表示构建成功。
-
-### 第三步：创建并启动容器
-
-```bash
-docker run -it --name autochecker-container autochecker:1.0 /bin/bash
-```
-
-执行后会自动进入容器的交互终端，默认位于 AutoChecker 的根目录下。
-
-### 第四步：配置 LLM 大模型
+#### Step3 配置 LLM 大模型
 
 在容器内的软件根目录下创建 `.env` 文件，填入你的大模型 API 信息：
 
@@ -67,9 +63,80 @@ BASE_URL=API接口地址（如 https://api.deepseek.com）
 
 配置完成后，安装就结束了。接下来只需准备规则和测试用例，就能开始生成 checker 了。
 
-## 快速上手
+#### Step4 准备规则和测试套件
 
-### 1. 准备规则文件
+在项目根目录新建rule.json
+```json
+{
+    "data": {
+        "ucassaat": [
+            {
+                "main_title": "use-uncheck-pointer-after-malloc",
+                "description": "The rule requires that any pointer obtained through dynamic memory allocation functions (such as malloc, calloc, or realloc) must be checked for non-null before its first use. This check must occur before the pointer is used; performing the check after use is considered a violation. Acceptable check methods include explicit or implicit null pointer comparisons like if (ptr != NULL), if (ptr), or if (!ptr). If a dynamically allocated pointer is never used, it does not violate this rule. If a pointer is reallocated, it must be checked again before any subsequent use. This rule applies equally to global and local variables. Only one warning should be reported per violating pointer variable.",
+                "category": "ucassaat",
+                "rule_test_path": "/root/code_check/experiment/gjb8114/codeql_test_case/use_uncheck_pointer_after_malloc"
+            }
+        ]
+    }
+}
+
+```
+注意：
+- 如果您希望生成clang-tidy的checker，category字段值请和![deploy clang-tidy](/doc/clang_tidy_install_cn.md)中一致。
+- rule_test_path请使用绝对路径，指向测试套件的位置。
+- 测试套件里面违反规则的测试用例，请在代码中用"CHECK-MESSAGES"进行注释。
+
+#### Step5 运行
+```
+python src/main.py --rule_file rule.json --language cpp  --analyzer clang-tidy
+```
+最终生成的结果会默认保存到result-generation目录中。
+
+
+
+### Docker
+
+
+#### 第一步：克隆项目
+
+```bash
+git clone https://github.com/SQUARE-RG/AutoChecker.git
+cd AutoChecker
+```
+
+#### 第二步：构建 Docker 镜像
+
+镜像构建过程会自动完成以下工作：安装 Python 运行环境、配置 conda 虚拟环境、下载嵌入模型、编译各静态分析工具的工具链，整个过程约需 10 分钟。
+
+```bash
+docker build -t autochecker:1.0 .
+```
+
+> 构建过程中会执行各项依赖的安装和编译，请耐心等待。看到 `Successfully tagged autochecker:1.0` 即表示构建成功。
+
+#### 第三步：创建并启动容器
+
+```bash
+docker run -it --name autochecker-container autochecker:1.0 /bin/bash
+```
+
+执行后会自动进入容器的交互终端，默认位于 AutoChecker 的根目录下。
+
+#### 第四步：配置 LLM 大模型
+
+在容器内的软件根目录下创建 `.env` 文件，填入你的大模型 API 信息：
+
+```
+API_KEY=你的API密钥
+MODEL=模型名称（如 deepseek、gpt-4 等）
+BASE_URL=API接口地址（如 https://api.deepseek.com）
+```
+
+配置完成后，安装就结束了。接下来只需准备规则和测试用例，就能开始生成 checker 了。
+
+
+
+#### 1. 准备规则文件
 
 在软件根目录下创建 `rule.json`，填写你的检测规则和测试用例路径：
 
@@ -85,7 +152,7 @@ BASE_URL=API接口地址（如 https://api.deepseek.com）
 
 测试用例要求：以 `.cpp`、`.c` 或 `.java` 等对应语言后缀结尾的代码文件，每个文件需能独立编译。
 
-### 2. 启动生成
+#### 2. 启动生成
 
 ```bash
 python src/main.py --input rule.json
@@ -95,7 +162,7 @@ python src/main.py --input rule.json
 - **final_checker/**：最终生成的检查器代码（.h 头文件和 .cpp 实现文件）
 - **checker_generation_result.json**：检查器在测试用例上的表现报告（准确率、耗时、费用等）
 
-### 3. 将生成的 checker 集成到你的工具中
+#### 3. 将生成的 checker 集成到你的工具中
 
 生成的 checker 代码可直接放入对应静态分析工具的 checker 目录中，编译后即可使用。
 
