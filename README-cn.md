@@ -197,9 +197,30 @@ python src/main.py --input rule.json
 | `top_key` | 检索最相关代码片段的数量 | 2 |
 | `result_dir` | 结果输出目录 | result-generation/ |
 
-## 论文和引用
-+ 论文pdf
-  
-+ 正式参考文献格式
+## Publications
 
-+ bib 信息
+If you use our work in your research, please kindly cite us as:
+1. Jun Liu*, Yuanyuan Xie*, Jiwei Yan#, Jinhao Huang, Jun Yan, Jian Zhang. Write Your Own CodeChecker: An Automated Test-Driven Checker Development Approach with LLMs. ICSE 2026.[paper](https://conf.researchr.org/details/icse-2026/icse-2026-research-track/43/Write-Your-Own-Code-Checker-An-Automated-Test-Driven-Checker-Development-Approach-wi)
+```bibtex
+@inproceedings{AutoChecker,
+      title={Write Your Own CodeChecker: An Automated Test-Driven Checker Development Approach with LLMs}, 
+      author={Jun Liu and Yuanyuan Xie and Jiwei Yan and Jinhao Huang and Jun Yan and Jian Zhang},
+      booktitle={Proceedings of the International Conference on Software Engineering (ICSE)},
+      year={2026}
+}
+```
+
+## Maintainers/Contributors
+Kea2 has been actively developed and maintained by the people in [SQUARE Research Group](https://square16.org/zh):
+- Jun Liu
+- Yuanyuan Xie
+- [Liqiang Ji](https://carlson-jlq.github.io/liqiang-ji.github.io/)([@carlson-jlq](https://github.com/Carlson-JLQ))
+- Jinhao Huang
+- Yuyang Xi
+- Xianglong Qi
+## Become a Contributor!
+AutoChecker is open source and we welcome contributions from the community.
+See [Developer Guide](/doc/Developer_Guide.md) for more details.
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=SQUARE-RG/AutoChecker&type=Date)](https://star-history.com/#SQUARE-RG/AutoChecker&Date)
