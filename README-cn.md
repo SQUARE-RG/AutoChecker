@@ -1,24 +1,22 @@
 # AutoChecker
 
-AutoChecker 是一个自动生成代码静态检查器的工具。
+**AutoChecker 是一个基于用户的规则检查需求，自动为主流静态分析工具（如 CodeQL、Clang-tidy等）生成代码检查器的工具**。
 
-在日常开发中，我们经常需要检查代码是否符合规范（比如有没有空指针风险、资源是否正确释放、命名是否合规）。要让静态分析工具（如 Clang-tidy、PMD、CodeQL 等）识别这些问题，通常需要开发者手动为每个工具分别编写 checker，这既耗时又容易出错。
-
-**AutoChecker 的思路很简单：你只需要描述清楚规则并给出示例，它会自动帮你生成对应工具的 checker**，一条规则可以同时输出到多个工具，省去重复劳动。
+在日常开发中，我们经常需要检查代码是否符合规范（比如有没有空指针风险、资源是否正确释放、命名是否合规）。虽然静态分析工具提供了部分内置检查器，但内置检查器与用户需求常常存在不匹配的情况，如果自行开发满足需求的检查器，不仅耗时又容易出错。而AutoChecker提供了这一场景下的新方案：**用户给出需求（描述规则并给出示例），AutoChecker会自动帮你生成对应静态分析工具的代码检查器**。此外，仅需给定一条规则，AutoChecker可以生成多个分析工具的检查器供用户选用。
 
 ![Overview](Autochecker.png)
 
 ## 主要功能
 
-- **基于规则和用例自动生成 checker**：只需提供规则描述和正反面测试用例，工具就能自动生成对应的检查器代码。
-- **支持多种主流静态检查工具**：目前支持 PMD（Java）、Clang-tidy（C/C++）、Clang Static Analyzer（C/C++）和 CodeQL（多语言），即将支持 Semgrep。
-- **一次编写，多工具输出**：同一条规则配上测试用例，可同时生成适用于不同分析工具的 checker，避免重复编写。
+- **基于规则描述和用例自动生成 checker**：用户输入规则描述和正反测试用例，工具输出该规则在选定静态分析工具中直接可用的检查器代码。
+- **一次需求编写，多工具检查器生成**：对于检查需求，仅需一次性设计规则描述和测试用例作为规约，后续可生成适用于不同分析工具的 checker，方便用户高效选用。
+- **支持多种主流静态检查工具**：目前支持 Clang-tidy（C/C++）、Clang Static Analyzer（C/C++）、 CodeQL（多语言）和PMD（Java），即将支持 Semgrep。
 
-## 在线体验
+## 在线快速体验
 
-我们提供了一个在线演示网站，你可以在浏览器中直接体验工具效果：[autochecker.party](https://autochecker.veilaxis.com/en)
+[New!] 可点击链接快速在浏览器中体验工具效果：[autochecker.party](https://autochecker.veilaxis.com/en)
 
-## 安装指南
+## 本地安装指南
 
 AutoChecker 通过 Docker 一键部署，自动配置好所有依赖环境和工具链，无需手动折腾编译环境。
 
@@ -188,3 +186,10 @@ python src/main.py --input rule.json
 | `max_compiler_trys` | 修复编译失败的最大尝试次数 | 5 |
 | `top_key` | 检索最相关代码片段的数量 | 2 |
 | `result_dir` | 结果输出目录 | result-generation/ |
+
+## 论文和引用
++ 论文pdf
+  
++ 正式参考文献格式
+
++ bib 信息
