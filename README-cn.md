@@ -16,18 +16,22 @@
 
 [New!] 可点击链接快速在浏览器中体验工具效果：[autochecker.party](https://autochecker.veilaxis.com/en)
 
-## 本地安装指南
+## 安装指南
 
-AutoChecker 通过 Docker 一键部署，自动配置好所有依赖环境和工具链，无需手动折腾编译环境。
+AutoChecker有两种安装方式：
+- 1. 手动安装依赖，配置环境变量，编译运行。
+- 2. 通过 Docker 一键部署，自动配置好所有依赖环境和工具链，无需手动折腾编译环境。
 
-### 前置要求
+第一种方式可以支持PMD,clang-tidy，codeql等工具的检查器生成。
+第二种方式目前只支持clang-tidy，codeql的检查器生成。
+### 手动安装
+#### 前置要求
+磁盘空间：至少64GB
+内存：至少16GB
+处理器：至少4核
+操作系统：Ubuntu 22.04（推荐）
+LLM API 密钥：需要一个大语言模型的 API Key（如 DeepSeek、OpenAI 等）
 
-| 依赖 | 说明 |
-| ---- | ---- |
-| **Docker** | 建议 28.1.1 或以上版本 |
-| **操作系统** | Ubuntu 22.04（推荐），其他 Linux 发行版也可运行 |
-| **LLM API 密钥** | 需要一个大语言模型的 API Key（如 DeepSeek、OpenAI 等） |
-### Native (Linux)
 #### Step1 环境准备
 克隆仓库：
 ```bash
@@ -93,16 +97,22 @@ python src/main.py --rule_file rule.json --language cpp  --analyzer clang-tidy
 
 
 ### Docker
+#### 前置要求
 
+| 依赖 | 说明 |
+| ---- | ---- |
+| **Docker** | 建议 28.1.1 或以上版本 |
+| **操作系统** | Ubuntu 22.04（推荐），其他 Linux 发行版也可运行 |
+| **LLM API 密钥** | 需要一个大语言模型的 API Key（如 DeepSeek、OpenAI 等） |
 
-#### 第一步：克隆项目
+#### Step1克隆项目
 
 ```bash
 git clone https://github.com/SQUARE-RG/AutoChecker.git
 cd AutoChecker
 ```
 
-#### 第二步：构建 Docker 镜像
+#### Step2 构建 Docker 镜像
 
 镜像构建过程会自动完成以下工作：安装 Python 运行环境、配置 conda 虚拟环境、下载嵌入模型、编译各静态分析工具的工具链，整个过程约需 10 分钟。
 
@@ -112,7 +122,7 @@ docker build -t autochecker:1.0 .
 
 > 构建过程中会执行各项依赖的安装和编译，请耐心等待。看到 `Successfully tagged autochecker:1.0` 即表示构建成功。
 
-#### 第三步：创建并启动容器
+#### Step3 创建并启动容器
 
 ```bash
 docker run -it --name autochecker-container autochecker:1.0 /bin/bash
@@ -120,7 +130,7 @@ docker run -it --name autochecker-container autochecker:1.0 /bin/bash
 
 执行后会自动进入容器的交互终端，默认位于 AutoChecker 的根目录下。
 
-#### 第四步：配置 LLM 大模型
+#### Step4 配置 LLM 大模型
 
 在容器内的软件根目录下创建 `.env` 文件，填入你的大模型 API 信息：
 
@@ -134,7 +144,7 @@ BASE_URL=API接口地址（如 https://api.deepseek.com）
 
 
 
-#### 1. 准备规则文件
+#### Step5 准备规则文件
 
 在软件根目录下创建 `rule.json`，填写你的检测规则和测试用例路径：
 
@@ -150,7 +160,7 @@ BASE_URL=API接口地址（如 https://api.deepseek.com）
 
 测试用例要求：以 `.cpp`、`.c` 或 `.java` 等对应语言后缀结尾的代码文件，每个文件需能独立编译。
 
-#### 2. 启动生成
+#### Step6 启动生成
 
 ```bash
 python src/main.py --input rule.json
@@ -160,7 +170,7 @@ python src/main.py --input rule.json
 - **final_checker/**：最终生成的检查器代码（.h 头文件和 .cpp 实现文件）
 - **checker_generation_result.json**：检查器在测试用例上的表现报告（准确率、耗时、费用等）
 
-#### 3. 将生成的 checker 集成到你的工具中
+#### Step7 将生成的 checker 集成到你的工具中
 
 生成的 checker 代码可直接放入对应静态分析工具的 checker 目录中，编译后即可使用。
 
