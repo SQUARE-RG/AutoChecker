@@ -215,9 +215,10 @@ Kea2 has been actively developed and maintained by the people in [SQUARE Researc
 - Jun Liu
 - Yuanyuan Xie
 - [Liqiang Ji](https://carlson-jlq.github.io/liqiang-ji.github.io/)([@carlson-jlq](https://github.com/Carlson-JLQ))
-- Jinhao Huang
-- Yuyang Xi
-- Xianglong Qi
+- Jinhao Huang([@jinhao-huang](https://github.com/jinhao-huang))
+- Yuyang Xie([@sisifuCha](https://github.com/sisifuCha))
+- Xianglong Qi([@Meiosis-Poor](https://github.com/Meiosis-Poor))
+- [Jiwei Yan](https://hanada31.github.io/)
 ## Become a Contributor!
 AutoChecker is open source and we welcome contributions from the community.
 See [Developer Guide](/doc/Developer_Guide.md) for more details.
