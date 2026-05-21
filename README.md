@@ -147,6 +147,7 @@ The generated results are saved to the `result-generation` directory by default.
 ```bash
 git clone https://github.com/SQUARE-RG/AutoChecker.git
 cd AutoChecker
+git clone https://github.com/llvm/llvm-project.git --branch release/17.x --depth 1
 ```
 
 #### Step 2: Build the Docker Image

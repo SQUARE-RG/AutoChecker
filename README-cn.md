@@ -147,6 +147,7 @@ python src/main.py --rule_file rule.json --language cpp --analyzer clang-tidy
 ```bash
 git clone https://github.com/SQUARE-RG/AutoChecker.git
 cd AutoChecker
+git clone https://github.com/llvm/llvm-project.git --branch release/17.x --depth 1
 ```
 
 #### 步骤 2：构建 Docker 镜像
