@@ -28,8 +28,9 @@ RUN curl -fsSL -o /tmp/miniconda.sh https://repo.anaconda.com/miniconda/Minicond
 ENV PATH=/root/anaconda3/bin:${PATH}
 
 COPY requirements.txt /tmp/requirements.txt
-RUN source /root/anaconda3/etc/profile.d/conda.sh \
- && conda create -y -n code_check python=3.10 \
+RUN /root/anaconda3/bin/conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main 2>/dev/null || true \
+ && /root/anaconda3/bin/conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r 2>/dev/null || true \
+ && /root/anaconda3/bin/conda create -y -n code_check python=3.10 \
  && /root/anaconda3/envs/code_check/bin/pip install --no-cache-dir -r /tmp/requirements.txt -i https://pypi.mirrors.ustc.edu.cn/simple \
  && /root/anaconda3/envs/code_check/bin/pip install --no-cache-dir modelscope -i https://pypi.mirrors.ustc.edu.cn/simple \
  && rm /tmp/requirements.txt
