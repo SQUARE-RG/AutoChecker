@@ -241,7 +241,7 @@ The `config.json` file in the project root directory can be adjusted as needed:
 
 If you use our work in your research or project, please consider citing:
 
-1. Jun Liu*, Yuanyuan Xie*, Jiwei Yan#, Jinhao Huang, Jun Yan, Jian Zhang. Write Your Own CodeChecker: An Automated Test-Driven Checker Development Approach with LLMs. ICSE 2026. [paper](https://conf.researchr.org/details/icse-2026/icse-2026-research-track/43/Write-Your-Own-Code-Checker-An-Automated-Test-Driven-Checker-Development-Approach-wi)
+1. Jun Liu, Yuanyuan Xie, Jiwei Yan, Jinhao Huang, Jun Yan, Jian Zhang. Write Your Own CodeChecker: An Automated Test-Driven Checker Development Approach with LLMs. ICSE 2026. [paper](https://hanada31.github.io/pdf/ICSE2026_AutoChecker.pdf)
 
 ```bibtex
 @inproceedings{AutoChecker,

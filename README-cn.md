@@ -241,7 +241,7 @@ python src/main.py --rule_file rule.json --language cpp --analyzer clang-tidy
 
 如果你的研究或项目使用了我们的工作，欢迎引用：
 
-1. Jun Liu*, Yuanyuan Xie*, Jiwei Yan#, Jinhao Huang, Jun Yan, Jian Zhang. Write Your Own CodeChecker: An Automated Test-Driven Checker Development Approach with LLMs. ICSE 2026. [paper](https://conf.researchr.org/details/icse-2026/icse-2026-research-track/43/Write-Your-Own-Code-Checker-An-Automated-Test-Driven-Checker-Development-Approach-wi)
+1. Jun Liu, Yuanyuan Xie, Jiwei Yan, Jinhao Huang, Jun Yan, Jian Zhang. Write Your Own CodeChecker: An Automated Test-Driven Checker Development Approach with LLMs. ICSE 2026. [paper](https://hanada31.github.io/pdf/ICSE2026_AutoChecker.pdf)
 
 ```bibtex
 @inproceedings{AutoChecker,
