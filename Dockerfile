@@ -31,6 +31,7 @@ COPY requirements.txt /tmp/requirements.txt
 RUN /root/anaconda3/bin/conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main 2>/dev/null || true \
  && /root/anaconda3/bin/conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r 2>/dev/null || true \
  && /root/anaconda3/bin/conda create -y -n code_check python=3.10 \
+ && /root/anaconda3/envs/code_check/bin/pip install --no-cache-dir setuptools -i https://pypi.mirrors.ustc.edu.cn/simple \
  && /root/anaconda3/envs/code_check/bin/pip install --no-cache-dir -r /tmp/requirements.txt -i https://pypi.mirrors.ustc.edu.cn/simple \
  && /root/anaconda3/envs/code_check/bin/pip install --no-cache-dir modelscope -i https://pypi.mirrors.ustc.edu.cn/simple \
  && rm /tmp/requirements.txt
