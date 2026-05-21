@@ -11,8 +11,8 @@
 </p>
 
 <p align="center">
-  <a href="./README.md">English</a> |
-  <a href="./README-cn.md">简体中文</a> |
+  <a href="./README.md"><img src="https://img.shields.io/badge/lang-English-b0e8ff?style=flat-square&labelColor=0a0e14" alt="English"></a>
+  <a href="./README-cn.md"><img src="https://img.shields.io/badge/lang-%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-b0e8ff?style=flat-square&labelColor=0a0e14" alt="简体中文"></a>
   <a href="https://github.com/SQUARE-RG/AutoChecker/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-b0e8ff?style=flat-square&labelColor=0a0e14" alt="license"></a>
 </p>
 
