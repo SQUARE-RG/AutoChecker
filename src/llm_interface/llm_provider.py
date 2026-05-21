@@ -31,6 +31,17 @@ def get_llm_client():
             temperature=0.7)
         return client
     
+def get_llm_client_from_config(api_key: str, base_url: str, model_name: str = "deepseek-chat"):
+    """根据传入的配置动态创建 LLM client，供 SDK 模式使用。"""
+    client = ChatOpenAI(
+        model=model_name,
+        api_key=api_key,
+        base_url=base_url,
+        temperature=0.7
+    )
+    return client
+
+
 def llm_invoke(llm_provider ,prompt: str) -> str:
     messages = build_messages(prompt)
     with get_openai_callback() as cb:

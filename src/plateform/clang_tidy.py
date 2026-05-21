@@ -4,6 +4,7 @@ import os
 import subprocess
 from pathlib import Path
 import time
+import shutil
 #实现Checker的增删改查
 config = {}
 with open("/root/code_check/src/config.json", 'r') as f:
@@ -162,6 +163,43 @@ def compiler_clang_tidy():
     compiler_success = result.returncode == 0
     
     return result.returncode,result.stdout, result.stderr,compiler_success
+
+def run_clang_tidy_directly(test_case_path: str, rule_name: str, include_dir: str = None,
+                             std: str = "c++17"):
+    """直接运行 clang-tidy 二进制文件（不依赖 CHECK-MESSAGES 测试脚本）。
+    适用于 SDK 模式，因为 SDK 测试用例不含 CHECK-MESSAGES 注释。
+
+    返回 (stdout, warning_count)。
+    """
+    cmd = [
+        config['compiler']['build_bin_clang_tidy'],
+        f'--checks=-*,{rule_name}',
+        test_case_path,
+        '--',
+        f'-std={std}',
+    ]
+    if include_dir:
+        cmd.extend(['-I', include_dir])
+
+    proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+    full_output = proc.stdout
+    warning_count = full_output.count("warning:")
+    return full_output, warning_count
+
+
+def setup_sdk_test_temp_dir(rule_name: str) -> str:
+    """为 SDK 模式创建测试用例临时目录，返回目录路径。"""
+    temp_dir = config['checker']['temp_test_dir'] + f"sdk_{rule_name}/"
+    os.makedirs(temp_dir, exist_ok=True)
+    return temp_dir
+
+
+def cleanup_sdk_temp_dir(rule_name: str):
+    """清理 SDK 模式的测试用例临时目录。"""
+    temp_dir = config['checker']['temp_test_dir'] + f"sdk_{rule_name}/"
+    if os.path.exists(temp_dir):
+        shutil.rmtree(temp_dir)
+
 
 if __name__ == "__main__":
     # print("main")

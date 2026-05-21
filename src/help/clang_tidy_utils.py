@@ -12,6 +12,7 @@ from retriever.retrieve_from_astMatchers import get_related_astMatchers
 from retriever.retrieve_from_astMatchers_meta_op import get_related_astMatchers_meta_op
 from retriever.retrieve_from_check_op import get_related_check_op
 from retriever.retrieve_from_ast_api import get_related_ast_api
+from entity.concreteProduct_Clang_Tidy import Case_Clang_Tidy, Rule_Clang_Tidy
 # Clang tidy check name utils
 #只适用于clang tidy的checker生成过程
 def get_camel_name(check_name):
@@ -298,3 +299,50 @@ def save_middle_check(checker_cpp: str, checker_h:str,round_dir: str):
     with open(ruler_checker_h, 'w', encoding='utf-8') as file:
         file.write(checker_h)
     return ""
+
+
+# ============================================================
+# SDK 适配器：将 SDK 类型转换为内部实体类
+# ============================================================
+
+def adapt_sdk_test_cases(test_cases: list, temp_dir: str) -> list:
+    """
+    将 SDK 的 TestCaseData 列表转换为内部 Case_Clang_Tidy 列表。
+
+    TestCaseData.compliant=True  → 正例（合规代码，checker 不应报警）
+    TestCaseData.compliant=False → 负例（违规代码，checker 应报警）
+
+    同时将 code 写入 temp_dir 下的 .cpp 文件，因为 clang-tidy 需要实际文件路径。
+    """
+    case_list = []
+    os.makedirs(temp_dir, exist_ok=True)
+    for tc in test_cases:
+        file_path = os.path.join(temp_dir, tc.file_name)
+        with open(file_path, 'w', encoding='utf-8') as f:
+            f.write(tc.code)
+        case = Case_Clang_Tidy(
+            case_code=tc.code,
+            case_description=f"SDK test case: {tc.file_name}",
+            case_flag=tc.compliant,
+            case_path=file_path
+        )
+        case_list.append(case)
+    return case_list
+
+
+def adapt_sdk_input_to_entities(rule_name: str, rule_description: str,
+                                 test_cases: list, temp_test_dir: str = None):
+    """
+    从 SDK 输入创建内部实体：Rule_Clang_Tidy + List[Case_Clang_Tidy]。
+    返回 (rule, case_list) 元组。
+    """
+    if temp_test_dir is None:
+        temp_test_dir = config['checker']['temp_test_dir'] + f"sdk_{rule_name}/"
+    rule = Rule_Clang_Tidy(
+        rule_name=rule_name,
+        rule_description=rule_description,
+        rule_test_path=temp_test_dir,
+        rule_category="ucassaat"
+    )
+    case_list = adapt_sdk_test_cases(test_cases, temp_test_dir)
+    return rule, case_list

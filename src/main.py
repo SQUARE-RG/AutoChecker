@@ -9,13 +9,14 @@ from dotenv import load_dotenv
 import loguru
 from entity.factory import Factory_Clang_Tidy, Factory_CodeQL
 from entity.abstractProduct import AbstractRule
-from plateform.clang_tidy import compiler_clang_tidy,pre_Generate_Checker_Template,remove_Checker_Template
-from help.clang_tidy_utils import get_camel_check_name
+from plateform.clang_tidy import compiler_clang_tidy,pre_Generate_Checker_Template,remove_Checker_Template,setup_sdk_test_temp_dir,cleanup_sdk_temp_dir
+from help.clang_tidy_utils import get_camel_check_name,adapt_sdk_input_to_entities
 from entity.abstractProduct import AbstractCase
 from generator import Clang_tidy_CheckerGenerator
 from typing import List
 from client import AutoCheckerClient
 from types import GeneratorStatus, LogLevel
+from llm_interface.llm_provider import get_llm_client_from_config
 autoCheckerClient= AutoCheckerClient()
 logger = loguru.logger
 def init_logger(log_dir: str = "./logs", result_name: str = "result"):
@@ -101,7 +102,6 @@ def process_rule_info(rule_info,plateform: str):
         else:
             case.case_flag = True
             positive_case_count +=1
-            # print("负例")
         case.case_path = test_case_file_path         
         Case_List.append(case)
     rule_info['negative_case_amount'] = negative_case_count
@@ -127,6 +127,128 @@ def get_checker_generator(plateform: str,rule:AbstractRule,all_Test_Case_List: L
         checker_generator = Clang_tidy_CheckerGenerator(rule, all_Test_Case_List, skipped_Test_Cases, rule_result_dir)
         return checker_generator
     return None
+
+def main_sdk():
+    """SDK 模式入口：从 stdin 读取 GeneratorInput，通过 stdout 发送进度/产物/状态。"""
+    init_logger(result_name="sdk_generator")
+    result_dir = global_config['result']['result_dir']
+
+    # 1. 从 stdin 读取 SDK 输入
+    autoCheckerClient.log("Waiting for GeneratorInput from stdin...", level=LogLevel.INFO)
+    sdk_input = autoCheckerClient.get_input()
+    autoCheckerClient.log(f"Received input for rule: {sdk_input.rule_name}", level=LogLevel.INFO)
+
+    rule_name = sdk_input.rule_name
+    rule_description = sdk_input.rule_description
+    language = sdk_input.language
+    framework = sdk_input.framework
+
+    # 2. 框架检查
+    if framework.value != "clang-tidy":
+        autoCheckerClient.log(f"Unsupported framework: {framework.value}. Only clang-tidy is supported.", level=LogLevel.ERROR)
+        autoCheckerClient.send_status(status=GeneratorStatus.FAILED, error_message=f"Unsupported framework: {framework.value}")
+        sys.exit(1)
+
+    # 3. 创建 SDK LLM client
+    autoCheckerClient.report_progress(stage="Initializing LLM client")
+    sdk_llm_client = get_llm_client_from_config(
+        api_key=sdk_input.api_key,
+        base_url=sdk_input.base_url,
+        model_name=sdk_input.model_name,
+    )
+    autoCheckerClient.log(f"LLM client initialized: model={sdk_input.model_name}", level=LogLevel.INFO)
+
+    # 4. 转换 SDK 输入为内部实体
+    autoCheckerClient.report_progress(stage="Preparing test cases")
+    temp_test_dir = setup_sdk_test_temp_dir(rule_name)
+    rule, case_list = adapt_sdk_input_to_entities(
+        rule_name=rule_name,
+        rule_description=rule_description,
+        test_cases=sdk_input.test_cases,
+        temp_test_dir=temp_test_dir,
+    )
+    negative_count = sum(1 for c in case_list if not c.get_flag())
+    positive_count = sum(1 for c in case_list if c.get_flag())
+    autoCheckerClient.log(
+        f"Prepared {len(case_list)} test cases ({positive_count} positive, {negative_count} negative)",
+        level=LogLevel.INFO
+    )
+
+    # 5. 创建结果目录
+    rule_result_dir = result_dir + rule.rule_name + "/"
+    if os.path.exists(rule_result_dir):
+        shutil.rmtree(rule_result_dir)
+    os.makedirs(rule_result_dir, exist_ok=True)
+
+    # 6. 预编译 clang-tidy
+    autoCheckerClient.report_progress(stage="Compiling clang-tidy")
+    pre_compiler_returncode = pre_compiler_clang_tidy()
+    if pre_compiler_returncode != 0:
+        autoCheckerClient.log("Pre-compilation of clang-tidy failed.", level=LogLevel.ERROR)
+        autoCheckerClient.send_status(status=GeneratorStatus.FAILED, error_message="Pre-compilation failed")
+        cleanup_sdk_temp_dir(rule_name)
+        sys.exit(1)
+
+    # 7. 生成 checker 模板
+    autoCheckerClient.report_progress(stage="Generating checker template")
+    pre_generate_returncode = pre_Generate_Checker_Template(checker_name=rule.get_rule_name())
+    if pre_generate_returncode != 0:
+        autoCheckerClient.log(f"Failed to generate checker template for rule: {rule.get_rule_name()}", level=LogLevel.ERROR)
+        autoCheckerClient.send_status(status=GeneratorStatus.FAILED, error_message="Template generation failed")
+        cleanup_sdk_temp_dir(rule_name)
+        sys.exit(1)
+
+    # 8. 创建生成器并运行（传入 SDK LLM client 和 SDK communication client）
+    start = time.perf_counter()
+    autoCheckerClient.report_progress(stage="Generating checker")
+    checker_generator = Clang_tidy_CheckerGenerator(
+        rule,
+        all_Test_Case_List=case_list,
+        skipped_Test_Cases=None,
+        rule_result_dir=rule_result_dir,
+        llm_client=sdk_llm_client,
+        sdk_client=autoCheckerClient,
+    )
+    try:
+        checkers_list = checker_generator.generate_checker()
+    except Exception as exc:
+        autoCheckerClient.log(f"Unexpected error during checker generation: {str(exc)}", level=LogLevel.ERROR)
+        autoCheckerClient.send_status(
+            status=GeneratorStatus.FAILED,
+            error_message=f"Unexpected error: {str(exc)}"
+        )
+        remove_Checker_Template(checker_name=rule.get_rule_name())
+        compiler_clang_tidy()
+        cleanup_sdk_temp_dir(rule_name)
+        sys.exit(1)
+
+    # 9. 处理结果
+    save_final_checkers(rule.get_rule_name(), rule_result_dir, "clang-tidy")
+    end = time.perf_counter()
+    elapsed = end - start
+
+    if checkers_list is None:
+        autoCheckerClient.log(f"Checker generation failed for rule: {rule_name}", level=LogLevel.ERROR)
+        autoCheckerClient.send_status(
+            status=GeneratorStatus.FAILED,
+            error_message=f"Generation failed after {elapsed:.2f}s"
+        )
+    else:
+        final_checker = checkers_list[-1]
+        passed = len(final_checker.get_passed_cases())
+        total = len(case_list)
+        autoCheckerClient.log(
+            f"Checker generated successfully: {passed}/{total} test cases passed in {elapsed:.2f}s",
+            level=LogLevel.INFO
+        )
+        autoCheckerClient.send_status(status=GeneratorStatus.COMPLETED)
+
+    # 10. 清理
+    remove_Checker_Template(checker_name=rule.get_rule_name())
+    compiler_clang_tidy()
+    cleanup_sdk_temp_dir(rule_name)
+    autoCheckerClient.log(f"Cleanup completed for rule: {rule_name}", level=LogLevel.INFO)
+
 
 def main(plateform: str = "clang-tidy"):
     # 初始化日志
@@ -216,5 +338,13 @@ def main(plateform: str = "clang-tidy"):
         json.dump(rule_data, f, indent=4)
                     
 if __name__ == "__main__":
-    main()
+    import argparse
+    parser = argparse.ArgumentParser(description="AutoChecker Static Analysis Generator")
+    parser.add_argument("--mode", choices=["local", "sdk"], default="local",
+                        help="运行模式: local=本地文件模式, sdk=SDK stdin/stdout 模式")
+    args = parser.parse_args()
+    if args.mode == "sdk":
+        main_sdk()
+    else:
+        main()
     

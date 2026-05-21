@@ -1,0 +1,47 @@
+{
+  "permissions": {
+    "defaultMode": "dontAsk",
+    "allow": [
+      "Bash(*cmake *)",
+      "Bash(*python *)",
+      "Bash(*git *)",
+      "Bash(*find *)",
+      "Bash(*ls *)",
+      "Bash(*cat *)",
+      "Bash(*rm *)",
+      "Bash(*mkdir *)",
+      "Bash(*cp *)",
+      "Bash(*mv *)",
+      "Bash(*chmod *)",
+      "Bash(*make *)",
+      "Bash(*ninja *)",
+      "Bash(*grep *)",
+      "Bash(*diff *)",
+      "Bash(*echo *)",
+      "Bash(*pip *)",
+      "Bash(*conda *)",
+      "Bash(*npm *)",
+      "Bash(*npx *)",
+      "Bash(*node *)",
+      "Bash(*clang *)",
+      "Bash(*clang-tidy *)",
+      "Bash(*subprocess *)",
+      "Bash(*curl *)",
+      "Bash(*wget *)",
+      "Bash(*tar *)",
+      "Bash(*unzip *)",
+      "Bash(*source *)",
+      "Bash(*jq *)",
+      "Bash(*which *)",
+      "Read(*)",
+      "Edit(*)",
+      "Write(*)",
+      "Glob(*)",
+      "Grep(*)"
+    ],
+    "additionalDirectories": [
+      "/root/code_check",
+      "/root/cw-base"
+    ]
+  }
+}
