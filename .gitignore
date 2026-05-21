@@ -1,0 +1,50 @@
+build/
+linux/
+linux/build/
+codeql/
+tmp/
+*.log
+*.tmp
+.DS_Store
+.vscode/
+.idea/
+linux-db/
+llvm-project/
+src/embedding_db/
+logs/
+src/retriever/vector_db
+temp_validate/
+temp_test_dir/
+commit_to_test_cases/kparser/tree-sitter-cpp
+
+result-generation/
+experiment/
+## build目录
+llvm-project/build/
+src/retriever/embedding_model/
+
+codeql-linux64.zip
+# 其他常见的需要排除的文件和目录
+*.o
+*.a
+*.so
+*.out
+*.exe
+*.app
+
+# IDE 相关文件
+.vscode/
+.idea/
+*.swp
+*.swo
+.env
+*.yaml
+*.yml   
+
+
+# 编译产物
+*.dll
+*.lib
+*.class
+*.pyc
+__pycache__/    
