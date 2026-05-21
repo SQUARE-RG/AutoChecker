@@ -256,13 +256,13 @@ If you use our work in your research or project, please consider citing:
 
 AutoChecker is actively developed and maintained by members of [SQUARE Research Group](https://square16.org/):
 
-- Jun Liu
-- Yuanyuan Xie
+- Jun Liu([@nonsense-j](https://github.com/nonsense-j))
+- Yuanyuan Xie([@xyyusr](https://github.com/xyyusr))
 - [Liqiang Ji](https://carlson-jlq.github.io/liqiang-ji.github.io/) ([@carlson-jlq](https://github.com/Carlson-JLQ))
 - Jinhao Huang ([@jinhao-huang](https://github.com/jinhao-huang))
 - Yuyang Xie ([@sisifuCha](https://github.com/sisifuCha))
 - Xianglong Qi ([@Meiosis-Poor](https://github.com/Meiosis-Poor))
-- [Jiwei Yan](https://hanada31.github.io/)
+- [Jiwei Yan](https://hanada31.github.io/)([@hanada31](https://github.com/hanada31))
 
 ## Contributing
 

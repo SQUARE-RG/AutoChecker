@@ -256,13 +256,13 @@ python src/main.py --rule_file rule.json --language cpp --analyzer clang-tidy
 
 AutoChecker 由 [SQUARE Research Group](https://square16.org/) 的成员持续开发与维护：
 
-- Jun Liu
-- Yuanyuan Xie
+- Jun Liu([@nonsense-j](https://github.com/nonsense-j))
+- Yuanyuan Xie([@xyyusr](https://github.com/xyyusr))
 - [Liqiang Ji](https://carlson-jlq.github.io/liqiang-ji.github.io/) ([@carlson-jlq](https://github.com/Carlson-JLQ))
 - Jinhao Huang ([@jinhao-huang](https://github.com/jinhao-huang))
 - Yuyang Xie ([@sisifuCha](https://github.com/sisifuCha))
 - Xianglong Qi ([@Meiosis-Poor](https://github.com/Meiosis-Poor))
-- [Jiwei Yan](https://hanada31.github.io/)
+- [Jiwei Yan](https://hanada31.github.io/)([@hanada31](https://github.com/hanada31))
 
 ## 参与贡献
 
