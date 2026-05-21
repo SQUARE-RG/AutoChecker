@@ -13,7 +13,7 @@
 <p align="center">
   <a href="./README.md">English</a> |
   <a href="./README-cn.md">简体中文</a> |
-  <a href="https://github.com/oraios/serena/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-b0e8ff?style=flat-square&labelColor=0a0e14" alt="license"></a>
+  <a href="https://github.com/SQUARE-RG/AutoChecker/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-b0e8ff?style=flat-square&labelColor=0a0e14" alt="license"></a>
 </p>
 
 ---
