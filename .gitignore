@@ -22,7 +22,7 @@ experiment/
 ## build目录
 llvm-project/build/
 src/retriever/embedding_model/
-
+.claude
 codeql-linux64.zip
 # 其他常见的需要排除的文件和目录
 *.o

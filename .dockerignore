@@ -1,0 +1,30 @@
+# Build artifacts (not needed at runtime)
+logs
+result-generation
+temp_test_dir
+temp_validate
+tmp
+__pycache__
+*.pyc
+*.log
+
+# Git metadata
+.git
+.gitignore
+
+# Documentation / plans (not needed at runtime)
+*.md
+
+# Experiments and test outputs
+experiment
+hello
+commits
+commit_to_test_cases
+
+# Docker
+Dockerfile
+.dockerignore
+
+# IDE
+.vscode
+.idea

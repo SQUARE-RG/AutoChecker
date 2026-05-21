@@ -1,16 +1,10 @@
 {
     "file_paths":{
-        "base_dir": "/root/cw-base/",
-        "autoChecker":"/root/cw-base/AutoChecker",
-        "genChecker":"/root/cw-base/AutoChecker/genChecker",
         "clang-tidy":"/root/code_check/llvm-project/clang-tools-extra/clang-tidy/",
         "python_env":"/root/anaconda3/envs/code_check/bin/python",
         "codeql":"/root/code_check/codeql"
     },
-    "check":{
-        "module":"ucassaat",
-        "name":"readability-named-parameter"
-    },
+    
     "embedding_model":{
         "bge_model_path":"/root/code_check/src/retriever/embedding_model/bge-large-en-v1.5"
     },

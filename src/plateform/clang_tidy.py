@@ -5,6 +5,7 @@ import subprocess
 from pathlib import Path
 import time
 import shutil
+from loguru import logger
 #实现Checker的增删改查
 config = {}
 with open("/root/code_check/src/config.json", 'r') as f:
@@ -12,7 +13,7 @@ with open("/root/code_check/src/config.json", 'r') as f:
 
 ## 该函数用于生成Clang Tidy Checker模板
 def pre_Generate_Checker_Template(checker_name=config['check']['name']):
-    print("---------------------生成Checker模板-----------------------------")
+    logger.debug("---------------------生成Checker模板-----------------------------")
     """生成Checker模板"""
     # 使用subprocess运行Python脚本
     result = subprocess.run(
@@ -21,15 +22,15 @@ def pre_Generate_Checker_Template(checker_name=config['check']['name']):
             config['file_paths']['clang-tidy'] + 'add_new_check.py',
             config['check']['module'],
             checker_name
-        ], 
-        stdout=subprocess.PIPE, 
+        ],
+        stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         text=True
     )
-    
-    print("返回码:", result.returncode)
-    print("标准输出:\n", result.stdout)
-    print("错误输出:\n", result.stderr)
+
+    logger.debug(f"返回码: {result.returncode}")
+    logger.debug(f"标准输出:\n{result.stdout}")
+    logger.debug(f"错误输出:\n{result.stderr}")
     return result.returncode  # 返回生成模板的返回码，0表示成功，其他表示失败
 
 
@@ -37,7 +38,7 @@ def pre_Generate_Checker_Template(checker_name=config['check']['name']):
 ## 该函数用于删除Clang Tidy Checker模板
 def remove_Checker_Template(checker_name=config['check']['name']):
     """删除Checker模板"""
-    print("----------------------删除Checker-----------------------------")
+    logger.debug("----------------------删除Checker-----------------------------")
     # 使用subprocess运行Python脚本
     result = subprocess.run(
         [
@@ -45,40 +46,40 @@ def remove_Checker_Template(checker_name=config['check']['name']):
             config['file_paths']['clang-tidy'] + 'remove_clang_tidy_check.py',
             config['check']['module'],
             checker_name
-        ], 
-        stdout=subprocess.PIPE, 
+        ],
+        stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         text=True
     )
-    
-    print("返回码:", result.returncode)
-    print("标准输出:\n", result.stdout)
-    print("错误输出:\n", result.stderr)
+
+    logger.debug(f"返回码: {result.returncode}")
+    logger.debug(f"标准输出:\n{result.stdout}")
+    logger.debug(f"错误输出:\n{result.stderr}")
 
 def runChecker(checker_name=config['check']['name'],testCase_path=[]):
     """运行Checker"""
-    print("----------------------运行Checker-----------------------------")
+    logger.debug("----------------------运行Checker-----------------------------")
     # 使用subprocess运行Python脚本
     if not testCase_path:
-        print("没有指定测试用例路径")
+        logger.debug("没有指定测试用例路径")
     else:
         for testCase in testCase_path:
-            print(f"正在运行测试用例: {testCase}")
+            logger.debug(f"正在运行测试用例: {testCase}")
             # 使用subprocess运行clang-tidy命令
             result = subprocess.run(
             [
                 config['compiler']['build_bin_clang_tidy'],
                 f'--checks=-*,{checker_name}',
                 testCase,
-            ], 
-            stdout=subprocess.PIPE, 
+            ],
+            stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True
             )
-        
-            print("返回码:", result.returncode)
-            print("标准输出:\n", result.stdout)
-            print("错误输出:\n", result.stderr)
+
+            logger.debug(f"返回码: {result.returncode}")
+            logger.debug(f"标准输出:\n{result.stdout}")
+            logger.debug(f"错误输出:\n{result.stderr}")
 
 def run_Checker_with_Check_clang_tidy(
     test_case_path: str,
@@ -119,10 +120,10 @@ def run_Checker_with_Check_clang_tidy(
     Path(log_name).write_text(full_output, encoding="utf-8")
     #成功就是返回码为0
     
-    print("输出日志已保存到:", log_name)
+    logger.debug(f"输出日志已保存到: {log_name}")
     if proc.returncode != 0:
-        print(f"运行 {test_case_path} 时发生错误，返回码: {proc.returncode}")
-       
+        logger.error(f"运行 {test_case_path} 时发生错误，返回码: {proc.returncode}")
+
         return full_output, -1
     warning_count = full_output.count("warning:")
     return full_output, warning_count
@@ -130,18 +131,18 @@ def run_Checker_with_Check_clang_tidy(
 
 def modifyCheckerCode(checker_name=config['check']['name'], new_checker_code=None):
     """修改Checker代码"""
-    print("----------------------修改Checker代码-----------------------------")
+    logger.debug("----------------------修改Checker代码-----------------------------")
     if new_checker_code:
-        print(f"将{checker_name}代码修改 ")
+        logger.debug(f"将{checker_name}代码修改 ")
         # 假设new_checker_code是一个字符串，包含新的Checker代码
         ##TODO: 实现代码修改逻辑
         # 这里可以使用文件操作或其他方式将new_checker_code写入到相应的Checker文件中
-        
+
     else:
-        print("没有传入新的checker代码，无法修改")
+        logger.debug("没有传入新的checker代码，无法修改")
 def compiler_clang_tidy():
     """编译Clang Tidy"""
-    print("----------------------编译Clang-tidy-----------------------------")
+    logger.debug("----------------------编译Clang-tidy-----------------------------")
     # 使用subprocess运行编译命令
     result = subprocess.run(
     [
@@ -151,17 +152,17 @@ def compiler_clang_tidy():
         '--config', 'RelWithDebInfo',
         '--target', 'clang-tidy','-j','56',
         '--'
-    ], 
-    stdout=subprocess.PIPE, 
+    ],
+    stdout=subprocess.PIPE,
     stderr=subprocess.PIPE,
     text=True
     )
-    
-    print("返回码:", result.returncode)
-    print("标准输出:\n", result.stdout)
-    print("错误输出:\n", result.stderr)
+
+    logger.debug(f"返回码: {result.returncode}")
+    logger.debug(f"标准输出:\n{result.stdout}")
+    logger.debug(f"错误输出:\n{result.stderr}")
     compiler_success = result.returncode == 0
-    
+
     return result.returncode,result.stdout, result.stderr,compiler_success
 
 def run_clang_tidy_directly(test_case_path: str, rule_name: str, include_dir: str = None,

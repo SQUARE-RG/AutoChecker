@@ -119,9 +119,9 @@ def get_Case_AST(case_path):
     case_ast_json = ''
     case_ast_node_list = parse_and_deduplicate_ast_nodes(content)
     case_ast_node_list = list(set(case_ast_node_list))  # 去重
-    print("AST节点种类:", case_ast_node_list)
-    print("AST节点数量:", len(case_ast_node_list))
-    print("AST节点示例:", case_ast_node_list[:10])  # 打印前10个节点种类
+    logger.debug("AST节点种类: " + str(case_ast_node_list))
+    logger.debug("AST节点数量: " + str(len(case_ast_node_list)))
+    logger.debug("AST节点示例: " + str(case_ast_node_list[:10]))  # 打印前10个节点种类
 
     return content,case_ast_json,case_ast_node_list
 # 去除编号前缀的函数

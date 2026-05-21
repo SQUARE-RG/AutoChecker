@@ -1,4 +1,0 @@
-"简单版：检测未使用的函数参数","查找函数中声明但从未使用的参数","warning","参数 'unused1' 在函数 'printMessage' 中可能未被使用。","/test_unused_parameter.cpp","16","47","16","53"
-"简单版：检测未使用的函数参数","查找函数中声明但从未使用的参数","warning","参数 'unused2' 在函数 'printMessage' 中可能未被使用。","/test_unused_parameter.cpp","16","62","16","68"
-"简单版：检测未使用的函数参数","查找函数中声明但从未使用的参数","warning","参数 'unused_param' 在函数 'processData' 中可能未被使用。","/test_unused_parameter.cpp","5","32","5","43"
-"简单版：检测未使用的函数参数","查找函数中声明但从未使用的参数","warning","参数 'unused_param' 在函数 'method1' 中可能未被使用。","/test_unused_parameter.cpp","24","38","24","49"
