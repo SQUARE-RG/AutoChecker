@@ -30,9 +30,8 @@ ENV PATH=/root/anaconda3/bin:${PATH}
 COPY requirements.txt /tmp/requirements.txt
 RUN source /root/anaconda3/etc/profile.d/conda.sh \
  && conda create -y -n code_check python=3.10 \
- && conda activate code_check \
- && pip install --no-cache-dir -r /tmp/requirements.txt -i https://pypi.mirrors.ustc.edu.cn/simple \
- && pip install --no-cache-dir modelscope -i https://pypi.mirrors.ustc.edu.cn/simple \
+ && /root/anaconda3/envs/code_check/bin/pip install --no-cache-dir -r /tmp/requirements.txt -i https://pypi.mirrors.ustc.edu.cn/simple \
+ && /root/anaconda3/envs/code_check/bin/pip install --no-cache-dir modelscope -i https://pypi.mirrors.ustc.edu.cn/simple \
  && rm /tmp/requirements.txt
 
 RUN mkdir -p /root/code_check/src/retriever/embedding_model \
