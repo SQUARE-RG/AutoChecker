@@ -28,7 +28,8 @@ RUN chmod +x scripts/install.sh && bash scripts/install.sh
 # ============================================================
 # Layer 3: Embedding model download (not covered by install.sh)
 # ============================================================
-RUN mkdir -p /root/code_check/src/retriever/embedding_model \
+RUN /root/anaconda3/envs/code_check/bin/pip install --no-cache-dir setuptools -i https://pypi.mirrors.ustc.edu.cn/simple \
+ && mkdir -p /root/code_check/src/retriever/embedding_model \
  && /root/anaconda3/envs/code_check/bin/modelscope download \
     --model BAAI/bge-large-en-v1.5 \
     --local_dir /root/code_check/src/retriever/embedding_model/bge-large-en-v1.5
