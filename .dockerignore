@@ -8,10 +8,6 @@ __pycache__
 *.pyc
 *.log
 
-# Git metadata
-.git
-.gitignore
-
 # Documentation / plans (not needed at runtime)
 *.md
 
