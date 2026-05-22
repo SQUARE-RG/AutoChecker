@@ -20,7 +20,7 @@ RUN apt-get update \
 # install.sh does: prepair_python_env → prepair_clang_tidy → clang_tidy_dev_flow
 # ============================================================
 COPY . /root/code_check
-COPY llvm-project /root/code_check/llvm-project
+# COPY llvm-project /root/code_check/llvm-project
 WORKDIR /root/code_check
 
 RUN chmod +x scripts/install.sh && bash scripts/install.sh
