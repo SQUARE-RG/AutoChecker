@@ -4,6 +4,22 @@ import math
 from concurrent.futures import ProcessPoolExecutor
 from multiprocessing import cpu_count
 from typing import List, Tuple
+import threading
+
+# 模型全局单例：避免每次调用 sequential_encode 都重新加载 ~1.3GB 模型
+_model_lock = threading.Lock()
+_model_cache = {}  # key = model_path, value = SentenceTransformer instance
+
+
+def _get_model(model_path: str, device: str = 'cpu') -> SentenceTransformer:
+    """懒加载 + 缓存 SentenceTransformer 实例，线程安全。"""
+    if model_path not in _model_cache:
+        with _model_lock:
+            if model_path not in _model_cache:
+                _model_cache[model_path] = SentenceTransformer(
+                    model_path, device=device
+                )
+    return _model_cache[model_path]
 
 # Worker globals
 _worker_model = None
@@ -56,7 +72,7 @@ def parallel_encode(texts: List[str], model_path: str, num_workers: int = None, 
 
     # If small workload, do single-process encode to avoid model copies
     if num_workers <= 1 or n <= batch_size * 2:
-        model = SentenceTransformer(model_path, device='cpu')
+        model = _get_model(model_path, device='cpu')
         return model.encode(texts, batch_size=batch_size, convert_to_numpy=True, normalize_embeddings=True)
 
     chunks = _split_chunks(texts, num_workers)
@@ -80,7 +96,7 @@ def sequential_encode(texts: List[str], model_path: str, batch_size: int = 64) -
     if n == 0:
         return np.empty((0, 0))
 
-    model = SentenceTransformer(model_path, device='cpu')
+    model = _get_model(model_path, device='cpu')
     return model.encode(
         texts,
         batch_size=batch_size,

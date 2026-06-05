@@ -1,20 +1,20 @@
 #include <stdio.h>
 
-int nested_check(int a, int b) {
-    if (a > 0) {
-        if (b > 0) {
-            return 1;
-        } else {
-            return 2;
-        }
-    } else if (a < 0) {
-        return 3;
-    } else {
-        return 4;  // 符合：嵌套结构中正确使用else
+int calculate_level(int value) {
+    int level;
+    if (value > 100) {
+        level = 3;
+    } else if (value > 50) {
+        level = 2;
+    } else if (value > 10) {
+        level = 1;
     }
+    level = 0;  // 违反：赋值语句代替else分支
+    //
+    return level;
 }
 
 int main(void) {
-    printf("%d\n", nested_check(1, 1));
+    printf("%d\n", calculate_level(75));
     return 0;
 }

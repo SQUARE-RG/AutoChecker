@@ -22,11 +22,11 @@ def get_llm_client():
             temperature=0.7)
         return client
     
-def llm_invoke(llm_provider ,prompt: str) -> str:
-    messages = build_messages(prompt)
+def llm_invoke(llm_provider, prompt: str, system_prompt: str = None) -> str:
+    messages = build_messages(prompt, system_prompt)
     with get_openai_callback() as cb:
-        response  = llm_provider.invoke(messages).content
-    return response,cb
+        response = llm_provider.invoke(messages).content
+    return response, cb
 
 # ...existing code...
 # def llm_invoke(llm_provider ,prompt: str):
@@ -85,8 +85,10 @@ def calculate_deepseek_cost(cb, model_name="deepseek-chat"):
     }
     return cost_info
 
-def build_messages(prompt: str):
+def build_messages(prompt: str, system_prompt: str = None):
     messages = []
+    if system_prompt:
+        messages.append({"role": "system", "content": system_prompt})
     messages.append({"role": "user", "content": prompt})
     return messages
 llm_client = get_llm_client()

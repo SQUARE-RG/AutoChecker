@@ -1,10 +1,10 @@
 #include <stdio.h>
 
 int main(void) {
-    int x = 5, y = 0, z = 10;
-    if (x > 0 && (y = z)) {  // 违反：在逻辑与表达式中使用赋值语句
+    int a = 0, b = 0, c = 5;
+    if (a == 0 || (b = c)) {  // 违反：在逻辑或表达式中使用赋值语句
         //
-        printf("y is %d\n", y);
+        printf("b is %d\n", b);
     }
     return 0;
 }

@@ -135,7 +135,7 @@ def main(plateform: str = "clang-tidy"):
     init_logger()
     result_dir = global_config['result']['result_dir']
     # os.makedirs(result_dir, exist_ok=True)
-    with open("/root/code_check/clang_tidy_sub_checker/jgb8114_single_rules.json", 'r') as f:
+    with open("/root/code_check/experiment/gjb8114/rule_clang-tidy/jgb8114_all_rules_new.json", 'r') as f:
         rule_data = json.load(f)
     for rule_package,rule_list in rule_data['data'].items():
         for rule_info in rule_list:

@@ -1,6 +1,8 @@
-// File: positive_free_no_use.c
+// File: positive_c_shorthand.c
 #include <stdlib.h>
-void test_free(void) {
+void test_c_shorthand(void) {
     int *p = (int*)malloc(sizeof(int));
-    free(p); // 释放前未使用
+    if (p) {
+        *p = 1;
+    }
 }

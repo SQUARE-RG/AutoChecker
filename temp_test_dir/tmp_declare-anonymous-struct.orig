@@ -1,16 +1,15 @@
 #include <stdio.h>
 
-struct ArrayContainer {
-    int numbers[5];
-    struct Element {
-        int id;
-        char type;
-    } elements[10];  // 符合：结构体数组成员
+struct DataHolder {
+    struct {
+        int arr[5];
+        char name[20];
+    };  // 违反：匿名结构体包含数组
+    //
 };
 
 int main(void) {
-    struct ArrayContainer ac;
-    ac.numbers[0] = 1;
-    ac.elements[0].id = 100;
+    struct DataHolder dh;
+    dh.arr[0] = 1;
     return 0;
 }

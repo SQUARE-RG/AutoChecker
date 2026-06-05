@@ -1,10 +1,15 @@
 #include <stdio.h>
 
-int global_data = 100;  // 全局变量，但与局部变量不同名
+int *global_ptr = NULL;  // 全局指针变量
+int array[5] = {1, 2, 3, 4, 5};
 
 int main(void) {
-    for (int counter = 0; counter < 5; counter++) {  // 符合：局部变量与全局变量不同名
-        printf("%d (global=%d)\n", counter, global_data);
+    int value = 10;
+    global_ptr = &value;
+    
+    for (*global_ptr = 0; *global_ptr < 3; (*global_ptr)++) {  // 违反：使用全局指针变量作为循环控制变量
+        //
+        printf("%d ", *global_ptr);
     }
     return 0;
 }
