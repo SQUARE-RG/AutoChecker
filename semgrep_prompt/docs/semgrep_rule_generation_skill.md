@@ -1,6 +1,8 @@
 # Semgrep Rule Generation Skill
 
-Use this reference when generating or repairing one Semgrep OSS rule for C/C++ from a requirement plus paired BAD/GOOD examples.
+Use this reference when generating one Semgrep OSS rule for the requested target
+language from a requirement plus paired BAD/GOOD examples. The v1 caller adds
+target-language-specific parser guidance when needed.
 
 ## Mission
 
@@ -14,7 +16,8 @@ Relaxed generalization means using meaningful semantic anchors. It does not mean
 - Put one complete YAML file in `semgrep_rule_yaml`.
 - YAML must have top-level `rules:` and exactly one rule.
 - The rule must include `id`, `message`, `severity`, and `languages`.
-- Use `languages: [c, cpp]` unless the task explicitly narrows the language.
+- Set `languages` to the requested Semgrep language id. Do not include
+  unrelated languages merely because an example uses a familiar syntax.
 - Use Semgrep OSS syntax only. Do not emit alternatives, candidates, fallback rules, markdown, or placeholders.
 
 ## Decision Process
@@ -23,7 +26,8 @@ Relaxed generalization means using meaningful semantic anchors. It does not mean
 2. Choose search mode or taint mode from the evidence.
 3. Identify the BAD trigger and the paired GOOD separator.
 4. Build compact semantic branches rather than one branch per sample.
-5. Audit YAML shape, metavariable binding, and C/C++ parser stability.
+5. Audit YAML shape, metavariable binding, and parser stability for the target
+   language.
 
 ## Problem Models
 
@@ -143,6 +147,10 @@ Rules:
 
 ## C/C++ Pattern Stability
 
+The concrete carrier guidance in this section applies when the target language
+is C or C++. For other languages, preserve the same principles with their own
+parseable statement and expression syntax.
+
 - Prefer parse-safe structural Semgrep patterns over regex.
 - Statement patterns should be complete statements with semicolons.
 - If a pattern starts with `*` or `&`, use a YAML block scalar.
@@ -177,10 +185,10 @@ Pattern-IR is a semantic hint layer, not a Semgrep template.
 
 - Implement semantic branches first.
 - Use family lists as support material, not catch-all permission.
-- `source_families` must contain real trust-boundary operations only.
-- `sensitive_context_families` become search-mode constraints.
-- `sink_families` and `structural_trigger_families` become compact positive branches.
-- `good_path_exclusions` and `sanitizer_families` are precision evidence.
+- `families.sources` must contain real trust-boundary operations only.
+- `families.sensitive_contexts` become search-mode constraints.
+- `families.sinks` and `families.structural_triggers` become compact positive branches.
+- `families.good_exclusions` and `families.sanitizers` are precision evidence.
 - If Pattern-IR conflicts with paired BAD/GOOD evidence, trust the paired evidence.
 
 ## Final Checklist

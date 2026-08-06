@@ -1,6 +1,7 @@
 # Semgrep Compact Guide (Core Syntax, Taint Modeling, Principles, Limitations)
 
-This document is a compressed, high-signal reference for LLM-driven rule generation and repair.
+This document is a compressed, high-signal reference for the v1 LLM-driven
+rule generation and repair workflow.
 Its goals are:
 1) avoid overfitting to validation samples,
 2) enforce source-to-sink variable linkage in taint rules,
@@ -114,7 +115,7 @@ rules:
 
 ---
 
-## 4. C/C++ Modeling Notes (High-impact for Juliet-style tasks)
+## 4. C/C++ Modeling Notes (Apply only to C/C++ targets)
 
 1) **By-side-effect sources** (`fgets/read/recv/scanf` family)  
 **Principle**: taint is on destination buffer/argument, not fake return assignment.  
@@ -139,14 +140,17 @@ Model source/sink families and invariants, not file-specific/API-by-API over-exp
 ## 5. Pattern-IR to Semgrep Mapping
 
 Pattern-IR should describe the rule's semantic contract before YAML is generated.
+In v1, the contract uses `problem`, `families`, `semantic_branches`, and
+`semgrep_notes` fields. It is generated only for fresh rule generation; repair
+uses the current YAML and evaluation evidence directly.
 
-- `problem_model.kind` controls the rule mode. Use `source_sink_flow` for real source-to-sink problems; use `sensitive_sink_context` for sensitive local values reaching output sinks; use search mode for local structural/API/lifetime misuse.
-- `source_families` should contain concrete trust-boundary operations only. Do not treat local variable names, assignments, arithmetic, or member access as taint sources.
-- `sensitive_context_families` should contain sensitive variable/parameter/field/string context. Translate it to search-mode metavariable constraints, not taint sources.
-- `sink_families` and `structural_trigger_families` should be translated into compact Semgrep branches. Each branch must still encode the vulnerability invariant.
-- `good_path_exclusions` and `sanitizer_families` are first-class requirements, not optional cleanup. They should become `pattern-not`, `pattern-not-inside`, `pattern-sanitizers`, or branch-local metavariable constraints.
+- `problem.kind` controls the rule mode. Use `source_sink_flow` for real source-to-sink problems; use `sensitive_sink_context` for sensitive local values reaching output sinks; use search mode for local structural/API/lifetime misuse.
+- `families.sources` should contain concrete trust-boundary operations only. Do not treat local variable names, assignments, arithmetic, or member access as taint sources.
+- `families.sensitive_contexts` should contain sensitive variable/parameter/field/string context. Translate it to search-mode metavariable constraints, not taint sources.
+- `families.sinks` and `families.structural_triggers` should be translated into compact Semgrep branches. Each branch must still encode the vulnerability invariant.
+- `families.good_exclusions` and `families.sanitizers` are first-class requirements, not optional cleanup. They should become `pattern-not`, `pattern-not-inside`, `pattern-sanitizers`, or branch-local metavariable constraints.
 - `semantic_branches` are the highest-priority contract. Generate from these branches first, then use family lists as support.
-- `semgrep_mapping.primary_rule_mode` is a strong default, but parseability and precision can justify switching to search mode.
+- `problem.recommended_mode` is a strong default, but parseability and precision can justify switching to search mode.
 - `pattern-not` clauses should share metavariables already bound by the same positive branch, or use concrete syntax. Fresh metavariables in an exclusion often erase valid matches or make the branch empty.
 - Do not use `metavariable-regex` as a metavariable-to-metavariable comparison. Regex text does not expand `$OTHER` metavariables.
 - For C/C++ statement patterns, include semicolons. Model declaration initializers (`$TYPE $V = ...;`) separately from reassignments (`$V = ...;`).

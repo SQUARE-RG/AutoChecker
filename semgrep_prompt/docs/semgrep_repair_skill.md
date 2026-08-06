@@ -1,7 +1,9 @@
 # Semgrep Repair Skill
 
-Use this compact reference only when repairing one existing Semgrep OSS rule for
-C/C++. The repair goal is a local behavioral change, not a fresh rewrite.
+Use this compact reference only when repairing one existing Semgrep OSS rule in
+the requested target language. The repair goal is a local behavioral change,
+not a fresh rewrite. The C/C++ examples below are conditional guidance for
+those languages; other languages must use their own parseable syntax.
 
 ## Repair Contract
 

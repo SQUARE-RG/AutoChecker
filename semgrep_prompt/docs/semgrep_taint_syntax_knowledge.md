@@ -1,6 +1,8 @@
 # Semgrep Taint Syntax Knowledge (Official-Docs Derived)
 
-This note distills syntax constraints from Semgrep docs for stable C/C++ rule generation.
+This note distills syntax constraints from Semgrep docs for stable v1 rule
+generation across supported languages. Concrete examples focus on C/C++ where
+side-effect and parser behavior require extra care.
 
 ## 1. Mode Selection (Search vs Taint)
 - Prefer `mode: taint` only when detection requires SOURCE -> DATA -> SINK across multiple statements.
@@ -142,14 +144,13 @@ patterns:
 Pattern-IR is a semantic contract between example analysis and final rule generation. It is not a Semgrep rule template.
 
 Required fields to preserve:
-- `problem_model.kind`: choose `source_sink_flow` only for real dataflow from a source to a sink; choose `sensitive_sink_context` when local sensitive names/parameters reach output sinks; choose `structural_misuse`, `api_misuse`, or `lifetime_misuse` for local AST misuse.
-- `vulnerability_logic.source_families`: real trust-boundary operations only. Local assignments, copies, arithmetic, or identifier names are propagators/context, not sources.
-- `vulnerability_logic.sensitive_context_families`: local variable/parameter/field/string context proving that a sink argument is sensitive. These entries are search-mode constraints, not taint sources.
-- `vulnerability_logic.sink_families`: concrete risky operation/output/API families or structural operations to flag.
-- `vulnerability_logic.structural_trigger_families`: local bad operations for search-mode rules.
-- `vulnerability_logic.semantic_branches`: each branch groups one BAD semantic family with required context and GOOD exclusions. This is the main rule-generation contract.
-- `vulnerability_logic.good_path_exclusions` and `sanitizer_families`: paired compliant conditions that must stay clean.
-- `semgrep_mapping.primary_rule_mode`: final YAML should follow this mode unless parser correctness or precision is better served by switching to search mode.
+- `problem.kind`: choose `source_sink_flow` only for real dataflow from a source to a sink; choose `sensitive_sink_context` when local sensitive names/parameters reach output sinks; choose `structural_misuse`, `api_misuse`, or `lifetime_or_order_misuse` for local AST misuse.
+- `families.sources`: real trust-boundary operations only. Local assignments, copies, arithmetic, or identifier names are propagators/context, not sources.
+- `families.sensitive_contexts`: local variable/parameter/field/string context proving that a sink argument is sensitive. These entries are search-mode constraints, not taint sources.
+- `families.sinks` and `families.structural_triggers`: concrete risky operation/output/API families or structural operations to flag.
+- `semantic_branches`: each branch groups one BAD semantic family with required context and GOOD exclusions. This is the main rule-generation contract.
+- `families.good_exclusions` and `families.sanitizers`: paired compliant conditions that must stay clean.
+- `problem.recommended_mode`: a strong default for final YAML, unless parser correctness or precision is better served by switching mode.
 
 Use Pattern-IR by translating families into compact Semgrep clauses. Do not copy placeholders unchanged, and do not create one branch per sample.
 

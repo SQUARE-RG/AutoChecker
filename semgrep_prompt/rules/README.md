@@ -1,49 +1,46 @@
 # Semgrep Rule Library
 
-This directory is the formal reusable checker library. It contains accepted LLM-generated `final_rule.yml` outputs, retained prior accepted outputs after real-project noise review, and imported upstream Semgrep C checkers kept in a separate source folder.
+This is the formal reusable checker library for the `v1` workflow. Rules are
+stored by Semgrep language and provenance:
 
-Collection policy:
+```text
+rules/
+  <language>/
+    <source>/
+      <checker>.yml
+```
 
-- Include accepted LLM-generated final_rule.yml outputs with paired BAD/GOOD samples.
-- Include existing accepted checkers not removed by real-project noise review.
-- Include imported upstream Semgrep C checkers under rules/c/semgrep_original as active non-LLM rules.
-- Exclude rules removed for excessive real-project false positives.
-- Exclude manual-only rules.
-- Exclude failed generations.
-- Exclude skipped overbroad or invalid generated rules.
-- Exclude demo intermediate generated_rule.yml files.
-- Exclude repair_candidate.yml and other repair artifacts.
+The collection policy is deliberately narrow:
 
-Layout: `rules/<language>/<source>/<checker>.yml`.
+- keep accepted Juliet final checkers from the configured `v1` batch;
+- keep final checkers selected from the latest real-project scan;
+- preserve source and checker metadata in each rule;
+- exclude invalid YAML, failed generations, intermediate generation files,
+  repair candidates, and manually rejected rules.
 
-| Language | Files |
-|---|---:|
-| `c` | 105 |
-| `java` | 42 |
-| `javascript` | 4 |
-| `python` | 41 |
-| `rust` | 9 |
+`manifest.json` records the source inputs, collection time, counts, and output
+paths for the current library. Rebuild the library with:
 
-| Source | Files |
-|---|---:|
-| `generated_20260519` | 7 |
-| `generated_20260520` | 6 |
-| `generated_20260524` | 67 |
-| `generated_20260525` | 25 |
-| `generated_20260526` | 15 |
-| `generated_20260526_semgrep_migration` | 10 |
-| `generated_20260527` | 1 |
-| `generated_20260601` | 13 |
-| `generated_20260609` | 15 |
-| `generated_20260611` | 8 |
-| `juliet` | 4 |
-| `latest_real_project_scan` | 14 |
-| `semgrep_original` | 16 |
+```bash
+/home/meiosis/py310/bin/python \
+  /home/meiosis/data/work/autochecker/code_check/semgrep_prompt/v1/collect_rule_library.py \
+  --clean
+```
 
-| Logical checker groups | Count |
-|---|---:|
-| `checkers` | 201 |
+Before a checker is added, review its paired-sample behavior and rule shape.
+The library is a set of reusable alerts, not an assertion that every finding
+in an arbitrary project is a vulnerability. Project results require manual
+confirmation and rule-specific triage.
 
-2026-06-09 Java/Python CWE gap update: added 7 accepted Java and 8 accepted Python LLM-generated checkers under `generated_20260609`, bringing Java to 37 and Python to 38 active rules.
+Scan a project directly with the language directory that applies:
 
-2026-06-11 Java/Python CWE gap round 2: added 5 accepted Java and 3 accepted Python LLM-generated checkers under `generated_20260611`, bringing Java to 42 and Python to 41 active rules. Skipped broad or low-recall candidates are recorded in `reports/20260611/java_python_cwe_expand_round2/rule_generation_review.md`.
+```bash
+semgrep scan \
+  --config semgrep_prompt/rules/python \
+  --config semgrep_prompt/rules/javascript \
+  /path/to/project
+```
+
+The generated YAML remains a single Semgrep rule. A rule should be retained
+only when its semantic intent, parseability, practical coverage, and false
+positive behavior have been reviewed.

@@ -32,7 +32,7 @@ This catalog is intentionally abstract. It is not a rule template collection and
 - Pick 1 to 2 classes per rule attempt.
 - Prefer the smallest class set that still expresses the vulnerability invariant.
 - If a case needs deep inter-procedural flow, mark it unsupported instead of forcing a fake bridge.
-- Do not enumerate concrete Juliet file shapes or sample-specific lines.
+- Do not enumerate concrete dataset file shapes or sample-specific lines.
 
 ## Semgrep capability boundary
 
