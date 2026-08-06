@@ -1,0 +1,24 @@
+rules:
+- id: python-pyyaml-unsafe-load
+  message: Avoid unsafe yaml.load usage; use yaml.safe_load or an explicit SafeLoader
+    instead.
+  severity: WARNING
+  languages:
+  - python
+  pattern-either:
+  - patterns:
+    - pattern: yaml.load($X)
+    - pattern-not: yaml.safe_load($X)
+    - pattern-not: yaml.load($X, Loader=yaml.SafeLoader);
+  - patterns:
+    - pattern: yaml.load($X, Loader=yaml.Loader);
+    - pattern-not: yaml.safe_load($X)
+    - pattern-not: yaml.load($X, Loader=yaml.SafeLoader);
+  - patterns:
+    - pattern: yaml.load($X, Loader=yaml.UnsafeLoader);
+    - pattern-not: yaml.safe_load($X)
+    - pattern-not: yaml.load($X, Loader=yaml.SafeLoader);
+  - patterns:
+    - pattern: yaml.load($X, Loader=yaml.FullLoader);
+    - pattern-not: yaml.safe_load($X)
+    - pattern-not: yaml.load($X, Loader=yaml.SafeLoader);

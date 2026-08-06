@@ -1,0 +1,124 @@
+rules:
+- id: java-cwe-642-session-critical-state-from-request
+  message: Request-controlled data is being written into a security-critical HttpSession
+    attribute without an authorization or ownership check.
+  severity: WARNING
+  languages:
+  - java
+  pattern-either:
+  - patterns:
+    - pattern: $SESSION.setAttribute("isAdmin", $VAL)
+    - pattern: $REQ.getParameter(...)
+  - patterns:
+    - pattern: $SESSION.setAttribute("isAdmin", $VAL)
+    - pattern: $REQ.getParameterValues(...)
+  - patterns:
+    - pattern: $SESSION.setAttribute("isAdmin", $VAL)
+    - pattern: $REQ.getHeader(...)
+  - patterns:
+    - pattern: $SESSION.setAttribute("role", $VAL)
+    - pattern: $REQ.getParameter(...)
+  - patterns:
+    - pattern: $SESSION.setAttribute("role", $VAL)
+    - pattern: $REQ.getParameterValues(...)
+  - patterns:
+    - pattern: $SESSION.setAttribute("role", $VAL)
+    - pattern: $REQ.getHeader(...)
+  - patterns:
+    - pattern: $SESSION.setAttribute("superuser", $VAL)
+    - pattern: $REQ.getParameter(...)
+  - patterns:
+    - pattern: $SESSION.setAttribute("superuser", $VAL)
+    - pattern: $REQ.getParameterValues(...)
+  - patterns:
+    - pattern: $SESSION.setAttribute("superuser", $VAL)
+    - pattern: $REQ.getHeader(...)
+  - patterns:
+    - pattern: $SESSION.setAttribute("permissions", $VAL)
+    - pattern: $REQ.getParameter(...)
+  - patterns:
+    - pattern: $SESSION.setAttribute("permissions", $VAL)
+    - pattern: $REQ.getParameterValues(...)
+  - patterns:
+    - pattern: $SESSION.setAttribute("permissions", $VAL)
+    - pattern: $REQ.getHeader(...)
+  - patterns:
+    - pattern: $SESSION.setAttribute("mfaPassed", $VAL)
+    - pattern: $REQ.getParameter(...)
+  - patterns:
+    - pattern: $SESSION.setAttribute("mfaPassed", $VAL)
+    - pattern: $REQ.getParameterValues(...)
+  - patterns:
+    - pattern: $SESSION.setAttribute("mfaPassed", $VAL)
+    - pattern: $REQ.getHeader(...)
+  - patterns:
+    - pattern: $SESSION.setAttribute("tenantId", $VAL)
+    - pattern: $REQ.getParameter(...)
+  - patterns:
+    - pattern: $SESSION.setAttribute("tenantId", $VAL)
+    - pattern: $REQ.getParameterValues(...)
+  - patterns:
+    - pattern: $SESSION.setAttribute("tenantId", $VAL)
+    - pattern: $REQ.getHeader(...)
+  - patterns:
+    - pattern: $SESSION.setAttribute("tenantId", $VAL)
+    - pattern: $OBJ.$FIELD
+  - patterns:
+    - pattern: $SESSION.setAttribute("account_id", $VAL)
+    - pattern: $REQ.getParameter(...)
+  - patterns:
+    - pattern: $SESSION.setAttribute("account_id", $VAL)
+    - pattern: $REQ.getParameterValues(...)
+  - patterns:
+    - pattern: $SESSION.setAttribute("account_id", $VAL)
+    - pattern: $REQ.getHeader(...)
+  - patterns:
+    - pattern: $SESSION.setAttribute("account_id", $VAL)
+    - pattern: $OBJ.$FIELD
+  - patterns:
+    - pattern: $SESSION.setAttribute("bypassAuth", $VAL)
+    - pattern: $REQ.getParameter(...)
+  - patterns:
+    - pattern: $SESSION.setAttribute("bypassAuth", $VAL)
+    - pattern: $REQ.getParameterValues(...)
+  - patterns:
+    - pattern: $SESSION.setAttribute("bypassAuth", $VAL)
+    - pattern: $REQ.getHeader(...)
+  - patterns:
+    - pattern: $SESSION.setAttribute("approved", $VAL)
+    - pattern: $REQ.getParameter(...)
+  - patterns:
+    - pattern: $SESSION.setAttribute("approved", $VAL)
+    - pattern: $REQ.getParameterValues(...)
+  - patterns:
+    - pattern: $SESSION.setAttribute("approved", $VAL)
+    - pattern: $REQ.getHeader(...)
+  - patterns:
+    - pattern: $SESSION.setAttribute("securityMode", $VAL)
+    - pattern: $REQ.getParameter(...)
+  - patterns:
+    - pattern: $SESSION.setAttribute("securityMode", $VAL)
+    - pattern: $REQ.getParameterValues(...)
+  - patterns:
+    - pattern: $SESSION.setAttribute("securityMode", $VAL)
+    - pattern: $REQ.getHeader(...)
+  - patterns:
+    - pattern: $REQ.getSession().putValue("bypassAuth", $VAL)
+    - pattern: $REQ.getParameter(...)
+  - patterns:
+    - pattern: $REQ.getSession().putValue("bypassAuth", $VAL)
+    - pattern: $REQ.getParameterValues(...)
+  - patterns:
+    - pattern: $REQ.getSession().putValue("bypassAuth", $VAL)
+    - pattern: $REQ.getHeader(...)
+  - patterns:
+    - pattern: $REQ.getSession().putValue("isAdmin", $VAL)
+    - pattern: $REQ.getParameter(...)
+  - patterns:
+    - pattern: $REQ.getSession().putValue("isAdmin", $VAL)
+    - pattern: $REQ.getParameterValues(...)
+  - patterns:
+    - pattern: $REQ.getSession().putValue("isAdmin", $VAL)
+    - pattern: $REQ.getHeader(...)
+  metadata:
+    cwe: CWE-642

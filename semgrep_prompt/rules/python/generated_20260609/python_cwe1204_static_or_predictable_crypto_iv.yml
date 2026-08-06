@@ -1,0 +1,59 @@
+rules:
+- id: python-crypto-weak-iv-nonce-generation
+  message: Avoid fixed, predictable, or hardcoded IV/nonce values for CBC, CFB, OFB,
+    GCM, and CTR; use cryptographically secure randomness such as os.urandom, secrets.token_bytes,
+    or Crypto.Random.get_random_bytes.
+  severity: WARNING
+  languages:
+  - python
+  pattern-either:
+  - patterns:
+    - pattern: AES.new($KEY, AES.MODE_CBC, b'...')
+    - pattern-not: AES.new($KEY, AES.MODE_CBC, os.urandom(...))
+    - pattern-not: AES.new($KEY, AES.MODE_CBC, secrets.token_bytes(...))
+    - pattern-not: AES.new($KEY, AES.MODE_CBC, get_random_bytes(...))
+  - patterns:
+    - pattern: AES.new($KEY, AES.MODE_CTR, nonce=b'...');
+    - pattern-not: AES.new($KEY, AES.MODE_CTR, nonce=os.urandom(...));
+    - pattern-not: AES.new($KEY, AES.MODE_CTR, nonce=secrets.token_bytes(...));
+    - pattern-not: AES.new($KEY, AES.MODE_CTR, nonce=get_random_bytes(...));
+  - patterns:
+    - pattern: Cipher(algorithms.AES($KEY), modes.CBC(b'...'))
+    - pattern-not: Cipher(algorithms.AES($KEY), modes.CBC(os.urandom(...)))
+    - pattern-not: Cipher(algorithms.AES($KEY), modes.CBC(secrets.token_bytes(...)))
+    - pattern-not: Cipher(algorithms.AES($KEY), modes.CBC(get_random_bytes(...)))
+  - patterns:
+    - pattern: Cipher(algorithms.AES($KEY), modes.GCM(b'...'))
+    - pattern-not: Cipher(algorithms.AES($KEY), modes.GCM(os.urandom(...)))
+    - pattern-not: Cipher(algorithms.AES($KEY), modes.GCM(secrets.token_bytes(...)))
+    - pattern-not: Cipher(algorithms.AES($KEY), modes.GCM(get_random_bytes(...)))
+  - patterns:
+    - pattern: modes.CFB(b'...')
+    - pattern-not: modes.CFB(os.urandom(...))
+    - pattern-not: modes.CFB(secrets.token_bytes(...))
+    - pattern-not: modes.CFB(get_random_bytes(...))
+  - patterns:
+    - pattern: modes.OFB(b'...')
+    - pattern-not: modes.OFB(os.urandom(...))
+    - pattern-not: modes.OFB(secrets.token_bytes(...))
+    - pattern-not: modes.OFB(get_random_bytes(...))
+  - patterns:
+    - pattern: AES.new($KEY, AES.MODE_CBC, bytes(16))
+  - patterns:
+    - pattern: AES.new($KEY, AES.MODE_CBC, bytes([$X for $Y in ...]))
+  - patterns:
+    - pattern: AES.new($KEY, AES.MODE_CBC, $IV.encode())
+  - patterns:
+    - pattern: AES.new($KEY, AES.MODE_CBC, b'0' * 16)
+  - patterns:
+    - pattern: AES.new($KEY, AES.MODE_CBC, b'abcdefghijklmnop').encrypt($DATA)
+  - patterns:
+    - pattern: AES.new($KEY, AES.MODE_CBC, $IV)
+    - pattern-not: AES.new($KEY, AES.MODE_CBC, os.urandom(...))
+    - pattern-not: AES.new($KEY, AES.MODE_CBC, secrets.token_bytes(...))
+    - pattern-not: AES.new($KEY, AES.MODE_CBC, get_random_bytes(...))
+  - patterns:
+    - pattern: modes.OFB($IV)
+    - pattern-not: modes.OFB(os.urandom(...))
+    - pattern-not: modes.OFB(secrets.token_bytes(...))
+    - pattern-not: modes.OFB(get_random_bytes(...))

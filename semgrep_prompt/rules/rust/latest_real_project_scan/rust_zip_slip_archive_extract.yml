@@ -1,0 +1,81 @@
+rules:
+- id: rust-zip-slip-archive-extraction-traversal
+  message: Archive entry paths must not be joined directly into extraction targets;
+    use enclosed_name, unpack_in, or explicit traversal validation.
+  severity: WARNING
+  languages:
+  - rust
+  pattern-either:
+  - patterns:
+    - pattern: 'let $TARGET = $BASE.join($ENTRY.name());
+
+        '
+    - pattern-not: 'let $TARGET = $BASE.join($ENTRY.enclosed_name().unwrap());
+
+        '
+  - patterns:
+    - pattern: 'let $TARGET = $BASE.join($ENTRY.path().unwrap());
+
+        '
+    - pattern-not: '$ENTRY.unpack_in($BASE).unwrap();
+
+        '
+  - patterns:
+    - pattern: 'let $TARGET = $BASE.join($PATH);
+
+        '
+    - pattern-not: "if !$PATH.components().any(|$C| matches!($C, std::path::Component::ParentDir))\
+        \ {\n  ...\n}\n"
+    - pattern-not: 'let $TARGET = $BASE.join(std::path::Path::new(&$PATH).file_name().unwrap());
+
+        '
+  - patterns:
+    - pattern: '$SINK($BASE.join($ENTRY.name()), ...)
+
+        '
+    - pattern: std::fs::copy(...)
+  - patterns:
+    - pattern: '$SINK($BASE.join($ENTRY.name()), ...)
+
+        '
+    - pattern: std::fs::File::create(...)
+  - patterns:
+    - pattern: '$SINK($BASE.join($ENTRY.name()), ...)
+
+        '
+    - pattern: std::fs::write(...)
+  - patterns:
+    - pattern: '$SINK($BASE.join($ENTRY.name()), ...)
+
+        '
+    - pattern: std::fs::create_dir_all(...)
+  - patterns:
+    - pattern: '$ENTRY.unpack($BASE.join($ENTRY.path().unwrap())).unwrap();
+
+        '
+    - pattern-not: '$ENTRY.unpack_in($BASE).unwrap();
+
+        '
+  - patterns:
+    - pattern: std::fs::write($BASE.join($ENTRY.name()), ...)
+  - patterns:
+    - pattern: std::fs::create_dir_all($BASE.join($PATH), ...)
+  - patterns:
+    - pattern: std::fs::rename(..., $BASE.join($ENTRY.name()))
+  - patterns:
+    - pattern: $SINK($BASE.join($PATH), ...)
+    - pattern: std::fs::write(...)
+  - patterns:
+    - pattern: $SINK($BASE.join($PATH), ...)
+    - pattern: std::fs::rename(...)
+  - patterns:
+    - pattern: $SINK($BASE.join($PATH), ...)
+    - pattern: std::fs::File::create(...)
+  - patterns:
+    - pattern: $SINK($BASE.join($PATH), ...)
+    - pattern: std::fs::copy(...)
+  - patterns:
+    - pattern: $SINK($BASE.join($PATH), ...)
+    - pattern: std::fs::create_dir_all(...)
+  - patterns:
+    - pattern: std::fs::rename(..., $BASE.join($PATH))

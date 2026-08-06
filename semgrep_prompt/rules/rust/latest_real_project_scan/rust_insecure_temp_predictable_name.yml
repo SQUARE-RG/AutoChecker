@@ -1,0 +1,57 @@
+rules:
+- id: rust-insecure-temp-predictable-name
+  message: Avoid predictable temporary file or directory creation; use secure tempfile
+    APIs instead.
+  severity: WARNING
+  languages:
+  - rust
+  pattern-either:
+  - patterns:
+    - pattern: std::fs::File::create($PATH)
+    - pattern-not: std::fs::OpenOptions::new().create_new(true).write(true).open($PATH)
+    - pattern-not: tempfile::NamedTempFile::new()
+    - pattern-not: tempfile::tempfile()
+    - pattern-not: tempfile::tempdir()
+    - pattern-not: tempfile::Builder::new().prefix(...).tempdir()
+    - pattern-not: tempfile::Builder::new().prefix(...).tempfile()
+  - patterns:
+    - pattern: std::fs::write($PATH, ...)
+    - pattern-not: std::fs::OpenOptions::new().create_new(true).write(true).open($PATH)
+    - pattern-not: tempfile::NamedTempFile::new()
+    - pattern-not: tempfile::tempfile()
+    - pattern-not: tempfile::tempdir()
+    - pattern-not: tempfile::Builder::new().prefix(...).tempdir()
+    - pattern-not: tempfile::Builder::new().prefix(...).tempfile()
+    - pattern-not: std::fs::write("debug.log", ...)
+  - patterns:
+    - pattern: std::fs::create_dir($PATH)
+    - pattern-not: std::fs::OpenOptions::new().create_new(true).write(true).open($PATH)
+    - pattern-not: tempfile::NamedTempFile::new()
+    - pattern-not: tempfile::tempfile()
+    - pattern-not: tempfile::tempdir()
+    - pattern-not: tempfile::Builder::new().prefix(...).tempdir()
+    - pattern-not: tempfile::Builder::new().prefix(...).tempfile()
+  - patterns:
+    - pattern: std::fs::rename($SRC, $PATH)
+    - pattern-not: std::fs::OpenOptions::new().create_new(true).write(true).open($PATH)
+    - pattern-not: tempfile::NamedTempFile::new()
+    - pattern-not: tempfile::tempfile()
+    - pattern-not: tempfile::tempdir()
+    - pattern-not: tempfile::Builder::new().prefix(...).tempdir()
+    - pattern-not: tempfile::Builder::new().prefix(...).tempfile()
+  - patterns:
+    - pattern: std::fs::OpenOptions::new().create(true).write(true).open($PATH)
+    - pattern-not: std::fs::OpenOptions::new().create_new(true).write(true).open($PATH)
+    - pattern-not: tempfile::NamedTempFile::new()
+    - pattern-not: tempfile::tempfile()
+    - pattern-not: tempfile::tempdir()
+    - pattern-not: tempfile::Builder::new().prefix(...).tempdir()
+    - pattern-not: tempfile::Builder::new().prefix(...).tempfile()
+  - patterns:
+    - pattern: std::env::temp_dir().join($NAME)
+    - pattern-not: std::fs::OpenOptions::new().create_new(true).write(true).open($PATH)
+    - pattern-not: tempfile::NamedTempFile::new()
+    - pattern-not: tempfile::tempfile()
+    - pattern-not: tempfile::tempdir()
+    - pattern-not: tempfile::Builder::new().prefix(...).tempdir()
+    - pattern-not: tempfile::Builder::new().prefix(...).tempfile()

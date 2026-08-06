@@ -1,0 +1,29 @@
+rules:
+- id: c.windows.loadlibrary.user-controlled-path
+  message: User-controlled DLL path passed to Windows LoadLibrary/LoadLibraryA/LoadLibraryW
+  severity: WARNING
+  languages:
+  - c
+  mode: taint
+  options:
+    taint_unify_mvars: true
+  pattern-sources:
+  - patterns:
+    - pattern: getenv(...)
+    - focus-metavariable: $X
+    by-side-effect: true
+  - pattern: argv[$I]
+  - patterns:
+    - pattern: $SRC
+    - pattern-not-inside: "HMODULE $F(...) {\n  return LoadLibraryA(\"C:\\\\Program\
+        \ Files\\\\App\\\\safe.dll\");\n}"
+  pattern-sinks:
+  - pattern-either:
+    - pattern: LoadLibrary($ARG)
+    - pattern: LoadLibraryA($ARG)
+    - pattern: LoadLibraryW($ARG)
+  pattern-sanitizers:
+  - patterns:
+    - pattern: LoadLibrary("...")
+    - focus-metavariable: $ARG
+    by-side-effect: true

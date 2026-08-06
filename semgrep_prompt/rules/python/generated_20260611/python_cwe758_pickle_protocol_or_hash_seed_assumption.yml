@@ -1,0 +1,13 @@
+rules:
+- id: python-cwe758-implementation-defined-hash-pickle
+  message: Avoid using `pickle.dumps()` without an explicit `protocol=` and avoid
+    built-in `hash()` for tokens, cache keys, shard selection, auth codes, or other
+    persistent/security-sensitive values.
+  severity: WARNING
+  languages:
+  - python
+  pattern-either:
+  - pattern: pickle.dumps($X)
+  - patterns:
+    - pattern: hash($X)
+    - pattern-not: hash("...")

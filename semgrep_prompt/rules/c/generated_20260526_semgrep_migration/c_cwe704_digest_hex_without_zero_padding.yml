@@ -1,0 +1,26 @@
+rules:
+- id: c-digest-hex-without-zero-padding
+  message: Use zero-padded two-digit hex formatting when converting digest bytes to
+    text.
+  severity: WARNING
+  languages:
+  - c
+  pattern-either:
+  - patterns:
+    - pattern: sprintf($BUF, "%x", $BYTE);
+    - pattern-not: sprintf($BUF, "%02x", $BYTE);
+  - patterns:
+    - pattern: sprintf($BUF, "%X", $BYTE);
+    - pattern-not: sprintf($BUF, "%02x", $BYTE);
+  - patterns:
+    - pattern: sprintf($BUF, "%1x", $BYTE);
+    - pattern-not: sprintf($BUF, "%02x", $BYTE);
+  - patterns:
+    - pattern: sprintf($BUF, "%lx", $BYTE);
+    - pattern-not: sprintf($BUF, "%02x", $BYTE);
+  - patterns:
+    - pattern: sprintf($BUF, "%hhx", $BYTE);
+    - pattern-not: sprintf($BUF, "%02x", $BYTE);
+  - patterns:
+    - pattern: sprintf($BUF, $FMT, $BYTE);
+    - pattern-not: sprintf($BUF, "%02x", $BYTE);

@@ -1,0 +1,25 @@
+rules:
+- id: insecure-temporary-file-creation
+  message: Insecure temporary file creation or predictable temp-path use without exclusivity.
+  severity: WARNING
+  languages:
+  - c
+  pattern-either:
+  - pattern: tmpnam(...);
+  - pattern: tempnam(...);
+  - pattern: mktemp(...);
+  - pattern: system("touch /tmp/...");
+  - pattern: freopen("/tmp/...", ...);
+  - pattern: fopen("/tmp/...", ...);
+  - pattern: fopen("/var/tmp/...", ...);
+  - pattern: open("/tmp/...", ...);
+  - pattern: sprintf($BUF, "/tmp/...", ...);
+  - pattern: sprintf($BUF, "/var/tmp/...", ...);
+  - patterns:
+    - pattern: open($PATH, $FLAGS, $MODE);
+    - pattern-not: open($PATH, O_CREAT|O_EXCL|..., 0600)
+    - pattern-not: open($PATH, O_CREAT|O_WRONLY|O_EXCL, 0600)
+    - pattern-not: open($PATH, O_CREAT|O_WRONLY|O_EXCL|..., 0600)
+  - patterns:
+    - pattern: fopen($PATH, "w")
+    - pattern-inside: "void f(...) {\n  ...\n  if ($P) fclose($P);\n  ...\n}\n"

@@ -1,0 +1,10 @@
+rules:
+- id: openssl-tls-cert-verification-disabled
+  message: OpenSSL TLS certificate verification is disabled with SSL_VERIFY_NONE in
+    SSL_CTX_set_verify().
+  severity: WARNING
+  languages:
+  - c
+  pattern-either:
+  - pattern: SSL_CTX_set_verify($CTX, SSL_VERIFY_NONE, ...);
+  - pattern: SSL_CTX_set_verify($CTX, SSL_VERIFY_NONE, 0);

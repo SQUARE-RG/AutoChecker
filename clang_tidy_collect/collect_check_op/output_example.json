@@ -1,0 +1,38 @@
+[
+    {
+        "meta_op": "Extract all relevant matched AST nodes from MatchResult",
+        "meta_impl": "const auto *ContainingCtor = Result.Nodes.getNodeAs<CXXConstructorDecl>(\"containing-ctor\");\nconst auto *ContainingCtorInit = Result.Nodes.getNodeAs<Expr>(\"containing-ctor-init\");\nconst auto *ContainingLambda = Result.Nodes.getNodeAs<LambdaExpr>(\"containing-lambda\");\nconst auto *ContainingFunc = Result.Nodes.getNodeAs<FunctionDecl>(\"containing-func\");\nconst auto *CallMove = Result.Nodes.getNodeAs<CallExpr>(\"call-move\");\nconst auto *MovingCall = Result.Nodes.getNodeAs<Expr>(\"moving-call\");\nconst auto *Arg = Result.Nodes.getNodeAs<DeclRefExpr>(\"arg\");"
+    },
+    {
+        "meta_op": "Resolve the actual moving expression: if moving-call is invalid, fallback to call-move",
+        "meta_impl": "if (!MovingCall || !MovingCall->getExprLoc().isValid())\n  MovingCall = CallMove;"
+    },
+    {
+        "meta_op": "Ignore std::move calls on variables that are not local to a function or method",
+        "meta_impl": "if (!Arg->getDecl()->getDeclContext()->isFunctionOrMethod())\n  return;"
+    },
+    {
+        "meta_op": "Collect all code regions that must be analyzed for potential uses-after-move",
+        "meta_impl": "llvm::SmallVector<Stmt *> CodeBlocks{};\nif (ContainingCtor) {\n  CodeBlocks.push_back(ContainingCtor->getBody());\n  if (ContainingCtorInit) {\n    bool BeforeMove{true};\n    for (CXXCtorInitializer *Init : ContainingCtor->inits()) {\n      if (BeforeMove && Init->getInit()->IgnoreImplicit() ==\n                            ContainingCtorInit->IgnoreImplicit())\n        BeforeMove = false;\n      if (!BeforeMove)\n        CodeBlocks.push_back(Init->getInit());\n    }\n  }\n} else if (ContainingLambda) {\n  CodeBlocks.push_back(ContainingLambda->getBody());\n} else if (ContainingFunc) {\n  CodeBlocks.push_back(ContainingFunc->getBody());\n}"
+    },
+    {
+        "meta_op": "Iterate over all collected code blocks and perform use-after-move analysis",
+        "meta_impl": "for (Stmt *CodeBlock : CodeBlocks) {\n  UseAfterMoveFinder Finder(Result.Context);\n  UseAfterMove Use;\n  if (Finder.find(CodeBlock, MovingCall, Arg->getDecl(), &Use))\n    emitDiagnostic(MovingCall, Arg, Use, this, Result.Context);\n}"
+    },
+    {
+        "meta_op": "Helper: detect and report a use-after-move diagnostic including ordering information",
+        "meta_impl": "static void emitDiagnostic(const Expr *MovingCall, const DeclRefExpr *MoveArg,\n                           const UseAfterMove &Use, ClangTidyCheck *Check,\n                           ASTContext *Context) {\n  SourceLocation UseLoc = Use.DeclRef->getExprLoc();\n  SourceLocation MoveLoc = MovingCall->getExprLoc();\n\n  Check->diag(UseLoc, \"'%0' used after it was moved\")\n      << MoveArg->getDecl()->getName();\n  Check->diag(MoveLoc, \"move occurred here\", DiagnosticIDs::Note);\n  if (Use.EvaluationOrderUndefined) {\n    Check->diag(UseLoc,\n                \"the use and move are unsequenced, i.e. there is no guarantee \"\n                \"about the order in which they are evaluated\",\n                DiagnosticIDs::Note);\n  } else if (UseLoc < MoveLoc || Use.DeclRef == MoveArg) {\n    Check->diag(UseLoc,\n                \"the use happens in a later loop iteration than the move\",\n                DiagnosticIDs::Note);\n  }\n}"
+    },
+    {
+        "meta_op": "Helper: perform CFG-based traversal to detect first use of a moved variable",
+        "meta_impl": "bool UseAfterMoveFinder::find(Stmt *CodeBlock, const Expr *MovingCall,\n                              const ValueDecl *MovedVariable,\n                              UseAfterMove *TheUseAfterMove) {\n  CFG::BuildOptions Options;\n  Options.AddImplicitDtors = true;\n  Options.AddTemporaryDtors = true;\n  std::unique_ptr<CFG> TheCFG = CFG::buildCFG(nullptr, CodeBlock, Context, Options);\n  if (!TheCFG)\n    return false;\n\n  Sequence = std::make_unique<ExprSequence>(TheCFG.get(), CodeBlock, Context);\n  BlockMap = std::make_unique<StmtToBlockMap>(TheCFG.get(), Context);\n  Visited.clear();\n\n  const CFGBlock *Block = BlockMap->blockContainingStmt(MovingCall);\n  if (!Block)\n    Block = &TheCFG->getEntry();\n\n  return findInternal(Block, MovingCall, MovedVariable, TheUseAfterMove);\n}"
+    },
+    {
+        "meta_op": "Helper: recursively scan CFG blocks for first unsafe use of the moved variable",
+        "meta_impl": "bool UseAfterMoveFinder::findInternal(const CFGBlock *Block,\n                                      const Expr *MovingCall,\n                                      const ValueDecl *MovedVariable,\n                                      UseAfterMove *TheUseAfterMove) {\n  if (Visited.count(Block))\n    return false;\n  if (!MovingCall)\n    Visited.insert(Block);\n\n  llvm::SmallVector<const DeclRefExpr *, 1> Uses;\n  llvm::SmallPtrSet<const Stmt *, 1> Reinits;\n  getUsesAndReinits(Block, MovedVariable, &Uses, &Reinits);\n\n  llvm::SmallVector<const Stmt *, 1> ReinitsToDelete;\n  for (const Stmt *Reinit : Reinits) {\n    if (MovingCall && Reinit != MovingCall &&\n        Sequence->potentiallyAfter(MovingCall, Reinit))\n      ReinitsToDelete.push_back(Reinit);\n  }\n  for (const Stmt *Reinit : ReinitsToDelete)\n    Reinits.erase(Reinit);\n\n  for (const DeclRefExpr *Use : Uses) {\n    if (!MovingCall || Sequence->potentiallyAfter(Use, MovingCall)) {\n      bool HaveSavingReinit = false;\n      for (const Stmt *Reinit : Reinits) {\n        if (!Sequence->potentiallyAfter(Reinit, Use))\n          HaveSavingReinit = true;\n      }\n      if (!HaveSavingReinit) {\n        TheUseAfterMove->DeclRef = Use;\n        TheUseAfterMove->EvaluationOrderUndefined =\n            MovingCall != nullptr && Sequence->potentiallyAfter(MovingCall, Use);\n        return true;\n      }\n    }\n  }\n\n  if (Reinits.empty()) {\n    for (const auto &Succ : Block->succs()) {\n      if (Succ && findInternal(Succ, nullptr, MovedVariable, TheUseAfterMove))\n        return true;\n    }\n  }\n\n  return false;\n}"
+    },
+    {
+        "meta_op": "Helper: classify all DeclRefExpr uses and reinitialization statements for a variable within a CFG block",
+        "meta_impl": "void UseAfterMoveFinder::getUsesAndReinits(\n    const CFGBlock *Block, const ValueDecl *MovedVariable,\n    llvm::SmallVectorImpl<const DeclRefExpr *> *Uses,\n    llvm::SmallPtrSetImpl<const Stmt *> *Reinits) {\n  llvm::SmallPtrSet<const DeclRefExpr *, 1> DeclRefs;\n  llvm::SmallPtrSet<const DeclRefExpr *, 1> ReinitDeclRefs;\n\n  getDeclRefs(Block, MovedVariable, &DeclRefs);\n  getReinits(Block, MovedVariable, Reinits, &ReinitDeclRefs);\n\n  Uses->clear();\n  for (const DeclRefExpr *DeclRef : DeclRefs) {\n    if (!ReinitDeclRefs.count(DeclRef))\n      Uses->push_back(DeclRef);\n  }\n\n  llvm::sort(*Uses, [](const DeclRefExpr *D1, const DeclRefExpr *D2) {\n    return D1->getExprLoc() < D2->getExprLoc();\n  });\n}"
+    }
+]

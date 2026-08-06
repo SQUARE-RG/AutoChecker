@@ -1,0 +1,18 @@
+rules:
+- id: c-openssl-weak-cipher-list
+  message: Avoid enabling weak OpenSSL cipher suites in SSL_CTX_set_cipher_list; use
+    strong cipher lists and explicit exclusions instead.
+  severity: WARNING
+  languages:
+  - c
+  pattern-either:
+  - pattern: SSL_CTX_set_cipher_list($CTX, "NULL");
+  - pattern: SSL_CTX_set_cipher_list($CTX, "aNULL");
+  - pattern: SSL_CTX_set_cipher_list($CTX, "EXPORT");
+  - pattern: SSL_CTX_set_cipher_list($CTX, "LOW");
+  - pattern: SSL_CTX_set_cipher_list($CTX, "RC4");
+  - pattern: SSL_CTX_set_cipher_list($CTX, "DES");
+  - pattern: SSL_CTX_set_cipher_list($CTX, "EXP-RC4-MD5");
+  - pattern: SSL_CTX_set_cipher_list($CTX, "ALL:!HIGH");
+  - pattern: SSL_CTX_set_cipher_list($CTX, "DEFAULT:RC4");
+  - pattern: SSL_CTX_set_cipher_list($CTX, "AES128-SHA:NULL");

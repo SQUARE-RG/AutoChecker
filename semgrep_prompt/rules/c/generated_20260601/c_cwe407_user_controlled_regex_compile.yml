@@ -1,0 +1,17 @@
+rules:
+- id: c-regex-compile-nonliteral-pattern
+  message: Avoid compiling regex patterns from non-literal or otherwise non-fixed
+    input.
+  severity: WARNING
+  languages:
+  - c
+  pattern-either:
+  - patterns:
+    - pattern: regcomp($RE, $PATTERN, ...);
+    - pattern-not: regcomp($RE, "^[A-Za-z0-9_]+$", ...);
+  - pattern: pcre_compile($PATTERN, ...);
+  - pattern: pcre2_compile($PATTERN, ...);
+  pattern-not:
+  - pattern: regcomp($RE, "...", ...);
+  - pattern: pcre_compile("...", ...);
+  - pattern: pcre2_compile("...", ...);

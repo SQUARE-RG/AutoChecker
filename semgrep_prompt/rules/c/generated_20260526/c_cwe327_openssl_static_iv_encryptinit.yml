@@ -1,0 +1,60 @@
+rules:
+- id: c-openssl-static-iv-in-evp-encryptinit-ex
+  message: Avoid passing a fixed or statically initialized IV to EVP_EncryptInit_ex;
+    use a freshly generated random IV (for example via RAND_bytes) before encryption
+    initialization.
+  severity: WARNING
+  languages:
+  - c
+  pattern-either:
+  - patterns:
+    - pattern: EVP_EncryptInit_ex($CTX, EVP_aes_128_cbc(), NULL, $KEY, (unsigned char
+        *)"...");
+    - pattern-not: 'if (RAND_bytes($IV, sizeof($IV)) != 1) return 0;
+
+        return EVP_EncryptInit_ex($CTX, EVP_aes_128_cbc(), NULL, $KEY, $IV);
+
+        '
+    - pattern-not: 'if (RAND_bytes($IV, sizeof($IV)) != 1) return 0;
+
+        EVP_EncryptInit_ex($CTX, EVP_aes_128_cbc(), NULL, $KEY, $IV);
+
+        '
+  - patterns:
+    - pattern: EVP_EncryptInit_ex($CTX, EVP_aes_128_cbc(), NULL, $KEY, (unsigned char
+        *)(unsigned char *)"...");
+    - pattern-not: 'if (RAND_bytes($IV, sizeof($IV)) != 1) return 0;
+
+        return EVP_EncryptInit_ex($CTX, EVP_aes_128_cbc(), NULL, $KEY, $IV);
+
+        '
+    - pattern-not: 'if (RAND_bytes($IV, sizeof($IV)) != 1) return 0;
+
+        EVP_EncryptInit_ex($CTX, EVP_aes_128_cbc(), NULL, $KEY, $IV);
+
+        '
+  - patterns:
+    - pattern: EVP_EncryptInit_ex($CTX, EVP_aes_128_cbc(), NULL, $KEY, (unsigned char
+        *)$IV);
+    - pattern-not-inside: 'if (RAND_bytes($IV, sizeof($IV)) != 1) return 0;
+
+        return EVP_EncryptInit_ex($CTX, EVP_aes_128_cbc(), NULL, $KEY, $IV);
+
+        '
+    - pattern-not-inside: 'if (RAND_bytes($IV, sizeof($IV)) != 1) return 0;
+
+        EVP_EncryptInit_ex($CTX, EVP_aes_128_cbc(), NULL, $KEY, $IV);
+
+        '
+  - patterns:
+    - pattern: EVP_EncryptInit_ex($CTX, EVP_aes_128_cbc(), NULL, $KEY, $IV);
+    - pattern-not-inside: 'if (RAND_bytes($IV, sizeof($IV)) != 1) return 0;
+
+        return EVP_EncryptInit_ex($CTX, EVP_aes_128_cbc(), NULL, $KEY, $IV);
+
+        '
+    - pattern-not-inside: 'if (RAND_bytes($IV, sizeof($IV)) != 1) return 0;
+
+        EVP_EncryptInit_ex($CTX, EVP_aes_128_cbc(), NULL, $KEY, $IV);
+
+        '

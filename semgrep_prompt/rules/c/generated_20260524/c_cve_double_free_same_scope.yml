@@ -1,0 +1,18 @@
+rules:
+- id: c-double-free-same-scope
+  message: Possible same-scope double free of the same pointer without resetting it
+    to NULL.
+  severity: WARNING
+  languages:
+  - c
+  patterns:
+  - pattern: 'free($P);
+
+      free($P);
+
+      '
+  - pattern-not: 'free($P);
+
+      $P = 0;
+
+      '

@@ -1,0 +1,20 @@
+rules:
+- id: c.mkfifo-world-writable-mode
+  message: mkfifo() creates a FIFO with world-writable permissions
+  severity: WARNING
+  languages:
+  - c
+  pattern-either:
+  - pattern: mkfifo($PATH, 0666);
+  - pattern: mkfifo($PATH, 0777);
+  - pattern: mkfifo($PATH, 0000666);
+  - pattern: mkfifo($PATH, 0000777);
+  - pattern: mkfifo($PATH, ACCESSPERMS);
+  - pattern: mkfifo($PATH, S_IRWXU|S_IRWXG|S_IRWXO);
+  - pattern: mkfifo($PATH, S_IRWXO|S_IRWXU);
+  - pattern: mkfifo($PATH, S_IWOTH|$X);
+  - pattern: mkfifo($PATH, $X|S_IWOTH);
+  - pattern: mkfifo($PATH, S_IROTH|S_IWOTH|$X);
+  - pattern: mkfifo($PATH, $X|S_IROTH|S_IWOTH);
+  - pattern: mkfifo($PATH, 0660|0006);
+  - pattern: mkfifo($PATH, 0006|0660);

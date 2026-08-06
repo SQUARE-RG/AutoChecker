@@ -1,0 +1,64 @@
+rules:
+- id: c-missing-nul-termination-after-strncpy-full-dst
+  message: strncpy copies the full destination size, so the buffer may be left unterminated
+    before it is used as a C string.
+  severity: WARNING
+  languages:
+  - c
+  pattern-either:
+  - patterns:
+    - pattern: 'char $BUF[$N];
+
+        ...
+
+        strncpy($BUF, $SRC, sizeof($BUF));
+
+        ...
+
+        $SINK($BUF);
+
+        '
+    - pattern-not: 'char $BUF[$N];
+
+        ...
+
+        strncpy($BUF, $SRC, sizeof($BUF) - 1);
+
+        ...
+
+        $BUF[sizeof($BUF) - 1] = ''\0'';
+
+        ...
+
+        $SINK($BUF);
+
+        '
+    - pattern-inside: "void $F(...) {\n  ...\n}\n"
+  - patterns:
+    - pattern: 'char $BUF[$N];
+
+        ...
+
+        strncpy($BUF, $SRC, sizeof($BUF));
+
+        ...
+
+        $SINK($BUF);
+
+        '
+    - pattern-not: 'char $BUF[$N];
+
+        ...
+
+        strncpy($BUF, $SRC, sizeof($BUF) - 1);
+
+        ...
+
+        $BUF[sizeof($BUF) - 1] = ''\0'';
+
+        ...
+
+        $SINK($BUF);
+
+        '
+    - pattern-inside: "int $F(...) {\n  ...\n}\n"

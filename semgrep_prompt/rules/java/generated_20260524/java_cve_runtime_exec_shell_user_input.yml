@@ -1,0 +1,10 @@
+rules:
+- id: java-runtime-exec-shell-c-command-injection
+  message: Avoid Runtime.exec with a shell and -c; it interprets runtime-controlled
+    command text through the shell.
+  severity: ERROR
+  languages:
+  - java
+  patterns:
+  - pattern: Runtime.getRuntime().exec(new String[]{"sh", "-c", $CMD})
+  - pattern-not: Runtime.getRuntime().exec(new String[]{"/bin/cat", $FILE})

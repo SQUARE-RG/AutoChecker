@@ -1,0 +1,14 @@
+rules:
+- id: openssl-weak-evp-cipher
+  message: Use of weak OpenSSL EVP cipher constructor (DES/RC4)
+  severity: WARNING
+  languages:
+  - c
+  metadata:
+    category: security
+  pattern-either:
+  - pattern: return EVP_des_ecb();
+  - pattern: return EVP_rc4();
+  - pattern: return EVP_des_...();
+  - pattern: "const EVP_CIPHER *$F(...) {\n  return EVP_des_ecb();\n}\n"
+  - pattern: "const EVP_CIPHER *$F(...) {\n  return EVP_rc4();\n}\n"

@@ -1,0 +1,40 @@
+rules:
+- id: django-csrf-exempt-view
+  message: Django view is decorated with csrf_exempt, which disables CSRF protection.
+  severity: WARNING
+  languages:
+  - python
+  pattern-either:
+  - patterns:
+    - pattern: "@csrf_exempt\ndef $FUNC(...):\n  ...\n"
+    - pattern-not: "@csrf_protect\ndef $FUNC(...):\n  ...\n"
+    - pattern-not: "@csrf_protect(...)\ndef $FUNC(...):\n  ...\n"
+    - pattern-not: "@django.views.decorators.csrf.csrf_protect\ndef $FUNC(...):\n\
+        \  ...\n"
+    - pattern-not: "@django.views.decorators.csrf.csrf_protect(...)\ndef $FUNC(...):\n\
+        \  ...\n"
+  - patterns:
+    - pattern: "@csrf_exempt(...)\ndef $FUNC(...):\n  ...\n"
+    - pattern-not: "@csrf_protect\ndef $FUNC(...):\n  ...\n"
+    - pattern-not: "@csrf_protect(...)\ndef $FUNC(...):\n  ...\n"
+    - pattern-not: "@django.views.decorators.csrf.csrf_protect\ndef $FUNC(...):\n\
+        \  ...\n"
+    - pattern-not: "@django.views.decorators.csrf.csrf_protect(...)\ndef $FUNC(...):\n\
+        \  ...\n"
+  - patterns:
+    - pattern: "@django.views.decorators.csrf.csrf_exempt\ndef $FUNC(...):\n  ...\n"
+    - pattern-not: "@csrf_protect\ndef $FUNC(...):\n  ...\n"
+    - pattern-not: "@csrf_protect(...)\ndef $FUNC(...):\n  ...\n"
+    - pattern-not: "@django.views.decorators.csrf.csrf_protect\ndef $FUNC(...):\n\
+        \  ...\n"
+    - pattern-not: "@django.views.decorators.csrf.csrf_protect(...)\ndef $FUNC(...):\n\
+        \  ...\n"
+  - patterns:
+    - pattern: "@django.views.decorators.csrf.csrf_exempt(...)\ndef $FUNC(...):\n\
+        \  ...\n"
+    - pattern-not: "@csrf_protect\ndef $FUNC(...):\n  ...\n"
+    - pattern-not: "@csrf_protect(...)\ndef $FUNC(...):\n  ...\n"
+    - pattern-not: "@django.views.decorators.csrf.csrf_protect\ndef $FUNC(...):\n\
+        \  ...\n"
+    - pattern-not: "@django.views.decorators.csrf.csrf_protect(...)\ndef $FUNC(...):\n\
+        \  ...\n"

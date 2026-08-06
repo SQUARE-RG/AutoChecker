@@ -1,0 +1,17 @@
+rules:
+- id: c-strlcpy-return-ignored-truncation
+  message: strlcpy return value is ignored; truncation of a fixed-size destination
+    may go undetected.
+  severity: WARNING
+  languages:
+  - c
+  patterns:
+  - pattern: strlcpy($DST, $SRC, sizeof($DST));
+  - pattern-not: 'size_t $N = strlcpy($DST, $SRC, sizeof($DST));
+
+      '
+  - pattern-not: 'size_t $N = strlcpy($DST, $SRC, sizeof($DST));
+
+      if ($N >= sizeof($DST)) return ...;
+
+      '

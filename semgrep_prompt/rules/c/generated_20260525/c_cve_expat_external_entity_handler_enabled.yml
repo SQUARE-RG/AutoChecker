@@ -1,0 +1,11 @@
+rules:
+- id: expat-external-entity-handler-enabled
+  message: Setting an Expat external entity reference handler to a non-NULL function
+    enables external entity resolution.
+  severity: WARNING
+  languages:
+  - c
+  pattern-either:
+  - patterns:
+    - pattern: XML_SetExternalEntityRefHandler($P, $H);
+    - pattern-not: XML_SetExternalEntityRefHandler($P, NULL);

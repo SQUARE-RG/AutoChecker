@@ -1,0 +1,19 @@
+rules:
+- id: c-cwe367-access-then-open-toctou
+  message: access() check followed by open() on the same path can create a TOCTOU
+    race; avoid checking access() before opening, or use safer open flags such as
+    O_NOFOLLOW.
+  severity: WARNING
+  languages:
+  - c
+  pattern-either:
+  - patterns:
+    - pattern: "if (access($PATH, $MODE) == 0) {\n  ...\n  open($PATH, $FLAGS);\n\
+        \  ...\n}\n"
+    - pattern-not: "if (access($PATH, $MODE) == 0) {\n  ...\n  open($PATH, $FLAGS\
+        \ | O_NOFOLLOW);\n  ...\n}\n"
+  - patterns:
+    - pattern: "if ((access($PATH, $MODE) == 0)) {\n  ...\n  open($PATH, $FLAGS);\n\
+        \  ...\n}\n"
+    - pattern-not: "if ((access($PATH, $MODE) == 0)) {\n  ...\n  open($PATH, $FLAGS\
+        \ | O_NOFOLLOW);\n  ...\n}\n"

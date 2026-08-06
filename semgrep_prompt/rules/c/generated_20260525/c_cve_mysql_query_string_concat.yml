@@ -1,0 +1,68 @@
+rules:
+- id: c-mysql-query-unsafe-sql-construction
+  message: Unsafe SQL string construction is passed to mysql_query; use prepared statements
+    with mysql_stmt_bind_param and mysql_stmt_execute instead.
+  severity: WARNING
+  languages:
+  - c
+  pattern-either:
+  - patterns:
+    - pattern: 'snprintf($BUF, ..., ...);
+
+        ...
+
+        mysql_query($DB, $BUF);
+
+        '
+    - pattern-not: 'mysql_stmt_bind_param(...);
+
+        ...
+
+        mysql_stmt_execute(...);
+
+        '
+  - patterns:
+    - pattern: 'sprintf($BUF, ...);
+
+        ...
+
+        mysql_query($DB, $BUF);
+
+        '
+    - pattern-not: 'mysql_stmt_bind_param(...);
+
+        ...
+
+        mysql_stmt_execute(...);
+
+        '
+  - patterns:
+    - pattern: '$BUF = $LEFT + $RIGHT;
+
+        ...
+
+        mysql_query($DB, $BUF);
+
+        '
+    - pattern-not: 'mysql_stmt_bind_param(...);
+
+        ...
+
+        mysql_stmt_execute(...);
+
+        '
+  - patterns:
+    - pattern: '$BUF = $LEFT;
+
+        ...
+
+        mysql_query($DB, $BUF);
+
+        '
+    - pattern-not: 'mysql_stmt_bind_param(...);
+
+        ...
+
+        mysql_stmt_execute(...);
+
+        '

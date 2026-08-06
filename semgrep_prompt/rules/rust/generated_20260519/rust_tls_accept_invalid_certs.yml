@@ -1,0 +1,21 @@
+rules:
+- id: rust-tls-disable-cert-or-hostname-verification
+  message: Disabling certificate or hostname verification in a Rust HTTP/TLS client
+    builder can make TLS connections insecure.
+  severity: WARNING
+  languages:
+  - rust
+  pattern-either:
+  - pattern: reqwest::Client::builder().danger_accept_invalid_certs(true)
+  - pattern: reqwest::blocking::Client::builder().danger_accept_invalid_certs(true)
+  - pattern: reqwest::ClientBuilder::new().danger_accept_invalid_certs(true)
+  - pattern: reqwest::blocking::ClientBuilder::new().danger_accept_invalid_certs(true)
+  - pattern: native_tls::TlsConnector::builder().danger_accept_invalid_certs(true)
+  - pattern: reqwest::Client::builder().danger_accept_invalid_hostnames(true)
+  - pattern: reqwest::blocking::Client::builder().danger_accept_invalid_hostnames(true)
+  - pattern: reqwest::ClientBuilder::new().danger_accept_invalid_hostnames(true)
+  - pattern: reqwest::blocking::ClientBuilder::new().danger_accept_invalid_hostnames(true)
+  - pattern: native_tls::TlsConnector::builder().danger_accept_invalid_hostnames(true)
+  - patterns:
+    - pattern: $B = $B.danger_accept_invalid_certs(true);
+    - pattern-inside: "fn $F(...) {\n  ...\n}\n"

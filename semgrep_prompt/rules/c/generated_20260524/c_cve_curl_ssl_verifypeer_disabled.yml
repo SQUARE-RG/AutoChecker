@@ -1,0 +1,11 @@
+rules:
+- id: curl-tls-verification-disabled
+  message: libcurl TLS verification is disabled with CURLOPT_SSL_VERIFYPEER or CURLOPT_SSL_VERIFYHOST
+  severity: ERROR
+  languages:
+  - c
+  pattern-either:
+  - pattern: curl_easy_setopt($CURL, CURLOPT_SSL_VERIFYPEER, 0L);
+  - pattern: curl_easy_setopt($CURL, CURLOPT_SSL_VERIFYHOST, 0L);
+  - pattern: curl_easy_setopt($CURL, CURLOPT_SSL_VERIFYPEER, 0);
+  - pattern: curl_easy_setopt($CURL, CURLOPT_SSL_VERIFYHOST, 0);

@@ -1,0 +1,28 @@
+rules:
+- id: jndi-ldap-runtime-lookup
+  message: Avoid InitialContext.lookup with runtime-built ldap:// URLs; use fixed
+    java:comp/env resource names or other constant lookup targets instead.
+  severity: WARNING
+  languages:
+  - java
+  pattern-either:
+  - patterns:
+    - pattern: new InitialContext().lookup("ldap://" + $X + $Y)
+    - pattern-not: new InitialContext().lookup("java:comp/env/jdbc/AppDS")
+    - pattern-not: new InitialContext().lookup("java:comp/env/$X")
+  - patterns:
+    - pattern: new InitialContext().lookup($P + "ldap://" + $X + $Y)
+    - pattern-not: new InitialContext().lookup("java:comp/env/jdbc/AppDS")
+    - pattern-not: new InitialContext().lookup("java:comp/env/$X")
+  - patterns:
+    - pattern: new InitialContext().lookup("ldap://" + $X)
+    - pattern-not: new InitialContext().lookup("java:comp/env/jdbc/AppDS")
+    - pattern-not: new InitialContext().lookup("java:comp/env/$X")
+  - patterns:
+    - pattern: new InitialContext().lookup($P + "ldap://" + $X)
+    - pattern-not: new InitialContext().lookup("java:comp/env/jdbc/AppDS")
+    - pattern-not: new InitialContext().lookup("java:comp/env/$X")
+  - patterns:
+    - pattern: new InitialContext().lookup("ldap://" + $X + $Y + $Z)
+    - pattern-not: new InitialContext().lookup("java:comp/env/jdbc/AppDS")
+    - pattern-not: new InitialContext().lookup("java:comp/env/$X")

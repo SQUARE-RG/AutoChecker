@@ -1,0 +1,45 @@
+rules:
+- id: c-sqlite3-exec-snprintf-string-concat
+  message: Avoid passing SQL built with snprintf or string concatenation to sqlite3_exec;
+    use prepared statements with bound parameters instead.
+  severity: WARNING
+  languages:
+  - c
+  metadata:
+    category: security
+    technology:
+    - sqlite3
+  pattern-either:
+  - patterns:
+    - pattern: 'char $BUF[$N];
+
+        snprintf($BUF, sizeof($BUF), $FMT, ...);
+
+        ...
+
+        sqlite3_exec($DB, $BUF, ...);
+
+        '
+    - pattern-not: 'char $BUF[$N];
+
+        snprintf($BUF, sizeof($BUF), "...", ...);
+
+        ...
+
+        sqlite3_exec($DB, $BUF, ...);
+
+        '
+  - patterns:
+    - pattern: 'char $BUF[$N] = $INIT;
+
+        ...
+
+        sqlite3_exec($DB, $BUF, ...);
+
+        '
+    - metavariable-regex:
+        metavariable: $INIT
+        regex: .*\+.*
+  - pattern: 'sqlite3_exec($DB, $SQL, ...);
+
+      '

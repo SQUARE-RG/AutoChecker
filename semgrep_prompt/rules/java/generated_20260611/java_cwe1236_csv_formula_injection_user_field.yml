@@ -1,0 +1,29 @@
+rules:
+- id: java-csv-formula-injection-unneutralized-output
+  message: Unneutralized request-controlled data is being written to CSV-compatible
+    output.
+  severity: WARNING
+  languages:
+  - java
+  pattern-either:
+  - patterns:
+    - pattern: $OUT.println($X + "," + ...);
+    - pattern-not: $OUT.println("'" + $X + ...);
+  - patterns:
+    - pattern: $OUT.write($X + ...);
+    - pattern-not: $OUT.write("'" + $X + ...);
+  - patterns:
+    - pattern: $CSV.printRecord($X, ...);
+    - pattern-not: $CSV.printRecord("'" + $X, ...);
+  - patterns:
+    - pattern: $SB.append($X).append(',');
+    - pattern-not: $SB.append("'" + $X).append(',');
+  - patterns:
+    - pattern: $OUT.printf($FMT, $X, ...);
+    - pattern-not: $OUT.printf($FMT, "'" + $X, ...);
+  - patterns:
+    - pattern: Files.writeString($PATH, $X);
+    - pattern-not: Files.writeString($PATH, "'" + $X);
+  - patterns:
+    - pattern: return java.util.Arrays.asList($X, ...);
+    - pattern-not: return java.util.Arrays.asList("'" + $X, ...);

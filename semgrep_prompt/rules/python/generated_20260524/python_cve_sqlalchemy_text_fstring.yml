@@ -1,0 +1,23 @@
+rules:
+- id: sqlalchemy-text-dynamic-sql
+  message: Avoid passing dynamically constructed SQL to sqlalchemy.text(); use a static
+    SQL template with bind parameters instead.
+  severity: WARNING
+  languages:
+  - python
+  pattern-either:
+  - patterns:
+    - pattern: text(f"...")
+    - pattern-not: text("...")
+  - patterns:
+    - pattern: text($A + $B)
+    - pattern-not: text("...")
+  - patterns:
+    - pattern: text($A + "...")
+    - pattern-not: text("...")
+  - patterns:
+    - pattern: text("..." + $B)
+    - pattern-not: text("...")
+  - patterns:
+    - pattern: text("..." + $B + "...")
+    - pattern-not: text("...")

@@ -1,0 +1,28 @@
+rules:
+- id: java-multipartfile-originalfilename-path-traversal
+  message: Do not use MultipartFile.getOriginalFilename() directly in upload destination
+    paths or file writes; generate a server-side filename instead.
+  severity: WARNING
+  languages:
+  - java
+  mode: taint
+  pattern-sources:
+  - pattern: $MF.getOriginalFilename()
+  pattern-sinks:
+  - patterns:
+    - pattern-either:
+      - pattern: Paths.get(..., $FILENAME)
+      - pattern: Files.copy(..., Paths.get(..., $FILENAME), ...)
+      - pattern: Files.write(Paths.get(..., $FILENAME), ...)
+    - metavariable-pattern:
+        metavariable: $FILENAME
+        pattern: $X
+  pattern-sanitizers:
+  - patterns:
+    - pattern-either:
+      - pattern: UUID.randomUUID().toString()
+      - pattern: java.util.UUID.randomUUID().toString()
+    - focus-metavariable: $X
+    by-side-effect: true
+  options:
+    taint_unify_mvars: true

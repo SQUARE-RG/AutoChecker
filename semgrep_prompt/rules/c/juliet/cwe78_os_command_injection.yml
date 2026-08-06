@@ -1,0 +1,42 @@
+rules:
+- id: c-command-injection-taint
+  message: 'Possible command injection: untrusted data reaches a command-execution
+    sink.'
+  severity: WARNING
+  languages:
+  - c
+  mode: taint
+  pattern-sources:
+  - pattern: argv[$I]
+  - pattern: getenv(...)
+  - patterns:
+    - pattern: fgets($BUF, ...)
+    - focus-metavariable: $BUF
+    by-side-effect: true
+  - patterns:
+    - pattern: scanf(..., $BUF)
+    - focus-metavariable: $BUF
+    by-side-effect: true
+  pattern-propagators:
+  - pattern: $DST = $SRC;
+    from: $SRC
+    to: $DST
+  - pattern: strcat($DST, $SRC);
+    from: $SRC
+    to: $DST
+    by-side-effect: true
+  - pattern: snprintf($DST, ..., $FMT, $SRC)
+    from: $SRC
+    to: $DST
+    by-side-effect: true
+  - pattern: $RET = $FUNC($SRC);
+    from: $SRC
+    to: $RET
+  pattern-sinks:
+  - pattern-either:
+    - pattern: system($CMD)
+    - pattern: popen($CMD, ...)
+    - pattern: execvp($FILE, $ARGV)
+    - pattern: execl(..., "-c", $CMD, ...)
+    - pattern: execlp(..., "-c", $CMD, ...)
+    - pattern: execle(..., "-c", $CMD, ...)

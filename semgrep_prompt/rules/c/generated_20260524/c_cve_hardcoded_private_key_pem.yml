@@ -1,0 +1,7 @@
+rules:
+- id: c-hardcoded-pem-private-key
+  message: Hardcoded PEM private key material found in a C string literal.
+  severity: WARNING
+  languages:
+  - c
+  pattern-regex: '"-----BEGIN[^"]*PRIVATE KEY-----[^"]*-----END[^"]*PRIVATE KEY-----"'

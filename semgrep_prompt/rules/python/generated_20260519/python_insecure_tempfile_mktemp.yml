@@ -1,0 +1,15 @@
+rules:
+- id: python-insecure-tempfile-mktemp
+  message: Avoid tempfile.mktemp() because it generates a predictable temporary name
+    without creating the file or directory; use mkstemp, NamedTemporaryFile, TemporaryFile,
+    TemporaryDirectory, mkdtemp, or SpooledTemporaryFile instead.
+  severity: WARNING
+  languages:
+  - python
+  pattern-either:
+  - pattern: tempfile.mktemp(...)
+  - pattern: mktemp(...)
+  - pattern: open(tempfile.mktemp(...), ...)
+  - pattern: open(mktemp(...), ...)
+  - pattern: return tempfile.mktemp(...)
+  - pattern: return mktemp(...)

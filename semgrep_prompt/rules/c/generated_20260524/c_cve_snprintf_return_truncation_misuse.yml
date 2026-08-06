@@ -1,0 +1,33 @@
+rules:
+- id: snprintf-return-used-as-index-without-bounds-check
+  message: snprintf return value is used as an array index without checking for negative
+    return or truncation against the buffer size.
+  severity: WARNING
+  languages:
+  - c
+  patterns:
+  - pattern: 'int $WRITTEN = snprintf($BUF, sizeof($BUF), ...);
+
+      ...
+
+      $BUF[$WRITTEN] = $VAL;
+
+      '
+  - pattern-not: 'int $WRITTEN = snprintf($BUF, sizeof($BUF), ...);
+
+      if ($WRITTEN < 0 || $WRITTEN >= (int)sizeof($BUF)) return;
+
+      ...
+
+      $BUF[$WRITTEN] = $VAL;
+
+      '
+  - pattern-not: 'int $WRITTEN = snprintf($BUF, sizeof($BUF), ...);
+
+      if ($WRITTEN < 0 || $WRITTEN >= sizeof($BUF)) return;
+
+      ...
+
+      $BUF[$WRITTEN] = $VAL;
+
+      '

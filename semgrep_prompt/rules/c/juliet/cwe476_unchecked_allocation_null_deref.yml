@@ -1,0 +1,119 @@
+rules:
+- id: unchecked-allocation-dereference
+  message: Dereference or use of heap allocation result before a null check or failure
+    handling.
+  severity: WARNING
+  languages:
+  - c
+  pattern-either:
+  - patterns:
+    - pattern-inside: '$PTR = malloc(...);
+
+        ...'
+    - pattern: '*$PTR = ...;'
+    - pattern-not-inside: "if (!$PTR)\n  return;\n...\n*$PTR = ...;"
+    - pattern-not-inside: "if (!$PTR) {\n  ...\n  return;\n}\n...\n*$PTR = ...;"
+    - pattern-not-inside: "if ($PTR == NULL)\n  return;\n...\n*$PTR = ...;"
+    - pattern-not-inside: "if ($PTR == nullptr)\n  return;\n...\n*$PTR = ...;"
+    - pattern-not-inside: "if ($PTR != NULL) {\n  ...\n  *$PTR = ...;\n  ...\n}"
+    - pattern-not-inside: "if ($PTR) {\n  ...\n  *$PTR = ...;\n  ...\n}"
+    - pattern-not-inside: "if ((bool)$PTR) {\n  ...\n  *$PTR = ...;\n  ...\n}"
+    - pattern-not-inside: "if (static_cast<bool>($PTR)) {\n  ...\n  *$PTR = ...;\n\
+        \  ...\n}"
+  - patterns:
+    - pattern: '$PTR = malloc(...);
+
+        ...
+
+        $PTR[...];
+
+        '
+    - pattern-not-inside: 'if (!$PTR) abort();
+
+        ...
+
+        $PTR[...];
+
+        '
+  - patterns:
+    - pattern-inside: '$PTR = calloc(...);
+
+        ...'
+    - pattern: '*$PTR = ...;'
+    - pattern-not-inside: "if (!$PTR)\n  return;\n...\n*$PTR = ...;"
+    - pattern-not-inside: "if (!$PTR) {\n  ...\n  return;\n}\n...\n*$PTR = ...;"
+    - pattern-not-inside: "if ($PTR == NULL)\n  return;\n...\n*$PTR = ...;"
+    - pattern-not-inside: "if ($PTR == nullptr)\n  return;\n...\n*$PTR = ...;"
+    - pattern-not-inside: "if ($PTR != NULL) {\n  ...\n  *$PTR = ...;\n  ...\n}"
+    - pattern-not-inside: "if ($PTR) {\n  ...\n  *$PTR = ...;\n  ...\n}"
+    - pattern-not-inside: "if ((bool)$PTR) {\n  ...\n  *$PTR = ...;\n  ...\n}"
+    - pattern-not-inside: "if (static_cast<bool>($PTR)) {\n  ...\n  *$PTR = ...;\n\
+        \  ...\n}"
+  - pattern: '$PTR = calloc(...);
+
+      ...
+
+      $PTR[...];
+
+      '
+  - pattern: '$PTR = realloc($PTR, ...);
+
+      ...
+
+      $PTR[...];
+
+      '
+  - pattern: '$PTR = malloc(...);
+
+      ...
+
+      strcpy($PTR, ...);
+
+      '
+  - pattern: '$PTR = malloc(...);
+
+      ...
+
+      puts($PTR);
+
+      '
+  - pattern: '$PTR = malloc(...);
+
+      ...
+
+      ++*$PTR;
+
+      '
+  - pattern: '$PTR = malloc(...);
+
+      ...
+
+      $CASTPTR[...];
+
+      '
+  - patterns:
+    - pattern: 'struct S *$S = malloc(...);
+
+        ...
+
+        $S->$FIELD = ...;
+
+        '
+    - pattern-inside: 'struct S *$S = malloc(...);
+
+        ...
+
+        '
+  - patterns:
+    - pattern: '$T *$P = malloc(...);
+
+        ...
+
+        $P[...];
+
+        '
+    - pattern-inside: '$T *$P = malloc(...);
+
+        ...
+
+        '

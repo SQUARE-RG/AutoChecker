@@ -1,0 +1,40 @@
+rules:
+- id: c-runtime-sized-alloca
+  message: Avoid alloca with a runtime or user-controlled size, especially when the
+    allocated buffer is later copied into.
+  severity: WARNING
+  languages:
+  - c
+  pattern-either:
+  - patterns:
+    - pattern: char *$BUF = alloca($SIZE);
+    - pattern-not: 'if ($SIZE <= 0 || $SIZE > 4096) return;
+
+        ...
+
+        $BUF = alloca($SIZE);
+
+        '
+    - pattern-not: 'if ($SIZE <= 0 || $SIZE > 4096) return;
+
+        ...
+
+        char *$BUF = alloca($SIZE);
+
+        '
+  - patterns:
+    - pattern: $BUF = alloca($SIZE);
+    - pattern-not: 'if ($SIZE <= 0 || $SIZE > 4096) return;
+
+        ...
+
+        $BUF = alloca($SIZE);
+
+        '
+    - pattern-not: 'if ($SIZE <= 0 || $SIZE > 4096) return;
+
+        ...
+
+        char *$BUF = alloca($SIZE);
+
+        '

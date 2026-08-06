@@ -1,0 +1,33 @@
+rules:
+- id: c-creat-world-writable-mode
+  message: creat() should not create files with world-writable permissions
+  severity: WARNING
+  languages:
+  - c
+  pattern-either:
+  - pattern: creat($PATH, 0666)
+  - pattern: creat($PATH, 0777)
+  - pattern: creat($PATH, 0000666)
+  - pattern: creat($PATH, 0000777)
+  - pattern: creat($PATH, ACCESSPERMS)
+  - patterns:
+    - pattern: creat($PATH, $MODE)
+    - pattern: $MODE = S_IWOTH|$REST;
+  - patterns:
+    - pattern: creat($PATH, $MODE)
+    - pattern: $MODE = $REST|S_IWOTH;
+  - patterns:
+    - pattern: creat($PATH, $MODE)
+    - pattern: creat($PATH, S_IWOTH|$REST)
+  - patterns:
+    - pattern: creat($PATH, $MODE)
+    - pattern: creat($PATH, $REST|S_IWOTH)
+  - patterns:
+    - pattern: creat($PATH, $MODE)
+    - pattern: creat($PATH, S_IRWXU|S_IRWXG|S_IRWXO)
+  - patterns:
+    - pattern: creat($PATH, $MODE)
+    - pattern: creat($PATH, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH)
+  - patterns:
+    - pattern: creat($PATH, $MODE)
+    - pattern: creat($PATH, S_IRWXO|S_IRWXU)

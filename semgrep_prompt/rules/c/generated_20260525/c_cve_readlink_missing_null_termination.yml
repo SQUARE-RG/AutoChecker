@@ -1,0 +1,45 @@
+rules:
+- id: c-readlink-missing-null-termination
+  message: readlink result is used as a string without explicitly writing a null terminator.
+  severity: WARNING
+  languages:
+  - c
+  pattern-either:
+  - patterns:
+    - pattern: 'ssize_t $LEN = readlink($PATH, $BUF, sizeof($BUF));
+
+        ...
+
+        puts($BUF);
+
+        '
+    - pattern-not: 'ssize_t $LEN = readlink($PATH, $BUF, sizeof($BUF) - 1);
+
+        ...
+
+        $BUF[$LEN] = ''\0'';
+
+        ...
+
+        puts($BUF);
+
+        '
+  - patterns:
+    - pattern: '$LEN = readlink($PATH, $BUF, sizeof($BUF));
+
+        ...
+
+        puts($BUF);
+
+        '
+    - pattern-not: '$LEN = readlink($PATH, $BUF, sizeof($BUF) - 1);
+
+        ...
+
+        $BUF[$LEN] = ''\0'';
+
+        ...
+
+        puts($BUF);
+
+        '

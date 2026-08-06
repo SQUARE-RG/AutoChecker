@@ -1,0 +1,28 @@
+rules:
+- id: python-os-system-user-input
+  message: Avoid executing shell commands with os.system when the command is built
+    from runtime input; use argv-list subprocess APIs instead.
+  severity: WARNING
+  languages:
+  - python
+  mode: taint
+  pattern-sources:
+  - pattern: $SRC
+  pattern-sinks:
+  - pattern: os.system($CMD)
+  pattern-propagators:
+  - pattern: $DST = $SRC;
+    from: $SRC
+    to: $DST
+  - pattern: $DST = $LEFT + $RIGHT;
+    from: $LEFT
+    to: $DST
+  - pattern: $DST = $LEFT + $RIGHT;
+    from: $RIGHT
+    to: $DST
+  - pattern: $DST = f"...{$SRC}..."
+    from: $SRC
+    to: $DST
+  - pattern: $DST = "...".format(..., $SRC, ...);
+    from: $SRC
+    to: $DST

@@ -1,0 +1,39 @@
+rules:
+- id: c-predictable-token-generation-srand-time-rand
+  message: 'Predictable PRNG use for security-sensitive token or nonce generation:
+    srand(time(NULL)) followed by rand()/random() output formatting.'
+  severity: WARNING
+  languages:
+  - c
+  pattern-not: 'RAND_bytes($OUT, ...);
+
+    '
+  pattern-either:
+  - pattern: 'srand(time(NULL));
+
+      ...
+
+      sprintf($OUT, $FMT, rand(), rand());
+
+      '
+  - pattern: 'srand(time(NULL));
+
+      ...
+
+      sprintf($OUT, $FMT, random(), random());
+
+      '
+  - pattern: 'srand(time(NULL));
+
+      ...
+
+      snprintf($OUT, $N, $FMT, rand(), rand());
+
+      '
+  - pattern: 'srand(time(NULL));
+
+      ...
+
+      snprintf($OUT, $N, $FMT, random(), random());
+
+      '

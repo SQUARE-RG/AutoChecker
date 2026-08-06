@@ -1,0 +1,9 @@
+rules:
+- id: openssl-rand-pseudo-bytes-usage
+  message: Use RAND_bytes instead of RAND_pseudo_bytes.
+  severity: WARNING
+  languages:
+  - c
+  patterns:
+  - pattern: RAND_pseudo_bytes(...);
+  - pattern-not: RAND_bytes(...);

@@ -1,0 +1,12 @@
+rules:
+- id: c-scanf-string-no-width
+  message: scanf family string conversion uses %s without an explicit maximum field
+    width
+  severity: WARNING
+  languages:
+  - c
+  pattern-either:
+  - pattern: scanf("%s", ...);
+  - pattern: fscanf(..., "%s", ...);
+  - pattern: sscanf(..., "%s", ...);
+  - pattern: scanf("%[^\"]s", ...);

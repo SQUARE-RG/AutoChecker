@@ -1,0 +1,23 @@
+rules:
+- id: jinja2-from-string-dynamic-template
+  message: Avoid passing runtime-controlled template text to Jinja2 Environment.from_string;
+    use fixed, trusted templates instead.
+  severity: WARNING
+  languages:
+  - python
+  patterns:
+  - pattern: 'Environment().from_string($TEMPLATE)
+
+      '
+  - pattern-not: 'Environment().from_string("...")
+
+      '
+  - pattern-not: 'Environment().from_string(''...'')
+
+      '
+  - pattern-not: 'Environment().from_string(TEMPLATES[$KEY])
+
+      '
+  - pattern-not: 'Environment().from_string(templates[$KEY])
+
+      '

@@ -1,0 +1,24 @@
+# Inputs
+
+## current checker code
+checker_cpp:
+```cpp
+{check_cpp_code}
+```
+
+checker_h:
+```cpp
+{check_h_code}
+```
+
+## passed test cases code
+
+```cpp
+{passed_test_cases}
+```
+
+## failed test cases code
+This test case should report an issue, but the current checker code cannot detect this code's problem.
+```cpp
+{failed_test_cases}
+```

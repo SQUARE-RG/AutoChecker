@@ -1,0 +1,8 @@
+rules:
+- id: c-gets-unbounded-input
+  message: Use of gets() is unsafe because it reads unbounded input into the destination
+    buffer.
+  severity: WARNING
+  languages:
+  - c
+  pattern: gets($BUF);

@@ -1,0 +1,18 @@
+rules:
+- id: openssl-ecb-cipher-selection
+  message: OpenSSL ECB-mode cipher selection is insecure; use an authenticated or
+    randomized mode such as GCM instead.
+  severity: WARNING
+  languages:
+  - c
+  pattern-either:
+  - pattern: return EVP_aes_128_ecb();
+  - pattern: return EVP_aes_192_ecb();
+  - pattern: return EVP_aes_256_ecb();
+  - pattern: return EVP_des_ecb();
+  - pattern: return EVP_des_ede3_ecb();
+  - pattern: return EVP_bf_ecb();
+  - pattern: return EVP_cast5_ecb();
+  - pattern: return EVP_seed_ecb();
+  - pattern: return EVP_aria_128_ecb();
+  - pattern: return EVP_sm4_ecb();

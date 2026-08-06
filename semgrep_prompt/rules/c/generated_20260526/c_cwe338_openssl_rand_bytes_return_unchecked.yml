@@ -1,0 +1,11 @@
+rules:
+- id: c-openssl-rand-bytes-return-ignored
+  message: OpenSSL RAND_bytes return value is ignored; check for success (== 1) before
+    using the generated buffer.
+  severity: WARNING
+  languages:
+  - c
+  patterns:
+  - pattern: RAND_bytes($BUF, $LEN);
+  - pattern-not: if (RAND_bytes($BUF, $LEN) != 1) $REST;
+  - pattern-not: if (RAND_bytes($BUF, $LEN) == 1) $REST;

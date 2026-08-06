@@ -1,0 +1,68 @@
+rules:
+- id: python-proxy-header-trust-boundary-mismatch
+  message: Avoid trusting proxy-related request headers directly for redirects, absolute
+    URLs, secure-scheme decisions, or IP-based authorization without trusted proxy
+    handling or allowlist validation.
+  severity: WARNING
+  languages:
+  - python
+  pattern-either:
+  - patterns:
+    - pattern: '$H = request.headers[''X-Forwarded-Host'']
+
+        ...
+
+        return redirect($PREFIX + $H + $SUFFIX)
+
+        '
+    - pattern-not: "if $H != ...:\n  ...\n"
+  - patterns:
+    - pattern: '$H = request.headers.get(''X-Forwarded-Host'')
+
+        ...
+
+        return redirect($PREFIX + $H + $SUFFIX)
+
+        '
+    - pattern-not: "if $H != ...:\n  ...\n"
+  - patterns:
+    - pattern: '$H = request.headers.get(''host'')
+
+        ...
+
+        return {$KEY: $PREFIX + $H + $SUFFIX}
+
+        '
+    - pattern-not: "if $H != ...:\n  ...\n"
+  - patterns:
+    - pattern: '$S = request.headers.get(''X-Forwarded-Proto'')
+
+        ...
+
+        return $S + ''://'' + ...
+
+        '
+    - pattern-not: "if $S not in (...):\n  ...\n"
+  - pattern: return request.headers.get('X-Forwarded-Proto') == 'https';
+  - patterns:
+    - pattern: '$IP = request.META[''HTTP_X_FORWARDED_FOR'']
+
+        ...
+
+        allow_admin_for_ip($IP)
+
+        '
+    - pattern-not: $IP = trusted_proxy_ip(request);
+  - patterns:
+    - pattern: "$IP = request.headers['X-Real-IP']\n...\nif $IP.startswith($P):\n\
+        \  ...\n  enable_internal()\n"
+    - pattern-not: "if $IP not in (...):\n  ...\n"
+  - patterns:
+    - pattern: '$ORIGIN = request.headers.get(''X-Forwarded-Host'')
+
+        ...
+
+        raise web.HTTPFound($PREFIX + $ORIGIN + $SUFFIX)
+
+        '
+    - pattern-not: "if $ORIGIN not in {...}:\n  ...\n"

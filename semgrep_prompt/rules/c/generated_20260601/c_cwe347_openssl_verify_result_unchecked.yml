@@ -1,0 +1,33 @@
+rules:
+- id: openssl-verify-return-ignored
+  message: Check the return value of OpenSSL signature verification APIs; do not treat
+    success as unconditional.
+  severity: WARNING
+  languages:
+  - c
+  pattern-either:
+  - patterns:
+    - pattern: EVP_DigestVerifyFinal($CTX, $SIG, $LEN);
+    - pattern-not-inside: 'int $OK = EVP_DigestVerifyFinal($CTX, $SIG, $LEN);
+
+        ...
+
+        if ($OK != 1) ...
+
+        '
+  - patterns:
+    - pattern: RSA_verify($TYPE, $MSG, $MSG_LEN, $SIG, $SIG_LEN, $RSA);
+    - pattern-not: 'int $OK = EVP_DigestVerifyFinal($CTX, $SIG, $LEN);
+
+        ...
+
+        if ($OK != 1) ...
+
+        '
+    - pattern-not: 'int $OK = RSA_verify($TYPE, $MSG, $MSG_LEN, $SIG, $SIG_LEN, $RSA);
+
+        ...
+
+        if ($OK != 1) ...
+
+        '

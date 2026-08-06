@@ -1,0 +1,5 @@
+{
+    "_type": "prompt",
+    "input_variables": ["rule_description", "negative_test_case"],
+    "template_path": "/root/code_check/src/prompt/clang_tidy_prompt/prompt_txt/logic_for_negative_case.txt"
+}

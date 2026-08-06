@@ -1,0 +1,29 @@
+rules:
+- id: python-unsafe-yaml-deserialization
+  message: Unsafe YAML deserialization can execute or instantiate untrusted content;
+    use safe_load or SafeLoader instead.
+  severity: WARNING
+  languages:
+  - python
+  pattern-either:
+  - patterns:
+    - pattern: yaml.load(...)
+    - pattern-not: yaml.load(..., Loader=yaml.SafeLoader);
+    - pattern-not-inside: '$LOADER = yaml.SafeLoader
+
+        ...
+
+        yaml.load(..., Loader=$LOADER)
+
+        '
+  - patterns:
+    - pattern: yaml.load($DATA, Loader=$LOADER);
+    - pattern: yaml.Loader
+  - patterns:
+    - pattern: yaml.load($DATA, Loader=$LOADER);
+    - pattern: yaml.UnsafeLoader
+  - pattern: yaml.unsafe_load(...)
+  - pattern: yaml.full_load(...)
+  - pattern: load(...)
+  - pattern: unsafe_load(...)
+  - pattern: full_load(...)

@@ -1,0 +1,30 @@
+rules:
+- id: c-strcpy-off-by-one-allocation
+  message: Allocation derived from strlen() must reserve space for the null terminator
+    before strcpy()
+  severity: WARNING
+  languages:
+  - c
+  patterns:
+  - pattern: 'size_t $LEN = strlen($SRC);
+
+      ...
+
+      $DST = malloc($LEN);
+
+      ...
+
+      strcpy($DST, $SRC);
+
+      '
+  - pattern-not: 'size_t $LEN = strlen($SRC) + 1;
+
+      ...
+
+      $DST = malloc($LEN);
+
+      ...
+
+      memcpy($DST, $SRC, $LEN);
+
+      '

@@ -1,0 +1,158 @@
+rules:
+- id: java-xxe-unhardened-xml-factory-use
+  message: 'Potential XXE risk: XML factory/parsers are used without prior hardening
+    against DOCTYPE or external entity access.'
+  severity: ERROR
+  languages:
+  - java
+  pattern-either:
+  - patterns:
+    - pattern: 'DocumentBuilderFactory $DBF = DocumentBuilderFactory.newInstance();
+
+        ...
+
+        $DBF.newDocumentBuilder().parse(...);
+
+        '
+    - pattern-not: 'DocumentBuilderFactory $DBF = DocumentBuilderFactory.newInstance();
+
+        $DBF.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+
+        ...
+
+        $DBF.newDocumentBuilder().parse(...);
+
+        '
+    - pattern-not: 'DocumentBuilderFactory $DBF = DocumentBuilderFactory.newInstance();
+
+        $DBF.setFeature("http://xml.org/sax/features/external-general-entities", false);
+
+        $DBF.setFeature("http://xml.org/sax/features/external-parameter-entities",
+        false);
+
+        ...
+
+        $DBF.newDocumentBuilder().parse(...);
+
+        '
+    - pattern-not: 'DocumentBuilderFactory $DBF = DocumentBuilderFactory.newInstance();
+
+        $DBF.setExpandEntityReferences(false);
+
+        ...
+
+        $DBF.newDocumentBuilder().parse(...);
+
+        '
+  - patterns:
+    - pattern: 'SAXParserFactory $SPF = SAXParserFactory.newInstance();
+
+        ...
+
+        $SPF.newSAXParser().parse(...);
+
+        '
+    - pattern-not: 'SAXParserFactory $SPF = SAXParserFactory.newInstance();
+
+        $SPF.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+
+        ...
+
+        $SPF.newSAXParser().parse(...);
+
+        '
+  - patterns:
+    - pattern: 'XMLInputFactory $XIF = XMLInputFactory.newFactory();
+
+        ...
+
+        $XIF.createXMLStreamReader(...);
+
+        '
+    - pattern-not: 'XMLInputFactory $XIF = XMLInputFactory.newFactory();
+
+        $XIF.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+
+        ...
+
+        $XIF.createXMLStreamReader(...);
+
+        '
+  - patterns:
+    - pattern: 'TransformerFactory $TF = TransformerFactory.newInstance();
+
+        ...
+
+        $TF.newTransformer().transform(...);
+
+        '
+    - pattern-not: 'TransformerFactory $TF = TransformerFactory.newInstance();
+
+        $TF.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);
+
+        ...
+
+        $TF.newTransformer().transform(...);
+
+        '
+  - patterns:
+    - pattern: 'SchemaFactory $SF = SchemaFactory.newInstance(...);
+
+        ...
+
+        $SF.newSchema(...);
+
+        '
+    - pattern-not: 'SchemaFactory $SF = SchemaFactory.newInstance(...);
+
+        $SF.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);
+
+        ...
+
+        $SF.newSchema(...);
+
+        '
+    - pattern-not: 'SchemaFactory $SF = SchemaFactory.newInstance(...);
+
+        $SF.setProperty(javax.xml.XMLConstants.ACCESS_EXTERNAL_DTD, "");
+
+        ...
+
+        $SF.newSchema(...);
+
+        '
+    - pattern-not: 'SchemaFactory $SF = SchemaFactory.newInstance(...);
+
+        $SF.setProperty(javax.xml.XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+
+        ...
+
+        $SF.newSchema(...);
+
+        '
+  - patterns:
+    - pattern: 'SAXReader $READER = new SAXReader();
+
+        ...
+
+        $READER.read(...);
+
+        '
+    - pattern-not: 'SAXReader $READER = new SAXReader();
+
+        $READER.setFeature("http://apache.org/xml/features/disallow-doctype-decl",
+        true);
+
+        ...
+
+        $READER.read(...);
+
+        '
+  - patterns:
+    - pattern: 'DocumentBuilderFactory $DBF = DocumentBuilderFactory.newInstance();
+
+        DocumentBuilder $B = $DBF.newDocumentBuilder();
+
+        $B.parse(...);
+
+        '

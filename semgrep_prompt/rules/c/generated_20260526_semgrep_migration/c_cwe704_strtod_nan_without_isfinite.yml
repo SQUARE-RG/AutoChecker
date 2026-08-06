@@ -1,0 +1,80 @@
+rules:
+- id: c-nan-injection-finite-check-missing
+  message: Floating-point input parsed with strtod/strtof/strtold/atof is used or
+    compared without a prior isfinite/isnan check.
+  severity: WARNING
+  languages:
+  - c
+  pattern-either:
+  - patterns:
+    - pattern: 'double $VAL = strtod($INPUT, ...);
+
+        if ($VAL > $THRESHOLD) { ... }
+
+        '
+    - pattern-not: 'if (!isfinite($VAL)) return ...;
+
+        '
+  - patterns:
+    - pattern: 'double $VAL = atof($INPUT);
+
+        if ($VAL > $THRESHOLD) { ... }
+
+        '
+    - pattern-not: 'if (!isfinite($VAL)) return ...;
+
+        '
+  - patterns:
+    - pattern: 'double $VAL = strtof($INPUT, ...);
+
+        if ($VAL > $THRESHOLD) { ... }
+
+        '
+    - pattern-not: 'if (!isfinite($VAL)) return ...;
+
+        '
+  - patterns:
+    - pattern: 'double $VAL = strtold($INPUT, ...);
+
+        if ($VAL > $THRESHOLD) { ... }
+
+        '
+    - pattern-not: 'if (!isfinite($VAL)) return ...;
+
+        '
+  - patterns:
+    - pattern: 'double $VAL = strtod($INPUT, ...);
+
+        if ($VAL > $THRESHOLD) { puts(...); }
+
+        '
+    - pattern-not: 'if (!isfinite($VAL)) return ...;
+
+        '
+  - patterns:
+    - pattern: 'double $VAL = atof($INPUT);
+
+        if ($VAL > $THRESHOLD) { puts(...); }
+
+        '
+    - pattern-not: 'if (!isfinite($VAL)) return ...;
+
+        '
+  - patterns:
+    - pattern: 'double $VAL = strtof($INPUT, ...);
+
+        if ($VAL > $THRESHOLD) { puts(...); }
+
+        '
+    - pattern-not: 'if (!isfinite($VAL)) return ...;
+
+        '
+  - patterns:
+    - pattern: 'double $VAL = strtold($INPUT, ...);
+
+        if ($VAL > $THRESHOLD) { puts(...); }
+
+        '
+    - pattern-not: 'if (!isfinite($VAL)) return ...;
+
+        '

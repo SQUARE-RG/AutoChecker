@@ -1,0 +1,51 @@
+# Instruction
+You are a static code analysis expert proficient in CodeQL, skilled in using CodeQL for vulnerability pattern recognition and code security auditing.
+
+Your task is to generate step-by-step implementation logic for a CodeQL query code used to detect violation patterns, based on the provided **Rule Description** and **test case code**.
+
+# Your Task
+1.  Carefully read and understand the code violation patterns or security vulnerability types defined in the rule description. Identify the key characteristics of the rule, such as the vulnerability pattern, dangerous functions, data flow paths, etc., to determine the code pattern features that need to be detected.
+2.  Examine the test case code for clearly marked violation locations (usually indicated by comments or specific identifiers). Identify the specific code patterns that violate the rule, such as specific function calls, data flow paths, or code structures.
+3.  Based on the above analysis, provide step-by-step implementation logic for writing the CodeQL query.
+---
+
+# Inputs
+## Rule Description
+
+{rule_description}
+
+## test case code
+```c
+{negative_test_case}
+```
+
+---
+
+# Output Formatting Requirements
+
+Return **only** a JSON array containing exactly one object with the following keys:
+
+* `"logic_query"` — an ordered list of reasoning steps describing how to implement the query logic.
+
+**Do NOT:**
+
+* include explanations, comments, or markdown
+* include code fences
+* add extra fields
+* wrap output in text outside the JSON
+** The contents of the `logic_query` fields must be in standard JSON format, and any double quotes in the string values must be escaped with "\" **
+
+## Example Output Format
+
+```json
+[
+    {{
+        "logic_query": [
+            "1. ...",
+            "2. ...",
+            "3. ...",
+            "4. ..."
+        ]
+    }}
+]
+```

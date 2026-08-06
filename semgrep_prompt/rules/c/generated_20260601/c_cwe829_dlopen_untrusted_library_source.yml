@@ -1,0 +1,16 @@
+rules:
+- id: c-untrusted-dlopen-path
+  message: Avoid calling dlopen with an untrusted or variable library path; use a
+    fixed trusted path after allowlist validation.
+  severity: WARNING
+  languages:
+  - c
+  pattern-either:
+  - patterns:
+    - pattern: return dlopen($PATH, RTLD_NOW);
+    - pattern-not: return dlopen("...", RTLD_NOW);
+    - pattern-not: dlopen("...", RTLD_NOW);
+  - patterns:
+    - pattern: dlopen($PATH, RTLD_NOW);
+    - pattern-not: return dlopen("...", RTLD_NOW);
+    - pattern-not: dlopen("...", RTLD_NOW);

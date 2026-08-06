@@ -1,0 +1,387 @@
+rules:
+- id: java-missing-authorization-on-admin-sensitive-endpoint
+  message: Missing authorization check on an admin-sensitive endpoint action
+  severity: WARNING
+  languages:
+  - java
+  pattern-either:
+  - patterns:
+    - pattern: "@PostMapping(...)\n$RET $METHOD(...){\n  ...\n  deleteUser(...);\n\
+        \  ...\n}\n"
+    - pattern-not: "@PreAuthorize(...)\n$RET $METHOD(...){\n  ...\n}\n"
+    - pattern-not: "@RolesAllowed(...)\n$RET $METHOD(...){\n  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!Security.canDelete()) return;\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!Auth.isAdmin()) throw new SecurityException(...);\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!Auth.requirePermission(...))\
+        \ return;\n  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!Auth.requireAdmin()) return;\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!request.isUserInRole(...)) return;\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!r.isUserInRole(...)) return;\n\
+        \  ...\n}\n"
+  - patterns:
+    - pattern: "@PostMapping(...)\n$RET $METHOD(...){\n  ...\n  grantAdmin(...);\n\
+        \  ...\n}\n"
+    - pattern-not: "@PreAuthorize(...)\n$RET $METHOD(...){\n  ...\n}\n"
+    - pattern-not: "@RolesAllowed(...)\n$RET $METHOD(...){\n  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!Security.canDelete()) return;\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!Auth.isAdmin()) throw new SecurityException(...);\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!Auth.requirePermission(...))\
+        \ return;\n  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!Auth.requireAdmin()) return;\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!request.isUserInRole(...)) return;\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!r.isUserInRole(...)) return;\n\
+        \  ...\n}\n"
+  - patterns:
+    - pattern: "@PostMapping(...)\n$RET $METHOD(...){\n  ...\n  exportAll(...);\n\
+        \  ...\n}\n"
+    - pattern-not: "@PreAuthorize(...)\n$RET $METHOD(...){\n  ...\n}\n"
+    - pattern-not: "@RolesAllowed(...)\n$RET $METHOD(...){\n  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!Security.canDelete()) return;\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!Auth.isAdmin()) throw new SecurityException(...);\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!Auth.requirePermission(...))\
+        \ return;\n  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!Auth.requireAdmin()) return;\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!request.isUserInRole(...)) return;\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!r.isUserInRole(...)) return;\n\
+        \  ...\n}\n"
+  - patterns:
+    - pattern: "@PostMapping(...)\n$RET $METHOD(...){\n  ...\n  saveConfig(...);\n\
+        \  ...\n}\n"
+    - pattern-not: "@PreAuthorize(...)\n$RET $METHOD(...){\n  ...\n}\n"
+    - pattern-not: "@RolesAllowed(...)\n$RET $METHOD(...){\n  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!Security.canDelete()) return;\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!Auth.isAdmin()) throw new SecurityException(...);\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!Auth.requirePermission(...))\
+        \ return;\n  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!Auth.requireAdmin()) return;\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!request.isUserInRole(...)) return;\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!r.isUserInRole(...)) return;\n\
+        \  ...\n}\n"
+  - patterns:
+    - pattern: "@PostMapping(...)\n$RET $METHOD(...){\n  ...\n  disableMfa(...);\n\
+        \  ...\n}\n"
+    - pattern-not: "@PreAuthorize(...)\n$RET $METHOD(...){\n  ...\n}\n"
+    - pattern-not: "@RolesAllowed(...)\n$RET $METHOD(...){\n  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!Security.canDelete()) return;\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!Auth.isAdmin()) throw new SecurityException(...);\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!Auth.requirePermission(...))\
+        \ return;\n  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!Auth.requireAdmin()) return;\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!request.isUserInRole(...)) return;\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!r.isUserInRole(...)) return;\n\
+        \  ...\n}\n"
+  - patterns:
+    - pattern: "@PostMapping(...)\n$RET $METHOD(...){\n  ...\n  impersonate(...);\n\
+        \  ...\n}\n"
+    - pattern-not: "@PreAuthorize(...)\n$RET $METHOD(...){\n  ...\n}\n"
+    - pattern-not: "@RolesAllowed(...)\n$RET $METHOD(...){\n  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!Security.canDelete()) return;\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!Auth.isAdmin()) throw new SecurityException(...);\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!Auth.requirePermission(...))\
+        \ return;\n  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!Auth.requireAdmin()) return;\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!request.isUserInRole(...)) return;\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!r.isUserInRole(...)) return;\n\
+        \  ...\n}\n"
+  - patterns:
+    - pattern: "@PutMapping(...)\n$RET $METHOD(...){\n  ...\n  grantAdmin(...);\n\
+        \  ...\n}\n"
+    - pattern-not: "@PreAuthorize(...)\n$RET $METHOD(...){\n  ...\n}\n"
+    - pattern-not: "@RolesAllowed(...)\n$RET $METHOD(...){\n  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!Security.canDelete()) return;\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!Auth.isAdmin()) throw new SecurityException(...);\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!Auth.requirePermission(...))\
+        \ return;\n  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!Auth.requireAdmin()) return;\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!request.isUserInRole(...)) return;\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!r.isUserInRole(...)) return;\n\
+        \  ...\n}\n"
+  - patterns:
+    - pattern: "@PutMapping(...)\n$RET $METHOD(...){\n  ...\n  updateBilling(...);\n\
+        \  ...\n}\n"
+    - pattern-not: "@PreAuthorize(...)\n$RET $METHOD(...){\n  ...\n}\n"
+    - pattern-not: "@RolesAllowed(...)\n$RET $METHOD(...){\n  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!Security.canDelete()) return;\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!Auth.isAdmin()) throw new SecurityException(...);\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!Auth.requirePermission(...))\
+        \ return;\n  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!Auth.requireAdmin()) return;\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!request.isUserInRole(...)) return;\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!r.isUserInRole(...)) return;\n\
+        \  ...\n}\n"
+  - patterns:
+    - pattern: "@PutMapping(...)\n$RET $METHOD(...){\n  ...\n  saveConfig(...);\n\
+        \  ...\n}\n"
+    - pattern-not: "@PreAuthorize(...)\n$RET $METHOD(...){\n  ...\n}\n"
+    - pattern-not: "@RolesAllowed(...)\n$RET $METHOD(...){\n  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!Security.canDelete()) return;\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!Auth.isAdmin()) throw new SecurityException(...);\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!Auth.requirePermission(...))\
+        \ return;\n  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!Auth.requireAdmin()) return;\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!request.isUserInRole(...)) return;\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!r.isUserInRole(...)) return;\n\
+        \  ...\n}\n"
+  - patterns:
+    - pattern: "@DeleteMapping(...)\n$RET $METHOD(...){\n  ...\n  deleteTenant(...);\n\
+        \  ...\n}\n"
+    - pattern-not: "@PreAuthorize(...)\n$RET $METHOD(...){\n  ...\n}\n"
+    - pattern-not: "@RolesAllowed(...)\n$RET $METHOD(...){\n  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!Security.canDelete()) return;\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!Auth.isAdmin()) throw new SecurityException(...);\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!Auth.requirePermission(...))\
+        \ return;\n  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!Auth.requireAdmin()) return;\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!request.isUserInRole(...)) return;\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!r.isUserInRole(...)) return;\n\
+        \  ...\n}\n"
+  - patterns:
+    - pattern: "@DeleteMapping(...)\n$RET $METHOD(...){\n  ...\n  deleteUser(...);\n\
+        \  ...\n}\n"
+    - pattern-not: "@PreAuthorize(...)\n$RET $METHOD(...){\n  ...\n}\n"
+    - pattern-not: "@RolesAllowed(...)\n$RET $METHOD(...){\n  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!Security.canDelete()) return;\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!Auth.isAdmin()) throw new SecurityException(...);\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!Auth.requirePermission(...))\
+        \ return;\n  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!Auth.requireAdmin()) return;\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!request.isUserInRole(...)) return;\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!r.isUserInRole(...)) return;\n\
+        \  ...\n}\n"
+  - patterns:
+    - pattern: "@GetMapping(...)\n$RET $METHOD(...){\n  ...\n  exportAll(...);\n \
+        \ ...\n}\n"
+    - pattern-not: "@PreAuthorize(...)\n$RET $METHOD(...){\n  ...\n}\n"
+    - pattern-not: "@RolesAllowed(...)\n$RET $METHOD(...){\n  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!Security.canDelete()) return;\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!Auth.isAdmin()) throw new SecurityException(...);\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!Auth.requirePermission(...))\
+        \ return;\n  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!Auth.requireAdmin()) return;\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!request.isUserInRole(...)) return;\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(...){\n  ...\n  if (!r.isUserInRole(...)) return;\n\
+        \  ...\n}\n"
+  - patterns:
+    - pattern: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  $SINK($REQ.getParameter(...));\n\
+        \  ...\n}\n"
+    - pattern: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  updateBilling(...);\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  if (!$REQ.isUserInRole(...))\
+        \ return;\n  ...\n}\n"
+    - pattern-not: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  if (!Auth.isAdmin())\
+        \ throw new SecurityException(...);\n  ...\n}\n"
+    - pattern-not: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  if (!Auth.requireAdmin())\
+        \ return;\n  ...\n}\n"
+  - patterns:
+    - pattern: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  $SINK($REQ.getParameter(...));\n\
+        \  ...\n}\n"
+    - pattern: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  saveConfig(...);\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  if (!$REQ.isUserInRole(...))\
+        \ return;\n  ...\n}\n"
+    - pattern-not: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  if (!Auth.isAdmin())\
+        \ throw new SecurityException(...);\n  ...\n}\n"
+    - pattern-not: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  if (!Auth.requireAdmin())\
+        \ return;\n  ...\n}\n"
+  - patterns:
+    - pattern: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  $SINK($REQ.getParameter(...));\n\
+        \  ...\n}\n"
+    - pattern: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  deleteUser(...);\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  if (!$REQ.isUserInRole(...))\
+        \ return;\n  ...\n}\n"
+    - pattern-not: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  if (!Auth.isAdmin())\
+        \ throw new SecurityException(...);\n  ...\n}\n"
+    - pattern-not: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  if (!Auth.requireAdmin())\
+        \ return;\n  ...\n}\n"
+  - patterns:
+    - pattern: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  $SINK($REQ.getParameter(...));\n\
+        \  ...\n}\n"
+    - pattern: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  deleteTenant(...);\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  if (!$REQ.isUserInRole(...))\
+        \ return;\n  ...\n}\n"
+    - pattern-not: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  if (!Auth.isAdmin())\
+        \ throw new SecurityException(...);\n  ...\n}\n"
+    - pattern-not: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  if (!Auth.requireAdmin())\
+        \ return;\n  ...\n}\n"
+  - patterns:
+    - pattern: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  $SINK($REQ.getParameter(...));\n\
+        \  ...\n}\n"
+    - pattern: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  exportAll(...);\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  if (!$REQ.isUserInRole(...))\
+        \ return;\n  ...\n}\n"
+    - pattern-not: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  if (!Auth.isAdmin())\
+        \ throw new SecurityException(...);\n  ...\n}\n"
+    - pattern-not: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  if (!Auth.requireAdmin())\
+        \ return;\n  ...\n}\n"
+  - patterns:
+    - pattern: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  $SINK($REQ.getParameter(...));\n\
+        \  ...\n}\n"
+    - pattern: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  disableMfa(...);\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  if (!$REQ.isUserInRole(...))\
+        \ return;\n  ...\n}\n"
+    - pattern-not: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  if (!Auth.isAdmin())\
+        \ throw new SecurityException(...);\n  ...\n}\n"
+    - pattern-not: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  if (!Auth.requireAdmin())\
+        \ return;\n  ...\n}\n"
+  - patterns:
+    - pattern: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  $SINK($REQ.getParameter(...));\n\
+        \  ...\n}\n"
+    - pattern: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  impersonate(...);\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  if (!$REQ.isUserInRole(...))\
+        \ return;\n  ...\n}\n"
+    - pattern-not: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  if (!Auth.isAdmin())\
+        \ throw new SecurityException(...);\n  ...\n}\n"
+    - pattern-not: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  if (!Auth.requireAdmin())\
+        \ return;\n  ...\n}\n"
+  - patterns:
+    - pattern: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  $SINK($REQ.getParameter(...));\n\
+        \  ...\n}\n"
+    - pattern: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  grantAdmin(...);\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  if (!$REQ.isUserInRole(...))\
+        \ return;\n  ...\n}\n"
+    - pattern-not: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  if (!Auth.isAdmin())\
+        \ throw new SecurityException(...);\n  ...\n}\n"
+    - pattern-not: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  if (!Auth.requireAdmin())\
+        \ return;\n  ...\n}\n"
+  - patterns:
+    - pattern: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  $SINK($REQ.getParameter(...),\
+        \ ...);\n  ...\n}\n"
+    - pattern: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  updateBilling(...);\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  if (!$REQ.isUserInRole(...))\
+        \ return;\n  ...\n}\n"
+    - pattern-not: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  if (!Auth.isAdmin())\
+        \ throw new SecurityException(...);\n  ...\n}\n"
+    - pattern-not: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  if (!Auth.requireAdmin())\
+        \ return;\n  ...\n}\n"
+  - patterns:
+    - pattern: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  $SINK($REQ.getParameter(...),\
+        \ ...);\n  ...\n}\n"
+    - pattern: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  saveConfig(...);\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  if (!$REQ.isUserInRole(...))\
+        \ return;\n  ...\n}\n"
+    - pattern-not: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  if (!Auth.isAdmin())\
+        \ throw new SecurityException(...);\n  ...\n}\n"
+    - pattern-not: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  if (!Auth.requireAdmin())\
+        \ return;\n  ...\n}\n"
+  - patterns:
+    - pattern: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  $SINK($REQ.getParameter(...),\
+        \ ...);\n  ...\n}\n"
+    - pattern: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  deleteUser(...);\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  if (!$REQ.isUserInRole(...))\
+        \ return;\n  ...\n}\n"
+    - pattern-not: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  if (!Auth.isAdmin())\
+        \ throw new SecurityException(...);\n  ...\n}\n"
+    - pattern-not: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  if (!Auth.requireAdmin())\
+        \ return;\n  ...\n}\n"
+  - patterns:
+    - pattern: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  $SINK($REQ.getParameter(...),\
+        \ ...);\n  ...\n}\n"
+    - pattern: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  deleteTenant(...);\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  if (!$REQ.isUserInRole(...))\
+        \ return;\n  ...\n}\n"
+    - pattern-not: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  if (!Auth.isAdmin())\
+        \ throw new SecurityException(...);\n  ...\n}\n"
+    - pattern-not: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  if (!Auth.requireAdmin())\
+        \ return;\n  ...\n}\n"
+  - patterns:
+    - pattern: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  $SINK($REQ.getParameter(...),\
+        \ ...);\n  ...\n}\n"
+    - pattern: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  exportAll(...);\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  if (!$REQ.isUserInRole(...))\
+        \ return;\n  ...\n}\n"
+    - pattern-not: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  if (!Auth.isAdmin())\
+        \ throw new SecurityException(...);\n  ...\n}\n"
+    - pattern-not: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  if (!Auth.requireAdmin())\
+        \ return;\n  ...\n}\n"
+  - patterns:
+    - pattern: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  $SINK($REQ.getParameter(...),\
+        \ ...);\n  ...\n}\n"
+    - pattern: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  disableMfa(...);\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  if (!$REQ.isUserInRole(...))\
+        \ return;\n  ...\n}\n"
+    - pattern-not: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  if (!Auth.isAdmin())\
+        \ throw new SecurityException(...);\n  ...\n}\n"
+    - pattern-not: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  if (!Auth.requireAdmin())\
+        \ return;\n  ...\n}\n"
+  - patterns:
+    - pattern: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  $SINK($REQ.getParameter(...),\
+        \ ...);\n  ...\n}\n"
+    - pattern: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  impersonate(...);\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  if (!$REQ.isUserInRole(...))\
+        \ return;\n  ...\n}\n"
+    - pattern-not: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  if (!Auth.isAdmin())\
+        \ throw new SecurityException(...);\n  ...\n}\n"
+    - pattern-not: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  if (!Auth.requireAdmin())\
+        \ return;\n  ...\n}\n"
+  - patterns:
+    - pattern: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  $SINK($REQ.getParameter(...),\
+        \ ...);\n  ...\n}\n"
+    - pattern: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  grantAdmin(...);\n\
+        \  ...\n}\n"
+    - pattern-not: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  if (!$REQ.isUserInRole(...))\
+        \ return;\n  ...\n}\n"
+    - pattern-not: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  if (!Auth.isAdmin())\
+        \ throw new SecurityException(...);\n  ...\n}\n"
+    - pattern-not: "$RET $METHOD(HttpServletRequest $REQ, ...){\n  ...\n  if (!Auth.requireAdmin())\
+        \ return;\n  ...\n}\n"

@@ -1,0 +1,21 @@
+rules:
+- id: python-requests-disable-tls-verification
+  message: Requests TLS verification is disabled with verify=False; use verification
+    or an explicit trusted CA bundle instead.
+  severity: WARNING
+  languages:
+  - python
+  pattern-either:
+  - pattern: requests.$METHOD(..., verify=False, ...);
+  - pattern: $SESSION.verify = False;
+  - patterns:
+    - pattern: $SESSION.$METHOD(...)
+    - pattern-inside: '$SESSION = requests.Session()
+
+        ...
+
+        '
+    - pattern-not: $SESSION.verify = True;
+    - pattern-not: $SESSION.verify = "/...";
+    - pattern-not: $SESSION.verify = '/...';
+  - pattern: requests.Session().request(..., verify=False, ...);

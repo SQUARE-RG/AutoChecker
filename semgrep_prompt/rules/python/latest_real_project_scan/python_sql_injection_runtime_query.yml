@@ -1,0 +1,59 @@
+rules:
+- id: python-sql-injection-dynamic-query
+  message: Avoid building SQL with runtime values before execute-like calls; use parameter
+    binding or fixed allowlisted fragments instead.
+  severity: WARNING
+  languages:
+  - python
+  pattern-either:
+  - patterns:
+    - pattern: $CURSOR.execute($SQL + $X)
+    - pattern-not: $CURSOR.execute($SQL, ...)
+  - patterns:
+    - pattern: $CURSOR.executemany($SQL + $X, ...)
+    - pattern-not: $CURSOR.execute($SQL, ...)
+  - patterns:
+    - pattern: $CURSOR.executescript($SQL + $X)
+    - pattern-not: $CURSOR.execute($SQL, ...)
+  - patterns:
+    - pattern: $ENGINE.execute($SQL + $X)
+    - pattern-not: $CURSOR.execute($SQL, ...)
+  - patterns:
+    - pattern: $SESSION.execute($SQL + $X)
+    - pattern-not: $CURSOR.execute($SQL, ...)
+  - patterns:
+    - pattern: $CURSOR.execute(f"$BEFORE{$X}$AFTER")
+  - patterns:
+    - pattern: $CURSOR.executemany(f"$BEFORE{$X}$AFTER", ...)
+  - patterns:
+    - pattern: $CURSOR.executescript(f"$BEFORE{$X}$AFTER")
+  - patterns:
+    - pattern: $ENGINE.execute(f"$BEFORE{$X}$AFTER")
+  - patterns:
+    - pattern: $SESSION.execute(f"$BEFORE{$X}$AFTER")
+  - patterns:
+    - pattern: $Q = "$BEFORE%s$AFTER" % $X;
+  - patterns:
+    - pattern: $Q = "$BEFORE{}$AFTER".format($X)
+  - patterns:
+    - pattern: $CURSOR.execute($Q)
+  - patterns:
+    - pattern: $CURSOR.executemany($Q, ...)
+  - patterns:
+    - pattern: $CURSOR.executescript($Q)
+  - patterns:
+    - pattern: $ENGINE.execute($Q)
+  - patterns:
+    - pattern: $SESSION.execute($Q)
+  - patterns:
+    - pattern: $CURSOR.execute("select * from " + $TABLE)
+  - patterns:
+    - pattern: $CURSOR.execute("select * from " + $TABLE + ...)
+  - patterns:
+    - pattern: $CURSOR.execute("select * from " + ... + $TABLE)
+  - patterns:
+    - pattern: $CURSOR.execute("... order by " + $ORDER)
+  - patterns:
+    - pattern: $SESSION.execute(f"select * from orders order by {$ORDER}")
+  - patterns:
+    - pattern: $ENGINE.execute("select * from users where id=" + $X);

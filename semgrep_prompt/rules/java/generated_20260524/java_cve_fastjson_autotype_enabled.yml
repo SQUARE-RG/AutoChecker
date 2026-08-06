@@ -1,0 +1,8 @@
+rules:
+- id: fastjson-autotype-support-enabled
+  message: Fastjson auto type support is enabled with setAutoTypeSupport(true).
+  severity: WARNING
+  languages:
+  - java
+  patterns:
+  - pattern: ParserConfig.getGlobalInstance().setAutoTypeSupport(true);

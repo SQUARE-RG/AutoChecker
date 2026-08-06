@@ -1,0 +1,9 @@
+rules:
+- id: openssl-legacy-methods
+  message: Use TLS_method instead of legacy OpenSSL SSLv3_method or TLSv1_method.
+  severity: WARNING
+  languages:
+  - c
+  pattern-either:
+  - pattern: SSLv3_method(...)
+  - pattern: TLSv1_method(...)

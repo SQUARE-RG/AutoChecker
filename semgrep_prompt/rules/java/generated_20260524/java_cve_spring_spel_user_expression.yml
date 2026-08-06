@@ -1,0 +1,10 @@
+rules:
+- id: spring-spel-runtime-expression-injection
+  message: 'Possible Spring SpEL injection: parseExpression() is called with a runtime-derived
+    expression instead of a fixed string literal.'
+  severity: WARNING
+  languages:
+  - java
+  patterns:
+  - pattern: new SpelExpressionParser().parseExpression($ARG)
+  - pattern-not: new SpelExpressionParser().parseExpression("...")

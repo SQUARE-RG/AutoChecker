@@ -1,0 +1,16 @@
+rules:
+- id: java-processbuilder-shell-command-injection
+  message: Avoid passing runtime input to a shell via ProcessBuilder("sh", "-c", ...)
+    or ProcessBuilder("cmd", "/c", ...).
+  severity: WARNING
+  languages:
+  - java
+  pattern-either:
+  - patterns:
+    - pattern: new ProcessBuilder("sh", "-c", $CMD).start()
+    - pattern-not: new ProcessBuilder("sh", "-c", "...").start()
+    - pattern-not: new ProcessBuilder("cmd", "/c", "...").start()
+  - patterns:
+    - pattern: new ProcessBuilder("cmd", "/c", $CMD).start()
+    - pattern-not: new ProcessBuilder("sh", "-c", "...").start()
+    - pattern-not: new ProcessBuilder("cmd", "/c", "...").start()

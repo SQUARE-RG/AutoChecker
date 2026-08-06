@@ -1,0 +1,15 @@
+rules:
+- id: libxml2-noent-without-nonet
+  message: libxml2 parser call uses XML_PARSE_NOENT without XML_PARSE_NONET
+  severity: WARNING
+  languages:
+  - c
+  pattern-either:
+  - patterns:
+    - pattern: xmlReadFile($P, $Q, XML_PARSE_NOENT)
+    - pattern-not: xmlReadFile($P, $Q, XML_PARSE_NONET)
+    - pattern-not: xmlReadMemory($P, $Q, $R, $S, XML_PARSE_NONET)
+  - patterns:
+    - pattern: xmlReadMemory($P, $Q, $R, $S, XML_PARSE_NOENT)
+    - pattern-not: xmlReadFile($P, $Q, XML_PARSE_NONET)
+    - pattern-not: xmlReadMemory($P, $Q, $R, $S, XML_PARSE_NONET)

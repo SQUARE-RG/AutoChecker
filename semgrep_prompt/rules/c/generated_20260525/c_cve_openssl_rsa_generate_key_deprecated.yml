@@ -1,0 +1,11 @@
+rules:
+- id: openssl-deprecated-rsa-generate-key
+  message: Use RSA_generate_key_ex instead of deprecated RSA_generate_key, and avoid
+    weak 1024-bit RSA key generation.
+  severity: WARNING
+  languages:
+  - c
+  pattern-either:
+  - pattern: RSA_generate_key(1024, ...)
+  - pattern: RSA_generate_key(...)
+  - pattern: RSA_generate_key_ex(..., 1024, ...)

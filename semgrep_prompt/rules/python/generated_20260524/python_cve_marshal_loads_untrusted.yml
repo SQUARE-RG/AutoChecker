@@ -1,0 +1,9 @@
+rules:
+- id: python-unsafe-marshal-deserialization
+  message: Unsafe deserialization with marshal.load or marshal.loads on runtime data.
+  severity: WARNING
+  languages:
+  - python
+  pattern-either:
+  - pattern: marshal.loads(...)
+  - pattern: marshal.load(...)

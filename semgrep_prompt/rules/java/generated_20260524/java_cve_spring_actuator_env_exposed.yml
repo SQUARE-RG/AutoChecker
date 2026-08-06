@@ -1,0 +1,23 @@
+rules:
+- id: spring-actuator-exposure-wildcard
+  message: Spring Boot actuator exposure is configured with a wildcard include value.
+  severity: WARNING
+  languages:
+  - java
+  pattern-either:
+  - patterns:
+    - pattern: String $X = "management.endpoints.web.exposure.include=*";
+    - pattern-not: String $X = "management.endpoints.web.exposure.include=health,info";
+    - pattern-not: $X = "management.endpoints.web.exposure.include=health,info";
+  - patterns:
+    - pattern: $X = "management.endpoints.web.exposure.include=*";
+    - pattern-not: String $X = "management.endpoints.web.exposure.include=health,info";
+    - pattern-not: $X = "management.endpoints.web.exposure.include=health,info";
+  - patterns:
+    - pattern: $X.put("management.endpoints.web.exposure.include", "*");
+    - pattern-not: String $X = "management.endpoints.web.exposure.include=health,info";
+    - pattern-not: $X = "management.endpoints.web.exposure.include=health,info";
+  - patterns:
+    - pattern: $X.setProperty("management.endpoints.web.exposure.include", "*");
+    - pattern-not: String $X = "management.endpoints.web.exposure.include=health,info";
+    - pattern-not: $X = "management.endpoints.web.exposure.include=health,info";

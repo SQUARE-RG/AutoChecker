@@ -1,0 +1,8 @@
+rules:
+- id: c-umask-world-writable-default
+  message: Avoid setting umask to 0000, which makes newly created files group/world
+    accessible.
+  severity: WARNING
+  languages:
+  - c
+  pattern: umask(0000);

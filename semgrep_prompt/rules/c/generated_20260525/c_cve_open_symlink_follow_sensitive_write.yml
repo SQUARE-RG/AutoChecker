@@ -1,0 +1,16 @@
+rules:
+- id: c-open-sensitive-file-write-without-nofollow
+  message: open() uses O_CREAT|O_TRUNC without O_NOFOLLOW, which can follow symlinks
+    during a sensitive file write.
+  severity: WARNING
+  languages:
+  - c
+  pattern-either:
+  - patterns:
+    - pattern: open($PATH, O_CREAT|O_WRONLY|O_TRUNC, $MODE)
+    - pattern-not: open($PATH, O_CREAT|O_WRONLY|O_TRUNC|O_NOFOLLOW, $MODE)
+    - pattern-not: open($PATH, O_WRONLY|O_CREAT|O_TRUNC|O_NOFOLLOW, $MODE)
+  - patterns:
+    - pattern: open($PATH, O_WRONLY|O_CREAT|O_TRUNC, $MODE)
+    - pattern-not: open($PATH, O_CREAT|O_WRONLY|O_TRUNC|O_NOFOLLOW, $MODE)
+    - pattern-not: open($PATH, O_WRONLY|O_CREAT|O_TRUNC|O_NOFOLLOW, $MODE)

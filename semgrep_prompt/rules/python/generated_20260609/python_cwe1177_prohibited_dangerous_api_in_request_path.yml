@@ -1,0 +1,48 @@
+rules:
+- id: python-web-request-controlled-dangerous-api
+  message: Request-controlled data reaches a prohibited dangerous API.
+  severity: ERROR
+  languages:
+  - python
+  mode: taint
+  pattern-sources:
+  - pattern-either:
+    - pattern: request.data
+    - pattern: request.get_data(...)
+    - pattern: request.args[$KEY]
+    - pattern: request.GET[$KEY]
+    - pattern: request.POST[$KEY]
+    - pattern: await request.json()
+    - pattern: await request.body()
+    - pattern: await request.read()
+    - pattern: request.json()
+    - pattern: request.body()
+    - pattern: request.read()
+  pattern-propagators:
+  - pattern: $DST = $SRC;
+    from: $SRC
+    to: $DST
+  - pattern: $DST = str($SRC);
+    from: $SRC
+    to: $DST
+  - pattern: $DST = ($SRC);
+    from: $SRC
+    to: $DST
+  - pattern: $DST = $SRC[$IDX];
+    from: $SRC
+    to: $DST
+  pattern-sinks:
+  - pattern-either:
+    - pattern: pickle.loads($DATA)
+    - pattern: marshal.loads($DATA)
+    - pattern: eval($DATA)
+    - pattern: exec($DATA)
+    - pattern: compile($DATA, ...)
+    - pattern: os.system($DATA)
+    - pattern: subprocess.check_output($DATA, shell=True, ...);
+    - pattern: subprocess.run($DATA, shell=True, ...);
+    - pattern: subprocess.call($DATA, shell=True, ...);
+    - pattern: subprocess.Popen($DATA, shell=True, ...);
+    - pattern: yaml.load($DATA, Loader=yaml.Loader, ...);
+    - pattern: yaml.load($DATA, Loader=yaml.FullLoader, ...);
+    - pattern: yaml.load($DATA, Loader=yaml.UnsafeLoader, ...);

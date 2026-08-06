@@ -1,0 +1,63 @@
+rules:
+- id: java-use-after-close
+  message: Resource is used after it has been closed.
+  severity: WARNING
+  languages:
+  - java
+  pattern-either:
+  - patterns:
+    - pattern: '$R.close();
+
+        ...
+
+        $R.read(...);
+
+        '
+  - patterns:
+    - pattern: '$R.close();
+
+        ...
+
+        $R.readLine(...);
+
+        '
+  - patterns:
+    - pattern: '$R.close();
+
+        ...
+
+        $R.write(...);
+
+        '
+  - patterns:
+    - pattern: '$R.close();
+
+        ...
+
+        $R.flush(...);
+
+        '
+  - patterns:
+    - pattern: '$R.close();
+
+        ...
+
+        $R.seek(...);
+
+        '
+  - patterns:
+    - pattern: '$R.close();
+
+        ...
+
+        $R.prepareStatement(...);
+
+        '
+  - patterns:
+    - pattern: '$R.close();
+
+        ...
+
+        $R.println(...);
+
+        '

@@ -1,0 +1,30 @@
+rules:
+- id: python-requests-verify-false
+  message: Avoid disabling TLS certificate verification in requests calls by setting
+    verify=False.
+  severity: WARNING
+  languages:
+  - python
+  pattern-either:
+  - pattern: requests.get(..., verify=False, ...);
+  - pattern: requests.post(..., verify=False, ...);
+  - pattern: requests.put(..., verify=False, ...);
+  - pattern: requests.patch(..., verify=False, ...);
+  - pattern: requests.delete(..., verify=False, ...);
+  - pattern: requests.head(..., verify=False, ...);
+  - pattern: requests.options(..., verify=False, ...);
+  - pattern: requests.request(..., verify=False, ...);
+  - pattern: requests.session().get(..., verify=False, ...);
+  - pattern: requests.session().post(..., verify=False, ...);
+  - pattern: requests.session().put(..., verify=False, ...);
+  - pattern: requests.session().patch(..., verify=False, ...);
+  - pattern: requests.session().delete(..., verify=False, ...);
+  - pattern: requests.session().head(..., verify=False, ...);
+  - pattern: requests.session().options(..., verify=False, ...);
+  - pattern: requests.Session().get(..., verify=False, ...);
+  - pattern: requests.Session().post(..., verify=False, ...);
+  - pattern: requests.Session().put(..., verify=False, ...);
+  - pattern: requests.Session().patch(..., verify=False, ...);
+  - pattern: requests.Session().delete(..., verify=False, ...);
+  - pattern: requests.Session().head(..., verify=False, ...);
+  - pattern: requests.Session().options(..., verify=False, ...);

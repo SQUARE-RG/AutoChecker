@@ -1,0 +1,23 @@
+rules:
+- id: c-unchecked-setuid-setgid-return
+  message: Unchecked setuid/setgid return value; verify failure and stop before continuing.
+  severity: WARNING
+  languages:
+  - c
+  pattern-either:
+  - patterns:
+    - pattern: setuid(...);
+    - pattern-not-inside: 'if (setuid(...) != 0) return;
+
+        '
+    - pattern-not-inside: 'if (setgid(...) != 0) return;
+
+        '
+  - patterns:
+    - pattern: setgid(...);
+    - pattern-not-inside: 'if (setuid(...) != 0) return;
+
+        '
+    - pattern-not-inside: 'if (setgid(...) != 0) return;
+
+        '

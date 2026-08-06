@@ -1,0 +1,14 @@
+rules:
+- id: spring-security-csrf-disabled
+  message: Spring Security CSRF protection is explicitly disabled.
+  severity: WARNING
+  languages:
+  - java
+  pattern-either:
+  - pattern: $HTTP.csrf().disable()
+  - pattern: $HTTP.authorizeRequests().and().csrf().disable()
+  - pattern: $HTTP.cors().and().csrf().disable()
+  - pattern: $HTTP.headers().and().csrf().disable()
+  - pattern: $HTTP.authorizeExchange().and().csrf().disable()
+  - pattern: $HTTP.csrf($CFG -> $CFG.disable())
+  - pattern: $HTTP.csrf($CFG -> { $CFG.disable(); ...; })

@@ -1,0 +1,16 @@
+rules:
+- id: java-scriptengine-eval-runtime-input
+  message: ScriptEngine.eval should not be called with a runtime variable or method
+    parameter; avoid evaluating non-literal input.
+  severity: WARNING
+  languages:
+  - java
+  pattern-either:
+  - patterns:
+    - pattern: $ENGINE.eval($X)
+    - pattern-not: $ENGINE.eval("...")
+    - pattern-not: $OBJ.$ENGINE.eval("...")
+  - patterns:
+    - pattern: $OBJ.$ENGINE.eval($X)
+    - pattern-not: $ENGINE.eval("...")
+    - pattern-not: $OBJ.$ENGINE.eval("...")

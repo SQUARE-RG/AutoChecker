@@ -1,0 +1,51 @@
+rules:
+- id: c-protocol-parser-fixed-buffer-copy-from-length
+  message: Direct copy from a protocol-derived length into a fixed-size destination
+    can overflow the destination.
+  severity: WARNING
+  languages:
+  - c
+  pattern-either:
+  - patterns:
+    - pattern: memcpy($DST, $SRC, $LEN);
+    - pattern-not: memcpy($DST, $SRC, sizeof($DST));
+    - pattern-not: "if ($LEN >= sizeof($DST)) {\n  ...\n}\n"
+    - pattern-not: "if ($LEN > sizeof($DST)) {\n  ...\n}\n"
+    - pattern-not: "if ($LEN == sizeof($DST)) {\n  ...\n}\n"
+    - pattern-not: "if ($LEN < sizeof($DST)) {\n  ...\n}\n"
+    - pattern-not-inside: "if ($LEN <= sizeof($DST)) {\n  ...\n}\n"
+    - metavariable-regex:
+        metavariable: $LEN
+        regex: ^(ntohs\([^)]*\)|[A-Za-z_][A-Za-z0-9_]*(->|\.)?(length|len|field_len|payload_len|field_value|value|data|payload))$
+    - metavariable-regex:
+        metavariable: $DST
+        regex: ^(?:[A-Za-z_][A-Za-z0-9_]*(?:->|\.)[A-Za-z_][A-Za-z0-9_]*|[A-Za-z_][A-Za-z0-9_]*)$
+  - patterns:
+    - pattern: memmove($DST, $SRC, $LEN);
+    - pattern-not: memmove($DST, $SRC, sizeof($DST));
+    - pattern-not: "if ($LEN >= sizeof($DST)) {\n  ...\n}\n"
+    - pattern-not: "if ($LEN > sizeof($DST)) {\n  ...\n}\n"
+    - pattern-not: "if ($LEN == sizeof($DST)) {\n  ...\n}\n"
+    - pattern-not: "if ($LEN < sizeof($DST)) {\n  ...\n}\n"
+    - metavariable-regex:
+        metavariable: $LEN
+        regex: ^(ntohs\([^)]*\)|[A-Za-z_][A-Za-z0-9_]*(->|\.)?(length|len|field_len|payload_len|field_value|value|data|payload))$
+    - metavariable-regex:
+        metavariable: $DST
+        regex: ^(?:[A-Za-z_][A-Za-z0-9_]*(?:->|\.)[A-Za-z_][A-Za-z0-9_]*|[A-Za-z_][A-Za-z0-9_]*)$
+  - patterns:
+    - pattern: memcpy(&$DST_MEMBER, $SRC, $LEN);
+    - metavariable-regex:
+        metavariable: $DST_MEMBER
+        regex: ^[A-Za-z_][A-Za-z0-9_]*->?[A-Za-z_][A-Za-z0-9_]*$
+    - metavariable-regex:
+        metavariable: $LEN
+        regex: ^(ntohs\([^)]*\)|[A-Za-z_][A-Za-z0-9_]*(->|\.)?(length|len|field_len|payload_len|field_value|value|data|payload))$
+  - patterns:
+    - pattern: memcpy($DST, $SRC, $LEN);
+    - metavariable-regex:
+        metavariable: $LEN
+        regex: ^[A-Za-z_][A-Za-z0-9_]*->name_len$
+    - metavariable-regex:
+        metavariable: $DST
+        regex: ^[A-Za-z_][A-Za-z0-9_]*$

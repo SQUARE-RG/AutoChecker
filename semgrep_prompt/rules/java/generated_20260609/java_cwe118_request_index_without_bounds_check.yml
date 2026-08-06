@@ -1,0 +1,50 @@
+rules:
+- id: java-web-request-controlled-index-without-bounds-check
+  message: Request-controlled index is used to access an array, list, string, or substring-like
+    position without a prior bounds check.
+  severity: WARNING
+  languages:
+  - java
+  mode: taint
+  pattern-sources:
+  - pattern: $REQ.getParameter(...)
+  - pattern: $REQ.getHeader(...)
+  - pattern: '@RequestParam $T $X'
+  pattern-propagators:
+  - pattern: $DST = Integer.parseInt($SRC);
+    from: $SRC
+    to: $DST
+  - pattern: $DST = Integer.valueOf($SRC);
+    from: $SRC
+    to: $DST
+  - pattern: int $DST = Integer.parseInt($SRC);
+    from: $SRC
+    to: $DST
+  - pattern: int $DST = Integer.valueOf($SRC);
+    from: $SRC
+    to: $DST
+  - pattern: $DST = $SRC + $N;
+    from: $SRC
+    to: $DST
+  - pattern: $DST = $SRC - $N;
+    from: $SRC
+    to: $DST
+  pattern-sinks:
+  - pattern: $ARR[$IDX]
+  - pattern: $LIST.get($IDX)
+  - pattern: $STR.charAt($IDX)
+  - pattern: $STR.substring($IDX)
+  - pattern: $STR.substring($START, $END)
+  pattern-sanitizers:
+  - patterns:
+    - pattern: if ($IDX >= 0 && $IDX < $TARGET.length) { ... }
+    - focus-metavariable: $IDX
+  - patterns:
+    - pattern: if ($IDX >= 0 && $IDX < $TARGET.size()) { ... }
+    - focus-metavariable: $IDX
+  - patterns:
+    - pattern: if ($IDX < 0 || $IDX >= $TARGET.length) return ...;
+    - focus-metavariable: $IDX
+  - patterns:
+    - pattern: if ($IDX < 0 || $IDX >= $TARGET.size()) return ...;
+    - focus-metavariable: $IDX

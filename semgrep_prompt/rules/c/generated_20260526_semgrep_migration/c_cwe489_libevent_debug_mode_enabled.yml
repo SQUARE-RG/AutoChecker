@@ -1,0 +1,24 @@
+rules:
+- id: libevent-debug-mode-enabled
+  message: Libevent debug mode or debug logging is enabled.
+  severity: WARNING
+  languages:
+  - c
+  pattern-either:
+  - patterns:
+    - pattern: event_enable_debug_mode();
+    - pattern-not-inside: "if (0) {\n  event_enable_debug_mode();\n}\n"
+  - pattern: event_enable_debug_logging(EVENT_DBG_ALL);
+  - pattern: event_enable_debug_logging(EVENT_DBG_NONE + 1);
+  - patterns:
+    - pattern: int $LEVEL = EVENT_DBG_ALL; event_enable_debug_logging($LEVEL);
+    - pattern-not: int $LEVEL = EVENT_DBG_NONE; event_enable_debug_logging($LEVEL);
+  - patterns:
+    - pattern: event_enable_debug_logging($LEVEL);
+    - pattern-not: event_enable_debug_logging(EVENT_DBG_NONE);
+    - pattern-not: event_enable_debug_logging(0);
+    - pattern-not-inside: 'int $LEVEL = EVENT_DBG_NONE;
+
+        event_enable_debug_logging($LEVEL);
+
+        '

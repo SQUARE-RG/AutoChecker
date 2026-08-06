@@ -1,0 +1,13 @@
+rules:
+- id: mybatis-annotation-sql-string-substitution
+  message: Unsafe MyBatis SQL annotation uses ${...} string substitution instead of
+  severity: WARNING
+  languages:
+  - java
+  patterns:
+  - pattern: '@Select($SQL)
+
+      '
+  - metavariable-regex:
+      metavariable: $SQL
+      regex: .*\$\{[A-Za-z_][A-Za-z0-9_]*\}.*

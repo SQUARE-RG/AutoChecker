@@ -1,0 +1,5 @@
+{
+    "_type": "prompt",
+    "input_variables": ["rule_description", "ast_txt","logics","reference_astMatchers","renference_check_api","content_of_ruler_checker_cpp","content_of_ruler_checker_h","passed_test_cases","failed_test_cases"],
+    "template_path": "/root/code_check/src/prompt/clang_tidy_prompt/prompt_txt/augmentation_check_by_negative_case.txt"
+}

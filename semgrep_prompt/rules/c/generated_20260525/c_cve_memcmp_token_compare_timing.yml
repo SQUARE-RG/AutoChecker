@@ -1,0 +1,20 @@
+rules:
+- id: c-memcmp-secret-timing
+  message: Avoid memcmp/strcmp for secret or token comparisons; use a constant-time
+    comparison such as CRYPTO_memcmp instead.
+  severity: WARNING
+  languages:
+  - c
+  pattern-either:
+  - pattern: memcmp($A, $B, $N) == 0;
+  - pattern: memcmp($A, $B, $N) != 0;
+  - pattern: memcmp($A, $B, $N) < 0
+  - pattern: memcmp($A, $B, $N) <= 0;
+  - pattern: memcmp($A, $B, $N) > 0
+  - pattern: memcmp($A, $B, $N) >= 0;
+  - pattern: strcmp($A, $B) == 0;
+  - pattern: strcmp($A, $B) != 0;
+  - pattern: strcmp($A, $B) < 0
+  - pattern: strcmp($A, $B) <= 0;
+  - pattern: strcmp($A, $B) > 0
+  - pattern: strcmp($A, $B) >= 0;

@@ -1,0 +1,13 @@
+rules:
+- id: spring-security-admin-permitall
+  message: Spring Security admin paths should not be configured with permitAll();
+    require role/authority checks instead.
+  severity: ERROR
+  languages:
+  - java
+  pattern: '$HTTP.authorizeHttpRequests($A -> $A.requestMatchers("/admin/**").permitAll());
+
+    '
+  pattern-not: '$HTTP.authorizeHttpRequests($A -> $A.requestMatchers("/admin/**").hasRole(...));
+
+    '

@@ -1,0 +1,28 @@
+rules:
+- id: rust-bincode-untrusted-deserialize
+  message: Avoid bincode deserialization of runtime or untrusted bytes; prefer safe
+    parsing or encoding-only operations.
+  severity: WARNING
+  languages:
+  - rust
+  pattern-either:
+  - patterns:
+    - pattern: bincode::deserialize($X)
+    - pattern-not: serde_json::from_slice($X)
+    - pattern-not: bincode::encode_to_vec(...)
+  - patterns:
+    - pattern: bincode::deserialize_from($X)
+    - pattern-not: serde_json::from_slice($X)
+    - pattern-not: bincode::encode_to_vec(...)
+  - patterns:
+    - pattern: bincode::serde::decode_from_slice($X, ...)
+    - pattern-not: serde_json::from_slice($X)
+    - pattern-not: bincode::encode_to_vec(...)
+  - patterns:
+    - pattern: bincode::serde::decode_from_slice::<$T, _>($X, ...)
+    - pattern-not: serde_json::from_slice($X)
+    - pattern-not: bincode::encode_to_vec(...)
+  - patterns:
+    - pattern: bincode::deserialize::<$T>($X)
+    - pattern-not: serde_json::from_slice($X)
+    - pattern-not: bincode::encode_to_vec(...)

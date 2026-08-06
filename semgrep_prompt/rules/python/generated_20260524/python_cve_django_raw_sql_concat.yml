@@ -1,0 +1,23 @@
+rules:
+- id: django-raw-sql-string-concat
+  message: Avoid building SQL with string concatenation or formatting in cursor.execute;
+    use parameterized queries instead.
+  severity: WARNING
+  languages:
+  - python
+  pattern-either:
+  - pattern: '$C.execute($SQL + $X)
+
+      '
+  - pattern: '$C.execute($X + $SQL)
+
+      '
+  - pattern: '$C.execute($SQL % $X)
+
+      '
+  - pattern: '$C.execute($SQL.format(...))
+
+      '
+  - pattern: '$C.execute(f"...{...}...")
+
+      '

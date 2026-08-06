@@ -1,0 +1,34 @@
+rules:
+- id: javascript-nosql-injection-direct-query-or-update
+  message: Untrusted request input should not be used directly in MongoDB/Mongoose
+    query predicates or update documents without conversion, sanitization, or fixed-field
+    mapping.
+  severity: WARNING
+  languages:
+  - javascript
+  pattern-either:
+  - pattern: '$OBJ.findOne({ $KEY: $VAL, ... });
+
+      '
+  - pattern: '$OBJ.find({ $KEY: $VAL, ... });
+
+      '
+  - pattern: '$OBJ.deleteOne({ $KEY: $VAL, ... });
+
+      '
+  - pattern: '$OBJ.updateOne({ $KEY1: $VAL1, ... }, { $OP: $VAL2, ... });
+
+      '
+  - pattern: '$OBJ.findOne($VAL);
+
+      '
+  - pattern: '$OBJ.find($VAL);
+
+      '
+  - pattern: '$OBJ.deleteOne($VAL);
+
+      '
+  pattern-not: '$OBJ.updateOne({ $KEY1: Number($VAL1), ... }, { $OP: sanitize($VAL2),
+    ... });
+
+    '

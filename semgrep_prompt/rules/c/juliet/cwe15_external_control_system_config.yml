@@ -1,0 +1,43 @@
+rules:
+- id: c.external-control-system-config
+  message: Untrusted external input reaches a system/configuration-setting API.
+  severity: WARNING
+  languages:
+  - c
+  mode: taint
+  options:
+    taint_unify_mvars: true
+  pattern-sources:
+  - pattern: argv[$I]
+  - pattern: getenv(...)
+  - patterns:
+    - pattern: fgets($DATA, ...)
+    - focus-metavariable: $DATA
+    by-side-effect: true
+  - patterns:
+    - pattern: recv(..., $DATA, ...)
+    - focus-metavariable: $DATA
+    by-side-effect: true
+  - patterns:
+    - pattern: read(..., $DATA, ...)
+    - focus-metavariable: $DATA
+    by-side-effect: true
+  - patterns:
+    - pattern: GetEnvironmentVariableA(..., $DATA, ...)
+    - focus-metavariable: $DATA
+    by-side-effect: true
+  - patterns:
+    - pattern: $BUF[$IDX] = '\0';
+    - pattern-inside: "void $F(...) {\n  ...\n}\n"
+  pattern-propagators:
+  - pattern: $DST = $SRC;
+    from: $SRC
+    to: $DST
+  - pattern: strcpy($DST, $SRC);
+    from: $SRC
+    to: $DST
+    by-side-effect: true
+  pattern-sinks:
+  - pattern: SetComputerNameA($DATA)
+  - pattern: SetEnvironmentVariableA($NAME, $VALUE)
+  - pattern: putenv($DATA)

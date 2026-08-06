@@ -1,0 +1,5 @@
+{
+    "_type": "prompt",
+    "input_variables": ["query_code"],
+    "template_path": "/root/code_check/codeql_collect/codeql_query_op/prompt/collect_codeql_op.txt"
+}

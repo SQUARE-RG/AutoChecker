@@ -1,0 +1,11 @@
+rules:
+- id: world-writable-chmod
+  message: Avoid setting world-writable file permissions with chmod/fchmod.
+  severity: WARNING
+  languages:
+  - c
+  pattern-either:
+  - pattern: chmod($PATH, 0777);
+  - pattern: chmod($PATH, 0666);
+  - pattern: fchmod($FD, 0777);
+  - pattern: fchmod($FD, 0666);

@@ -1,0 +1,17 @@
+rules:
+- id: openssl-weak-evp-bytestokey-md5-low-iterations
+  message: Weak OpenSSL password-based key derivation using EVP_BytesToKey with MD5
+    and very low iterations.
+  severity: WARNING
+  languages:
+  - c
+  pattern-either:
+  - patterns:
+    - pattern: EVP_BytesToKey($CIPHER, EVP_md5(), $SALT, $PW, $N, 1, $KEY, $IV);
+    - pattern-not: PKCS5_PBKDF2_HMAC(...);
+  - patterns:
+    - pattern: EVP_BytesToKey($CIPHER, EVP_md5(), $SALT, $PW, $N, $ITER, $KEY, $IV);
+    - metavariable-regex:
+        metavariable: $ITER
+        regex: ^[0-9]+$
+    - pattern-not: PKCS5_PBKDF2_HMAC(...);

@@ -1,0 +1,18 @@
+rules:
+- id: c-mkdir-world-writable-permissions
+  message: Avoid creating directories with world-writable permissions in mkdir();
+    use owner-only permissions instead.
+  severity: WARNING
+  languages:
+  - c
+  pattern-either:
+  - pattern: mkdir($PATH, 0777)
+  - pattern: mkdir($PATH, 0666)
+  - pattern: mkdir($PATH, 0000777)
+  - pattern: mkdir($PATH, ACCESSPERMS)
+  - pattern: mkdir($PATH, S_IRWXU|S_IRWXG|S_IRWXO)
+  - pattern: mkdir($PATH, S_IRWXO|S_IRWXU)
+  - pattern: mkdir($PATH, S_IRWXG|S_IRWXO|S_IRWXU)
+  - pattern: mkdir($PATH, S_IWOTH|S_IXOTH|S_IRUSR|S_IWUSR|S_IXUSR)
+  - pattern: mkdir($PATH, S_IROTH|S_IWOTH|S_IXOTH|S_IRWXU)
+  - pattern: mkdir($PATH, 0775|0002)

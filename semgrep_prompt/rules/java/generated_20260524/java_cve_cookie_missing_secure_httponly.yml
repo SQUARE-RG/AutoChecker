@@ -1,0 +1,22 @@
+rules:
+- id: java-servlet-cookie-missing-secure-httponly
+  message: Servlet cookie is added to the response without setting both Secure and
+    HttpOnly before addCookie.
+  severity: WARNING
+  languages:
+  - java
+  patterns:
+  - pattern: 'Cookie $C = new Cookie(...);
+
+      $R.addCookie($C);
+
+      '
+  - pattern-not: 'Cookie $C = new Cookie(...);
+
+      $C.setHttpOnly(true);
+
+      $C.setSecure(true);
+
+      $R.addCookie($C);
+
+      '

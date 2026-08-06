@@ -1,0 +1,12 @@
+rules:
+- id: django-mark-safe-on-runtime-html
+  message: Avoid calling mark_safe on HTML built from runtime input without escaping
+    first.
+  severity: WARNING
+  languages:
+  - python
+  patterns:
+  - pattern: mark_safe($PREFIX + $X + $SUFFIX)
+  - pattern-not: mark_safe($PREFIX + escape($X) + $SUFFIX)
+  - pattern-not: mark_safe($X)
+  - pattern-not: mark_safe($PREFIX + "..." + $SUFFIX)

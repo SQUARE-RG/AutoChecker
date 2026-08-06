@@ -1,0 +1,109 @@
+{
+  "project": "semgrep_prompt",
+  "purpose": "Semgrep documentation and prompt library for rule generation and checker grounding",
+  "entry_points": {
+    "llm_generation_module": "demo/guardian_llm_generation.py",
+    "paired_dataset_runner": "demo/run_semgrep_juliet_interface_test.py",
+    "comparison_runner": "demo/run_manual_llm_comparison.py",
+    "paired_rule_evaluator": "demo/evaluate_paired_semgrep_rule.py",
+    "api_classifier_script": "demo/classify_semgrep_api.py",
+    "api_category_table": "demo/api_category/api_category_table.json",
+    "autochecker_script": "demo/run_semgrep_autochecker.py",
+    "autochecker_prompt_loader": "demo/build_semgrep_prompt.py",
+    "autochecker_prompt_templates": "demo/prompt_json/",
+    "guide_zh": "说明.md",
+    "workspace_agent": ".github/agents/semgrep-prompt.agent.md"
+  },
+  "sources": [
+    {
+      "type": "local-distillation",
+      "title": "Semgrep Rule Generation Skill",
+      "url": "local:docs/semgrep_rule_generation_skill.md",
+      "local_file": "docs/semgrep_rule_generation_skill.md"
+    },
+    {
+      "type": "local-distillation",
+      "title": "Semgrep Taint Syntax Knowledge",
+      "url": "local:docs/semgrep_taint_syntax_knowledge.md",
+      "local_file": "docs/semgrep_taint_syntax_knowledge.md"
+    },
+    {
+      "type": "local-distillation",
+      "title": "Checker Class Catalog",
+      "url": "local:docs/checker_class_catalog.md",
+      "local_file": "docs/checker_class_catalog.md"
+    },
+    {
+      "type": "local-distillation",
+      "title": "Semgrep Source Reference Cases",
+      "url": "local:docs/semgrep_source_reference_cases.md",
+      "local_file": "docs/semgrep_source_reference_cases.md"
+    },
+    {
+      "type": "official-doc",
+      "title": "Rule Syntax",
+      "url": "https://semgrep.dev/docs/writing-rules/rule-syntax",
+      "local_file": "docs/rule-syntax.md"
+    },
+    {
+      "type": "official-doc",
+      "title": "Pattern Syntax",
+      "url": "https://semgrep.dev/docs/writing-rules/pattern-syntax",
+      "local_file": "docs/pattern-syntax.md"
+    },
+    {
+      "type": "official-doc",
+      "title": "Rule-defined fix",
+      "url": "https://semgrep.dev/docs/writing-rules/rule-defined-fix",
+      "local_file": "docs/rule-defined-fix.md"
+    },
+    {
+      "type": "official-doc",
+      "title": "Pattern Examples",
+      "url": "https://semgrep.dev/docs/writing-rules/pattern-examples",
+      "local_file": "docs/pattern-examples.md"
+    },
+    {
+      "type": "official-doc",
+      "title": "Data-flow Overview",
+      "url": "https://semgrep.dev/docs/writing-rules/data-flow/data-flow-overview",
+      "local_file": "docs/data-flow-overview.md"
+    },
+    {
+      "type": "official-doc",
+      "title": "Taint Mode Overview",
+      "url": "https://semgrep.dev/docs/writing-rules/data-flow/taint-mode/overview",
+      "local_file": "docs/taint-mode-overview.md"
+    },
+    {
+      "type": "skill-page",
+      "title": "Semgrep Rule Variant Creator",
+      "url": "https://skillsclaude.com/guides/skills/semgrep-rule-variant-creator",
+      "local_file": "skills/semgrep-rule-variant-creator.md"
+    },
+    {
+      "type": "skill-page",
+      "title": "Security Semgrep",
+      "url": "https://www.allskills.cn/skills/security-semgrep/",
+      "local_file": "skills/security-semgrep.md"
+    },
+    {
+      "type": "skill-repo",
+      "title": "semgrep/skills",
+      "url": "https://github.com/semgrep/skills",
+      "local_file": "skills/semgrep-skills-repo.md"
+    },
+    {
+      "type": "checker-reference",
+      "title": "collect_semgrep_rule_api_semgrep_show",
+      "url": "local:/home/meiosis/data/work/autochecker/code_check/semgrep_collect/collect_semgrep_rule_api/collect_semgrep_rule_api_semgrep_show.md",
+      "local_file": "checker/semgrep-collect-reference.md"
+    },
+    {
+      "type": "collect-api",
+      "title": "c_lang_v8 API corpus",
+      "url": "local:/home/meiosis/data/work/autochecker/code_check/semgrep_collect/collect_semgrep_rule_api/out/c_lang_v8/semgrep_structured_rule_api_semgrep_show.pretty.json",
+      "local_file": "demo/api_category/api_category_table.json"
+    }
+  ]
+}

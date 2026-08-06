@@ -1,0 +1,42 @@
+# Inputs
+
+## rule
+**Rule Description:**
+{rule_description}
+
+## current checker code
+
+checker_cpp:
+```cpp
+{content_of_ruler_checker_cpp}
+```
+
+checker_h:
+```cpp
+{content_of_ruler_checker_h}
+```
+
+## passed test cases code
+
+```cpp
+{passed_test_cases}
+```
+
+## failed test cases code
+This test case should report an issue, but the current checker code cannot detect this code's problem.
+```cpp
+{failed_test_cases}
+```
+
+### ast of  failed test cases
+{ast_txt}
+
+
+## reference logic step
+{logics}
+
+## reference astMatchers
+{reference_astMatchers}
+
+## reference code snippets
+{renference_check_api}

@@ -1,0 +1,26 @@
+rules:
+- id: c-strcat-fixed-buffer-overflow
+  message: Unsafe strcat appends into a fixed-size stack buffer; use a bounded length-aware
+    alternative.
+  severity: WARNING
+  languages:
+  - c
+  pattern-either:
+  - patterns:
+    - pattern: strcat($DST, $SRC);
+    - pattern-not: 'char $BUF[$N] = ...;
+
+        strncat($BUF, $SRC, sizeof($BUF) - strlen($BUF) - 1);
+
+        '
+  - patterns:
+    - pattern: 'char $BUF[$N] = ...;
+
+        strcat($BUF, $SRC);
+
+        '
+    - pattern-not: 'char $BUF[$N] = ...;
+
+        strncat($BUF, $SRC, sizeof($BUF) - strlen($BUF) - 1);
+
+        '

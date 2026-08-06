@@ -1,0 +1,10 @@
+rules:
+- id: fchmod-world-writable-permissions
+  message: Avoid using fchmod() with world-writable permission literals such as 0666
+    or 0777.
+  severity: WARNING
+  languages:
+  - c
+  pattern-either:
+  - pattern: fchmod($FD, 0666)
+  - pattern: fchmod($FD, 0777)

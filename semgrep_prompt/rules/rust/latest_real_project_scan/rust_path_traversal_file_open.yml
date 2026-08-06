@@ -1,0 +1,51 @@
+rules:
+- id: rust-path-traversal-user-controlled-path-to-filesystem-sink
+  message: User-controlled path fragments should not reach filesystem open/read/write/remove
+    APIs without basename filtering or a fixed path.
+  severity: WARNING
+  languages:
+  - rust
+  mode: taint
+  pattern-sources:
+  - pattern-either:
+    - pattern: $DATA
+    - pattern: $DATA = $SRC;
+  pattern-propagators:
+  - pattern: $DST = format!(...);
+    from: $SRC
+    to: $DST
+  - pattern: $DST = $BASE.join($SRC);
+    from: $SRC
+    to: $DST
+  - pattern: $DST.push($SRC)
+    from: $SRC
+    to: $DST
+    by-side-effect: true
+  - pattern: $DST = [$A, $SRC, ...].join($SEP);
+    from: $SRC
+    to: $DST
+  pattern-sanitizers:
+  - patterns:
+    - pattern: std::path::Path::new(...).file_name()
+    - focus-metavariable: $X
+    by-side-effect: false
+  - patterns:
+    - pattern: std::path::Path::new(...).file_name().unwrap().to_string_lossy()
+    - focus-metavariable: $X
+    by-side-effect: false
+  pattern-sinks:
+  - pattern-either:
+    - pattern: std::fs::read($X)
+    - pattern: std::fs::read_to_string($X)
+    - pattern: std::fs::write($X, ...)
+    - pattern: std::fs::remove_file($X)
+    - pattern: std::fs::File::open($X)
+    - pattern: std::fs::File::open($X).unwrap()
+    - pattern: tokio::fs::read($X)
+    - pattern: $FS::read($X)
+    - pattern: $FS::read_to_string($X)
+    - pattern: $FS::write($X, ...)
+    - pattern: $FS::remove_file($X)
+    - pattern: $FS::open($X)
+  options:
+    taint_unify_mvars: true

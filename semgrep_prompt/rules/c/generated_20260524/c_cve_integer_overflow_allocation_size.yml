@@ -1,0 +1,43 @@
+rules:
+- id: c-unsafe-allocation-size-multiplication
+  message: 'Possible integer overflow in allocation size: runtime count multiplied
+    by element size without a prior SIZE_MAX guard.'
+  severity: WARNING
+  languages:
+  - c
+  pattern-either:
+  - patterns:
+    - pattern: '$PTR = malloc($COUNT * sizeof(int));
+
+        '
+    - pattern-not: 'if ($COUNT > SIZE_MAX / sizeof(int)) ...
+
+        '
+    - pattern-not: 'if ($COUNT > SIZE_MAX / sizeof(char)) ...
+
+        '
+    - pattern-not-inside: 'if ($COUNT > SIZE_MAX / sizeof(int)) return;
+
+        ...
+
+        '
+  - patterns:
+    - pattern: '$PTR = malloc($COUNT * sizeof(char));
+
+        '
+    - pattern-not: 'if ($COUNT > SIZE_MAX / sizeof(int)) ...
+
+        '
+    - pattern-not: 'if ($COUNT > SIZE_MAX / sizeof(char)) ...
+
+        '
+  - patterns:
+    - pattern: '$PTR = malloc($COUNT * sizeof($ELEM));
+
+        '
+    - pattern-not: 'if ($COUNT > SIZE_MAX / sizeof(int)) ...
+
+        '
+    - pattern-not: 'if ($COUNT > SIZE_MAX / sizeof(char)) ...
+
+        '

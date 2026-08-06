@@ -1,0 +1,16 @@
+rules:
+- id: python-ssl-unverified-context-used-for-urlopen
+  message: Use of ssl._create_unverified_context with urllib.request.urlopen creates
+    an insecure HTTPS request context.
+  severity: WARNING
+  languages:
+  - python
+  pattern-either:
+  - pattern: '$CTX = ssl._create_unverified_context()
+
+      ...
+
+      urllib.request.urlopen($URL, context=$CTX)
+
+      '
+  - pattern: urllib.request.urlopen($URL, context=ssl._create_unverified_context());

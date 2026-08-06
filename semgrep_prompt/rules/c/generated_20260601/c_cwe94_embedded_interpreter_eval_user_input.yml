@@ -1,0 +1,23 @@
+rules:
+- id: c-embedded-interpreter-runtime-string-eval
+  message: Avoid passing runtime or user-controlled strings to embedded interpreter
+    execution APIs.
+  severity: WARNING
+  languages:
+  - c
+  pattern-either:
+  - patterns:
+    - pattern: luaL_dostring(..., $CODE)
+    - pattern-not: luaL_dostring(..., "...")
+    - pattern-not: PyRun_SimpleString("...")
+    - pattern-not: Tcl_Eval(..., "...")
+  - patterns:
+    - pattern: PyRun_SimpleString($CODE)
+    - pattern-not: luaL_dostring(..., "...")
+    - pattern-not: PyRun_SimpleString("...")
+    - pattern-not: Tcl_Eval(..., "...")
+  - patterns:
+    - pattern: Tcl_Eval(..., $CODE)
+    - pattern-not: luaL_dostring(..., "...")
+    - pattern-not: PyRun_SimpleString("...")
+    - pattern-not: Tcl_Eval(..., "...")

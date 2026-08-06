@@ -1,0 +1,40 @@
+rules:
+- id: spring-webmvc-sensitive-resource-handler
+  message: Spring resource handlers must not map public URL patterns to sensitive
+    filesystem locations.
+  severity: WARNING
+  languages:
+  - java
+  pattern-either:
+  - patterns:
+    - pattern-inside: "class $C implements WebMvcConfigurer {\n  ...\n  public void\
+        \ addResourceHandlers(ResourceHandlerRegistry $REGISTRY) {\n    ...\n  }\n\
+        \  ...\n}\n"
+    - pattern: $REGISTRY.addResourceHandler(...).addResourceLocations($LOC);
+    - metavariable-regex:
+        metavariable: $LOC
+        regex: ^"file:.*(/|\\\\)?(config|backup|backups|secrets?|keys?|\.ssh|private|reports?|debug|dump|dumps|db|database)(/|\\\\|$).*$
+  - patterns:
+    - pattern-inside: "class $C implements WebMvcConfigurer {\n  ...\n  public void\
+        \ addResourceHandlers(ResourceHandlerRegistry $REGISTRY) {\n    ...\n  }\n\
+        \  ...\n}\n"
+    - pattern: $REGISTRY.addResourceHandler(...).addResourceLocations($LOC, ...);
+    - metavariable-regex:
+        metavariable: $LOC
+        regex: ^"file:.*(/|\\\\)?(config|backup|backups|secrets?|keys?|\.ssh|private|reports?|debug|dump|dumps|db|database)(/|\\\\|$).*$
+  - patterns:
+    - pattern-inside: "class $C {\n  ...\n  @Bean\n  WebMvcConfigurer $M() {\n   \
+        \ return new WebMvcConfigurer() {\n      ...\n      public void addResourceHandlers(ResourceHandlerRegistry\
+        \ $REGISTRY) {\n        ...\n      }\n      ...\n    };\n  }\n  ...\n}\n"
+    - pattern: $REGISTRY.addResourceHandler(...).addResourceLocations($LOC);
+    - metavariable-regex:
+        metavariable: $LOC
+        regex: ^"file:.*(/|\\\\)?(config|backup|backups|secrets?|keys?|\.ssh|private|reports?|debug|dump|dumps|db|database)(/|\\\\|$).*$
+  - patterns:
+    - pattern-inside: "class $C {\n  ...\n  @Bean\n  WebMvcConfigurer $M() {\n   \
+        \ return new WebMvcConfigurer() {\n      ...\n      public void addResourceHandlers(ResourceHandlerRegistry\
+        \ $REGISTRY) {\n        ...\n      }\n      ...\n    };\n  }\n  ...\n}\n"
+    - pattern: $REGISTRY.addResourceHandler(...).addResourceLocations($LOC, ...);
+    - metavariable-regex:
+        metavariable: $LOC
+        regex: ^"file:.*(/|\\\\)?(config|backup|backups|secrets?|keys?|\.ssh|private|reports?|debug|dump|dumps|db|database)(/|\\\\|$).*$

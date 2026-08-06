@@ -1,0 +1,37 @@
+rules:
+- id: python-xml-etree-unsafe-parser
+  message: Avoid unsafe xml.etree.ElementTree XML parsing on untrusted input; use
+    a hardened parser such as defusedxml instead.
+  severity: WARNING
+  languages:
+  - python
+  pattern-either:
+  - patterns:
+    - pattern: ET.fromstring($X)
+    - pattern-not: from defusedxml import ElementTree as ET
+    - pattern-not-inside: 'from defusedxml import ElementTree as ET
+
+        ...
+
+        '
+  - patterns:
+    - pattern: xml.etree.ElementTree.fromstring($X)
+    - pattern-not: from defusedxml import ElementTree as ET
+  - patterns:
+    - pattern: ET.parse($X)
+    - pattern-not: from defusedxml import ElementTree as ET
+  - patterns:
+    - pattern: xml.etree.ElementTree.parse($X)
+    - pattern-not: from defusedxml import ElementTree as ET
+  - patterns:
+    - pattern: ET.XML($X)
+    - pattern-not: from defusedxml import ElementTree as ET
+  - patterns:
+    - pattern: xml.etree.ElementTree.XML($X)
+    - pattern-not: from defusedxml import ElementTree as ET
+  - patterns:
+    - pattern: ET.XMLParser(...)
+    - pattern-not: from defusedxml import ElementTree as ET
+  - patterns:
+    - pattern: xml.etree.ElementTree.XMLParser(...)
+    - pattern-not: from defusedxml import ElementTree as ET

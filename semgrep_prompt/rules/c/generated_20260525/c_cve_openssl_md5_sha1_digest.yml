@@ -1,0 +1,9 @@
+rules:
+- id: openssl-weak-digest-selection
+  message: Avoid OpenSSL EVP_md5() and EVP_sha1(); use EVP_sha256() or stronger.
+  severity: WARNING
+  languages:
+  - c
+  pattern-either:
+  - pattern: EVP_md5()
+  - pattern: EVP_sha1()

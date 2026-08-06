@@ -1,0 +1,21 @@
+rules:
+- id: java-ldap-jndi-provider-url-from-runtime-input
+  message: Runtime input is written to Context.PROVIDER_URL before creating a new
+    InitialContext.
+  severity: WARNING
+  languages:
+  - java
+  mode: taint
+  pattern-sources:
+  - pattern: $URL
+  pattern-sinks:
+  - pattern: $ENV.put(Context.PROVIDER_URL, $URL)
+  pattern-sanitizers:
+  - pattern: $ENV.put(Context.PROVIDER_URL, "ldaps://directory.internal")
+  pattern-propagators:
+  - pattern: $DST = $SRC;
+    from: $SRC
+    to: $DST
+  - pattern: $ENV.put(Context.PROVIDER_URL, $SRC)
+    from: $SRC
+    to: $SRC

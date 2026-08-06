@@ -1,0 +1,33 @@
+rules:
+- id: log4j-jndi-lookup-in-logged-string
+  message: Avoid logging strings that contain Log4j JNDI lookup syntax such as ${jndi:ldap://...};
+    use parameterized logging without lookup expressions.
+  severity: WARNING
+  languages:
+  - java
+  pattern-either:
+  - patterns:
+    - pattern: $LOG.error($MSG)
+    - metavariable-regex:
+        metavariable: $MSG
+        regex: .*\$\{jndi:[^}]*ldap://.*
+  - patterns:
+    - pattern: $LOG.warn($MSG)
+    - metavariable-regex:
+        metavariable: $MSG
+        regex: .*\$\{jndi:[^}]*ldap://.*
+  - patterns:
+    - pattern: $LOG.info($MSG)
+    - metavariable-regex:
+        metavariable: $MSG
+        regex: .*\$\{jndi:[^}]*ldap://.*
+  - patterns:
+    - pattern: $LOG.debug($MSG)
+    - metavariable-regex:
+        metavariable: $MSG
+        regex: .*\$\{jndi:[^}]*ldap://.*
+  - patterns:
+    - pattern: $LOG.trace($MSG)
+    - metavariable-regex:
+        metavariable: $MSG
+        regex: .*\$\{jndi:[^}]*ldap://.*

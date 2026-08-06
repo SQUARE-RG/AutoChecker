@@ -1,0 +1,41 @@
+rules:
+- id: python-dynamic-code-execution-runtime-input
+  message: Avoid executing runtime-controlled Python code with eval, exec, or compile(...,
+    'exec'); use safe parsing or fixed dispatch instead.
+  severity: WARNING
+  languages:
+  - python
+  mode: taint
+  pattern-sources:
+  - patterns:
+    - pattern: sys.argv[$I]
+    - focus-metavariable: $I
+    by-side-effect: false
+  - pattern: request.args[$KEY]
+  - pattern: $ENV.get(...)
+  - pattern: $DICT[$KEY]
+  - pattern: $FUNC(...)
+  pattern-propagators:
+  - pattern: $DST = $SRC;
+    from: $SRC
+    to: $DST
+  - pattern: $DST = compile($SRC, ..., 'exec');
+    from: $SRC
+    to: $DST
+  - pattern: $DST = $SRC.decode();
+    from: $SRC
+    to: $DST
+  - pattern: $DST = $SRC.decode('utf-8');
+    from: $SRC
+    to: $DST
+  pattern-sinks:
+  - pattern: eval($X)
+  - pattern: exec($X)
+  - pattern: exec(compile($X, ..., 'exec'))
+  - pattern: eval(globals()['__builtins__'] and $X)
+  pattern-sanitizers:
+  - pattern: ast.literal_eval($X)
+  - pattern: int($X)
+  - pattern: float($X)
+  - pattern: $DICT.get($KEY, '')
+  - pattern: $DICT.get($KEY)

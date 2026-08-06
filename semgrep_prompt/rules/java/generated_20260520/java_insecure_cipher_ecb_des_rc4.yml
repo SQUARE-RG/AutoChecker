@@ -1,0 +1,53 @@
+rules:
+- id: java-insecure-cipher-getinstance
+  message: Insecure cryptographic cipher transformation passed to Cipher.getInstance;
+    avoid ECB, DES/3DES, RC4/ARCFOUR, Blowfish, bare AES defaults, RSA/ECB/PKCS1Padding,
+    and weak PBE algorithms.
+  severity: WARNING
+  languages:
+  - java
+  pattern-either:
+  - patterns:
+    - pattern: Cipher.getInstance("$ALG")
+    - metavariable-regex:
+        metavariable: $ALG
+        regex: ^(?:[^"\n]*/ECB(?:/|$)|DESede(?:/|$)|DES(?:/|$)|RC4(?:/|$)|ARCFOUR(?:/|$)|Blowfish(?:/|$)|AES(?:$|/(?:ECB|[^/]+)?(?:/|$))|RSA/ECB/PKCS1Padding(?:$|/)|PBEWithMD5AndDES(?:$|/)|PBEWithMD5AndTripleDES(?:$|/))
+    - pattern-not: Cipher.getInstance("AES/GCM/NoPadding")
+    - pattern-not: javax.crypto.Cipher.getInstance("AES/GCM/NoPadding")
+    - pattern-not: Cipher.getInstance("ChaCha20-Poly1305")
+    - pattern-not: javax.crypto.Cipher.getInstance("ChaCha20-Poly1305")
+    - pattern-not: Cipher.getInstance("RSA/ECB/OAEPWithSHA-256AndMGF1Padding")
+    - pattern-not: javax.crypto.Cipher.getInstance("RSA/ECB/OAEPWithSHA-256AndMGF1Padding")
+  - patterns:
+    - pattern: javax.crypto.Cipher.getInstance("$ALG")
+    - metavariable-regex:
+        metavariable: $ALG
+        regex: ^(?:[^"\n]*/ECB(?:/|$)|DESede(?:/|$)|DES(?:/|$)|RC4(?:/|$)|ARCFOUR(?:/|$)|Blowfish(?:/|$)|AES(?:$|/(?:ECB|[^/]+)?(?:/|$))|RSA/ECB/PKCS1Padding(?:$|/)|PBEWithMD5AndDES(?:$|/)|PBEWithMD5AndTripleDES(?:$|/))
+    - pattern-not: Cipher.getInstance("AES/GCM/NoPadding")
+    - pattern-not: javax.crypto.Cipher.getInstance("AES/GCM/NoPadding")
+    - pattern-not: Cipher.getInstance("ChaCha20-Poly1305")
+    - pattern-not: javax.crypto.Cipher.getInstance("ChaCha20-Poly1305")
+    - pattern-not: Cipher.getInstance("RSA/ECB/OAEPWithSHA-256AndMGF1Padding")
+    - pattern-not: javax.crypto.Cipher.getInstance("RSA/ECB/OAEPWithSHA-256AndMGF1Padding")
+  - patterns:
+    - pattern: Cipher.getInstance($ALG)
+    - metavariable-regex:
+        metavariable: $ALG
+        regex: ^(?:[^"\n]*/ECB(?:/|$)|DESede(?:/|$)|DES(?:/|$)|RC4(?:/|$)|ARCFOUR(?:/|$)|Blowfish(?:/|$)|AES(?:$|/(?:ECB|[^/]+)?(?:/|$))|RSA/ECB/PKCS1Padding(?:$|/)|PBEWithMD5AndDES(?:$|/)|PBEWithMD5AndTripleDES(?:$|/))
+    - pattern-not: Cipher.getInstance("AES/GCM/NoPadding")
+    - pattern-not: javax.crypto.Cipher.getInstance("AES/GCM/NoPadding")
+    - pattern-not: Cipher.getInstance("ChaCha20-Poly1305")
+    - pattern-not: javax.crypto.Cipher.getInstance("ChaCha20-Poly1305")
+    - pattern-not: Cipher.getInstance("RSA/ECB/OAEPWithSHA-256AndMGF1Padding")
+    - pattern-not: javax.crypto.Cipher.getInstance("RSA/ECB/OAEPWithSHA-256AndMGF1Padding")
+  - patterns:
+    - pattern: javax.crypto.Cipher.getInstance($ALG)
+    - metavariable-regex:
+        metavariable: $ALG
+        regex: ^(?:[^"\n]*/ECB(?:/|$)|DESede(?:/|$)|DES(?:/|$)|RC4(?:/|$)|ARCFOUR(?:/|$)|Blowfish(?:/|$)|AES(?:$|/(?:ECB|[^/]+)?(?:/|$))|RSA/ECB/PKCS1Padding(?:$|/)|PBEWithMD5AndDES(?:$|/)|PBEWithMD5AndTripleDES(?:$|/))
+    - pattern-not: Cipher.getInstance("AES/GCM/NoPadding")
+    - pattern-not: javax.crypto.Cipher.getInstance("AES/GCM/NoPadding")
+    - pattern-not: Cipher.getInstance("ChaCha20-Poly1305")
+    - pattern-not: javax.crypto.Cipher.getInstance("ChaCha20-Poly1305")
+    - pattern-not: Cipher.getInstance("RSA/ECB/OAEPWithSHA-256AndMGF1Padding")
+    - pattern-not: javax.crypto.Cipher.getInstance("RSA/ECB/OAEPWithSHA-256AndMGF1Padding")

@@ -1,0 +1,38 @@
+rules:
+- id: python-cwe-501-request-data-written-to-session
+  message: Request-controlled data is written directly into a trust-sensitive session
+    field without authorization or ownership validation.
+  severity: WARNING
+  languages:
+  - python
+  mode: taint
+  pattern-sources:
+  - pattern-either:
+    - pattern: request.args[...]
+    - pattern: request.args.get(...)
+    - pattern: request.form[...]
+    - pattern: request.form.get(...)
+    - pattern: request.POST[...]
+    - pattern: request.GET[...]
+    - pattern: request.headers.get(...)
+    - pattern: request.cookies.get(...)
+    - pattern: request.query_params[...]
+    - pattern: request.query_params.get(...)
+  pattern-sinks:
+  - pattern-either:
+    - pattern: session[$KEY] = $VALUE;
+    - pattern: request.session[$KEY] = $VALUE;
+  pattern-sanitizers:
+  - patterns:
+    - pattern: session[$KEY] = $VALUE;
+    - pattern-either:
+      - pattern: current_user.$FIELD
+      - pattern: request.user.$FIELD
+      - pattern: permission_service.for_user(...)
+      - pattern: verify_otp(...)
+      - pattern: $VALUE in current_user.$FIELD
+      - pattern: $VALUE in request.user.$FIELD
+    - focus-metavariable: $VALUE
+    by-side-effect: false
+  options:
+    taint_unify_mvars: true

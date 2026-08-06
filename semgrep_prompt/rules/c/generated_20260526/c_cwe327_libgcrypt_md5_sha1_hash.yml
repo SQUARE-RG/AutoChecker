@@ -1,0 +1,13 @@
+rules:
+- id: cwe-327-libgcrypt-weak-digest-selection
+  message: Use of weak libgcrypt digest algorithms MD5, SHA1, or RIPEMD160 is insecure.
+  severity: WARNING
+  languages:
+  - c
+  pattern-either:
+  - pattern: gcry_md_hash_buffer(GCRY_MD_MD5, ...)
+  - pattern: gcry_md_hash_buffer(GCRY_MD_SHA1, ...)
+  - pattern: gcry_md_hash_buffer(GCRY_MD_RMD160, ...)
+  - pattern: gcry_md_open(&$HD, GCRY_MD_MD5, ...)
+  - pattern: gcry_md_open(&$HD, GCRY_MD_SHA1, ...)
+  - pattern: gcry_md_open(&$HD, GCRY_MD_RMD160, ...)

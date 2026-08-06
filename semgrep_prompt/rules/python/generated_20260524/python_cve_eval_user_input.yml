@@ -1,0 +1,10 @@
+rules:
+- id: python-eval-runtime-input
+  message: Avoid calling Python eval() on runtime input; use ast.literal_eval() for
+    literal-only parsing instead.
+  severity: WARNING
+  languages:
+  - python
+  patterns:
+  - pattern: eval($X)
+  - pattern-not: eval("...")

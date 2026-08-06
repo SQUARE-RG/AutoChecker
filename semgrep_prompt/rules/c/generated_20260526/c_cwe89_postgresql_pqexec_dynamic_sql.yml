@@ -1,0 +1,35 @@
+rules:
+- id: c-postgresql-pqexec-dynamic-sql
+  message: Dynamic SQL built from runtime input is executed with PQexec; use parameterized
+    PQexecParams instead.
+  severity: ERROR
+  languages:
+  - c
+  mode: taint
+  pattern-sources:
+  - pattern: $DATA = getenv(...);
+  - pattern: $DATA = $PARAM;
+  - pattern: $TYPE $DATA = $PARAM;
+  pattern-propagators:
+  - pattern: sprintf($DST, ...)
+    from: $SRC
+    to: $DST
+  - pattern: snprintf($DST, ...)
+    from: $SRC
+    to: $DST
+  - pattern: strcpy($DST, $SRC)
+    from: $SRC
+    to: $DST
+    by-side-effect: true
+  - pattern: strcat($DST, $SRC)
+    from: $SRC
+    to: $DST
+    by-side-effect: true
+  - pattern: asprintf(&$DST, ...)
+    from: $SRC
+    to: $DST
+    by-side-effect: true
+  pattern-sinks:
+  - pattern: PQexec($CONN, $SQL)
+  options:
+    taint_unify_mvars: true

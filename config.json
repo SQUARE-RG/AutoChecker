@@ -1,9 +1,0 @@
-{
-  "file_paths": {
-    "base_dir": "/Users/xyy/PycharmProjects/CheckerAutoGen/",
-    "PMD_FullAPI_DB": "/pmd/pmd_db/FullAPI_DB/PMD_FullAPI_DB.json",
-    "PMD_MetaAPI_DB": "/pmd/pmd_db/MetaAPI_DB/PMD_MetaAPI_DB.json",
-    "pmd_project": "/pmd/pmd_project/pmd-java",
-    "retriever": "/tool/retriever/semantic_matcher/bge-large-en-v1.5"
-  }
-}

@@ -1,0 +1,11 @@
+rules:
+- id: insecure-temporary-filename-api
+  message: Use mkstemp instead of insecure temporary filename APIs like tmpnam, tempnam,
+    or mktemp.
+  severity: WARNING
+  languages:
+  - c
+  pattern-either:
+  - pattern: tmpnam(...)
+  - pattern: tempnam(...)
+  - pattern: mktemp(...)

@@ -1,0 +1,21 @@
+rules:
+- id: python-tls-ssl-hostname-validation-disabled
+  message: TLS/SSL certificate or hostname validation is disabled.
+  severity: WARNING
+  languages:
+  - python
+  pattern-either:
+  - patterns:
+    - pattern: $CTX.check_hostname = False;
+    - pattern-not: $CTX.check_hostname = True;
+  - patterns:
+    - pattern: $CTX.check_hostname = 0;
+    - pattern-not: $CTX.check_hostname = 1;
+  - pattern: $CTX.verify_mode = ssl.CERT_NONE;
+  - pattern: ssl._create_unverified_context()
+  - pattern: aiohttp.TCPConnector(ssl=False);
+  - pattern: urllib3.PoolManager(assert_hostname=False);
+  - pattern: urllib3.HTTPSConnectionPool(..., assert_hostname=False);
+  - pattern: http.client.HTTPSConnection(..., context=ssl._create_unverified_context());
+  - pattern: setattr($CTX, 'check_hostname', False)
+  - pattern: setattr($CTX, 'check_hostname', 0)

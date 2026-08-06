@@ -1,0 +1,23 @@
+rules:
+- id: python.android.manifest.exported-component-without-permission
+  message: Android manifest XML declares an exported component without a protective
+    android:permission.
+  severity: WARNING
+  languages:
+  - python
+  pattern-either:
+  - patterns:
+    - pattern-regex: '["'']<activity\b[^>]*android:exported=["'']true["''][^>]*>["'']?'
+    - pattern-not-regex: '["'']<activity\b[^>]*android:permission=["''][^"'']+["''][^>]*>["'']?'
+  - patterns:
+    - pattern-regex: '["'']<service\b[^>]*android:exported=["'']true["''][^>]*>["'']?'
+    - pattern-not-regex: '["'']<service\b[^>]*android:permission=["''][^"'']+["''][^>]*>["'']?'
+  - patterns:
+    - pattern-regex: '["'']<receiver\b[^>]*android:exported=["'']true["''][^>]*>["'']?'
+    - pattern-not-regex: '["'']<receiver\b[^>]*android:permission=["''][^"'']+["''][^>]*>["'']?'
+  - patterns:
+    - pattern-regex: '["'']<provider\b[^>]*android:exported=["'']true["''][^>]*>["'']?'
+    - pattern-not-regex: '["'']<provider\b[^>]*android:permission=["''][^"'']+["''][^>]*>["'']?'
+  - patterns:
+    - pattern-regex: '["'']<activity-alias\b[^>]*android:exported=["'']true["''][^>]*>["'']?'
+    - pattern-not-regex: '["'']<activity-alias\b[^>]*android:permission=["''][^"'']+["''][^>]*>["'']?'

@@ -1,0 +1,226 @@
+rules:
+- id: flask-send-file-user-path-traversal
+  message: 'Potential Flask path traversal: send_file is called with a path built
+    from request-controlled input.'
+  severity: WARNING
+  languages:
+  - python
+  metadata:
+    category: security
+  pattern-either:
+  - patterns:
+    - pattern: send_file($PATH)
+    - pattern: $BASE + request.args[$KEY]
+    - metavariable-pattern:
+        metavariable: $PATH
+        pattern-either:
+        - pattern: $BASE + request.args[$KEY]
+        - pattern: $BASE + request.form[$KEY]
+        - pattern: $BASE + request.values[$KEY]
+        - pattern: $BASE + request.get_json()[...]
+        - pattern: os.path.join($BASE, request.args[$KEY])
+        - pattern: os.path.join($BASE, request.form[$KEY])
+        - pattern: os.path.join($BASE, request.values[$KEY])
+        - pattern: os.path.join($BASE, request.get_json()[...])
+        - pattern: pathlib.Path($BASE) / request.args[$KEY]
+        - pattern: pathlib.Path($BASE) / request.form[$KEY]
+        - pattern: pathlib.Path($BASE) / request.values[$KEY]
+        - pattern: pathlib.Path($BASE) / request.get_json()[...]
+  - patterns:
+    - pattern: send_file($PATH)
+    - pattern: $BASE + request.form[$KEY]
+    - metavariable-pattern:
+        metavariable: $PATH
+        pattern-either:
+        - pattern: $BASE + request.args[$KEY]
+        - pattern: $BASE + request.form[$KEY]
+        - pattern: $BASE + request.values[$KEY]
+        - pattern: $BASE + request.get_json()[...]
+        - pattern: os.path.join($BASE, request.args[$KEY])
+        - pattern: os.path.join($BASE, request.form[$KEY])
+        - pattern: os.path.join($BASE, request.values[$KEY])
+        - pattern: os.path.join($BASE, request.get_json()[...])
+        - pattern: pathlib.Path($BASE) / request.args[$KEY]
+        - pattern: pathlib.Path($BASE) / request.form[$KEY]
+        - pattern: pathlib.Path($BASE) / request.values[$KEY]
+        - pattern: pathlib.Path($BASE) / request.get_json()[...]
+  - patterns:
+    - pattern: send_file($PATH)
+    - pattern: $BASE + request.values[$KEY]
+    - metavariable-pattern:
+        metavariable: $PATH
+        pattern-either:
+        - pattern: $BASE + request.args[$KEY]
+        - pattern: $BASE + request.form[$KEY]
+        - pattern: $BASE + request.values[$KEY]
+        - pattern: $BASE + request.get_json()[...]
+        - pattern: os.path.join($BASE, request.args[$KEY])
+        - pattern: os.path.join($BASE, request.form[$KEY])
+        - pattern: os.path.join($BASE, request.values[$KEY])
+        - pattern: os.path.join($BASE, request.get_json()[...])
+        - pattern: pathlib.Path($BASE) / request.args[$KEY]
+        - pattern: pathlib.Path($BASE) / request.form[$KEY]
+        - pattern: pathlib.Path($BASE) / request.values[$KEY]
+        - pattern: pathlib.Path($BASE) / request.get_json()[...]
+  - patterns:
+    - pattern: send_file($PATH)
+    - pattern: $BASE + request.get_json()[...]
+    - metavariable-pattern:
+        metavariable: $PATH
+        pattern-either:
+        - pattern: $BASE + request.args[$KEY]
+        - pattern: $BASE + request.form[$KEY]
+        - pattern: $BASE + request.values[$KEY]
+        - pattern: $BASE + request.get_json()[...]
+        - pattern: os.path.join($BASE, request.args[$KEY])
+        - pattern: os.path.join($BASE, request.form[$KEY])
+        - pattern: os.path.join($BASE, request.values[$KEY])
+        - pattern: os.path.join($BASE, request.get_json()[...])
+        - pattern: pathlib.Path($BASE) / request.args[$KEY]
+        - pattern: pathlib.Path($BASE) / request.form[$KEY]
+        - pattern: pathlib.Path($BASE) / request.values[$KEY]
+        - pattern: pathlib.Path($BASE) / request.get_json()[...]
+  - patterns:
+    - pattern: send_file($PATH)
+    - pattern: os.path.join($BASE, request.args[$KEY])
+    - metavariable-pattern:
+        metavariable: $PATH
+        pattern-either:
+        - pattern: $BASE + request.args[$KEY]
+        - pattern: $BASE + request.form[$KEY]
+        - pattern: $BASE + request.values[$KEY]
+        - pattern: $BASE + request.get_json()[...]
+        - pattern: os.path.join($BASE, request.args[$KEY])
+        - pattern: os.path.join($BASE, request.form[$KEY])
+        - pattern: os.path.join($BASE, request.values[$KEY])
+        - pattern: os.path.join($BASE, request.get_json()[...])
+        - pattern: pathlib.Path($BASE) / request.args[$KEY]
+        - pattern: pathlib.Path($BASE) / request.form[$KEY]
+        - pattern: pathlib.Path($BASE) / request.values[$KEY]
+        - pattern: pathlib.Path($BASE) / request.get_json()[...]
+  - patterns:
+    - pattern: send_file($PATH)
+    - pattern: os.path.join($BASE, request.form[$KEY])
+    - metavariable-pattern:
+        metavariable: $PATH
+        pattern-either:
+        - pattern: $BASE + request.args[$KEY]
+        - pattern: $BASE + request.form[$KEY]
+        - pattern: $BASE + request.values[$KEY]
+        - pattern: $BASE + request.get_json()[...]
+        - pattern: os.path.join($BASE, request.args[$KEY])
+        - pattern: os.path.join($BASE, request.form[$KEY])
+        - pattern: os.path.join($BASE, request.values[$KEY])
+        - pattern: os.path.join($BASE, request.get_json()[...])
+        - pattern: pathlib.Path($BASE) / request.args[$KEY]
+        - pattern: pathlib.Path($BASE) / request.form[$KEY]
+        - pattern: pathlib.Path($BASE) / request.values[$KEY]
+        - pattern: pathlib.Path($BASE) / request.get_json()[...]
+  - patterns:
+    - pattern: send_file($PATH)
+    - pattern: os.path.join($BASE, request.values[$KEY])
+    - metavariable-pattern:
+        metavariable: $PATH
+        pattern-either:
+        - pattern: $BASE + request.args[$KEY]
+        - pattern: $BASE + request.form[$KEY]
+        - pattern: $BASE + request.values[$KEY]
+        - pattern: $BASE + request.get_json()[...]
+        - pattern: os.path.join($BASE, request.args[$KEY])
+        - pattern: os.path.join($BASE, request.form[$KEY])
+        - pattern: os.path.join($BASE, request.values[$KEY])
+        - pattern: os.path.join($BASE, request.get_json()[...])
+        - pattern: pathlib.Path($BASE) / request.args[$KEY]
+        - pattern: pathlib.Path($BASE) / request.form[$KEY]
+        - pattern: pathlib.Path($BASE) / request.values[$KEY]
+        - pattern: pathlib.Path($BASE) / request.get_json()[...]
+  - patterns:
+    - pattern: send_file($PATH)
+    - pattern: os.path.join($BASE, request.get_json()[...])
+    - metavariable-pattern:
+        metavariable: $PATH
+        pattern-either:
+        - pattern: $BASE + request.args[$KEY]
+        - pattern: $BASE + request.form[$KEY]
+        - pattern: $BASE + request.values[$KEY]
+        - pattern: $BASE + request.get_json()[...]
+        - pattern: os.path.join($BASE, request.args[$KEY])
+        - pattern: os.path.join($BASE, request.form[$KEY])
+        - pattern: os.path.join($BASE, request.values[$KEY])
+        - pattern: os.path.join($BASE, request.get_json()[...])
+        - pattern: pathlib.Path($BASE) / request.args[$KEY]
+        - pattern: pathlib.Path($BASE) / request.form[$KEY]
+        - pattern: pathlib.Path($BASE) / request.values[$KEY]
+        - pattern: pathlib.Path($BASE) / request.get_json()[...]
+  - patterns:
+    - pattern: send_file($PATH)
+    - pattern: pathlib.Path($BASE) / request.args[$KEY]
+    - metavariable-pattern:
+        metavariable: $PATH
+        pattern-either:
+        - pattern: $BASE + request.args[$KEY]
+        - pattern: $BASE + request.form[$KEY]
+        - pattern: $BASE + request.values[$KEY]
+        - pattern: $BASE + request.get_json()[...]
+        - pattern: os.path.join($BASE, request.args[$KEY])
+        - pattern: os.path.join($BASE, request.form[$KEY])
+        - pattern: os.path.join($BASE, request.values[$KEY])
+        - pattern: os.path.join($BASE, request.get_json()[...])
+        - pattern: pathlib.Path($BASE) / request.args[$KEY]
+        - pattern: pathlib.Path($BASE) / request.form[$KEY]
+        - pattern: pathlib.Path($BASE) / request.values[$KEY]
+        - pattern: pathlib.Path($BASE) / request.get_json()[...]
+  - patterns:
+    - pattern: send_file($PATH)
+    - pattern: pathlib.Path($BASE) / request.form[$KEY]
+    - metavariable-pattern:
+        metavariable: $PATH
+        pattern-either:
+        - pattern: $BASE + request.args[$KEY]
+        - pattern: $BASE + request.form[$KEY]
+        - pattern: $BASE + request.values[$KEY]
+        - pattern: $BASE + request.get_json()[...]
+        - pattern: os.path.join($BASE, request.args[$KEY])
+        - pattern: os.path.join($BASE, request.form[$KEY])
+        - pattern: os.path.join($BASE, request.values[$KEY])
+        - pattern: os.path.join($BASE, request.get_json()[...])
+        - pattern: pathlib.Path($BASE) / request.args[$KEY]
+        - pattern: pathlib.Path($BASE) / request.form[$KEY]
+        - pattern: pathlib.Path($BASE) / request.values[$KEY]
+        - pattern: pathlib.Path($BASE) / request.get_json()[...]
+  - patterns:
+    - pattern: send_file($PATH)
+    - pattern: pathlib.Path($BASE) / request.values[$KEY]
+    - metavariable-pattern:
+        metavariable: $PATH
+        pattern-either:
+        - pattern: $BASE + request.args[$KEY]
+        - pattern: $BASE + request.form[$KEY]
+        - pattern: $BASE + request.values[$KEY]
+        - pattern: $BASE + request.get_json()[...]
+        - pattern: os.path.join($BASE, request.args[$KEY])
+        - pattern: os.path.join($BASE, request.form[$KEY])
+        - pattern: os.path.join($BASE, request.values[$KEY])
+        - pattern: os.path.join($BASE, request.get_json()[...])
+        - pattern: pathlib.Path($BASE) / request.args[$KEY]
+        - pattern: pathlib.Path($BASE) / request.form[$KEY]
+        - pattern: pathlib.Path($BASE) / request.values[$KEY]
+        - pattern: pathlib.Path($BASE) / request.get_json()[...]
+  - patterns:
+    - pattern: send_file($PATH)
+    - pattern: pathlib.Path($BASE) / request.get_json()[...]
+    - metavariable-pattern:
+        metavariable: $PATH
+        pattern-either:
+        - pattern: $BASE + request.args[$KEY]
+        - pattern: $BASE + request.form[$KEY]
+        - pattern: $BASE + request.values[$KEY]
+        - pattern: $BASE + request.get_json()[...]
+        - pattern: os.path.join($BASE, request.args[$KEY])
+        - pattern: os.path.join($BASE, request.form[$KEY])
+        - pattern: os.path.join($BASE, request.values[$KEY])
+        - pattern: os.path.join($BASE, request.get_json()[...])
+        - pattern: pathlib.Path($BASE) / request.args[$KEY]
+        - pattern: pathlib.Path($BASE) / request.form[$KEY]
+        - pattern: pathlib.Path($BASE) / request.values[$KEY]
+        - pattern: pathlib.Path($BASE) / request.get_json()[...]

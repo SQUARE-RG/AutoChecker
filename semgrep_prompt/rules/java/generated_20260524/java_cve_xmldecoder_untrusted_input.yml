@@ -1,0 +1,9 @@
+rules:
+- id: java-xmldecoder-readobject-untrusted-input
+  message: Avoid using XMLDecoder.readObject() on untrusted input streams.
+  severity: WARNING
+  languages:
+  - java
+  patterns:
+  - pattern: new XMLDecoder($IN).readObject()
+  - pattern-not: new XMLDecoder(new java.io.ByteArrayInputStream(...)).readObject()

@@ -1,3 +1,18 @@
+# Build artifacts and generated binaries
+build/
+linux/
+linux/build/
+llvm-project/
+llvm-project/build/
+*.o
+*.a
+*.so
+*.dll
+*.lib
+*.out
+*.exe
+*.app
+*.class
 build/
 linux/
 linux/build/
@@ -16,7 +31,7 @@ src/retriever/vector_db
 temp_validate/
 temp_test_dir/
 commit_to_test_cases/kparser/tree-sitter-cpp
-
+temp_test_dir
 result-generation/
 experiment/
 ## build目录
@@ -24,27 +39,74 @@ llvm-project/build/
 src/retriever/embedding_model/
 
 codeql-linux64.zip
-# 其他常见的需要排除的文件和目录
-*.o
-*.a
-*.so
-*.out
-*.exe
-*.app
+# Local toolchains and large external datasets
+codeql/
+codeql-linux64.zip
+linux-db/
+experiment/
+commit_to_test_cases/kparser/tree-sitter-cpp
 
-# IDE 相关文件
+# Runtime output and temporary files
+tmp/
+logs/
+result-generation/
+temp_validate/
+temp_test_dir/
+*.log
+*.tmp
+
+# Semgrep local experiments and reports
+semgrep_prompt/demo/
+semgrep_prompt/v1_output/
+semgrep_prompt/demo_output/
+semgrep_prompt/project_scan_queue/
+semgrep_prompt/rule_review*/
+semgrep_prompt/reports/
+semgrep_collect/collect_semgrep_rule_api/out/
+semgrep_collect/collect_semgrep_rule_api/out_fine/
+local_reports/
+
+# Private credentials and local environment files
+.env
+.env.*
+*.env
+*api-key*
+*api_key*
+*apikey*
+*secret*
+*token*
+openai_key*
+api_keys/
+
+# Python caches and virtual environments
+__pycache__/
+*.py[cod]
+*.venv
+.venv/
+venv/
+
+# Project-local indexes and models
+src/embedding_db/
+src/retriever/vector_db/
+src/retriever/embedding_model/
+
+# Generated sample corpora
+semgrep_prompt/testcase/autochecker/
+semgrep_prompt/testcase/generated/
+semgrep_prompt/testcase/generated_probe/
+semgrep_prompt/testcase/guardian/
+
+# IDE and OS files
+.DS_Store
 .vscode/
 .idea/
 *.swp
 *.swo
-.env
+
+# Generated rule files
 *.yaml
-*.yml   
-
-
-# 编译产物
-*.dll
-*.lib
-*.class
-*.pyc
-__pycache__/    
+*.yml
+!semgrep_prompt/rules/**/*.yaml
+!semgrep_prompt/rules/**/*.yml
+semgrep_prompt/v1/collect_rule_library.py
+semgrep_prompt/v1/run_paired_dataset_batch.py

@@ -1,0 +1,53 @@
+rules:
+- id: java-jdbc-statement-sql-concat
+  message: JDBC Statement execution with concatenated SQL built from runtime input
+    can lead to SQL injection; use PreparedStatement with bind parameters instead.
+  severity: WARNING
+  languages:
+  - java
+  pattern-either:
+  - pattern: $CONN.createStatement().executeQuery($SQL)
+  - pattern: $CONN.createStatement().executeUpdate($SQL)
+  - pattern: $CONN.createStatement().execute($SQL)
+  - patterns:
+    - pattern: $CONN.createStatement().executeQuery($SQL)
+    - pattern-not: $CONN.createStatement().executeQuery("...")
+    - pattern-not: $CONN.createStatement().executeUpdate("...")
+    - pattern-not: $CONN.createStatement().execute("...")
+    - pattern-inside: '$CONN.createStatement();
+
+        '
+    - metavariable-pattern:
+        metavariable: $SQL
+        pattern-either:
+        - pattern: $A + $B
+        - pattern: $A + $B + $C
+        - pattern: $A + $B + $C + $D
+  - patterns:
+    - pattern: $CONN.createStatement().executeUpdate($SQL)
+    - pattern-not: $CONN.createStatement().executeQuery("...")
+    - pattern-not: $CONN.createStatement().executeUpdate("...")
+    - pattern-not: $CONN.createStatement().execute("...")
+    - pattern-inside: '$CONN.createStatement();
+
+        '
+    - metavariable-pattern:
+        metavariable: $SQL
+        pattern-either:
+        - pattern: $A + $B
+        - pattern: $A + $B + $C
+        - pattern: $A + $B + $C + $D
+  - patterns:
+    - pattern: $CONN.createStatement().execute($SQL)
+    - pattern-not: $CONN.createStatement().executeQuery("...")
+    - pattern-not: $CONN.createStatement().executeUpdate("...")
+    - pattern-not: $CONN.createStatement().execute("...")
+    - pattern-inside: '$CONN.createStatement();
+
+        '
+    - metavariable-pattern:
+        metavariable: $SQL
+        pattern-either:
+        - pattern: $A + $B
+        - pattern: $A + $B + $C
+        - pattern: $A + $B + $C + $D

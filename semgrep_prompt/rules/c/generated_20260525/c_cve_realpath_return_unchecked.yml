@@ -1,0 +1,39 @@
+rules:
+- id: c-realpath-return-ignored-before-use
+  message: realpath return value is ignored before the destination buffer is used
+  severity: WARNING
+  languages:
+  - c
+  notes: search-mode structural check for unchecked realpath result before buffer
+    use
+  pattern-either:
+  - patterns:
+    - pattern: 'char $BUF[...];
+
+        realpath($INPUT, $BUF);
+
+        puts($BUF);
+
+        '
+    - pattern-not: 'char $BUF[...];
+
+        if (!realpath($INPUT, $BUF)) return;
+
+        puts($BUF);
+
+        '
+  - patterns:
+    - pattern: 'char $BUF[...];
+
+        realpath($INPUT, $BUF);
+
+        $SINK($BUF);
+
+        '
+    - pattern-not: 'char $BUF[...];
+
+        if (!realpath($INPUT, $BUF)) return;
+
+        $SINK($BUF);
+
+        '

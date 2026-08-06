@@ -1,0 +1,311 @@
+rules:
+- id: rust-insecure-random-token-generation
+  message: 'Insecure random token generation: use cryptographically secure randomness
+    such as OsRng, getrandom, or a secure token helper instead of non-cryptographic
+    or fixed-seed RNGs.'
+  severity: WARNING
+  languages:
+  - rust
+  pattern-either:
+  - patterns:
+    - pattern: 'let $TOKEN: String = (0..$N).map(|_| rand::random::<u8>() as char).collect();
+
+        '
+    - pattern-not: 'let $TOKEN = uuid::Uuid::new_v4().to_string();
+
+        '
+    - pattern-not: 'let $TOKEN = secrets::SecretGenerator::default().token();
+
+        '
+    - pattern-not: 'let $TOKEN = csrf_token_from_os_rng();
+
+        '
+    - pattern-not: 'let $TOKEN = rand::rngs::OsRng.gen::<$T>();
+
+        '
+    - pattern-not: 'let mut $BUF = $ARR; rand::rngs::OsRng.fill_bytes(&mut $BUF);
+
+        '
+    - pattern-not: 'getrandom::getrandom(&mut $BUF).unwrap();
+
+        '
+    - pattern-not: 'let $TOKEN = ring::rand::SystemRandom::new();
+
+        '
+  - patterns:
+    - pattern: 'let $TOKEN = rand::random::<$T>().to_string();
+
+        '
+    - pattern-not: 'let $TOKEN = uuid::Uuid::new_v4().to_string();
+
+        '
+    - pattern-not: 'let $TOKEN = secrets::SecretGenerator::default().token();
+
+        '
+    - pattern-not: 'let $TOKEN = csrf_token_from_os_rng();
+
+        '
+    - pattern-not: 'let $TOKEN = rand::rngs::OsRng.gen::<$T>();
+
+        '
+    - pattern-not: 'let mut $BUF = $ARR; rand::rngs::OsRng.fill_bytes(&mut $BUF);
+
+        '
+    - pattern-not: 'getrandom::getrandom(&mut $BUF).unwrap();
+
+        '
+    - pattern-not: 'let $TOKEN = ring::rand::SystemRandom::new();
+
+        '
+  - patterns:
+    - pattern: 'let $TOKEN = format!("{}", rand::random::<$T>());
+
+        '
+    - pattern-not: 'let $TOKEN = uuid::Uuid::new_v4().to_string();
+
+        '
+    - pattern-not: 'let $TOKEN = secrets::SecretGenerator::default().token();
+
+        '
+    - pattern-not: 'let $TOKEN = csrf_token_from_os_rng();
+
+        '
+    - pattern-not: 'let $TOKEN = rand::rngs::OsRng.gen::<$T>();
+
+        '
+    - pattern-not: 'let mut $BUF = $ARR; rand::rngs::OsRng.fill_bytes(&mut $BUF);
+
+        '
+    - pattern-not: 'getrandom::getrandom(&mut $BUF).unwrap();
+
+        '
+    - pattern-not: 'let $TOKEN = ring::rand::SystemRandom::new();
+
+        '
+  - patterns:
+    - pattern: 'let $TOKEN = fastrand::u64(..).to_string();
+
+        '
+    - pattern-not: 'let $TOKEN = uuid::Uuid::new_v4().to_string();
+
+        '
+    - pattern-not: 'let $TOKEN = secrets::SecretGenerator::default().token();
+
+        '
+    - pattern-not: 'let $TOKEN = csrf_token_from_os_rng();
+
+        '
+    - pattern-not: 'let $TOKEN = rand::rngs::OsRng.gen::<$T>();
+
+        '
+    - pattern-not: 'let mut $BUF = $ARR; rand::rngs::OsRng.fill_bytes(&mut $BUF);
+
+        '
+    - pattern-not: 'getrandom::getrandom(&mut $BUF).unwrap();
+
+        '
+    - pattern-not: 'let $TOKEN = ring::rand::SystemRandom::new();
+
+        '
+  - patterns:
+    - pattern: 'let $TOKEN = rand::thread_rng().gen::<$T>();
+
+        '
+    - pattern-not: 'let $TOKEN = uuid::Uuid::new_v4().to_string();
+
+        '
+    - pattern-not: 'let $TOKEN = secrets::SecretGenerator::default().token();
+
+        '
+    - pattern-not: 'let $TOKEN = csrf_token_from_os_rng();
+
+        '
+    - pattern-not: 'let $TOKEN = rand::rngs::OsRng.gen::<$T>();
+
+        '
+    - pattern-not: 'let mut $BUF = $ARR; rand::rngs::OsRng.fill_bytes(&mut $BUF);
+
+        '
+    - pattern-not: 'getrandom::getrandom(&mut $BUF).unwrap();
+
+        '
+    - pattern-not: 'let $TOKEN = ring::rand::SystemRandom::new();
+
+        '
+  - patterns:
+    - pattern: 'let mut $RNG = rand::thread_rng();
+
+        let $TOKEN: $T = $RNG.gen();
+
+        '
+    - pattern-not: 'let $TOKEN = uuid::Uuid::new_v4().to_string();
+
+        '
+    - pattern-not: 'let $TOKEN = secrets::SecretGenerator::default().token();
+
+        '
+    - pattern-not: 'let $TOKEN = csrf_token_from_os_rng();
+
+        '
+    - pattern-not: 'let $TOKEN = rand::rngs::OsRng.gen::<$T>();
+
+        '
+    - pattern-not: 'let mut $BUF = $ARR; rand::rngs::OsRng.fill_bytes(&mut $BUF);
+
+        '
+    - pattern-not: 'getrandom::getrandom(&mut $BUF).unwrap();
+
+        '
+    - pattern-not: 'let $TOKEN = ring::rand::SystemRandom::new();
+
+        '
+  - patterns:
+    - pattern: 'let $TOKEN = rand::rngs::StdRng::seed_from_u64($SEED).gen::<$T>();
+
+        '
+    - pattern-not: 'let $TOKEN = uuid::Uuid::new_v4().to_string();
+
+        '
+    - pattern-not: 'let $TOKEN = secrets::SecretGenerator::default().token();
+
+        '
+    - pattern-not: 'let $TOKEN = csrf_token_from_os_rng();
+
+        '
+    - pattern-not: 'let $TOKEN = rand::rngs::OsRng.gen::<$T>();
+
+        '
+    - pattern-not: 'let mut $BUF = $ARR; rand::rngs::OsRng.fill_bytes(&mut $BUF);
+
+        '
+    - pattern-not: 'getrandom::getrandom(&mut $BUF).unwrap();
+
+        '
+    - pattern-not: 'let $TOKEN = ring::rand::SystemRandom::new();
+
+        '
+  - patterns:
+    - pattern: 'let $TOKEN = nanorand::tls_rng().generate::<$T>();
+
+        '
+    - pattern-not: 'let $TOKEN = uuid::Uuid::new_v4().to_string();
+
+        '
+    - pattern-not: 'let $TOKEN = secrets::SecretGenerator::default().token();
+
+        '
+    - pattern-not: 'let $TOKEN = csrf_token_from_os_rng();
+
+        '
+    - pattern-not: 'let $TOKEN = rand::rngs::OsRng.gen::<$T>();
+
+        '
+    - pattern-not: 'let mut $BUF = $ARR; rand::rngs::OsRng.fill_bytes(&mut $BUF);
+
+        '
+    - pattern-not: 'getrandom::getrandom(&mut $BUF).unwrap();
+
+        '
+    - pattern-not: 'let $TOKEN = ring::rand::SystemRandom::new();
+
+        '
+  - patterns:
+    - pattern: 'let $TOKEN = rand_pcg::$RNG::seed_from_u64($SEED).next_u32();
+
+        '
+    - pattern-not: 'let $TOKEN = uuid::Uuid::new_v4().to_string();
+
+        '
+    - pattern-not: 'let $TOKEN = secrets::SecretGenerator::default().token();
+
+        '
+    - pattern-not: 'let $TOKEN = csrf_token_from_os_rng();
+
+        '
+    - pattern-not: 'let $TOKEN = rand::rngs::OsRng.gen::<$T>();
+
+        '
+    - pattern-not: 'let mut $BUF = $ARR; rand::rngs::OsRng.fill_bytes(&mut $BUF);
+
+        '
+    - pattern-not: 'getrandom::getrandom(&mut $BUF).unwrap();
+
+        '
+    - pattern-not: 'let $TOKEN = ring::rand::SystemRandom::new();
+
+        '
+  - patterns:
+    - pattern: 'let $TOKEN = rand::random::<[u8; $N]>();
+
+        '
+    - pattern-not: 'let $TOKEN = uuid::Uuid::new_v4().to_string();
+
+        '
+    - pattern-not: 'let $TOKEN = secrets::SecretGenerator::default().token();
+
+        '
+    - pattern-not: 'let $TOKEN = csrf_token_from_os_rng();
+
+        '
+    - pattern-not: 'let $TOKEN = rand::rngs::OsRng.gen::<$T>();
+
+        '
+    - pattern-not: 'let mut $BUF = $ARR; rand::rngs::OsRng.fill_bytes(&mut $BUF);
+
+        '
+    - pattern-not: 'getrandom::getrandom(&mut $BUF).unwrap();
+
+        '
+    - pattern-not: 'let $TOKEN = ring::rand::SystemRandom::new();
+
+        '
+  - patterns:
+    - pattern: 'let $TOKEN = rand::thread_rng().gen::<u128>();
+
+        '
+    - pattern-not: 'let $TOKEN = uuid::Uuid::new_v4().to_string();
+
+        '
+    - pattern-not: 'let $TOKEN = secrets::SecretGenerator::default().token();
+
+        '
+    - pattern-not: 'let $TOKEN = csrf_token_from_os_rng();
+
+        '
+    - pattern-not: 'let $TOKEN = rand::rngs::OsRng.gen::<$T>();
+
+        '
+    - pattern-not: 'let mut $BUF = $ARR; rand::rngs::OsRng.fill_bytes(&mut $BUF);
+
+        '
+    - pattern-not: 'getrandom::getrandom(&mut $BUF).unwrap();
+
+        '
+    - pattern-not: 'let $TOKEN = ring::rand::SystemRandom::new();
+
+        '
+  - patterns:
+    - pattern: 'let $TOKEN = rand::thread_rng().gen::<u64>();
+
+        '
+    - pattern-not: 'let $TOKEN = uuid::Uuid::new_v4().to_string();
+
+        '
+    - pattern-not: 'let $TOKEN = secrets::SecretGenerator::default().token();
+
+        '
+    - pattern-not: 'let $TOKEN = csrf_token_from_os_rng();
+
+        '
+    - pattern-not: 'let $TOKEN = rand::rngs::OsRng.gen::<$T>();
+
+        '
+    - pattern-not: 'let mut $BUF = $ARR; rand::rngs::OsRng.fill_bytes(&mut $BUF);
+
+        '
+    - pattern-not: 'getrandom::getrandom(&mut $BUF).unwrap();
+
+        '
+    - pattern-not: 'let $TOKEN = ring::rand::SystemRandom::new();
+
+        '

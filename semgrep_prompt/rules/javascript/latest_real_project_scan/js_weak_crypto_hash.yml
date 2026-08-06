@@ -1,0 +1,74 @@
+rules:
+- id: javascript-weak-crypto-hash
+  message: Weak or legacy cryptographic hash/KDF choice detected; use a modern secure
+    hash or stronger KDF settings instead.
+  severity: WARNING
+  languages:
+  - javascript
+  pattern-either:
+  - patterns:
+    - pattern: crypto.createHash('md5')
+  - patterns:
+    - pattern: crypto.createHash('sha1')
+  - patterns:
+    - pattern: crypto.createHash('md4')
+  - patterns:
+    - pattern: crypto.createHash("md5")
+  - patterns:
+    - pattern: crypto.createHash("sha1")
+  - patterns:
+    - pattern: crypto.createHash("md4")
+  - patterns:
+    - pattern: createHash('md5')
+  - patterns:
+    - pattern: createHash('sha1')
+  - patterns:
+    - pattern: createHash('md4')
+  - patterns:
+    - pattern: createHash("md5")
+  - patterns:
+    - pattern: createHash("sha1")
+  - patterns:
+    - pattern: createHash("md4")
+  - patterns:
+    - pattern: crypto.createHash(`md5`)
+  - patterns:
+    - pattern: crypto.createHash(`sha1`)
+  - patterns:
+    - pattern: crypto.createHash(`md4`)
+  - patterns:
+    - pattern: createHash(`md5`)
+  - patterns:
+    - pattern: createHash(`sha1`)
+  - patterns:
+    - pattern: createHash(`md4`)
+  - patterns:
+    - pattern: crypto.createHmac('sha1', $KEY)
+  - patterns:
+    - pattern: crypto.createHmac("sha1", $KEY)
+  - patterns:
+    - pattern: createHmac('sha1', $KEY)
+  - patterns:
+    - pattern: createHmac("sha1", $KEY)
+  - patterns:
+    - pattern: crypto.createHmac(`sha1`, $KEY)
+  - patterns:
+    - pattern: createHmac(`sha1`, $KEY)
+  - patterns:
+    - pattern: md5($X)
+  - patterns:
+    - pattern: sha1($X)
+  - patterns:
+    - pattern: crypto.pbkdf2Sync($PASSWORD, $SALT, $ITER, $LEN, 'sha1')
+  - patterns:
+    - pattern: crypto.pbkdf2Sync($PASSWORD, $SALT, $ITER, $LEN, "sha1")
+  - patterns:
+    - pattern: crypto.pbkdf2Sync($PASSWORD, $SALT, $ITER, $LEN, `sha1`)
+  - patterns:
+    - pattern: pbkdf2Sync($PASSWORD, $SALT, $ITER, $LEN, 'sha1')
+  - patterns:
+    - pattern: pbkdf2Sync($PASSWORD, $SALT, $ITER, $LEN, "sha1")
+  - patterns:
+    - pattern: pbkdf2Sync($PASSWORD, $SALT, $ITER, $LEN, `sha1`)
+  - patterns:
+    - pattern: crypto.createHash('MD5')

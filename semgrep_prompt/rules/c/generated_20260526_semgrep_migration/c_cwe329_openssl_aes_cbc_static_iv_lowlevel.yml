@@ -1,0 +1,110 @@
+rules:
+- id: c-openssl-aes-cbc-static-iv
+  message: Avoid using a zero, static, literal, or locally fixed IV with OpenSSL AES_cbc_encrypt;
+    use a freshly randomized IV and verify RAND_bytes succeeds before encryption.
+  severity: WARNING
+  languages:
+  - c
+  pattern-either:
+  - patterns:
+    - pattern: 'unsigned char iv[16] = {0};
+
+        ...
+
+        AES_cbc_encrypt($IN, $OUT, $LEN, $KEY, iv, AES_ENCRYPT);
+
+        '
+    - pattern-not: 'unsigned char iv[16];
+
+        if (RAND_bytes(iv, sizeof(iv)) != 1) return 0;
+
+        AES_cbc_encrypt($IN, $OUT, $LEN, $KEY, iv, AES_ENCRYPT);
+
+        '
+  - patterns:
+    - pattern: 'unsigned char zero_iv[16] = {0};
+
+        ...
+
+        AES_cbc_encrypt($IN, $OUT, $LEN, $KEY, zero_iv, AES_ENCRYPT);
+
+        '
+    - pattern-not: 'unsigned char iv[16];
+
+        if (RAND_bytes(iv, sizeof(iv)) != 1) return 0;
+
+        AES_cbc_encrypt($IN, $OUT, $LEN, $KEY, iv, AES_ENCRYPT);
+
+        '
+  - patterns:
+    - pattern: 'static unsigned char static_iv[16] = {1};
+
+        ...
+
+        AES_cbc_encrypt($IN, $OUT, $LEN, $KEY, static_iv, AES_ENCRYPT);
+
+        '
+    - pattern-not: 'unsigned char iv[16];
+
+        if (RAND_bytes(iv, sizeof(iv)) != 1) return 0;
+
+        AES_cbc_encrypt($IN, $OUT, $LEN, $KEY, iv, AES_ENCRYPT);
+
+        '
+  - patterns:
+    - pattern: 'unsigned char fixed_iv[16] = "fixed-fixed-iv";
+
+        ...
+
+        AES_cbc_encrypt($IN, $OUT, $LEN, $KEY, fixed_iv, AES_ENCRYPT);
+
+        '
+    - pattern-not: 'unsigned char iv[16];
+
+        if (RAND_bytes(iv, sizeof(iv)) != 1) return 0;
+
+        AES_cbc_encrypt($IN, $OUT, $LEN, $KEY, iv, AES_ENCRYPT);
+
+        '
+  - patterns:
+    - pattern: 'unsigned char literal_iv[16] = "abcdefghijklmnop";
+
+        ...
+
+        AES_cbc_encrypt($IN, $OUT, $LEN, $KEY, literal_iv, AES_ENCRYPT);
+
+        '
+    - pattern-not: 'unsigned char iv[16];
+
+        if (RAND_bytes(iv, sizeof(iv)) != 1) return 0;
+
+        AES_cbc_encrypt($IN, $OUT, $LEN, $KEY, iv, AES_ENCRYPT);
+
+        '
+  - patterns:
+    - pattern: 'AES_cbc_encrypt($IN, $OUT, $LEN, $KEY, $IV, AES_ENCRYPT);
+
+        '
+    - pattern-inside: "void $F(...) {\n  ...\n  unsigned char $IV[16] = {0};\n  ...\n\
+        \  AES_cbc_encrypt($IN, $OUT, $LEN, $KEY, $IV, AES_ENCRYPT);\n  ...\n}\n"
+  - patterns:
+    - pattern: 'AES_cbc_encrypt($IN, $OUT, $LEN, $KEY, $IV, AES_ENCRYPT);
+
+        '
+    - pattern-inside: "void $F(...) {\n  ...\n  static unsigned char $IV[16] = {1};\n\
+        \  ...\n  AES_cbc_encrypt($IN, $OUT, $LEN, $KEY, $IV, AES_ENCRYPT);\n  ...\n\
+        }\n"
+  - patterns:
+    - pattern: 'AES_cbc_encrypt($IN, $OUT, $LEN, $KEY, $IV, AES_ENCRYPT);
+
+        '
+    - pattern-inside: "void $F(...) {\n  ...\n  unsigned char $IV[16] = \"fixed-fixed-iv\"\
+        ;\n  ...\n  AES_cbc_encrypt($IN, $OUT, $LEN, $KEY, $IV, AES_ENCRYPT);\n  ...\n\
+        }\n"
+  - patterns:
+    - pattern: 'AES_cbc_encrypt($IN, $OUT, $LEN, $KEY, $IV, AES_ENCRYPT);
+
+        '
+    - pattern-inside: "void $F(...) {\n  ...\n  unsigned char $IV[16] = \"abcdefghijklmnop\"\
+        ;\n  ...\n  AES_cbc_encrypt($IN, $OUT, $LEN, $KEY, $IV, AES_ENCRYPT);\n  ...\n\
+        }\n"

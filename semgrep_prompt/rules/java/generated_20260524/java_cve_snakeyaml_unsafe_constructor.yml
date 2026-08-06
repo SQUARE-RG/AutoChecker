@@ -1,0 +1,14 @@
+rules:
+- id: java-snakeyaml-unsafe-default-constructor
+  message: Unsafe SnakeYAML loading with the default Yaml constructor; use SafeConstructor
+    and LoaderOptions instead.
+  severity: WARNING
+  languages:
+  - java
+  patterns:
+  - pattern: 'new Yaml().load(...)
+
+      '
+  - pattern-not: 'new Yaml(new SafeConstructor(new LoaderOptions())).load(...)
+
+      '

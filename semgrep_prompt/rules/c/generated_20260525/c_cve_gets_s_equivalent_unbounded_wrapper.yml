@@ -1,0 +1,48 @@
+rules:
+- id: c-unsafe-line-input-wrapper
+  message: Wrapper uses gets or unbounded line input into a fixed buffer; prefer bounded
+    input such as fgets with an explicit size.
+  severity: WARNING
+  languages:
+  - c
+  pattern-either:
+  - patterns:
+    - pattern: 'char *$F(char *$B) { return gets($B); }
+
+        '
+    - pattern-not: 'char *$F(char *$B, size_t $N) { return fgets($B, $N, stdin); }
+
+        '
+    - pattern-not: 'char *$F(char *$B, size_t $N) { fgets($B, $N, stdin); }
+
+        '
+  - patterns:
+    - pattern: 'char *$F(char *$B) { gets($B); }
+
+        '
+    - pattern-not: 'char *$F(char *$B, size_t $N) { return fgets($B, $N, stdin); }
+
+        '
+    - pattern-not: 'char *$F(char *$B, size_t $N) { fgets($B, $N, stdin); }
+
+        '
+  - patterns:
+    - pattern: 'return gets($B);
+
+        '
+    - pattern-not: 'char *$F(char *$B, size_t $N) { return fgets($B, $N, stdin); }
+
+        '
+    - pattern-not: 'char *$F(char *$B, size_t $N) { fgets($B, $N, stdin); }
+
+        '
+  - patterns:
+    - pattern: 'gets($B);
+
+        '
+    - pattern-not: 'char *$F(char *$B, size_t $N) { return fgets($B, $N, stdin); }
+
+        '
+    - pattern-not: 'char *$F(char *$B, size_t $N) { fgets($B, $N, stdin); }
+
+        '

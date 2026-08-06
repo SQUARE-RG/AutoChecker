@@ -1,0 +1,40 @@
+rules:
+- id: c-use-after-free-same-scope
+  message: 'Use after free: pointer is freed and then dereferenced or indexed in the
+    same scope.'
+  severity: ERROR
+  languages:
+  - c
+  pattern-either:
+  - patterns:
+    - pattern: 'free($P);
+
+        ...
+
+        $P[$I] = $X;
+
+        '
+  - patterns:
+    - pattern: 'free($P);
+
+        ...
+
+        *$P = $X;
+
+        '
+  - patterns:
+    - pattern: 'free($P);
+
+        ...
+
+        $X = $P[$I];
+
+        '
+  - patterns:
+    - pattern: 'free($P);
+
+        ...
+
+        $X = *$P;
+
+        '

@@ -1,0 +1,23 @@
+rules:
+- id: c-realloc-direct-assign-null-deref
+  message: Directly assigning realloc back to the original pointer and then dereferencing
+    it without a NULL check can cause a null dereference.
+  severity: WARNING
+  languages:
+  - c
+  notes: Local lifetime/order misuse; search mode is the best fit because the issue
+    is direct realloc-to-original-pointer assignment followed by use without an intervening
+    NULL check.
+  pattern-either:
+  - patterns:
+    - pattern: '$P = realloc($P, $N);
+
+        $P[$I] = $V;
+
+        '
+  - patterns:
+    - pattern: '$P = realloc($P, $N);
+
+        *$P = $V;
+
+        '

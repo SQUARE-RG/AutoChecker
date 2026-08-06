@@ -1,0 +1,308 @@
+rules:
+- id: spring-critical-endpoint-missing-authorization
+  message: Spring controller endpoint with a critical route or handler name appears
+    to lack authorization.
+  severity: WARNING
+  languages:
+  - java
+  pattern-either:
+  - patterns:
+    - pattern: '@DeleteMapping($PATH)
+
+        $RET $METHOD(...) { ... }
+
+        '
+    - metavariable-regex:
+        metavariable: $PATH
+        regex: .*(admin|config|export|debug|delete|rotate|disable-mfa|impersonate|shutdown|tenant).*
+    - pattern-not: '@PreAuthorize(...)
+
+        $RET $METHOD(...) { ... }
+
+        '
+    - pattern-not: '@Secured(...)
+
+        $RET $METHOD(...) { ... }
+
+        '
+    - pattern-not: '@RolesAllowed(...)
+
+        $RET $METHOD(...) { ... }
+
+        '
+    - pattern-not: '$RET $METHOD(...) { requireAdmin(...); ... }
+
+        '
+    - pattern-not: '$RET $METHOD(...) { checkPermission(...); ... }
+
+        '
+  - patterns:
+    - pattern: '@GetMapping($PATH)
+
+        $RET $METHOD(...) { ... }
+
+        '
+    - metavariable-regex:
+        metavariable: $PATH
+        regex: .*(admin|config|export|debug|delete|rotate|disable-mfa|impersonate|shutdown|tenant).*
+    - pattern-not: '@PreAuthorize(...)
+
+        $RET $METHOD(...) { ... }
+
+        '
+    - pattern-not: '@Secured(...)
+
+        $RET $METHOD(...) { ... }
+
+        '
+    - pattern-not: '@RolesAllowed(...)
+
+        $RET $METHOD(...) { ... }
+
+        '
+    - pattern-not: '$RET $METHOD(...) { requireAdmin(...); ... }
+
+        '
+    - pattern-not: '$RET $METHOD(...) { checkPermission(...); ... }
+
+        '
+  - patterns:
+    - pattern: '@PostMapping($PATH)
+
+        $RET $METHOD(...) { ... }
+
+        '
+    - metavariable-regex:
+        metavariable: $PATH
+        regex: .*(admin|config|export|debug|delete|rotate|disable-mfa|impersonate|shutdown|tenant).*
+    - pattern-not: '@PreAuthorize(...)
+
+        $RET $METHOD(...) { ... }
+
+        '
+    - pattern-not: '@Secured(...)
+
+        $RET $METHOD(...) { ... }
+
+        '
+    - pattern-not: '@RolesAllowed(...)
+
+        $RET $METHOD(...) { ... }
+
+        '
+    - pattern-not: '$RET $METHOD(...) { requireAdmin(...); ... }
+
+        '
+    - pattern-not: '$RET $METHOD(...) { checkPermission(...); ... }
+
+        '
+  - patterns:
+    - pattern: '@PutMapping($PATH)
+
+        $RET $METHOD(...) { ... }
+
+        '
+    - metavariable-regex:
+        metavariable: $PATH
+        regex: .*(admin|config|export|debug|delete|rotate|disable-mfa|impersonate|shutdown|tenant).*
+    - pattern-not: '@PreAuthorize(...)
+
+        $RET $METHOD(...) { ... }
+
+        '
+    - pattern-not: '@Secured(...)
+
+        $RET $METHOD(...) { ... }
+
+        '
+    - pattern-not: '@RolesAllowed(...)
+
+        $RET $METHOD(...) { ... }
+
+        '
+    - pattern-not: '$RET $METHOD(...) { requireAdmin(...); ... }
+
+        '
+    - pattern-not: '$RET $METHOD(...) { checkPermission(...); ... }
+
+        '
+  - patterns:
+    - pattern: '@RequestMapping($PATH)
+
+        $RET $METHOD(...) { ... }
+
+        '
+    - metavariable-regex:
+        metavariable: $PATH
+        regex: .*(admin|config|export|debug|delete|rotate|disable-mfa|impersonate|shutdown|tenant).*
+    - pattern-not: '@PreAuthorize(...)
+
+        $RET $METHOD(...) { ... }
+
+        '
+    - pattern-not: '@Secured(...)
+
+        $RET $METHOD(...) { ... }
+
+        '
+    - pattern-not: '@RolesAllowed(...)
+
+        $RET $METHOD(...) { ... }
+
+        '
+    - pattern-not: '$RET $METHOD(...) { requireAdmin(...); ... }
+
+        '
+    - pattern-not: '$RET $METHOD(...) { checkPermission(...); ... }
+
+        '
+  - patterns:
+    - pattern: '@DeleteMapping(...)
+
+        $RET $METHOD(...) { ... }
+
+        '
+    - metavariable-regex:
+        metavariable: $METHOD
+        regex: .*(admin|config|export|debug|delete|rotate|disableMfa|impersonate|shutdown|tenant).*
+    - pattern-not: '@PreAuthorize(...)
+
+        $RET $METHOD(...) { ... }
+
+        '
+    - pattern-not: '@Secured(...)
+
+        $RET $METHOD(...) { ... }
+
+        '
+    - pattern-not: '@RolesAllowed(...)
+
+        $RET $METHOD(...) { ... }
+
+        '
+    - pattern-not: '$RET $METHOD(...) { requireAdmin(...); ... }
+
+        '
+    - pattern-not: '$RET $METHOD(...) { checkPermission(...); ... }
+
+        '
+  - patterns:
+    - pattern: '@GetMapping(...)
+
+        $RET $METHOD(...) { ... }
+
+        '
+    - metavariable-regex:
+        metavariable: $METHOD
+        regex: .*(admin|config|export|debug|delete|rotate|disableMfa|impersonate|shutdown|tenant).*
+    - pattern-not: '@PreAuthorize(...)
+
+        $RET $METHOD(...) { ... }
+
+        '
+    - pattern-not: '@Secured(...)
+
+        $RET $METHOD(...) { ... }
+
+        '
+    - pattern-not: '@RolesAllowed(...)
+
+        $RET $METHOD(...) { ... }
+
+        '
+    - pattern-not: '$RET $METHOD(...) { requireAdmin(...); ... }
+
+        '
+    - pattern-not: '$RET $METHOD(...) { checkPermission(...); ... }
+
+        '
+  - patterns:
+    - pattern: '@PostMapping(...)
+
+        $RET $METHOD(...) { ... }
+
+        '
+    - metavariable-regex:
+        metavariable: $METHOD
+        regex: .*(admin|config|export|debug|delete|rotate|disableMfa|impersonate|shutdown|tenant).*
+    - pattern-not: '@PreAuthorize(...)
+
+        $RET $METHOD(...) { ... }
+
+        '
+    - pattern-not: '@Secured(...)
+
+        $RET $METHOD(...) { ... }
+
+        '
+    - pattern-not: '@RolesAllowed(...)
+
+        $RET $METHOD(...) { ... }
+
+        '
+    - pattern-not: '$RET $METHOD(...) { requireAdmin(...); ... }
+
+        '
+    - pattern-not: '$RET $METHOD(...) { checkPermission(...); ... }
+
+        '
+  - patterns:
+    - pattern: '@PutMapping(...)
+
+        $RET $METHOD(...) { ... }
+
+        '
+    - metavariable-regex:
+        metavariable: $METHOD
+        regex: .*(admin|config|export|debug|delete|rotate|disableMfa|impersonate|shutdown|tenant).*
+    - pattern-not: '@PreAuthorize(...)
+
+        $RET $METHOD(...) { ... }
+
+        '
+    - pattern-not: '@Secured(...)
+
+        $RET $METHOD(...) { ... }
+
+        '
+    - pattern-not: '@RolesAllowed(...)
+
+        $RET $METHOD(...) { ... }
+
+        '
+    - pattern-not: '$RET $METHOD(...) { requireAdmin(...); ... }
+
+        '
+    - pattern-not: '$RET $METHOD(...) { checkPermission(...); ... }
+
+        '
+  - patterns:
+    - pattern: '@RequestMapping(...)
+
+        $RET $METHOD(...) { ... }
+
+        '
+    - metavariable-regex:
+        metavariable: $METHOD
+        regex: .*(admin|config|export|debug|delete|rotate|disableMfa|impersonate|shutdown|tenant).*
+    - pattern-not: '@PreAuthorize(...)
+
+        $RET $METHOD(...) { ... }
+
+        '
+    - pattern-not: '@Secured(...)
+
+        $RET $METHOD(...) { ... }
+
+        '
+    - pattern-not: '@RolesAllowed(...)
+
+        $RET $METHOD(...) { ... }
+
+        '
+    - pattern-not: '$RET $METHOD(...) { requireAdmin(...); ... }
+
+        '
+    - pattern-not: '$RET $METHOD(...) { checkPermission(...); ... }
+
+        '

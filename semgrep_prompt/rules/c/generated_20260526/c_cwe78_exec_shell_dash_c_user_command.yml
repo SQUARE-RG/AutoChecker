@@ -1,0 +1,95 @@
+rules:
+- id: c-shell-exec-dash-c-untrusted-command
+  message: Avoid invoking a shell with -c via exec-family calls when the command argument
+    is runtime-derived.
+  severity: WARNING
+  languages:
+  - c
+  mode: taint
+  pattern-sources:
+  - pattern: argv[$I]
+  - pattern: $TYPE $SRC = argv[$I];
+  pattern-propagators:
+  - pattern: $DST = $SRC;
+    from: $SRC
+    to: $DST
+  pattern-sinks:
+  - patterns:
+    - pattern-either:
+      - pattern: execl("/bin/sh", "sh", "-c", $CMD, ...);
+      - pattern: execl("/usr/bin/sh", "sh", "-c", $CMD, ...);
+      - pattern: execlp("sh", "sh", "-c", $CMD, ...);
+      - pattern: execle("/bin/sh", "sh", "-c", $CMD, ...);
+      - pattern: execv("/bin/sh", $ARGS);
+      - pattern: execvp("sh", $ARGS);
+      - pattern: execve("/bin/sh", $ARGS, $ENVP);
+      - patterns:
+        - pattern: execv($SHELL, $ARGS);
+        - pattern-either:
+          - pattern-inside: 'char *$ARGSNAME[] = {"/bin/sh", "-c", $CMD, ...};
+
+              ...
+
+              '
+          - pattern-inside: 'char *$ARGSNAME[] = {"/usr/bin/sh", "-c", $CMD, ...};
+
+              ...
+
+              '
+          - pattern-inside: 'char *$ARGSNAME[] = {"sh", "-c", $CMD, ...};
+
+              ...
+
+              '
+      - patterns:
+        - pattern: execve($SHELL, $ARGS, $ENVP);
+        - pattern-either:
+          - pattern-inside: 'char *$ARGSNAME[] = {"/bin/sh", "-c", $CMD, ...};
+
+              ...
+
+              '
+          - pattern-inside: 'char *$ARGSNAME[] = {"/usr/bin/sh", "-c", $CMD, ...};
+
+              ...
+
+              '
+          - pattern-inside: 'char *$ARGSNAME[] = {"sh", "-c", $CMD, ...};
+
+              ...
+
+              '
+      - patterns:
+        - pattern: execlp($SHELL, $PROG, "-c", $CMD, ...);
+        - pattern-either:
+          - pattern-inside: 'const char *$CMDVAR = $COND ? argv[$I] : ...;
+
+              ...
+
+              '
+          - pattern-inside: 'char *$CMDVAR = $COND ? argv[$I] : ...;
+
+              ...
+
+              '
+          - pattern-inside: 'const char *$CMDVAR = argv[$I];
+
+              ...
+
+              '
+          - pattern-inside: 'char *$CMDVAR = argv[$I];
+
+              ...
+
+              '
+          - pattern-inside: 'extern char **environ;
+
+              ...
+
+              '
+    - pattern-either:
+      - pattern: $ARGS
+      - pattern: $CMD
+      - pattern: $CMDVAR
+  options:
+    taint_unify_mvars: true

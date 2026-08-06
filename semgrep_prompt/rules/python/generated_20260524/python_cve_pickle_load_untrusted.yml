@@ -1,0 +1,9 @@
+rules:
+- id: python-unsafe-pickle-deserialization
+  message: Avoid unsafe pickle deserialization of untrusted runtime data.
+  severity: WARNING
+  languages:
+  - python
+  pattern-either:
+  - pattern: pickle.loads(...)
+  - pattern: pickle.load(...)

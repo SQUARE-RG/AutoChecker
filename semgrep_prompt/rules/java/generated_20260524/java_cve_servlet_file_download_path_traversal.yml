@@ -1,0 +1,23 @@
+rules:
+- id: java-servlet-file-download-path-traversal
+  message: Use validated, normalized file names before reading files from request
+    parameters.
+  severity: WARNING
+  languages:
+  - java
+  pattern-either:
+  - patterns:
+    - pattern: Files.readAllBytes(Paths.get(..., $REQ.getParameter(...)))
+    - pattern-not: '$F.contains("..") || $F.contains("/")
+
+        '
+  - patterns:
+    - pattern: Files.readAllBytes(Paths.get($BASE, $REQ.getParameter(...)))
+    - pattern-not: '$F.contains("..") || $F.contains("/")
+
+        '
+  - patterns:
+    - pattern: Files.readAllBytes(Paths.get($REQ.getParameter(...)))
+    - pattern-not: '$F.contains("..") || $F.contains("/")
+
+        '

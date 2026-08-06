@@ -1,0 +1,23 @@
+rules:
+- id: flask-debug-mode-enabled
+  message: Flask debug mode is enabled; keep debug off in production.
+  severity: WARNING
+  languages:
+  - python
+  pattern-either:
+  - pattern: app.run(debug=True);
+  - pattern: app.run(..., debug=True, ...);
+  - pattern: app.debug = True;
+  - pattern: app.config['DEBUG'] = True;
+  - pattern: app.config.update(DEBUG=True);
+  - pattern: app.config.from_mapping(DEBUG=True);
+  - pattern: Flask(...).run(debug=True);
+  - pattern: Flask(...).run(..., debug=True, ...);
+  - patterns:
+    - pattern: app.run(debug=DEBUG);
+    - pattern-not: app.run(debug=False);
+  - pattern: Flask(...).run(debug=DEBUG);
+  - pattern: app.debug=True;
+  - pattern: app.config['DEBUG']=True;
+  - pattern: app.config.update(DEBUG = True);
+  - pattern: app.config.from_mapping(DEBUG = True);

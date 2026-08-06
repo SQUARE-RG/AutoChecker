@@ -1,0 +1,15 @@
+rules:
+- id: java-objectinputstream-readobject-without-filter
+  message: Calling ObjectInputStream.readObject() without configuring an ObjectInputFilter
+    first can allow unsafe deserialization.
+  severity: WARNING
+  languages:
+  - java
+  pattern-either:
+  - pattern: new ObjectInputStream($IN).readObject()
+  - patterns:
+    - pattern: $OIS = new ObjectInputStream($IN);
+    - pattern: $OIS.readObject()
+    - pattern-not: '$OIS.setObjectInputFilter($FILTER);
+
+        '

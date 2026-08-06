@@ -1,0 +1,19 @@
+rules:
+- id: rust-command-injection-user-controlled-program
+  message: Avoid constructing Command with a non-literal or user-derived program/executable
+    name.
+  severity: WARNING
+  languages:
+  - rust
+  pattern-either:
+  - patterns:
+    - pattern: std::process::Command::new($X)
+    - pattern-not: std::process::Command::new("...")
+  - pattern: tokio::process::Command::new($X)
+  - patterns:
+    - pattern: Command::new($X)
+    - pattern-not: Command::new("...")
+  pattern-not:
+  - std::process::Command::new("...")
+  - tokio::process::Command::new("...")
+  - Command::new("...")

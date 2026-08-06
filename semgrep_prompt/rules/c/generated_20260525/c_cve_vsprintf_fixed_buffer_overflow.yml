@@ -1,0 +1,16 @@
+rules:
+- id: c-vsprintf-fixed-buffer-overflow
+  message: Unsafe use of vsprintf into a fixed-size buffer; use vsnprintf with the
+    destination size instead.
+  severity: ERROR
+  languages:
+  - c
+  pattern-either:
+  - patterns:
+    - pattern: vsprintf($BUF, $FMT, $AP);
+    - pattern-not: vsnprintf($BUF, sizeof($BUF), $FMT, $AP);
+    - pattern-not: vsnprintf($BUF, sizeof($BUF), $FMT, $AP)
+  - patterns:
+    - pattern: vsprintf($BUF, $FMT, $AP)
+    - pattern-not: vsnprintf($BUF, sizeof($BUF), $FMT, $AP);
+    - pattern-not: vsnprintf($BUF, sizeof($BUF), $FMT, $AP)

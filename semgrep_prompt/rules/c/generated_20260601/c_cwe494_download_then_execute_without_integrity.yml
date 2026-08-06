@@ -1,0 +1,54 @@
+rules:
+- id: cwe-494-download-then-execute-without-integrity-check
+  message: Executing or loading a downloaded artifact without a preceding integrity
+    verification such as verify_sha256, signature, or hash check.
+  severity: WARNING
+  languages:
+  - c
+  pattern-either:
+  - patterns:
+    - pattern: '...
+
+        snprintf($CMD, sizeof($CMD), ...);
+
+        ...
+
+        system($CMD);
+
+        ...
+
+        system("/tmp/u");
+
+        ...
+
+        '
+    - pattern-not: '...
+
+        if (!verify_sha256("/tmp/u", "known")) return;
+
+        ...
+
+        '
+  - patterns:
+    - pattern: '...
+
+        snprintf($CMD, sizeof($CMD), ...);
+
+        ...
+
+        system($CMD);
+
+        ...
+
+        system($PATH);
+
+        ...
+
+        '
+    - pattern-not: '...
+
+        if (!verify_sha256("/tmp/u", "known")) return;
+
+        ...
+
+        '

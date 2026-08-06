@@ -1,0 +1,48 @@
+# Instruction
+You are a clang-tidy expert, proficient in LLVM/Clang AST analysis and static checker development.
+
+Your task is to:
+1. Analyze compiler error messages in relation to the provided checker code (both .cpp and .h files).
+2. Identify the root causes of the compilation errors.
+3. Generate new checker code based on the repair steps and related reference code snippets.
+4. Ensure the generated checker code is complete and compilable.
+
+# Inputs
+
+## checker code 
+
+checker_cpp:
+```cpp
+{check_cpp_code}
+```
+
+checker_h:
+```cpp
+{check_h_code}
+```
+## compiler error info
+{compiler_error_info}
+
+## repair steps
+{repair_steps}
+
+## reference code snippets
+{repair_suggestions}
+
+# Output Formatting Requirements
+**Output Format Requirements:**
+- Strictly output according to the format below, do not add any additional explanations or text, code blocks are marked with ```cpp and include the complete source code.
+- Ensure that the source code is complete and compilable.
+- Please modify based on the checker code template above.Namespace content such as "namespace clang::tidy::ucassaat", please do not modify to prevent prevent compilation error.
+
+## **Example Output Format:**
+
+    checker_cpp:
+    ```cpp
+        ....(source code)....
+    ```
+
+    checker_h:
+    ```cpp
+        ....(source code)....
+    ```

@@ -1,0 +1,93 @@
+rules:
+- id: js-sql-injection-runtime-query-construction
+  message: Unsafe runtime SQL query construction with string concatenation or template
+    interpolation.
+  severity: WARNING
+  languages:
+  - javascript
+  pattern-either:
+  - patterns:
+    - pattern: $DB.query($SQL + ...)
+    - pattern-not: $DB.raw($SQL, ...)
+    - pattern-not: $DB.query($SQL, ...)
+    - pattern-not: $DB.execute($SQL, ...)
+    - pattern-not: $DB.all($SQL, ...)
+    - pattern-not: $DB.$queryRaw`...${...}...`
+    - pattern-not: $DB.query('select * from users order by ' + allowed[order])
+  - patterns:
+    - pattern: $DB.execute($SQL + ...)
+    - pattern-not: $DB.raw($SQL, ...)
+    - pattern-not: $DB.query($SQL, ...)
+    - pattern-not: $DB.execute($SQL, ...)
+    - pattern-not: $DB.all($SQL, ...)
+    - pattern-not: $DB.$queryRaw`...${...}...`
+  - patterns:
+    - pattern: $DB.raw($SQL + ...)
+    - pattern-not: $DB.raw($SQL, ...)
+    - pattern-not: $DB.query($SQL, ...)
+    - pattern-not: $DB.execute($SQL, ...)
+    - pattern-not: $DB.all($SQL, ...)
+    - pattern-not: $DB.$queryRaw`...${...}...`
+  - patterns:
+    - pattern: $DB.all($SQL + ...)
+    - pattern-not: $DB.raw($SQL, ...)
+    - pattern-not: $DB.query($SQL, ...)
+    - pattern-not: $DB.execute($SQL, ...)
+    - pattern-not: $DB.all($SQL, ...)
+    - pattern-not: $DB.$queryRaw`...${...}...`
+  - patterns:
+    - pattern: $DB.query(`...${...}...`)
+    - pattern-not: $DB.raw($SQL, ...)
+    - pattern-not: $DB.query($SQL, ...)
+    - pattern-not: $DB.execute($SQL, ...)
+    - pattern-not: $DB.all($SQL, ...)
+    - pattern-not: $DB.$queryRaw`...${...}...`
+  - patterns:
+    - pattern: $DB.execute(`...${...}...`)
+    - pattern-not: $DB.raw($SQL, ...)
+    - pattern-not: $DB.query($SQL, ...)
+    - pattern-not: $DB.execute($SQL, ...)
+    - pattern-not: $DB.all($SQL, ...)
+    - pattern-not: $DB.$queryRaw`...${...}...`
+  - patterns:
+    - pattern: $DB.raw(`...${...}...`)
+    - pattern-not: $DB.raw($SQL, ...)
+    - pattern-not: $DB.query($SQL, ...)
+    - pattern-not: $DB.execute($SQL, ...)
+    - pattern-not: $DB.all($SQL, ...)
+    - pattern-not: $DB.$queryRaw`...${...}...`
+  - patterns:
+    - pattern: $DB.all(`...${...}...`)
+    - pattern-not: $DB.raw($SQL, ...)
+    - pattern-not: $DB.query($SQL, ...)
+    - pattern-not: $DB.execute($SQL, ...)
+    - pattern-not: $DB.all($SQL, ...)
+    - pattern-not: $DB.$queryRaw`...${...}...`
+  - patterns:
+    - pattern: await $DB.$queryRawUnsafe($SQL + ...)
+    - pattern-not: $DB.raw($SQL, ...)
+    - pattern-not: $DB.query($SQL, ...)
+    - pattern-not: $DB.execute($SQL, ...)
+    - pattern-not: $DB.all($SQL, ...)
+    - pattern-not: $DB.$queryRaw`...${...}...`
+  - patterns:
+    - pattern: $DB.$queryRawUnsafe($SQL + ...)
+    - pattern-not: $DB.raw($SQL, ...)
+    - pattern-not: $DB.query($SQL, ...)
+    - pattern-not: $DB.execute($SQL, ...)
+    - pattern-not: $DB.all($SQL, ...)
+    - pattern-not: $DB.$queryRaw`...${...}...`
+  - patterns:
+    - pattern: await $DB.$queryRawUnsafe(`...${...}...`)
+    - pattern-not: $DB.raw($SQL, ...)
+    - pattern-not: $DB.query($SQL, ...)
+    - pattern-not: $DB.execute($SQL, ...)
+    - pattern-not: $DB.all($SQL, ...)
+    - pattern-not: $DB.$queryRaw`...${...}...`
+  - patterns:
+    - pattern: $DB.$queryRawUnsafe(`...${...}...`)
+    - pattern-not: $DB.raw($SQL, ...)
+    - pattern-not: $DB.query($SQL, ...)
+    - pattern-not: $DB.execute($SQL, ...)
+    - pattern-not: $DB.all($SQL, ...)
+    - pattern-not: $DB.$queryRaw`...${...}...`

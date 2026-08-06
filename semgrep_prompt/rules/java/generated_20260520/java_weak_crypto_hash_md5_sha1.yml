@@ -1,0 +1,16 @@
+rules:
+- id: java-weak-crypto-hash-algorithms
+  message: Weak cryptographic hash algorithm detected; use SHA-256, SHA-512, HmacSHA256,
+    or another modern hash instead.
+  severity: WARNING
+  languages:
+  - java
+  pattern-either:
+  - pattern: MessageDigest.getInstance("MD5")
+  - pattern: MessageDigest.getInstance("SHA1")
+  - pattern: MessageDigest.getInstance("SHA-1")
+  - pattern: MessageDigest.getInstance("md5")
+  - pattern: DigestUtils.md5Hex(...)
+  - pattern: DigestUtils.sha1Hex(...)
+  - pattern: Hashing.md5()
+  - pattern: Hashing.sha1()

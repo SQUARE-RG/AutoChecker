@@ -1,0 +1,5 @@
+{
+    "_type": "prompt",
+    "input_variables": ["check_cpp_code", "check_h_code", "compiler_error_info","repair_steps","repair_suggestions"],
+    "template_path": "/root/code_check/src/prompt/clang_tidy_prompt/prompt_txt/repair_compiler_error_code.txt"
+}

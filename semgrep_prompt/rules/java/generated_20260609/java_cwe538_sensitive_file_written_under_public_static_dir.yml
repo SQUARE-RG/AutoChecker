@@ -1,0 +1,47 @@
+rules:
+- id: java-cwe-538-sensitive-file-written-under-public-dir
+  message: Writing sensitive data into an externally reachable directory can expose
+    secrets, tokens, keys, configs, backups, dumps, or PEM material.
+  severity: WARNING
+  languages:
+  - java
+  pattern-either:
+  - patterns:
+    - pattern: Files.writeString(Paths.get($PATH), $DATA)
+    - metavariable-regex:
+        metavariable: $PATH
+        regex: .*(src/main/resources/static|resources/public|src/main/webapp|webroot|download|public|static).*
+    - metavariable-regex:
+        metavariable: $DATA
+        regex: .*(secret|token|password|key|config|dump|backup|pem).*
+  - patterns:
+    - pattern: Files.write(Paths.get($PATH), $DATA)
+    - metavariable-regex:
+        metavariable: $PATH
+        regex: .*(src/main/resources/static|resources/public|src/main/webapp|webroot|download|public|static).*
+    - metavariable-regex:
+        metavariable: $DATA
+        regex: .*(secret|token|password|key|config|dump|backup|pem).*
+  - patterns:
+    - pattern: new PrintWriter($PATH).println($DATA)
+    - metavariable-regex:
+        metavariable: $PATH
+        regex: .*(src/main/resources/static|resources/public|src/main/webapp|webroot|download|public|static).*
+    - metavariable-regex:
+        metavariable: $DATA
+        regex: .*(secret|token|password|key|config|dump|backup|pem).*
+  - patterns:
+    - pattern: new FileWriter($PATH)
+    - metavariable-regex:
+        metavariable: $PATH
+        regex: .*(src/main/resources/static|resources/public|src/main/webapp|webroot|download|public|static).*
+  - patterns:
+    - pattern: new FileOutputStream($PATH)
+    - metavariable-regex:
+        metavariable: $PATH
+        regex: .*(src/main/resources/static|resources/public|src/main/webapp|webroot|download|public|static).*
+  - patterns:
+    - pattern: $OUT.write($DATA)
+    - metavariable-regex:
+        metavariable: $DATA
+        regex: .*(secret|token|password|key|config|dump|backup|pem).*

@@ -1,0 +1,10 @@
+rules:
+- id: c-chown-runtime-path-symlink-follow
+  message: Use lchown instead of chown when changing ownership of a path, to avoid
+    following symlinks.
+  severity: WARNING
+  languages:
+  - c
+  patterns:
+  - pattern: chown($PATH, $UID, $GID);
+  - pattern-not: chown("...", $UID, $GID);

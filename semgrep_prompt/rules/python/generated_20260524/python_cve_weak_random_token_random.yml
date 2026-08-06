@@ -1,0 +1,111 @@
+rules:
+- id: python-insecure-random-token-generation
+  message: Use secrets.* token APIs instead of random module for token generation.
+  severity: WARNING
+  languages:
+  - python
+  pattern-either:
+  - patterns:
+    - pattern: 'return hex(random.getrandbits(...))
+
+        '
+    - pattern-not: 'return secrets.token_hex(...)
+
+        '
+    - pattern-not: 'return secrets.token_urlsafe(...)
+
+        '
+    - pattern-not: 'return secrets.token_bytes(...)
+
+        '
+  - patterns:
+    - pattern: 'return str(random.getrandbits(...))
+
+        '
+    - pattern-not: 'return secrets.token_hex(...)
+
+        '
+    - pattern-not: 'return secrets.token_urlsafe(...)
+
+        '
+    - pattern-not: 'return secrets.token_bytes(...)
+
+        '
+  - patterns:
+    - pattern: 'return random.getrandbits(...)
+
+        '
+    - pattern-not: 'return secrets.token_hex(...)
+
+        '
+    - pattern-not: 'return secrets.token_urlsafe(...)
+
+        '
+    - pattern-not: 'return secrets.token_bytes(...)
+
+        '
+  - patterns:
+    - pattern: 'return random.choice(...)
+
+        '
+    - pattern-not: 'return secrets.token_hex(...)
+
+        '
+    - pattern-not: 'return secrets.token_urlsafe(...)
+
+        '
+    - pattern-not: 'return secrets.token_bytes(...)
+
+        '
+  - patterns:
+    - pattern: 'return random.choices(...)
+
+        '
+    - pattern-not: 'return secrets.token_hex(...)
+
+        '
+    - pattern-not: 'return secrets.token_urlsafe(...)
+
+        '
+    - pattern-not: 'return secrets.token_bytes(...)
+
+        '
+  - patterns:
+    - pattern: 'return random.randint(...)
+
+        '
+    - pattern-not: 'return secrets.token_hex(...)
+
+        '
+    - pattern-not: 'return secrets.token_urlsafe(...)
+
+        '
+    - pattern-not: 'return secrets.token_bytes(...)
+
+        '
+  - patterns:
+    - pattern: 'return random.randrange(...)
+
+        '
+    - pattern-not: 'return secrets.token_hex(...)
+
+        '
+    - pattern-not: 'return secrets.token_urlsafe(...)
+
+        '
+    - pattern-not: 'return secrets.token_bytes(...)
+
+        '
+  - patterns:
+    - pattern: 'return f"$X"
+
+        '
+    - pattern-not: 'return secrets.token_hex(...)
+
+        '
+    - pattern-not: 'return secrets.token_urlsafe(...)
+
+        '
+    - pattern-not: 'return secrets.token_bytes(...)
+
+        '

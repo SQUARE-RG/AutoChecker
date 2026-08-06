@@ -1,0 +1,46 @@
+rules:
+- id: c.mkstemp-temporary-file-missing-cleanup
+  message: mkstemp-created temporary files must be closed and unlinked on the temporary
+    path.
+  severity: WARNING
+  languages:
+  - c
+  pattern-either:
+  - patterns:
+    - pattern: 'char $PATH[] = "...XXXXXX";
+
+        ...
+
+        int $FD = mkstemp($PATH);
+
+        ...
+
+        write($FD, ...);
+
+        '
+    - pattern-not: 'char $PATH[] = "...XXXXXX";
+
+        ...
+
+        unlink($PATH);
+
+        ...
+
+        close($FD);
+
+        '
+  - patterns:
+    - pattern: 'int $FD = mkstemp($PATH);
+
+        ...
+
+        write($FD, ...);
+
+        '
+    - pattern-not: 'unlink($PATH);
+
+        ...
+
+        close($FD);
+
+        '

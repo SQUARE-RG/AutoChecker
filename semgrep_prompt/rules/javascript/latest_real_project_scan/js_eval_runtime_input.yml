@@ -1,0 +1,49 @@
+rules:
+- id: javascript-dynamic-code-execution-from-runtime-input
+  message: Avoid executing runtime or user-controlled input with eval, Function, vm.runInNewContext,
+    vm.runInThisContext, or string-valued setTimeout/setInterval callbacks.
+  severity: WARNING
+  languages:
+  - javascript
+  mode: taint
+  pattern-sources:
+  - pattern: req.query.$X
+  - pattern: req.body.$X
+  - pattern: location.hash.slice(...)
+  - pattern: message.data
+  - pattern: userCode
+  - patterns:
+    - pattern: input
+    - pattern-not-inside: 'const run = JSON.parse;
+
+        ...
+
+        '
+  - pattern: source
+  pattern-sinks:
+  - pattern-either:
+    - pattern: eval($CODE)
+    - pattern: $OBJ.eval($CODE)
+    - pattern: Function($ARGS)
+    - pattern: new Function($ARGS)
+    - pattern: vm.runInNewContext($CODE)
+    - pattern: vm.runInThisContext($CODE)
+    - pattern: setTimeout($CB, ...)
+    - pattern: setInterval($CB, ...)
+    - pattern: run($ARG)
+  pattern-propagators:
+  - pattern: $DST = $SRC;
+    from: $SRC
+    to: $DST
+  - pattern: const $DST = $SRC;
+    from: $SRC
+    to: $DST
+  - pattern: let $DST = $SRC;
+    from: $SRC
+    to: $DST
+  - pattern: var $DST = $SRC;
+    from: $SRC
+    to: $DST
+  - pattern: $DST = $SRC.slice(...);
+    from: $SRC
+    to: $DST

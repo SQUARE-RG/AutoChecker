@@ -1,0 +1,55 @@
+rules:
+- id: java-sensitive-cookie-missing-samesite
+  message: Sensitive cookie is emitted without SameSite, or uses SameSite=None for
+    a sensitive token.
+  severity: WARNING
+  languages:
+  - java
+  pattern-either:
+  - patterns:
+    - pattern: $RESP.addCookie(new Cookie($NAME, ...));
+    - metavariable-regex:
+        metavariable: $NAME
+        regex: ^"(SESSIONID|sid|jwt|csrf|auth|accessToken|refreshToken|rememberMe)"$
+  - patterns:
+    - pattern: $RESP.addCookie($C);
+    - pattern-inside: 'Cookie $C = new Cookie($NAME, ...);
+
+        ...
+
+        '
+    - metavariable-regex:
+        metavariable: $NAME
+        regex: ^"(SESSIONID|sid|jwt|csrf|auth|accessToken|refreshToken|rememberMe)"$
+  - patterns:
+    - pattern: ResponseCookie.from($NAME, ...).secure(true).httpOnly(true).build()
+    - metavariable-regex:
+        metavariable: $NAME
+        regex: ^"(SESSIONID|sid|jwt|csrf|auth|accessToken|refreshToken|rememberMe)"$
+  - patterns:
+    - pattern: ResponseCookie.from($NAME, ...).secure(true).build()
+    - pattern-not: ResponseCookie.from($NAME, ...).secure(true).sameSite(...).build()
+    - metavariable-regex:
+        metavariable: $NAME
+        regex: ^"(SESSIONID|sid|jwt|csrf|auth|accessToken|refreshToken|rememberMe)"$
+  - patterns:
+    - pattern: new NewCookie($NAME, ...)
+    - metavariable-regex:
+        metavariable: $NAME
+        regex: ^"(SESSIONID|sid|jwt|csrf|auth|accessToken|refreshToken|rememberMe)"$
+  - patterns:
+    - pattern: $RESP.addHeader("Set-Cookie", $VALUE)
+    - metavariable-regex:
+        metavariable: $VALUE
+        regex: .*(SESSIONID|sid|jwt|csrf|auth|accessToken|refreshToken|rememberMe).*
+    - pattern-not-regex: SameSite\s*=\s*(Lax|Strict)
+  - patterns:
+    - pattern: $RESP.setHeader("Set-Cookie", $VALUE)
+    - metavariable-regex:
+        metavariable: $VALUE
+        regex: .*(SESSIONID|sid|jwt|csrf|auth|accessToken|refreshToken|rememberMe).*
+    - pattern-not-regex: SameSite\s*=\s*(Lax|Strict)
+  - patterns:
+    - pattern-regex: Set-Cookie:\s*(?:SESSIONID|sid|jwt|csrf|auth|accessToken|refreshToken|rememberMe)=[^;\n]*(?:;[^\n]*)*;\s*Secure(?:;[^\n]*)*;\s*HttpOnly(?:;[^\n]*)*$
+    - pattern-not-regex: SameSite\s*=\s*(Lax|Strict)
+    - pattern-regex: SameSite\s*=\s*None

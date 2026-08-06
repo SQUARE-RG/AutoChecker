@@ -1,0 +1,20 @@
+rules:
+- id: c-wordexp-user-controlled-input-without-nocmd
+  message: Avoid passing runtime-controlled strings to wordexp() without WRDE_NOCMD;
+    word expansion can execute command substitutions.
+  severity: WARNING
+  languages:
+  - c
+  pattern-either:
+  - patterns:
+    - pattern: wordexp(argv[$IDX], $P, $FLAGS);
+    - pattern-not: wordexp(argv[$IDX], $P, WRDE_NOCMD);
+  - patterns:
+    - pattern: wordexp(getenv(...), $P, $FLAGS);
+    - pattern-not: wordexp(getenv(...), $P, WRDE_NOCMD);
+  - patterns:
+    - pattern: wordexp($INPUT, $P, $FLAGS);
+    - pattern-not: wordexp("...", $P, ...);
+    - pattern-not: wordexp($INPUT, $P, WRDE_NOCMD);
+    - pattern-not: wordexp(argv[$IDX], $P, WRDE_NOCMD);
+    - pattern-not: wordexp(getenv(...), $P, WRDE_NOCMD);

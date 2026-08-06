@@ -1,0 +1,32 @@
+rules:
+- id: signed-length-upper-bound-only-to-size_t-copy
+  message: Signed length is only upper-bounded before being cast to size_t for a byte-copy/read
+    sink; require a non-negative lower bound as well.
+  severity: WARNING
+  languages:
+  - c
+  pattern-either:
+  - patterns:
+    - pattern: "if ($LEN < $MAX) {\n  memcpy($DST, $SRC, (size_t)$LEN);\n}\n"
+    - pattern-not: "if ($LEN >= 0 && $LEN < $MAX) {\n  memcpy($DST, $SRC, (size_t)$LEN);\n\
+        }\n"
+    - pattern-not: "if ($LEN >= 0 && $LEN < $MAX) {\n  memmove($DST, $SRC, (size_t)$LEN);\n\
+        }\n"
+    - pattern-not: "if ($LEN >= 0 && $LEN < $MAX) {\n  read($FD, $DST, (size_t)$LEN);\n\
+        }\n"
+  - patterns:
+    - pattern: "if ($LEN < $MAX) {\n  memmove($DST, $SRC, (size_t)$LEN);\n}\n"
+    - pattern-not: "if ($LEN >= 0 && $LEN < $MAX) {\n  memcpy($DST, $SRC, (size_t)$LEN);\n\
+        }\n"
+    - pattern-not: "if ($LEN >= 0 && $LEN < $MAX) {\n  memmove($DST, $SRC, (size_t)$LEN);\n\
+        }\n"
+    - pattern-not: "if ($LEN >= 0 && $LEN < $MAX) {\n  read($FD, $DST, (size_t)$LEN);\n\
+        }\n"
+  - patterns:
+    - pattern: "if ($LEN < $MAX) {\n  read($FD, $DST, (size_t)$LEN);\n}\n"
+    - pattern-not: "if ($LEN >= 0 && $LEN < $MAX) {\n  memcpy($DST, $SRC, (size_t)$LEN);\n\
+        }\n"
+    - pattern-not: "if ($LEN >= 0 && $LEN < $MAX) {\n  memmove($DST, $SRC, (size_t)$LEN);\n\
+        }\n"
+    - pattern-not: "if ($LEN >= 0 && $LEN < $MAX) {\n  read($FD, $DST, (size_t)$LEN);\n\
+        }\n"

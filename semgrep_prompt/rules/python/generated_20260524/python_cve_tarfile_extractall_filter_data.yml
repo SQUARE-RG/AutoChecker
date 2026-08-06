@@ -1,0 +1,10 @@
+rules:
+- id: python-tarfile-extractall-missing-safe-filter
+  message: Tarfile extraction should use filter="data" or an equivalent safe extraction
+    filter to prevent path traversal.
+  severity: WARNING
+  languages:
+  - python
+  patterns:
+  - pattern: $TAR.extractall(...)
+  - pattern-not: $TAR.extractall(..., filter="data", ...);

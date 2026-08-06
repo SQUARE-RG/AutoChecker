@@ -1,0 +1,29 @@
+rules:
+- id: getenv-used-in-authz-decision
+  message: Environment variables should not be used directly for authorization or
+    privilege decisions.
+  severity: WARNING
+  languages:
+  - c
+  mode: taint
+  pattern-sources:
+  - pattern: getenv(...)
+  pattern-sinks:
+  - patterns:
+    - pattern: return $COND;
+    - pattern-inside: "int $FUNC(...) {\n  ...\n}\n"
+    focus-metavariable: $COND
+  - patterns:
+    - pattern: return $COND;
+    - pattern-inside: "int $FUNC(...) {\n  ...\n}\n"
+    - pattern-not: return $PARAM == 1;
+    focus-metavariable: $COND
+  pattern-propagators:
+  - pattern: $DST = $SRC;
+    from: $SRC
+    to: $DST
+  - pattern: $TYPE $DST = $SRC;
+    from: $SRC
+    to: $DST
+  options:
+    taint_unify_mvars: true

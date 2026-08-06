@@ -1,0 +1,39 @@
+rules:
+- id: java-tls-certificate-validation-bypass
+  message: Detect insecure TLS/HTTPS certificate or hostname verification bypasses
+    in Java.
+  severity: WARNING
+  languages:
+  - java
+  pattern-either:
+  - patterns:
+    - pattern: "new X509TrustManager() {\n  ...\n  public void checkClientTrusted(...)\
+        \ { }\n  ...\n  public void checkServerTrusted(...) { }\n  ...\n}\n"
+  - patterns:
+    - pattern: "$CTX.init(null, new TrustManager[]{ new X509TrustManager() {\n  ...\n\
+        \  public void checkClientTrusted(...) { }\n  ...\n  public void checkServerTrusted(...)\
+        \ { }\n  ...\n} }, ...);\n"
+  - pattern: '(hostname, session) -> true
+
+      '
+  - pattern: "new HostnameVerifier() {\n  ...\n  public boolean verify(String $H,\
+      \ SSLSession $S) { return true; }\n  ...\n}\n"
+  - patterns:
+    - pattern: HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) ->
+        true);
+  - patterns:
+    - pattern: $C.setHostnameVerifier((hostname, session) -> true);
+  - patterns:
+    - pattern: $BUILDER.hostnameVerifier((hostname, session) -> true)
+  - pattern: org.apache.http.conn.ssl.NoopHostnameVerifier
+  - pattern: org.apache.http.conn.ssl.NoopHostnameVerifier.INSTANCE
+  - patterns:
+    - pattern: 'return new OkHttpClient.Builder().hostnameVerifier((h, s) -> true).build();
+
+        '
+  metadata:
+    category: security
+    technology:
+    - tls
+    - https
+    confidence: medium

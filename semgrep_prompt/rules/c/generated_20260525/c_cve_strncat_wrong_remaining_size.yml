@@ -1,0 +1,9 @@
+rules:
+- id: c-strncat-wrong-remaining-size
+  message: strncat uses sizeof(destination) instead of remaining capacity
+  severity: WARNING
+  languages:
+  - c
+  patterns:
+  - pattern: strncat($DST, $SRC, sizeof($DST));
+  - pattern-not: strncat($DST, $SRC, sizeof($DST) - strlen($DST) - 1);

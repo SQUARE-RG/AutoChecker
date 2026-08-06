@@ -1,0 +1,10 @@
+# Inputs
+## rule
+**Rule Description:**
+{rule_description}
+
+## test case code
+**Negative Test Case Code:**
+```c
+{negative_test_case}
+```

@@ -1,0 +1,14 @@
+rules:
+- id: java-zip-slip-resolve-without-normalize-check
+  languages:
+  - java
+  message: Possible Zip Slip path traversal when resolving ZipEntry names without
+    normalize()/startsWith() validation.
+  severity: ERROR
+  patterns:
+  - pattern: $DEST.resolve($ENTRY.getName())
+  - pattern-not-inside: 'Path $OUT = $DEST.resolve($ENTRY.getName()).normalize();
+
+      if (!$OUT.startsWith($DEST)) throw new SecurityException(...);
+
+      '

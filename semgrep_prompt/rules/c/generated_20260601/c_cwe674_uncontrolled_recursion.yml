@@ -1,0 +1,32 @@
+rules:
+- id: c-uncontrolled-recursion-linked-structure-no-depth-limit
+  message: Recursive descent over a linked structure without a visible recursion depth
+    limit.
+  severity: WARNING
+  languages:
+  - c
+  pattern-either:
+  - patterns:
+    - pattern: 'return 1 + $F($N->child);
+
+        '
+    - pattern-inside: "int $F(Node *$N) {\n  ...\n}\n"
+    - pattern-not-inside: "int $F(Node *$N, int $DEPTH) {\n  ...\n}\n"
+    - pattern-not: 'return 1 + $F($N->child, $DEPTH + 1);
+
+        '
+    - pattern-not: 'return $F($N->child, $DEPTH + 1);
+
+        '
+  - patterns:
+    - pattern: 'return $F($N->child);
+
+        '
+    - pattern-inside: "int $F(Node *$N) {\n  ...\n}\n"
+    - pattern-not-inside: "int $F(Node *$N, int $DEPTH) {\n  ...\n}\n"
+    - pattern-not: 'return 1 + $F($N->child, $DEPTH + 1);
+
+        '
+    - pattern-not: 'return $F($N->child, $DEPTH + 1);
+
+        '

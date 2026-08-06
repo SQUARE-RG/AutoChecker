@@ -1,0 +1,10 @@
+rules:
+- id: python-exec-on-runtime-input
+  message: Avoid calling exec() on runtime input.
+  severity: WARNING
+  languages:
+  - python
+  patterns:
+  - pattern: exec($CODE, ...)
+  - pattern-not: exec("...", ...)
+  - pattern-not: exec('...', ...)

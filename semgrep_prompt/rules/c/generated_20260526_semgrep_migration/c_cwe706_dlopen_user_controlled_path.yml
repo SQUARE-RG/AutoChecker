@@ -1,0 +1,30 @@
+rules:
+- id: c-dlopen-user-controlled-path
+  message: Dynamic library loading with a runtime-controlled path can load an unintended
+    library.
+  severity: WARNING
+  languages:
+  - c
+  mode: taint
+  pattern-sources:
+  - pattern: argv[$I]
+  - pattern: getenv(...)
+  - pattern: $SRC
+  pattern-sinks:
+  - patterns:
+    - pattern: dlopen($PATH, ...)
+    - pattern-not: dlopen("...", ...)
+  pattern-sanitizers:
+  - patterns:
+    - pattern: dlopen("...", ...)
+    - focus-metavariable: $PATH
+    by-side-effect: true
+  pattern-propagators:
+  - pattern: $DST = $SRC;
+    from: $SRC
+    to: $DST
+  - pattern: $TYPE $DST = $SRC;
+    from: $SRC
+    to: $DST
+  options:
+    taint_unify_mvars: true

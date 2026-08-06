@@ -1,0 +1,64 @@
+rules:
+- id: python-unsafe-reflection-dynamic-dispatch
+  message: External input is used to select a method, handler, global, local, or attribute
+    through reflective lookup without an allowlist mapping.
+  severity: WARNING
+  languages:
+  - python
+  pattern-either:
+  - patterns:
+    - pattern: getattr($OBJ, request.args[$KEY])()
+  - patterns:
+    - pattern: getattr($OBJ, request.GET[$KEY])()
+  - patterns:
+    - pattern: getattr($OBJ, request.query_params[$KEY])()
+  - patterns:
+    - pattern: getattr($OBJ, request.form.get($KEY))
+  - patterns:
+    - pattern: getattr($OBJ, await $REQ.json())
+  - patterns:
+    - pattern: getattr($OBJ, sys.argv[$IDX])()
+  - patterns:
+    - pattern: getattr($OBJ, request.args[$KEY])
+  - patterns:
+    - pattern: getattr($OBJ, request.GET[$KEY])
+  - patterns:
+    - pattern: getattr($OBJ, request.query_params[$KEY])
+  - patterns:
+    - pattern: getattr($OBJ, sys.argv[$IDX])
+  - patterns:
+    - pattern: globals()[request.args[$KEY]]()
+  - patterns:
+    - pattern: globals()[request.GET[$KEY]]()
+  - patterns:
+    - pattern: globals()[request.query_params[$KEY]]()
+  - patterns:
+    - pattern: globals()[request.form.get($KEY)]()
+  - patterns:
+    - pattern: globals()[await $REQ.json()]()
+  - patterns:
+    - pattern: globals()[sys.argv[$IDX]]()
+  - patterns:
+    - pattern: locals()[request.args[$KEY]]()
+  - patterns:
+    - pattern: locals()[request.GET[$KEY]]()
+  - patterns:
+    - pattern: locals()[request.query_params[$KEY]]()
+  - patterns:
+    - pattern: locals()[request.form.get($KEY)]()
+  - patterns:
+    - pattern: locals()[await $REQ.json()]()
+  - patterns:
+    - pattern: locals()[sys.argv[$IDX]]()
+  - patterns:
+    - pattern: getattr($OBJ, $SEL)()
+    - pattern-not: "if $SEL not in {$ALLOWED}:\n    raise ValueError(...)\n"
+  - patterns:
+    - pattern: getattr($OBJ, $SEL)
+    - pattern-not: "if $SEL not in {$ALLOWED}:\n    raise ValueError(...)\n"
+  - patterns:
+    - pattern: globals()[$SEL]()
+    - pattern-not: "if $SEL not in {$ALLOWED}:\n    raise ValueError(...)\n"
+  - patterns:
+    - pattern: locals()[$SEL]()
+    - pattern-not: "if $SEL not in {$ALLOWED}:\n    raise ValueError(...)\n"

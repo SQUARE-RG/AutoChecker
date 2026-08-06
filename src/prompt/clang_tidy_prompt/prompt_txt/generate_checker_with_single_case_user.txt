@@ -1,0 +1,34 @@
+# Inputs
+
+## rule
+**Rule Description:**
+{rule_description}
+
+## test case code
+**Test Case Code:**
+```cpp
+{test_code}
+```
+
+## AST
+{ast_txt}
+
+## reference logic step
+{logics}
+
+## reference astMatchers
+{reference_astMatchers}
+
+## reference api
+{renference_check_api}
+
+## checker code template
+
+The content of {ruler_checker_cpp_name} :
+```cpp
+{content_of_ruler_checker_cpp}
+```
+The content of {ruler_checker_h_name} :
+```cpp
+{content_of_ruler_checker_h}
+```

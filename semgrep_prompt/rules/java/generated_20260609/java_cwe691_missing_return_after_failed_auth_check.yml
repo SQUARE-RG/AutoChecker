@@ -1,0 +1,86 @@
+rules:
+- id: java-missing-return-after-auth-denial
+  message: Failed authentication or authorization handling should stop control flow
+    before a sensitive action.
+  severity: WARNING
+  languages:
+  - java
+  pattern-either:
+  - patterns:
+    - pattern: "if (!$COND) {\n  $DENY;\n}\n$SENSITIVE;\n"
+    - pattern: $RESP.sendError(...)
+  - patterns:
+    - pattern: "if (!$COND) {\n  $DENY;\n}\n$SENSITIVE;\n"
+    - pattern: $RESP.sendRedirect(...)
+  - patterns:
+    - pattern: "if (!$COND) {\n  $DENY;\n}\n$SENSITIVE;\n"
+    - pattern: $RESP.setStatus(...)
+  - patterns:
+    - pattern: "if (!$COND) {\n  $DENY;\n}\n$SENSITIVE;\n"
+    - pattern: logDenied(...)
+  - patterns:
+    - pattern: "if (!$COND) {\n  $DENY;\n}\n$SENSITIVE;\n"
+    - pattern: deny(...)
+  - patterns:
+    - pattern: "if (!$COND) {\n  $DENY;\n}\n$SENSITIVE;\n"
+    - pattern: error(...)
+  - patterns:
+    - pattern: "if (!$COND) {\n  $DENY;\n}\n$SENSITIVE;\n"
+    - pattern: audit(...)
+  - patterns:
+    - pattern: "if (!$COND) {\n  $DENY;\n}\n$SENSITIVE;\n"
+    - pattern: throwForbidden(...)
+  - patterns:
+    - pattern: "if (!$COND) {\n  $DENY;\n}\n$SENSITIVE;\n"
+    - pattern: $SENSITIVE;
+    - pattern: deleteUser(...)
+    - pattern-not: "if (!$COND) {\n  $DENY;\n  return;\n}\n$SENSITIVE;\n"
+    - pattern-not: "if (!$COND) {\n  $DENY;\n  throw ...;\n}\n$SENSITIVE;\n"
+  - patterns:
+    - pattern: "if (!$COND) {\n  $DENY;\n}\n$SENSITIVE;\n"
+    - pattern: $SENSITIVE;
+    - pattern: deleteTenant(...)
+    - pattern-not: "if (!$COND) {\n  $DENY;\n  return;\n}\n$SENSITIVE;\n"
+    - pattern-not: "if (!$COND) {\n  $DENY;\n  throw ...;\n}\n$SENSITIVE;\n"
+  - patterns:
+    - pattern: "if (!$COND) {\n  $DENY;\n}\n$SENSITIVE;\n"
+    - pattern: $SENSITIVE;
+    - pattern: updateConfig(...)
+    - pattern-not: "if (!$COND) {\n  $DENY;\n  return;\n}\n$SENSITIVE;\n"
+    - pattern-not: "if (!$COND) {\n  $DENY;\n  throw ...;\n}\n$SENSITIVE;\n"
+  - patterns:
+    - pattern: "if (!$COND) {\n  $DENY;\n}\n$SENSITIVE;\n"
+    - pattern: $SENSITIVE;
+    - pattern: exportData(...)
+    - pattern-not: "if (!$COND) {\n  $DENY;\n  return;\n}\n$SENSITIVE;\n"
+    - pattern-not: "if (!$COND) {\n  $DENY;\n  throw ...;\n}\n$SENSITIVE;\n"
+  - patterns:
+    - pattern: "if (!$COND) {\n  $DENY;\n}\n$SENSITIVE;\n"
+    - pattern: $SENSITIVE;
+    - pattern: rotateKey(...)
+    - pattern-not: "if (!$COND) {\n  $DENY;\n  return;\n}\n$SENSITIVE;\n"
+    - pattern-not: "if (!$COND) {\n  $DENY;\n  throw ...;\n}\n$SENSITIVE;\n"
+  - patterns:
+    - pattern: "if (!$COND) {\n  $DENY;\n}\n$SENSITIVE;\n"
+    - pattern: $SENSITIVE;
+    - pattern: grantRole(...)
+    - pattern-not: "if (!$COND) {\n  $DENY;\n  return;\n}\n$SENSITIVE;\n"
+    - pattern-not: "if (!$COND) {\n  $DENY;\n  throw ...;\n}\n$SENSITIVE;\n"
+  - patterns:
+    - pattern: "if (!$COND) {\n  $DENY;\n}\n$SENSITIVE;\n"
+    - pattern: $SENSITIVE;
+    - pattern: resetPassword(...)
+    - pattern-not: "if (!$COND) {\n  $DENY;\n  return;\n}\n$SENSITIVE;\n"
+    - pattern-not: "if (!$COND) {\n  $DENY;\n  throw ...;\n}\n$SENSITIVE;\n"
+  - patterns:
+    - pattern: "if (!$COND) {\n  $DENY;\n}\n$SENSITIVE;\n"
+    - pattern: $SENSITIVE;
+    - pattern: transferMoney(...)
+    - pattern-not: "if (!$COND) {\n  $DENY;\n  return;\n}\n$SENSITIVE;\n"
+    - pattern-not: "if (!$COND) {\n  $DENY;\n  throw ...;\n}\n$SENSITIVE;\n"
+  - patterns:
+    - pattern: "if (!$COND) {\n  $DENY;\n}\n$SENSITIVE;\n"
+    - pattern: $SENSITIVE;
+    - pattern: enableAdmin(...)
+    - pattern-not: "if (!$COND) {\n  $DENY;\n  return;\n}\n$SENSITIVE;\n"
+    - pattern-not: "if (!$COND) {\n  $DENY;\n  throw ...;\n}\n$SENSITIVE;\n"

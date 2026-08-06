@@ -1,0 +1,11 @@
+rules:
+- id: cwe-923-tls-hostname-verification-disabled
+  message: TLS hostname verification is disabled in libcurl via CURLOPT_SSL_VERIFYHOST
+    set to 0.
+  severity: WARNING
+  languages:
+  - c
+  pattern-either:
+  - pattern: curl_easy_setopt($CURL, CURLOPT_SSL_VERIFYHOST, 0L);
+  - pattern: curl_easy_setopt($CURL, CURLOPT_SSL_VERIFYHOST, 0);
+  - pattern: curl_easy_setopt($CURL, CURLOPT_SSL_VERIFYHOST, (long)0);

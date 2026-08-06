@@ -1,0 +1,19 @@
+rules:
+- id: rust-weak-hash-usage
+  message: Avoid weak hash algorithms like MD5 or SHA-1; use SHA-256, SHA-512, or
+    a stronger modern hash/KDF instead.
+  severity: WARNING
+  languages:
+  - rust
+  pattern-either:
+  - pattern: md5::compute(...)
+  - pattern: md5::Context::new(...)
+  - pattern: sha1::Sha1::new(...)
+  - pattern: crypto::md5::Md5::new(...)
+  - pattern: crypto::sha1::Sha1::new(...)
+  - pattern: MessageDigest::md5(...)
+  - pattern: MessageDigest::sha1(...)
+  - pattern: digest::Context::new(&digest::SHA1_FOR_LEGACY_USE_ONLY)
+  - pattern: ring::digest::digest(&ring::digest::SHA1_FOR_LEGACY_USE_ONLY, ...)
+  - pattern: openssl::hash::Hasher::new(openssl::hash::MessageDigest::md5()).unwrap()
+  - pattern: format!("{:x}", md5::compute(...))

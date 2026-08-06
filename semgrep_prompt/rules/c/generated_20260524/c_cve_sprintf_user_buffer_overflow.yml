@@ -1,0 +1,14 @@
+rules:
+- id: c-sprintf-into-fixed-stack-buffer
+  message: Avoid sprintf into fixed-size stack buffers; use snprintf with the destination
+    size instead.
+  severity: WARNING
+  languages:
+  - c
+  pattern-either:
+  - pattern: sprintf($BUF, ...);
+  - patterns:
+    - pattern: char $BUF[$N];
+    - pattern: sprintf($BUF, ...);
+  pattern-not:
+  - pattern: snprintf($BUF, sizeof($BUF), ...);

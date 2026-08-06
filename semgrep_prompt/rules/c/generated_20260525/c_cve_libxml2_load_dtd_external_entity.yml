@@ -1,0 +1,20 @@
+rules:
+- id: libxml2-unsafe-entity-expansion
+  message: libxml2 parsing enables DTD loading and/or entity substitution without
+    NONET, which can allow external entity expansion.
+  severity: WARNING
+  languages:
+  - c
+  pattern-either:
+  - patterns:
+    - pattern: xmlReadFile($P, $ENC, XML_PARSE_DTDLOAD | XML_PARSE_NOENT);
+    - pattern-not: xmlReadFile($P, $ENC, XML_PARSE_NONET | $REST);
+    - pattern-not: xmlReadFile($P, $ENC, $REST | XML_PARSE_NONET);
+  - patterns:
+    - pattern: xmlReadFile($P, $ENC, XML_PARSE_NOENT | XML_PARSE_DTDLOAD);
+    - pattern-not: xmlReadFile($P, $ENC, XML_PARSE_NONET | $REST);
+    - pattern-not: xmlReadFile($P, $ENC, $REST | XML_PARSE_NONET);
+  - patterns:
+    - pattern: xmlReadFile($P, $ENC, $OPTS);
+    - pattern-not: xmlReadFile($P, $ENC, XML_PARSE_NONET | $REST);
+    - pattern-not: xmlReadFile($P, $ENC, $REST | XML_PARSE_NONET);

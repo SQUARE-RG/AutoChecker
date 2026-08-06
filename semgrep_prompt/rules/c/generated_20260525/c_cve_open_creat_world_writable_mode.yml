@@ -1,0 +1,12 @@
+rules:
+- id: c-open-creat-world-writable-mode
+  message: open() with O_CREAT should not use world-writable permissions like 0666
+    or 0777.
+  severity: WARNING
+  languages:
+  - c
+  pattern-either:
+  - pattern: open($PATH, O_CREAT | $FLAGS, 0777)
+  - pattern: open($PATH, $FLAGS | O_CREAT, 0777)
+  - pattern: open($PATH, O_CREAT | $FLAGS, 0666)
+  - pattern: open($PATH, $FLAGS | O_CREAT, 0666)

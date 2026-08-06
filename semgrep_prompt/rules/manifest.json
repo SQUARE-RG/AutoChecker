@@ -1,0 +1,3068 @@
+{
+  "generated_at_utc": "2026-06-11T00:00:00Z",
+  "policy": {
+    "included": [
+      "Accepted LLM-generated final_rule.yml outputs with paired BAD/GOOD samples",
+      "Existing accepted checkers not removed by real-project noise review",
+      "Imported upstream Semgrep C checkers under rules/c/semgrep_original as active non-LLM rules"
+    ],
+    "excluded": [
+      "Rules removed for excessive real-project false positives",
+      "Manual-only rules",
+      "Failed generations",
+      "Skipped overbroad or invalid generated rules",
+      "demo intermediate generated_rule.yml files",
+      "repair_candidate.yml and other repair artifacts"
+    ]
+  },
+  "source_inputs": {
+    "round1_review_report": "semgrep_prompt/reports/20260609/java_python_cwe_expand/rule_generation_review.md",
+    "round2_review_report": "semgrep_prompt/reports/20260611/java_python_cwe_expand_round2/rule_generation_review.md",
+    "round1_generation_status": "/tmp/java_python_cwe_expand/status.jsonl",
+    "round2_generation_status": "/tmp/java_python_cwe_expand_round2_status.jsonl",
+    "candidate_list": "/home/meiosis/data/work/Semgrep_Java_Python_LLM规则拓展_CWE候选清单.md"
+  },
+  "counts": {
+    "files": 201,
+    "checkers": 201,
+    "by_language": {
+      "c": 105,
+      "java": 42,
+      "javascript": 4,
+      "python": 41,
+      "rust": 9
+    },
+    "by_source": {
+      "generated_20260519": 7,
+      "generated_20260520": 6,
+      "generated_20260524": 67,
+      "generated_20260525": 25,
+      "generated_20260526": 15,
+      "generated_20260526_semgrep_migration": 10,
+      "generated_20260527": 1,
+      "generated_20260601": 13,
+      "generated_20260609": 15,
+      "generated_20260611": 8,
+      "juliet": 4,
+      "latest_real_project_scan": 14,
+      "semgrep_original": 16
+    }
+  },
+  "rules": [
+    {
+      "checker": "c_cve_archive_extract_zip_slip",
+      "source": "generated_20260524",
+      "language": "c",
+      "rule_path": "c/generated_20260524/c_cve_archive_extract_zip_slip.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-archive-extract-path-traversal",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cve_chown_symlink_follow",
+      "source": "generated_20260524",
+      "language": "c",
+      "rule_path": "c/generated_20260524/c_cve_chown_symlink_follow.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-chown-runtime-path-symlink-follow",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cve_curl_ssl_verifypeer_disabled",
+      "source": "generated_20260524",
+      "language": "c",
+      "rule_path": "c/generated_20260524/c_cve_curl_ssl_verifypeer_disabled.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "curl-tls-verification-disabled",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cve_double_free_same_scope",
+      "source": "generated_20260524",
+      "language": "c",
+      "rule_path": "c/generated_20260524/c_cve_double_free_same_scope.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-double-free-same-scope",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cve_fopen_user_path_traversal",
+      "source": "generated_20260524",
+      "language": "c",
+      "rule_path": "c/generated_20260524/c_cve_fopen_user_path_traversal.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-fopen-path-traversal-without-basename-validation",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cve_gets_unbounded_input",
+      "source": "generated_20260524",
+      "language": "c",
+      "rule_path": "c/generated_20260524/c_cve_gets_unbounded_input.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-gets-unbounded-input",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cve_hardcoded_private_key_pem",
+      "source": "generated_20260524",
+      "language": "c",
+      "rule_path": "c/generated_20260524/c_cve_hardcoded_private_key_pem.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-hardcoded-pem-private-key",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cve_integer_overflow_allocation_size",
+      "source": "generated_20260524",
+      "language": "c",
+      "rule_path": "c/generated_20260524/c_cve_integer_overflow_allocation_size.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-unsafe-allocation-size-multiplication",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cve_null_deref_after_realloc",
+      "source": "generated_20260524",
+      "language": "c",
+      "rule_path": "c/generated_20260524/c_cve_null_deref_after_realloc.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-realloc-direct-assign-null-deref",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cve_openssl_no_cert_verify",
+      "source": "generated_20260524",
+      "language": "c",
+      "rule_path": "c/generated_20260524/c_cve_openssl_no_cert_verify.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "openssl-tls-cert-verification-disabled",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cve_scanf_string_no_width",
+      "source": "generated_20260524",
+      "language": "c",
+      "rule_path": "c/generated_20260524/c_cve_scanf_string_no_width.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-scanf-string-no-width",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cve_signed_unsigned_length_check_bypass",
+      "source": "generated_20260524",
+      "language": "c",
+      "rule_path": "c/generated_20260524/c_cve_signed_unsigned_length_check_bypass.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "signed-length-upper-bound-only-to-size_t-copy",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cve_snprintf_return_truncation_misuse",
+      "source": "generated_20260524",
+      "language": "c",
+      "rule_path": "c/generated_20260524/c_cve_snprintf_return_truncation_misuse.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "snprintf-return-used-as-index-without-bounds-check",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cve_sprintf_user_buffer_overflow",
+      "source": "generated_20260524",
+      "language": "c",
+      "rule_path": "c/generated_20260524/c_cve_sprintf_user_buffer_overflow.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-sprintf-into-fixed-stack-buffer",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cve_stack_alloca_user_size",
+      "source": "generated_20260524",
+      "language": "c",
+      "rule_path": "c/generated_20260524/c_cve_stack_alloca_user_size.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-runtime-sized-alloca",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cve_strcpy_off_by_one_heap_overflow",
+      "source": "generated_20260524",
+      "language": "c",
+      "rule_path": "c/generated_20260524/c_cve_strcpy_off_by_one_heap_overflow.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-strcpy-off-by-one-allocation",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cve_system_popen_user_command",
+      "source": "generated_20260524",
+      "language": "c",
+      "rule_path": "c/generated_20260524/c_cve_system_popen_user_command.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-shell-command-injection-system-popen",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cve_tmpnam_tempnam_mktemp_usage",
+      "source": "generated_20260524",
+      "language": "c",
+      "rule_path": "c/generated_20260524/c_cve_tmpnam_tempnam_mktemp_usage.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "insecure-temporary-filename-api",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cve_umask_world_writable",
+      "source": "generated_20260524",
+      "language": "c",
+      "rule_path": "c/generated_20260524/c_cve_umask_world_writable.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-umask-world-writable-default",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cve_use_after_free_same_scope",
+      "source": "generated_20260524",
+      "language": "c",
+      "rule_path": "c/generated_20260524/c_cve_use_after_free_same_scope.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-use-after-free-same-scope",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cve_world_writable_chmod",
+      "source": "generated_20260524",
+      "language": "c",
+      "rule_path": "c/generated_20260524/c_cve_world_writable_chmod.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "world-writable-chmod",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cve_chroot_without_chdir_root",
+      "source": "generated_20260525",
+      "language": "c",
+      "rule_path": "c/generated_20260525/c_cve_chroot_without_chdir_root.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-chroot-without-post-chdir-root",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cve_expat_external_entity_handler_enabled",
+      "source": "generated_20260525",
+      "language": "c",
+      "rule_path": "c/generated_20260525/c_cve_expat_external_entity_handler_enabled.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "expat-external-entity-handler-enabled",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cve_fchmod_world_writable",
+      "source": "generated_20260525",
+      "language": "c",
+      "rule_path": "c/generated_20260525/c_cve_fchmod_world_writable.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "fchmod-world-writable-permissions",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cve_getenv_used_for_security_decision",
+      "source": "generated_20260525",
+      "language": "c",
+      "rule_path": "c/generated_20260525/c_cve_getenv_used_for_security_decision.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "getenv-used-in-authz-decision",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cve_gets_s_equivalent_unbounded_wrapper",
+      "source": "generated_20260525",
+      "language": "c",
+      "rule_path": "c/generated_20260525/c_cve_gets_s_equivalent_unbounded_wrapper.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-unsafe-line-input-wrapper",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cve_libxml2_load_dtd_external_entity",
+      "source": "generated_20260525",
+      "language": "c",
+      "rule_path": "c/generated_20260525/c_cve_libxml2_load_dtd_external_entity.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "libxml2-unsafe-entity-expansion",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cve_libxml2_noent_without_nonet",
+      "source": "generated_20260525",
+      "language": "c",
+      "rule_path": "c/generated_20260525/c_cve_libxml2_noent_without_nonet.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "libxml2-noent-without-nonet",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cve_memcmp_token_compare_timing",
+      "source": "generated_20260525",
+      "language": "c",
+      "rule_path": "c/generated_20260525/c_cve_memcmp_token_compare_timing.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-memcmp-secret-timing",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cve_mysql_query_string_concat",
+      "source": "generated_20260525",
+      "language": "c",
+      "rule_path": "c/generated_20260525/c_cve_mysql_query_string_concat.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-mysql-query-unsafe-sql-construction",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cve_open_creat_world_writable_mode",
+      "source": "generated_20260525",
+      "language": "c",
+      "rule_path": "c/generated_20260525/c_cve_open_creat_world_writable_mode.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-open-creat-world-writable-mode",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cve_open_symlink_follow_sensitive_write",
+      "source": "generated_20260525",
+      "language": "c",
+      "rule_path": "c/generated_20260525/c_cve_open_symlink_follow_sensitive_write.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-open-sensitive-file-write-without-nofollow",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cve_openssl_des_rc4_cipher",
+      "source": "generated_20260525",
+      "language": "c",
+      "rule_path": "c/generated_20260525/c_cve_openssl_des_rc4_cipher.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "openssl-weak-evp-cipher",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cve_openssl_evp_bytestokey_weak_kdf",
+      "source": "generated_20260525",
+      "language": "c",
+      "rule_path": "c/generated_20260525/c_cve_openssl_evp_bytestokey_weak_kdf.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "openssl-weak-evp-bytestokey-md5-low-iterations",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cve_openssl_md5_sha1_digest",
+      "source": "generated_20260525",
+      "language": "c",
+      "rule_path": "c/generated_20260525/c_cve_openssl_md5_sha1_digest.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "openssl-weak-digest-selection",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cve_openssl_rand_pseudo_bytes",
+      "source": "generated_20260525",
+      "language": "c",
+      "rule_path": "c/generated_20260525/c_cve_openssl_rand_pseudo_bytes.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "openssl-rand-pseudo-bytes-usage",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cve_openssl_rsa_generate_key_deprecated",
+      "source": "generated_20260525",
+      "language": "c",
+      "rule_path": "c/generated_20260525/c_cve_openssl_rsa_generate_key_deprecated.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "openssl-deprecated-rsa-generate-key",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cve_openssl_tls1_ssl3_method",
+      "source": "generated_20260525",
+      "language": "c",
+      "rule_path": "c/generated_20260525/c_cve_openssl_tls1_ssl3_method.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "openssl-legacy-methods",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cve_readlink_missing_null_termination",
+      "source": "generated_20260525",
+      "language": "c",
+      "rule_path": "c/generated_20260525/c_cve_readlink_missing_null_termination.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-readlink-missing-null-termination",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cve_realpath_return_unchecked",
+      "source": "generated_20260525",
+      "language": "c",
+      "rule_path": "c/generated_20260525/c_cve_realpath_return_unchecked.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-realpath-return-ignored-before-use",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cve_setuid_before_setgid_order",
+      "source": "generated_20260525",
+      "language": "c",
+      "rule_path": "c/generated_20260525/c_cve_setuid_before_setgid_order.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c.setuid-before-setgid",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cve_setuid_return_unchecked",
+      "source": "generated_20260525",
+      "language": "c",
+      "rule_path": "c/generated_20260525/c_cve_setuid_return_unchecked.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-unchecked-setuid-setgid-return",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cve_sqlite3_exec_string_concat",
+      "source": "generated_20260525",
+      "language": "c",
+      "rule_path": "c/generated_20260525/c_cve_sqlite3_exec_string_concat.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-sqlite3-exec-snprintf-string-concat",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cve_strcat_fixed_buffer_overflow",
+      "source": "generated_20260525",
+      "language": "c",
+      "rule_path": "c/generated_20260525/c_cve_strcat_fixed_buffer_overflow.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-strcat-fixed-buffer-overflow",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cve_strncat_wrong_remaining_size",
+      "source": "generated_20260525",
+      "language": "c",
+      "rule_path": "c/generated_20260525/c_cve_strncat_wrong_remaining_size.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-strncat-wrong-remaining-size",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cve_vsprintf_fixed_buffer_overflow",
+      "source": "generated_20260525",
+      "language": "c",
+      "rule_path": "c/generated_20260525/c_cve_vsprintf_fixed_buffer_overflow.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-vsprintf-fixed-buffer-overflow",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cwe120_strlcpy_return_truncation_ignored",
+      "source": "generated_20260526",
+      "language": "c",
+      "rule_path": "c/generated_20260526/c_cwe120_strlcpy_return_truncation_ignored.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-strlcpy-return-ignored-truncation",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cwe170_strncpy_missing_null_termination",
+      "source": "generated_20260526",
+      "language": "c",
+      "rule_path": "c/generated_20260526/c_cwe170_strncpy_missing_null_termination.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-missing-nul-termination-after-strncpy-full-dst",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cwe269_seteuid_setegid_return_unchecked",
+      "source": "generated_20260526",
+      "language": "c",
+      "rule_path": "c/generated_20260526/c_cwe269_seteuid_setegid_return_unchecked.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-privilege-drop-return-value-ignored",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cwe327_libgcrypt_md5_sha1_hash",
+      "source": "generated_20260526",
+      "language": "c",
+      "rule_path": "c/generated_20260526/c_cwe327_libgcrypt_md5_sha1_hash.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "cwe-327-libgcrypt-weak-digest-selection",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cwe327_openssl_ecb_mode_cipher",
+      "source": "generated_20260526",
+      "language": "c",
+      "rule_path": "c/generated_20260526/c_cwe327_openssl_ecb_mode_cipher.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "openssl-ecb-cipher-selection",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cwe327_openssl_static_iv_encryptinit",
+      "source": "generated_20260526",
+      "language": "c",
+      "rule_path": "c/generated_20260526/c_cwe327_openssl_static_iv_encryptinit.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-openssl-static-iv-in-evp-encryptinit-ex",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cwe327_openssl_weak_cipher_list",
+      "source": "generated_20260526",
+      "language": "c",
+      "rule_path": "c/generated_20260526/c_cwe327_openssl_weak_cipher_list.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-openssl-weak-cipher-list",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cwe338_openssl_rand_bytes_return_unchecked",
+      "source": "generated_20260526",
+      "language": "c",
+      "rule_path": "c/generated_20260526/c_cwe338_openssl_rand_bytes_return_unchecked.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-openssl-rand-bytes-return-ignored",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cwe367_access_then_open_toctou",
+      "source": "generated_20260526",
+      "language": "c",
+      "rule_path": "c/generated_20260526/c_cwe367_access_then_open_toctou.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-cwe367-access-then-open-toctou",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cwe732_creat_world_writable_mode",
+      "source": "generated_20260526",
+      "language": "c",
+      "rule_path": "c/generated_20260526/c_cwe732_creat_world_writable_mode.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-creat-world-writable-mode",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cwe732_mkdir_world_writable_mode",
+      "source": "generated_20260526",
+      "language": "c",
+      "rule_path": "c/generated_20260526/c_cwe732_mkdir_world_writable_mode.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-mkdir-world-writable-permissions",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cwe732_mkfifo_world_writable_mode",
+      "source": "generated_20260526",
+      "language": "c",
+      "rule_path": "c/generated_20260526/c_cwe732_mkfifo_world_writable_mode.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c.mkfifo-world-writable-mode",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cwe78_exec_shell_dash_c_user_command",
+      "source": "generated_20260526",
+      "language": "c",
+      "rule_path": "c/generated_20260526/c_cwe78_exec_shell_dash_c_user_command.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-shell-exec-dash-c-untrusted-command",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cwe78_wordexp_user_input",
+      "source": "generated_20260526",
+      "language": "c",
+      "rule_path": "c/generated_20260526/c_cwe78_wordexp_user_input.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-wordexp-user-controlled-input-without-nocmd",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cwe89_postgresql_pqexec_dynamic_sql",
+      "source": "generated_20260526",
+      "language": "c",
+      "rule_path": "c/generated_20260526/c_cwe89_postgresql_pqexec_dynamic_sql.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-postgresql-pqexec-dynamic-sql",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cwe329_openssl_aes_cbc_static_iv_lowlevel",
+      "source": "generated_20260526_semgrep_migration",
+      "language": "c",
+      "rule_path": "c/generated_20260526_semgrep_migration/c_cwe329_openssl_aes_cbc_static_iv_lowlevel.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-openssl-aes-cbc-static-iv",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cwe489_libcurl_verbose_enabled",
+      "source": "generated_20260526_semgrep_migration",
+      "language": "c",
+      "rule_path": "c/generated_20260526_semgrep_migration/c_cwe489_libcurl_verbose_enabled.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-libcurl-verbose-enabled",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cwe489_libevent_debug_mode_enabled",
+      "source": "generated_20260526_semgrep_migration",
+      "language": "c",
+      "rule_path": "c/generated_20260526_semgrep_migration/c_cwe489_libevent_debug_mode_enabled.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "libevent-debug-mode-enabled",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cwe522_libjwt_hardcoded_hmac_secret",
+      "source": "generated_20260526_semgrep_migration",
+      "language": "c",
+      "rule_path": "c/generated_20260526_semgrep_migration/c_cwe522_libjwt_hardcoded_hmac_secret.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-libjwt-hardcoded-hmac-secret",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cwe522_libjwt_sensitive_password_claim",
+      "source": "generated_20260526_semgrep_migration",
+      "language": "c",
+      "rule_path": "c/generated_20260526_semgrep_migration/c_cwe522_libjwt_sensitive_password_claim.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-libjwt-sensitive-claim-name",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cwe673_cgi_host_header_absolute_redirect",
+      "source": "generated_20260526_semgrep_migration",
+      "language": "c",
+      "rule_path": "c/generated_20260526_semgrep_migration/c_cwe673_cgi_host_header_absolute_redirect.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-http-host-absolute-redirect",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cwe704_digest_hex_without_zero_padding",
+      "source": "generated_20260526_semgrep_migration",
+      "language": "c",
+      "rule_path": "c/generated_20260526_semgrep_migration/c_cwe704_digest_hex_without_zero_padding.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-digest-hex-without-zero-padding",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cwe704_strtod_nan_without_isfinite",
+      "source": "generated_20260526_semgrep_migration",
+      "language": "c",
+      "rule_path": "c/generated_20260526_semgrep_migration/c_cwe704_strtod_nan_without_isfinite.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-nan-injection-finite-check-missing",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cwe706_dlopen_user_controlled_path",
+      "source": "generated_20260526_semgrep_migration",
+      "language": "c",
+      "rule_path": "c/generated_20260526_semgrep_migration/c_cwe706_dlopen_user_controlled_path.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-dlopen-user-controlled-path",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cwe706_loadlibrary_user_controlled_path",
+      "source": "generated_20260526_semgrep_migration",
+      "language": "c",
+      "rule_path": "c/generated_20260526_semgrep_migration/c_cwe706_loadlibrary_user_controlled_path.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c.windows.loadlibrary.user-controlled-path",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cwe120_protocol_attr_length_fixed_buffer_memcpy",
+      "source": "generated_20260527",
+      "language": "c",
+      "rule_path": "c/generated_20260527/c_cwe120_protocol_attr_length_fixed_buffer_memcpy.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-protocol-parser-fixed-buffer-copy-from-length",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cwe116_cgi_html_unescaped_user_input",
+      "source": "generated_20260601",
+      "language": "c",
+      "rule_path": "c/generated_20260601/c_cwe116_cgi_html_unescaped_user_input.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-cgi-html-unescaped-printf",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cwe1391_default_weak_credentials",
+      "source": "generated_20260601",
+      "language": "c",
+      "rule_path": "c/generated_20260601/c_cwe1391_default_weak_credentials.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-weak-default-credentials",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cwe1419_pthread_mutex_used_without_init",
+      "source": "generated_20260601",
+      "language": "c",
+      "rule_path": "c/generated_20260601/c_cwe1419_pthread_mutex_used_without_init.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-pthread-mutex-used-without-init",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cwe330_predictable_token_srand_time_rand",
+      "source": "generated_20260601",
+      "language": "c",
+      "rule_path": "c/generated_20260601/c_cwe330_predictable_token_srand_time_rand.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-predictable-token-generation-srand-time-rand",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cwe346_cors_reflect_origin_with_credentials",
+      "source": "generated_20260601",
+      "language": "c",
+      "rule_path": "c/generated_20260601/c_cwe346_cors_reflect_origin_with_credentials.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-cors-reflect-origin-with-credentials",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cwe347_openssl_verify_result_unchecked",
+      "source": "generated_20260601",
+      "language": "c",
+      "rule_path": "c/generated_20260601/c_cwe347_openssl_verify_result_unchecked.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "openssl-verify-return-ignored",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cwe407_user_controlled_regex_compile",
+      "source": "generated_20260601",
+      "language": "c",
+      "rule_path": "c/generated_20260601/c_cwe407_user_controlled_regex_compile.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-regex-compile-nonliteral-pattern",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cwe459_mkstemp_without_cleanup",
+      "source": "generated_20260601",
+      "language": "c",
+      "rule_path": "c/generated_20260601/c_cwe459_mkstemp_without_cleanup.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c.mkstemp-temporary-file-missing-cleanup",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cwe494_download_then_execute_without_integrity",
+      "source": "generated_20260601",
+      "language": "c",
+      "rule_path": "c/generated_20260601/c_cwe494_download_then_execute_without_integrity.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "cwe-494-download-then-execute-without-integrity-check",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cwe674_uncontrolled_recursion",
+      "source": "generated_20260601",
+      "language": "c",
+      "rule_path": "c/generated_20260601/c_cwe674_uncontrolled_recursion.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-uncontrolled-recursion-linked-structure-no-depth-limit",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cwe829_dlopen_untrusted_library_source",
+      "source": "generated_20260601",
+      "language": "c",
+      "rule_path": "c/generated_20260601/c_cwe829_dlopen_untrusted_library_source.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-untrusted-dlopen-path",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cwe923_tls_hostname_verification_disabled",
+      "source": "generated_20260601",
+      "language": "c",
+      "rule_path": "c/generated_20260601/c_cwe923_tls_hostname_verification_disabled.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "cwe-923-tls-hostname-verification-disabled",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "c_cwe94_embedded_interpreter_eval_user_input",
+      "source": "generated_20260601",
+      "language": "c",
+      "rule_path": "c/generated_20260601/c_cwe94_embedded_interpreter_eval_user_input.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-embedded-interpreter-runtime-string-eval",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "cwe15_external_control_system_config",
+      "source": "juliet",
+      "language": "c",
+      "rule_path": "c/juliet/cwe15_external_control_system_config.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c.external-control-system-config",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "cwe377_insecure_temporary_file",
+      "source": "juliet",
+      "language": "c",
+      "rule_path": "c/juliet/cwe377_insecure_temporary_file.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "insecure-temporary-file-creation",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "cwe476_unchecked_allocation_null_deref",
+      "source": "juliet",
+      "language": "c",
+      "rule_path": "c/juliet/cwe476_unchecked_allocation_null_deref.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "unchecked-allocation-dereference",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "cwe78_os_command_injection",
+      "source": "juliet",
+      "language": "c",
+      "rule_path": "c/juliet/cwe78_os_command_injection.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-command-injection-taint",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "correctness_c-string-equality",
+      "source": "semgrep_original",
+      "language": "c",
+      "rule_path": "c/semgrep_original/correctness_c-string-equality.yaml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "c-string-equality",
+      "extra": {
+        "llm_generated": false
+      }
+    },
+    {
+      "checker": "correctness_goto-fail",
+      "source": "semgrep_original",
+      "language": "c",
+      "rule_path": "c/semgrep_original/correctness_goto-fail.yaml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "double_goto",
+      "extra": {
+        "llm_generated": false
+      }
+    },
+    {
+      "checker": "correctness_incorrect-use-ato-fn",
+      "source": "semgrep_original",
+      "language": "c",
+      "rule_path": "c/semgrep_original/correctness_incorrect-use-ato-fn.yaml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "incorrect-use-ato-fn",
+      "extra": {
+        "llm_generated": false
+      }
+    },
+    {
+      "checker": "correctness_incorrect-use-sscanf-fn",
+      "source": "semgrep_original",
+      "language": "c",
+      "rule_path": "c/semgrep_original/correctness_incorrect-use-sscanf-fn.yaml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "incorrect-use-sscanf-fn",
+      "extra": {
+        "llm_generated": false
+      }
+    },
+    {
+      "checker": "security_double-free",
+      "source": "semgrep_original",
+      "language": "c",
+      "rule_path": "c/semgrep_original/security_double-free.yaml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "double-free",
+      "extra": {
+        "llm_generated": false
+      }
+    },
+    {
+      "checker": "security_function-use-after-free",
+      "source": "semgrep_original",
+      "language": "c",
+      "rule_path": "c/semgrep_original/security_function-use-after-free.yaml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "function-use-after-free",
+      "extra": {
+        "llm_generated": false
+      }
+    },
+    {
+      "checker": "security_info-leak-on-non-formatted-string",
+      "source": "semgrep_original",
+      "language": "c",
+      "rule_path": "c/semgrep_original/security_info-leak-on-non-formatted-string.yaml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "info-leak-on-non-formated-string",
+      "extra": {
+        "llm_generated": false
+      }
+    },
+    {
+      "checker": "security_insecure-use-gets-fn",
+      "source": "semgrep_original",
+      "language": "c",
+      "rule_path": "c/semgrep_original/security_insecure-use-gets-fn.yaml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "insecure-use-gets-fn",
+      "extra": {
+        "llm_generated": false
+      }
+    },
+    {
+      "checker": "security_insecure-use-memset",
+      "source": "semgrep_original",
+      "language": "c",
+      "rule_path": "c/semgrep_original/security_insecure-use-memset.yaml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "insecure-use-memset",
+      "extra": {
+        "llm_generated": false
+      }
+    },
+    {
+      "checker": "security_insecure-use-printf-fn",
+      "source": "semgrep_original",
+      "language": "c",
+      "rule_path": "c/semgrep_original/security_insecure-use-printf-fn.yaml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "insecure-use-printf-fn",
+      "extra": {
+        "llm_generated": false
+      }
+    },
+    {
+      "checker": "security_insecure-use-scanf-fn",
+      "source": "semgrep_original",
+      "language": "c",
+      "rule_path": "c/semgrep_original/security_insecure-use-scanf-fn.yaml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "insecure-use-scanf-fn",
+      "extra": {
+        "llm_generated": false
+      }
+    },
+    {
+      "checker": "security_insecure-use-strcat-fn",
+      "source": "semgrep_original",
+      "language": "c",
+      "rule_path": "c/semgrep_original/security_insecure-use-strcat-fn.yaml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "insecure-use-strcat-fn",
+      "extra": {
+        "llm_generated": false
+      }
+    },
+    {
+      "checker": "security_insecure-use-string-copy-fn",
+      "source": "semgrep_original",
+      "language": "c",
+      "rule_path": "c/semgrep_original/security_insecure-use-string-copy-fn.yaml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "insecure-use-string-copy-fn",
+      "extra": {
+        "llm_generated": false
+      }
+    },
+    {
+      "checker": "security_insecure-use-strtok-fn",
+      "source": "semgrep_original",
+      "language": "c",
+      "rule_path": "c/semgrep_original/security_insecure-use-strtok-fn.yaml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "insecure-use-strtok-fn",
+      "extra": {
+        "llm_generated": false
+      }
+    },
+    {
+      "checker": "security_random-fd-exhaustion",
+      "source": "semgrep_original",
+      "language": "c",
+      "rule_path": "c/semgrep_original/security_random-fd-exhaustion.yaml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "random-fd-exhaustion",
+      "extra": {
+        "llm_generated": false
+      }
+    },
+    {
+      "checker": "security_use-after-free",
+      "source": "semgrep_original",
+      "language": "c",
+      "rule_path": "c/semgrep_original/security_use-after-free.yaml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "c"
+      ],
+      "rule_id": "use-after-free",
+      "extra": {
+        "llm_generated": false
+      }
+    },
+    {
+      "checker": "java_cors_allow_all_origin_credentials",
+      "source": "generated_20260520",
+      "language": "java",
+      "rule_path": "java/generated_20260520/java_cors_allow_all_origin_credentials.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "java"
+      ],
+      "rule_id": "spring-cors-wildcard-origins-with-credentials",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "java_insecure_cipher_ecb_des_rc4",
+      "source": "generated_20260520",
+      "language": "java",
+      "rule_path": "java/generated_20260520/java_insecure_cipher_ecb_des_rc4.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "java"
+      ],
+      "rule_id": "java-insecure-cipher-getinstance",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "java_spring_csrf_disabled",
+      "source": "generated_20260520",
+      "language": "java",
+      "rule_path": "java/generated_20260520/java_spring_csrf_disabled.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "java"
+      ],
+      "rule_id": "spring-security-csrf-disabled",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "java_trust_all_tls_certificate",
+      "source": "generated_20260520",
+      "language": "java",
+      "rule_path": "java/generated_20260520/java_trust_all_tls_certificate.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "java"
+      ],
+      "rule_id": "java-tls-certificate-validation-bypass",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "java_weak_crypto_hash_md5_sha1",
+      "source": "generated_20260520",
+      "language": "java",
+      "rule_path": "java/generated_20260520/java_weak_crypto_hash_md5_sha1.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "java"
+      ],
+      "rule_id": "java-weak-crypto-hash-algorithms",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "java_xxe_documentbuilder",
+      "source": "generated_20260520",
+      "language": "java",
+      "rule_path": "java/generated_20260520/java_xxe_documentbuilder.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "java"
+      ],
+      "rule_id": "java-xxe-unhardened-xml-factory-use",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "java_cve_cookie_missing_secure_httponly",
+      "source": "generated_20260524",
+      "language": "java",
+      "rule_path": "java/generated_20260524/java_cve_cookie_missing_secure_httponly.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "java"
+      ],
+      "rule_id": "java-servlet-cookie-missing-secure-httponly",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "java_cve_fastjson_autotype_enabled",
+      "source": "generated_20260524",
+      "language": "java",
+      "rule_path": "java/generated_20260524/java_cve_fastjson_autotype_enabled.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "java"
+      ],
+      "rule_id": "fastjson-autotype-support-enabled",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "java_cve_file_upload_original_filename_path",
+      "source": "generated_20260524",
+      "language": "java",
+      "rule_path": "java/generated_20260524/java_cve_file_upload_original_filename_path.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "java"
+      ],
+      "rule_id": "java-multipartfile-originalfilename-path-traversal",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "java_cve_jackson_default_typing_enabled",
+      "source": "generated_20260524",
+      "language": "java",
+      "rule_path": "java/generated_20260524/java_cve_jackson_default_typing_enabled.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "java"
+      ],
+      "rule_id": "jackson-default-typing-enabled",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "java_cve_jdbc_dynamic_sql_concat",
+      "source": "generated_20260524",
+      "language": "java",
+      "rule_path": "java/generated_20260524/java_cve_jdbc_dynamic_sql_concat.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "java"
+      ],
+      "rule_id": "java-jdbc-statement-sql-concat",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "java_cve_jndi_ldap_user_lookup",
+      "source": "generated_20260524",
+      "language": "java",
+      "rule_path": "java/generated_20260524/java_cve_jndi_ldap_user_lookup.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "java"
+      ],
+      "rule_id": "jndi-ldap-runtime-lookup",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "java_cve_jpa_createquery_concat",
+      "source": "generated_20260524",
+      "language": "java",
+      "rule_path": "java/generated_20260524/java_cve_jpa_createquery_concat.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "java"
+      ],
+      "rule_id": "java-jpa-hibernate-createquery-concat-runtime-input",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "java_cve_ldap_context_factory_user_provider_url",
+      "source": "generated_20260524",
+      "language": "java",
+      "rule_path": "java/generated_20260524/java_cve_ldap_context_factory_user_provider_url.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "java"
+      ],
+      "rule_id": "java-ldap-jndi-provider-url-from-runtime-input",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "java_cve_log4j_jndi_lookup_pattern",
+      "source": "generated_20260524",
+      "language": "java",
+      "rule_path": "java/generated_20260524/java_cve_log4j_jndi_lookup_pattern.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "java"
+      ],
+      "rule_id": "log4j-jndi-lookup-in-logged-string",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "java_cve_mybatis_statement_string_substitution",
+      "source": "generated_20260524",
+      "language": "java",
+      "rule_path": "java/generated_20260524/java_cve_mybatis_statement_string_substitution.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "java"
+      ],
+      "rule_id": "mybatis-annotation-sql-string-substitution",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "java_cve_noop_password_encoder",
+      "source": "generated_20260524",
+      "language": "java",
+      "rule_path": "java/generated_20260524/java_cve_noop_password_encoder.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "java"
+      ],
+      "rule_id": "spring-security-noop-passwordencoder-usage",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "java_cve_objectinputstream_without_filter",
+      "source": "generated_20260524",
+      "language": "java",
+      "rule_path": "java/generated_20260524/java_cve_objectinputstream_without_filter.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "java"
+      ],
+      "rule_id": "java-objectinputstream-readobject-without-filter",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "java_cve_processbuilder_shell_user_input",
+      "source": "generated_20260524",
+      "language": "java",
+      "rule_path": "java/generated_20260524/java_cve_processbuilder_shell_user_input.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "java"
+      ],
+      "rule_id": "java-processbuilder-shell-command-injection",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "java_cve_runtime_exec_shell_user_input",
+      "source": "generated_20260524",
+      "language": "java",
+      "rule_path": "java/generated_20260524/java_cve_runtime_exec_shell_user_input.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "java"
+      ],
+      "rule_id": "java-runtime-exec-shell-c-command-injection",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "java_cve_scriptengine_eval_user_input",
+      "source": "generated_20260524",
+      "language": "java",
+      "rule_path": "java/generated_20260524/java_cve_scriptengine_eval_user_input.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "java"
+      ],
+      "rule_id": "java-scriptengine-eval-runtime-input",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "java_cve_servlet_file_download_path_traversal",
+      "source": "generated_20260524",
+      "language": "java",
+      "rule_path": "java/generated_20260524/java_cve_servlet_file_download_path_traversal.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "java"
+      ],
+      "rule_id": "java-servlet-file-download-path-traversal",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "java_cve_snakeyaml_unsafe_constructor",
+      "source": "generated_20260524",
+      "language": "java",
+      "rule_path": "java/generated_20260524/java_cve_snakeyaml_unsafe_constructor.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "java"
+      ],
+      "rule_id": "java-snakeyaml-unsafe-default-constructor",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "java_cve_spring_actuator_env_exposed",
+      "source": "generated_20260524",
+      "language": "java",
+      "rule_path": "java/generated_20260524/java_cve_spring_actuator_env_exposed.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "java"
+      ],
+      "rule_id": "spring-actuator-exposure-wildcard",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "java_cve_spring_security_permitall_admin",
+      "source": "generated_20260524",
+      "language": "java",
+      "rule_path": "java/generated_20260524/java_cve_spring_security_permitall_admin.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "java"
+      ],
+      "rule_id": "spring-security-admin-permitall",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "java_cve_spring_spel_user_expression",
+      "source": "generated_20260524",
+      "language": "java",
+      "rule_path": "java/generated_20260524/java_cve_spring_spel_user_expression.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "java"
+      ],
+      "rule_id": "spring-spel-runtime-expression-injection",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "java_cve_trust_all_hostname_verifier",
+      "source": "generated_20260524",
+      "language": "java",
+      "rule_path": "java/generated_20260524/java_cve_trust_all_hostname_verifier.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "java"
+      ],
+      "rule_id": "java-tls-trust-all-hostname-verifier",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "java_cve_weak_password_hash_sha1_md5",
+      "source": "generated_20260524",
+      "language": "java",
+      "rule_path": "java/generated_20260524/java_cve_weak_password_hash_sha1_md5.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "java"
+      ],
+      "rule_id": "java-weak-password-hash-message-digest",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "java_cve_xmldecoder_untrusted_input",
+      "source": "generated_20260524",
+      "language": "java",
+      "rule_path": "java/generated_20260524/java_cve_xmldecoder_untrusted_input.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "java"
+      ],
+      "rule_id": "java-xmldecoder-readobject-untrusted-input",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "java_cve_zip_slip_archive_extract",
+      "source": "generated_20260524",
+      "language": "java",
+      "rule_path": "java/generated_20260524/java_cve_zip_slip_archive_extract.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "java"
+      ],
+      "rule_id": "java-zip-slip-resolve-without-normalize-check",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "java_cwe118_request_index_without_bounds_check",
+      "source": "generated_20260609",
+      "language": "java",
+      "rule_path": "java/generated_20260609/java_cwe118_request_index_without_bounds_check.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "java"
+      ],
+      "rule_id": "java-web-request-controlled-index-without-bounds-check",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "java_cwe522_credentials_written_to_log_or_response",
+      "source": "generated_20260609",
+      "language": "java",
+      "rule_path": "java/generated_20260609/java_cwe522_credentials_written_to_log_or_response.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "java"
+      ],
+      "rule_id": "java-cwe522-credential-disclosure",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "java_cwe538_sensitive_file_written_under_public_static_dir",
+      "source": "generated_20260609",
+      "language": "java",
+      "rule_path": "java/generated_20260609/java_cwe538_sensitive_file_written_under_public_static_dir.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "java"
+      ],
+      "rule_id": "java-cwe-538-sensitive-file-written-under-public-dir",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "java_cwe552_spring_static_resource_exposes_sensitive_path",
+      "source": "generated_20260609",
+      "language": "java",
+      "rule_path": "java/generated_20260609/java_cwe552_spring_static_resource_exposes_sensitive_path.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "java"
+      ],
+      "rule_id": "spring-webmvc-sensitive-resource-handler",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "java_cwe666_stream_use_after_close",
+      "source": "generated_20260609",
+      "language": "java",
+      "rule_path": "java/generated_20260609/java_cwe666_stream_use_after_close.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "java"
+      ],
+      "rule_id": "java-use-after-close",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "java_cwe691_missing_return_after_failed_auth_check",
+      "source": "generated_20260609",
+      "language": "java",
+      "rule_path": "java/generated_20260609/java_cwe691_missing_return_after_failed_auth_check.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "java"
+      ],
+      "rule_id": "java-missing-return-after-auth-denial",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "java_cwe862_admin_action_missing_role_check",
+      "source": "generated_20260609",
+      "language": "java",
+      "rule_path": "java/generated_20260609/java_cwe862_admin_action_missing_role_check.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "java"
+      ],
+      "rule_id": "java-missing-authorization-on-admin-sensitive-endpoint",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "java_cwe1236_csv_formula_injection_user_field",
+      "source": "generated_20260611",
+      "language": "java",
+      "rule_path": "java/generated_20260611/java_cwe1236_csv_formula_injection_user_field.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "java"
+      ],
+      "rule_id": "java-csv-formula-injection-unneutralized-output",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "java_cwe1275_sensitive_cookie_missing_samesite",
+      "source": "generated_20260611",
+      "language": "java",
+      "rule_path": "java/generated_20260611/java_cwe1275_sensitive_cookie_missing_samesite.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "java"
+      ],
+      "rule_id": "java-sensitive-cookie-missing-samesite",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "java_cwe306_spring_admin_mapping_without_preauthorize",
+      "source": "generated_20260611",
+      "language": "java",
+      "rule_path": "java/generated_20260611/java_cwe306_spring_admin_mapping_without_preauthorize.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "java"
+      ],
+      "rule_id": "spring-critical-endpoint-missing-authorization",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "java_cwe642_request_param_sets_session_admin_flag",
+      "source": "generated_20260611",
+      "language": "java",
+      "rule_path": "java/generated_20260611/java_cwe642_request_param_sets_session_admin_flag.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "java"
+      ],
+      "rule_id": "java-cwe-642-session-critical-state-from-request",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "java_cwe758_default_charset_security_boundary",
+      "source": "generated_20260611",
+      "language": "java",
+      "rule_path": "java/generated_20260611/java_cwe758_default_charset_security_boundary.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "java"
+      ],
+      "rule_id": "java.security-sensitive-default-charset-conversion",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "js_sql_injection_runtime_query",
+      "source": "generated_20260519",
+      "language": "javascript",
+      "rule_path": "javascript/generated_20260519/js_sql_injection_runtime_query.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "javascript"
+      ],
+      "rule_id": "js-sql-injection-runtime-query-construction",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "js_eval_runtime_input",
+      "source": "latest_real_project_scan",
+      "language": "javascript",
+      "rule_path": "javascript/latest_real_project_scan/js_eval_runtime_input.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "javascript"
+      ],
+      "rule_id": "javascript-dynamic-code-execution-from-runtime-input",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "js_nosql_injection_operator",
+      "source": "latest_real_project_scan",
+      "language": "javascript",
+      "rule_path": "javascript/latest_real_project_scan/js_nosql_injection_operator.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "javascript"
+      ],
+      "rule_id": "javascript-nosql-injection-direct-query-or-update",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "js_weak_crypto_hash",
+      "source": "latest_real_project_scan",
+      "language": "javascript",
+      "rule_path": "javascript/latest_real_project_scan/js_weak_crypto_hash.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "javascript"
+      ],
+      "rule_id": "javascript-weak-crypto-hash",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "python_insecure_tempfile_mktemp",
+      "source": "generated_20260519",
+      "language": "python",
+      "rule_path": "python/generated_20260519/python_insecure_tempfile_mktemp.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "python"
+      ],
+      "rule_id": "python-insecure-tempfile-mktemp",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "python_subprocess_shell_runtime_input",
+      "source": "generated_20260519",
+      "language": "python",
+      "rule_path": "python/generated_20260519/python_subprocess_shell_runtime_input.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "python"
+      ],
+      "rule_id": "python-command-injection-shell-or-string-command",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "python_yaml_unsafe_load",
+      "source": "generated_20260519",
+      "language": "python",
+      "rule_path": "python/generated_20260519/python_yaml_unsafe_load.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "python"
+      ],
+      "rule_id": "python-unsafe-yaml-deserialization",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "python_cve_django_csrf_exempt_view",
+      "source": "generated_20260524",
+      "language": "python",
+      "rule_path": "python/generated_20260524/python_cve_django_csrf_exempt_view.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "python"
+      ],
+      "rule_id": "django-csrf-exempt-view",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "python_cve_django_mark_safe_user_input",
+      "source": "generated_20260524",
+      "language": "python",
+      "rule_path": "python/generated_20260524/python_cve_django_mark_safe_user_input.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "python"
+      ],
+      "rule_id": "django-mark-safe-on-runtime-html",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "python_cve_django_raw_sql_concat",
+      "source": "generated_20260524",
+      "language": "python",
+      "rule_path": "python/generated_20260524/python_cve_django_raw_sql_concat.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "python"
+      ],
+      "rule_id": "django-raw-sql-string-concat",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "python_cve_eval_user_input",
+      "source": "generated_20260524",
+      "language": "python",
+      "rule_path": "python/generated_20260524/python_cve_eval_user_input.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "python"
+      ],
+      "rule_id": "python-eval-runtime-input",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "python_cve_exec_user_input",
+      "source": "generated_20260524",
+      "language": "python",
+      "rule_path": "python/generated_20260524/python_cve_exec_user_input.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "python"
+      ],
+      "rule_id": "python-exec-on-runtime-input",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "python_cve_flask_send_file_user_path",
+      "source": "generated_20260524",
+      "language": "python",
+      "rule_path": "python/generated_20260524/python_cve_flask_send_file_user_path.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "python"
+      ],
+      "rule_id": "flask-send-file-user-path-traversal",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "python_cve_flask_session_cookie_insecure",
+      "source": "generated_20260524",
+      "language": "python",
+      "rule_path": "python/generated_20260524/python_cve_flask_session_cookie_insecure.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "python"
+      ],
+      "rule_id": "flask-session-cookie-security-disabled",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "python_cve_hashlib_md5_sha1_password",
+      "source": "generated_20260524",
+      "language": "python",
+      "rule_path": "python/generated_20260524/python_cve_hashlib_md5_sha1_password.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "python"
+      ],
+      "rule_id": "python-insecure-password-hashlib-md5-sha1",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "python_cve_jinja2_template_from_string_user_input",
+      "source": "generated_20260524",
+      "language": "python",
+      "rule_path": "python/generated_20260524/python_cve_jinja2_template_from_string_user_input.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "python"
+      ],
+      "rule_id": "jinja2-from-string-dynamic-template",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "python_cve_marshal_loads_untrusted",
+      "source": "generated_20260524",
+      "language": "python",
+      "rule_path": "python/generated_20260524/python_cve_marshal_loads_untrusted.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "python"
+      ],
+      "rule_id": "python-unsafe-marshal-deserialization",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "python_cve_os_system_user_input",
+      "source": "generated_20260524",
+      "language": "python",
+      "rule_path": "python/generated_20260524/python_cve_os_system_user_input.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "python"
+      ],
+      "rule_id": "python-os-system-user-input",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "python_cve_pickle_load_untrusted",
+      "source": "generated_20260524",
+      "language": "python",
+      "rule_path": "python/generated_20260524/python_cve_pickle_load_untrusted.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "python"
+      ],
+      "rule_id": "python-unsafe-pickle-deserialization",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "python_cve_requests_verify_false",
+      "source": "generated_20260524",
+      "language": "python",
+      "rule_path": "python/generated_20260524/python_cve_requests_verify_false.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "python"
+      ],
+      "rule_id": "python-requests-verify-false",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "python_cve_sqlalchemy_text_fstring",
+      "source": "generated_20260524",
+      "language": "python",
+      "rule_path": "python/generated_20260524/python_cve_sqlalchemy_text_fstring.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "python"
+      ],
+      "rule_id": "sqlalchemy-text-dynamic-sql",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "python_cve_sqlite_execute_fstring",
+      "source": "generated_20260524",
+      "language": "python",
+      "rule_path": "python/generated_20260524/python_cve_sqlite_execute_fstring.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "python"
+      ],
+      "rule_id": "python-sqlite-execute-unsafe-inline-sql",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "python_cve_ssl_unverified_context",
+      "source": "generated_20260524",
+      "language": "python",
+      "rule_path": "python/generated_20260524/python_cve_ssl_unverified_context.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "python"
+      ],
+      "rule_id": "python-ssl-unverified-context-used-for-urlopen",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "python_cve_subprocess_shell_true_user_input",
+      "source": "generated_20260524",
+      "language": "python",
+      "rule_path": "python/generated_20260524/python_cve_subprocess_shell_true_user_input.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "python"
+      ],
+      "rule_id": "python-subprocess-shell-true-runtime-command",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "python_cve_tarfile_extractall_filter_data",
+      "source": "generated_20260524",
+      "language": "python",
+      "rule_path": "python/generated_20260524/python_cve_tarfile_extractall_filter_data.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "python"
+      ],
+      "rule_id": "python-tarfile-extractall-missing-safe-filter",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "python_cve_weak_random_token_random",
+      "source": "generated_20260524",
+      "language": "python",
+      "rule_path": "python/generated_20260524/python_cve_weak_random_token_random.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "python"
+      ],
+      "rule_id": "python-insecure-random-token-generation",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "python_cve_xml_etree_external_entity",
+      "source": "generated_20260524",
+      "language": "python",
+      "rule_path": "python/generated_20260524/python_cve_xml_etree_external_entity.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "python"
+      ],
+      "rule_id": "python-xml-etree-unsafe-parser",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "python_cve_yaml_load_unsafe_loader",
+      "source": "generated_20260524",
+      "language": "python",
+      "rule_path": "python/generated_20260524/python_cve_yaml_load_unsafe_loader.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "python"
+      ],
+      "rule_id": "python-pyyaml-unsafe-load",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "python_cve_zipfile_extract_path_traversal",
+      "source": "generated_20260524",
+      "language": "python",
+      "rule_path": "python/generated_20260524/python_cve_zipfile_extract_path_traversal.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "python"
+      ],
+      "rule_id": "python-zip-slip-path-traversal",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "python_cwe1177_prohibited_dangerous_api_in_request_path",
+      "source": "generated_20260609",
+      "language": "python",
+      "rule_path": "python/generated_20260609/python_cwe1177_prohibited_dangerous_api_in_request_path.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "python"
+      ],
+      "rule_id": "python-web-request-controlled-dangerous-api",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "python_cwe1204_static_or_predictable_crypto_iv",
+      "source": "generated_20260609",
+      "language": "python",
+      "rule_path": "python/generated_20260609/python_cwe1204_static_or_predictable_crypto_iv.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "python"
+      ],
+      "rule_id": "python-crypto-weak-iv-nonce-generation",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "python_cwe1419_resource_used_after_failed_initialization",
+      "source": "generated_20260609",
+      "language": "python",
+      "rule_path": "python/generated_20260609/python_cwe1419_resource_used_after_failed_initialization.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "python"
+      ],
+      "rule_id": "python-cwe-1419-resource-used-after-failed-initialization",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "python_cwe23_flask_path_join_without_safe_join",
+      "source": "generated_20260609",
+      "language": "python",
+      "rule_path": "python/generated_20260609/python_cwe23_flask_path_join_without_safe_join.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "python"
+      ],
+      "rule_id": "python-cwe23-path-traversal",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "python_cwe297_ssl_hostname_check_disabled",
+      "source": "generated_20260609",
+      "language": "python",
+      "rule_path": "python/generated_20260609/python_cwe297_ssl_hostname_check_disabled.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "python"
+      ],
+      "rule_id": "python-tls-ssl-hostname-validation-disabled",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "python_cwe435_proxy_header_trust_boundary_mismatch",
+      "source": "generated_20260609",
+      "language": "python",
+      "rule_path": "python/generated_20260609/python_cwe435_proxy_header_trust_boundary_mismatch.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "python"
+      ],
+      "rule_id": "python-proxy-header-trust-boundary-mismatch",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "python_cwe501_request_data_written_to_session_trust_boundary",
+      "source": "generated_20260609",
+      "language": "python",
+      "rule_path": "python/generated_20260609/python_cwe501_request_data_written_to_session_trust_boundary.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "python"
+      ],
+      "rule_id": "python-cwe-501-request-data-written-to-session",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "python_cwe666_file_or_socket_use_after_close",
+      "source": "generated_20260609",
+      "language": "python",
+      "rule_path": "python/generated_20260609/python_cwe666_file_or_socket_use_after_close.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "python"
+      ],
+      "rule_id": "python-use-after-close-or-cleanup",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "python_cwe470_getattr_user_controlled_handler",
+      "source": "generated_20260611",
+      "language": "python",
+      "rule_path": "python/generated_20260611/python_cwe470_getattr_user_controlled_handler.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "python"
+      ],
+      "rule_id": "python-unsafe-reflection-dynamic-dispatch",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "python_cwe758_pickle_protocol_or_hash_seed_assumption",
+      "source": "generated_20260611",
+      "language": "python",
+      "rule_path": "python/generated_20260611/python_cwe758_pickle_protocol_or_hash_seed_assumption.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "python"
+      ],
+      "rule_id": "python-cwe758-implementation-defined-hash-pickle",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "python_cwe926_android_exported_component_config",
+      "source": "generated_20260611",
+      "language": "python",
+      "rule_path": "python/generated_20260611/python_cwe926_android_exported_component_config.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "python"
+      ],
+      "rule_id": "python.android.manifest.exported-component-without-permission",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "python_eval_exec_runtime_input",
+      "source": "latest_real_project_scan",
+      "language": "python",
+      "rule_path": "python/latest_real_project_scan/python_eval_exec_runtime_input.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "python"
+      ],
+      "rule_id": "python-dynamic-code-execution-runtime-input",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "python_flask_debug_true",
+      "source": "latest_real_project_scan",
+      "language": "python",
+      "rule_path": "python/latest_real_project_scan/python_flask_debug_true.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "python"
+      ],
+      "rule_id": "flask-debug-mode-enabled",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "python_pickle_untrusted_load",
+      "source": "latest_real_project_scan",
+      "language": "python",
+      "rule_path": "python/latest_real_project_scan/python_pickle_untrusted_load.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "python"
+      ],
+      "rule_id": "python-untrusted-pickle-load",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "python_requests_verify_false",
+      "source": "latest_real_project_scan",
+      "language": "python",
+      "rule_path": "python/latest_real_project_scan/python_requests_verify_false.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "python"
+      ],
+      "rule_id": "python-requests-disable-tls-verification",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "python_sql_injection_runtime_query",
+      "source": "latest_real_project_scan",
+      "language": "python",
+      "rule_path": "python/latest_real_project_scan/python_sql_injection_runtime_query.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "python"
+      ],
+      "rule_id": "python-sql-injection-dynamic-query",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "rust_bincode_untrusted_deserialize",
+      "source": "generated_20260519",
+      "language": "rust",
+      "rule_path": "rust/generated_20260519/rust_bincode_untrusted_deserialize.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "rust"
+      ],
+      "rule_id": "rust-bincode-untrusted-deserialize",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "rust_tls_accept_invalid_certs",
+      "source": "generated_20260519",
+      "language": "rust",
+      "rule_path": "rust/generated_20260519/rust_tls_accept_invalid_certs.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "rust"
+      ],
+      "rule_id": "rust-tls-disable-cert-or-hostname-verification",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "rust_yaml_unsafe_deserialize",
+      "source": "generated_20260519",
+      "language": "rust",
+      "rule_path": "rust/generated_20260519/rust_yaml_unsafe_deserialize.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "rust"
+      ],
+      "rule_id": "rust-yaml-unsafe-deserialize",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "rust_command_new_shell_user_input",
+      "source": "latest_real_project_scan",
+      "language": "rust",
+      "rule_path": "rust/latest_real_project_scan/rust_command_new_shell_user_input.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "rust"
+      ],
+      "rule_id": "rust-command-injection-user-controlled-program",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "rust_insecure_random_token",
+      "source": "latest_real_project_scan",
+      "language": "rust",
+      "rule_path": "rust/latest_real_project_scan/rust_insecure_random_token.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "rust"
+      ],
+      "rule_id": "rust-insecure-random-token-generation",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "rust_insecure_temp_predictable_name",
+      "source": "latest_real_project_scan",
+      "language": "rust",
+      "rule_path": "rust/latest_real_project_scan/rust_insecure_temp_predictable_name.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "rust"
+      ],
+      "rule_id": "rust-insecure-temp-predictable-name",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "rust_path_traversal_file_open",
+      "source": "latest_real_project_scan",
+      "language": "rust",
+      "rule_path": "rust/latest_real_project_scan/rust_path_traversal_file_open.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "rust"
+      ],
+      "rule_id": "rust-path-traversal-user-controlled-path-to-filesystem-sink",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "rust_weak_hash_md5_sha1",
+      "source": "latest_real_project_scan",
+      "language": "rust",
+      "rule_path": "rust/latest_real_project_scan/rust_weak_hash_md5_sha1.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "rust"
+      ],
+      "rule_id": "rust-weak-hash-usage",
+      "extra": {
+        "llm_generated": true
+      }
+    },
+    {
+      "checker": "rust_zip_slip_archive_extract",
+      "source": "latest_real_project_scan",
+      "language": "rust",
+      "rule_path": "rust/latest_real_project_scan/rust_zip_slip_archive_extract.yml",
+      "original_path": "",
+      "source_summary": "",
+      "rule_languages": [
+        "rust"
+      ],
+      "rule_id": "rust-zip-slip-archive-extraction-traversal",
+      "extra": {
+        "llm_generated": true
+      }
+    }
+  ]
+}

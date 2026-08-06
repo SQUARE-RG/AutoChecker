@@ -1,0 +1,23 @@
+rules:
+- id: python-sqlite-execute-unsafe-inline-sql
+  message: Unsafe SQL construction passed to execute(); use parameterized queries
+    instead of f-strings or string concatenation.
+  severity: WARNING
+  languages:
+  - python
+  pattern-either:
+  - patterns:
+    - pattern: $CONN.execute(f"...")
+    - pattern-not: $CONN.execute("...", ...)
+  - patterns:
+    - pattern: $CONN.execute($SQL1 + $SQL2)
+    - pattern-not: $CONN.execute("...", ...)
+  - patterns:
+    - pattern: $CONN.execute($SQL1 + $SQL2, ...)
+    - pattern-not: $CONN.execute("...", ...)
+  - patterns:
+    - pattern: $CONN.execute("..." + $SQL)
+    - pattern-not: $CONN.execute("...", ...)
+  - patterns:
+    - pattern: $CONN.execute($SQL + "...")
+    - pattern-not: $CONN.execute("...", ...)

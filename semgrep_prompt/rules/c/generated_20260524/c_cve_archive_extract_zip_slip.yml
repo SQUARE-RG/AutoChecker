@@ -1,0 +1,46 @@
+rules:
+- id: c-archive-extract-path-traversal
+  message: Archive entry name is interpolated into an output path and opened for writing
+    without validating against dot-dot or absolute-path traversal.
+  severity: WARNING
+  languages:
+  - c
+  metadata:
+    category: security
+    technology:
+    - c
+  pattern-either:
+  - patterns:
+    - pattern: 'snprintf($OUT, sizeof($OUT), $FMT, $ENTRY);
+
+        ...
+
+        fopen($OUT, "wb");
+
+        '
+    - pattern-not-inside: 'if (strstr($ENTRY, "..") || $ENTRY[0] == ''/'') return;
+
+        ...
+
+        '
+  - pattern: 'snprintf($OUT, sizeof($OUT), $FMT, $ENTRY);
+
+      ...
+
+      open($OUT, O_WRONLY, ...);
+
+      '
+  - pattern: 'snprintf($OUT, sizeof($OUT), $FMT, $ENTRY);
+
+      ...
+
+      open($OUT, O_CREAT | O_WRONLY, ...);
+
+      '
+  - pattern: 'snprintf($OUT, sizeof($OUT), $FMT, $ENTRY);
+
+      ...
+
+      open($OUT, O_WRONLY | O_CREAT, ...);
+
+      '

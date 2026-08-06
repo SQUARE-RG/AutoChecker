@@ -1,0 +1,15 @@
+rules:
+- id: python-subprocess-shell-true-runtime-command
+  message: Avoid building subprocess shell commands from runtime input when shell=True.
+  severity: WARNING
+  languages:
+  - python
+  pattern-either:
+  - patterns:
+    - pattern: subprocess.run($CMD, shell=True);
+    - pattern-inside: "def $F(...):\n  ...\n  return subprocess.run($CMD, shell=True)\n"
+  - patterns:
+    - pattern: subprocess.run($CMD, shell=True);
+    - metavariable-regex:
+        metavariable: $CMD
+        regex: .*[+].*

@@ -1,0 +1,44 @@
+rules:
+- id: rust-yaml-unsafe-deserialize
+  message: Avoid deserializing untrusted or runtime data with serde_yaml; prefer trusted
+    inputs or serde_json when appropriate.
+  severity: WARNING
+  languages:
+  - rust
+  pattern-either:
+  - patterns:
+    - pattern: serde_yaml::from_str($X)
+    - pattern-not: serde_json::from_str($X)
+    - pattern-not: serde_json::from_str::<$T>($X)
+    - pattern-not: serde_json::from_slice($X)
+    - pattern-not: serde_json::from_slice::<$T>($X)
+  - patterns:
+    - pattern: serde_yaml::from_str::<$T>($X)
+    - pattern-not: serde_json::from_str($X)
+    - pattern-not: serde_json::from_str::<$T>($X)
+    - pattern-not: serde_json::from_slice($X)
+    - pattern-not: serde_json::from_slice::<$T>($X)
+  - patterns:
+    - pattern: serde_yaml::from_slice($X)
+    - pattern-not: serde_json::from_str($X)
+    - pattern-not: serde_json::from_str::<$T>($X)
+    - pattern-not: serde_json::from_slice($X)
+    - pattern-not: serde_json::from_slice::<$T>($X)
+  - patterns:
+    - pattern: serde_yaml::from_slice::<$T>($X)
+    - pattern-not: serde_json::from_str($X)
+    - pattern-not: serde_json::from_str::<$T>($X)
+    - pattern-not: serde_json::from_slice($X)
+    - pattern-not: serde_json::from_slice::<$T>($X)
+  - patterns:
+    - pattern: serde_yaml::from_reader($X)
+    - pattern-not: serde_json::from_str($X)
+    - pattern-not: serde_json::from_str::<$T>($X)
+    - pattern-not: serde_json::from_slice($X)
+    - pattern-not: serde_json::from_slice::<$T>($X)
+  - patterns:
+    - pattern: serde_yaml::from_reader::<$T>($X)
+    - pattern-not: serde_json::from_str($X)
+    - pattern-not: serde_json::from_str::<$T>($X)
+    - pattern-not: serde_json::from_slice($X)
+    - pattern-not: serde_json::from_slice::<$T>($X)

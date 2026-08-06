@@ -1,0 +1,14 @@
+rules:
+- id: java-tls-trust-all-hostname-verifier
+  message: Avoid replacing the default hostname verifier with a trust-all verifier
+    that unconditionally accepts hostnames.
+  severity: WARNING
+  languages:
+  - java
+  pattern-either:
+  - patterns:
+    - pattern: HttpsURLConnection.setDefaultHostnameVerifier((host, session) -> true)
+    - pattern-not: HttpsURLConnection.setDefaultHostnameVerifier(HttpsURLConnection.getDefaultHostnameVerifier())
+  - patterns:
+    - pattern: HttpsURLConnection.setDefaultHostnameVerifier($V)
+    - pattern-not: HttpsURLConnection.setDefaultHostnameVerifier(HttpsURLConnection.getDefaultHostnameVerifier())

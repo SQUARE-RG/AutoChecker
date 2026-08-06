@@ -1,0 +1,13 @@
+rules:
+- id: python-zip-slip-path-traversal
+  message: Unsafe ZIP extraction writes archive entry paths directly under the destination
+    directory without normalization and destination-root validation.
+  severity: ERROR
+  languages:
+  - python
+  patterns:
+  - pattern: "with zipfile.ZipFile($ZIP) as $Z:\n    for $NAME in $Z.namelist():\n\
+      \        open(os.path.join($DEST, $NAME), \"wb\").write($Z.read($NAME))\n"
+  - pattern-not: root = os.path.abspath($DEST);
+  - pattern-not: out = os.path.abspath(os.path.join(root, $NAME));
+  - pattern-not: "if not out.startswith(root + os.sep):\n    raise ValueError(...)\n"

@@ -1,0 +1,23 @@
+rules:
+- id: c-http-host-absolute-redirect
+  message: Avoid building absolute redirect or Location URLs from getenv("HTTP_HOST");
+    use a fixed trusted host instead.
+  severity: WARNING
+  languages:
+  - c
+  mode: taint
+  pattern-sources:
+  - pattern: getenv("HTTP_HOST")
+  pattern-sinks:
+  - patterns:
+    - pattern-either:
+      - pattern: snprintf($DST, ...)
+      - pattern: sprintf($DST, ...)
+      - pattern: asprintf(&$DST, ...)
+      - pattern: strcat($DST, ...)
+      - pattern: strcpy($DST, ...)
+    - metavariable-regex:
+        metavariable: $DST
+        regex: ^[A-Za-z_][A-Za-z0-9_]*$
+  options:
+    taint_unify_mvars: true

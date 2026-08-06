@@ -1,0 +1,24 @@
+rules:
+- id: java-jpa-hibernate-createquery-concat-runtime-input
+  message: Avoid building JPQL/HQL for createQuery with string concatenation of runtime
+    input; use named parameters with setParameter instead.
+  severity: WARNING
+  languages:
+  - java
+  pattern-either:
+  - patterns:
+    - pattern: $EM.createQuery($Q)
+    - pattern-not: $EM.createQuery("...").setParameter(...)
+    - pattern: $EM.createQuery("..." + $X + "...")
+  - patterns:
+    - pattern: $EM.createQuery($Q)
+    - pattern-not: $EM.createQuery("...").setParameter(...)
+    - pattern: $EM.createQuery($A + $X + $B)
+  - patterns:
+    - pattern: $EM.createQuery($Q)
+    - pattern-not: $EM.createQuery("...").setParameter(...)
+    - pattern: $EM.createQuery($A + $X)
+  - patterns:
+    - pattern: $EM.createQuery($Q)
+    - pattern-not: $EM.createQuery("...").setParameter(...)
+    - pattern: $EM.createQuery($X + $A)

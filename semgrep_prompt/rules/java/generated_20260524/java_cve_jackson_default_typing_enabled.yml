@@ -1,0 +1,12 @@
+rules:
+- id: jackson-default-typing-enabled
+  message: Jackson ObjectMapper default typing is enabled, which can allow unsafe
+    polymorphic deserialization.
+  severity: WARNING
+  languages:
+  - java
+  pattern-either:
+  - pattern: $OM.enableDefaultTyping(...)
+  - pattern: $OM.activateDefaultTyping(...)
+  - pattern: $OM.activateDefaultTypingAsProperty(...)
+  - pattern: $OM.enableDefaultTyping(...).$M(...)

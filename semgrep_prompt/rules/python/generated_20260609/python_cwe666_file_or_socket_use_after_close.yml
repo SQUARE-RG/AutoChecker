@@ -1,0 +1,111 @@
+rules:
+- id: python-use-after-close-or-cleanup
+  message: Resource is used after being closed or cleaned up in the same local flow.
+  severity: WARNING
+  languages:
+  - python
+  pattern-either:
+  - patterns:
+    - pattern: '$R.close()
+
+        ...
+
+        $R.$METHOD(...)
+
+        '
+    - pattern-not: '$R.close()
+
+        ...
+
+        $R.close()
+
+        '
+  - patterns:
+    - pattern: '$R.close()
+
+        ...
+
+        $R.$PROP
+
+        '
+  - patterns:
+    - pattern: '$R.cleanup()
+
+        ...
+
+        $CALL
+
+        '
+    - pattern: open($R.name)
+  - patterns:
+    - pattern: '$R.cleanup()
+
+        ...
+
+        $CALL
+
+        '
+    - pattern: $R.read()
+  - patterns:
+    - pattern: '$R.cleanup()
+
+        ...
+
+        $CALL
+
+        '
+    - pattern: $R.write(...)
+  - patterns:
+    - pattern: '$R.cleanup()
+
+        ...
+
+        $CALL
+
+        '
+    - pattern: $R.send(...)
+  - patterns:
+    - pattern: '$R.cleanup()
+
+        ...
+
+        $CALL
+
+        '
+    - pattern: $R.recv(...)
+  - patterns:
+    - pattern: '$R.cleanup()
+
+        ...
+
+        $CALL
+
+        '
+    - pattern: $R.execute(...)
+  - patterns:
+    - pattern: '$R.cleanup()
+
+        ...
+
+        $CALL
+
+        '
+    - pattern: $R.cursor()
+  - patterns:
+    - pattern: '$R.cleanup()
+
+        ...
+
+        $CALL
+
+        '
+    - pattern: $R.namelist()
+  - patterns:
+    - pattern: '$R.cleanup()
+
+        ...
+
+        $CALL
+
+        '
+    - pattern: $R.text

@@ -1,0 +1,61 @@
+rules:
+- id: java.security-sensitive-default-charset-conversion
+  message: Use an explicit Charset for security-sensitive String/byte conversions.
+  severity: WARNING
+  languages:
+  - java
+  metadata:
+    cwe: CWE-758
+  pattern-either:
+  - patterns:
+    - pattern: $X.getBytes()
+    - pattern: MessageDigest.getInstance(...).digest(...)
+  - patterns:
+    - pattern: $X.getBytes()
+    - pattern: MessageDigest.getInstance(...).update(...)
+  - patterns:
+    - pattern: $X.getBytes()
+    - pattern: $SIG.update(...)
+  - patterns:
+    - pattern: $X.getBytes()
+    - pattern: Base64.getEncoder().encodeToString(...)
+  - patterns:
+    - pattern: $X.getBytes()
+    - pattern: new SecretKeySpec(...)
+  - patterns:
+    - pattern: $X.getBytes()
+    - pattern: $A.equals(new String($BYTES))
+  - patterns:
+    - pattern: $X.getBytes()
+    - pattern: $A.equals($B)
+  - patterns:
+    - pattern: new String($BYTES)
+    - pattern: MessageDigest.getInstance(...).digest(...)
+  - patterns:
+    - pattern: new String($BYTES)
+    - pattern: MessageDigest.getInstance(...).update(...)
+  - patterns:
+    - pattern: new String($BYTES)
+    - pattern: $SIG.update(...)
+  - patterns:
+    - pattern: new String($BYTES)
+    - pattern: Base64.getEncoder().encodeToString(...)
+  - patterns:
+    - pattern: new String($BYTES)
+    - pattern: new SecretKeySpec(...)
+  - patterns:
+    - pattern: new String($BYTES)
+    - pattern: $A.equals(new String($BYTES))
+  - patterns:
+    - pattern: new String($BYTES)
+    - pattern: $A.equals($B)
+  - patterns:
+    - pattern: $X.getBytes()
+    - metavariable-regex:
+        metavariable: $X
+        regex: .*(token|nonce|password|challenge|key).*
+  - patterns:
+    - pattern: new String($BYTES)
+    - metavariable-regex:
+        metavariable: $BYTES
+        regex: .*

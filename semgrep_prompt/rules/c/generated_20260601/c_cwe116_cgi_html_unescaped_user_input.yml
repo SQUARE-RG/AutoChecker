@@ -1,0 +1,20 @@
+rules:
+- id: c-cgi-html-unescaped-printf
+  message: Directly interpolating unescaped input into HTML output with printf-family
+    formatting can lead to CWE-116.
+  severity: WARNING
+  languages:
+  - c
+  pattern-either:
+  - patterns:
+    - pattern: printf("<p>Hello %s</p>", $X);
+    - pattern-not: html_escape($X);
+  - patterns:
+    - pattern: fprintf($F, "<p>Hello %s</p>", $X);
+    - pattern-not: html_escape($X);
+  - patterns:
+    - pattern: sprintf($BUF, "<p>Hello %s</p>", $X);
+    - pattern-not: html_escape($X);
+  - patterns:
+    - pattern: snprintf($BUF, $SIZE, "<p>Hello %s</p>", $X);
+    - pattern-not: html_escape($X);

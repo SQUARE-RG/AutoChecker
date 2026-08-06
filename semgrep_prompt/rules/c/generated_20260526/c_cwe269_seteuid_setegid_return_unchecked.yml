@@ -1,0 +1,12 @@
+rules:
+- id: c-privilege-drop-return-value-ignored
+  message: Privilege-dropping call return value is ignored; check the result and handle
+    failure.
+  severity: WARNING
+  languages:
+  - c
+  pattern-either:
+  - pattern: seteuid(...);
+  - pattern: setegid(...);
+  - pattern: setresuid(..., ..., ...);
+  - pattern: setresgid(..., ..., ...);

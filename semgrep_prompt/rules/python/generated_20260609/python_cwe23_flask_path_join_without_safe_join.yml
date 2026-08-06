@@ -1,0 +1,59 @@
+rules:
+- id: python-cwe23-path-traversal
+  message: Possible relative path traversal from untrusted request or CLI input into
+    file path construction and file access.
+  severity: ERROR
+  languages:
+  - python
+  mode: taint
+  pattern-sources:
+  - pattern-either:
+    - pattern: request.args[$KEY]
+    - pattern: request.args.get(...)
+    - pattern: request.form[$KEY]
+    - pattern: request.GET[$KEY]
+    - pattern: request.query[$KEY]
+    - pattern: Query(...)
+    - pattern: sys.argv[$IDX]
+    - pattern: argparse.Namespace(...)
+  pattern-propagators:
+  - pattern: $DST = $SRC;
+    from: $SRC
+    to: $DST
+  - pattern: $DST = $LEFT + $RIGHT;
+    from: $LEFT
+    to: $DST
+  - pattern: $DST = f"...{$SRC}..."
+    from: $SRC
+    to: $DST
+  - pattern: $DST = os.path.join(..., $SRC, ...);
+    from: $SRC
+    to: $DST
+  - pattern: $DST = Path(..., $SRC);
+    from: $SRC
+    to: $DST
+  - pattern: $DST = ($ROOT / $SRC);
+    from: $SRC
+    to: $DST
+  pattern-sanitizers:
+  - patterns:
+    - pattern: path = safe_join(..., $SRC);
+    - focus-metavariable: $SRC
+    by-side-effect: true
+  - patterns:
+    - pattern: $DST = os.path.basename($SRC);
+    - focus-metavariable: $DST
+    by-side-effect: true
+  - patterns:
+    - pattern: $TARGET = (root / $SRC).resolve();
+    - focus-metavariable: $TARGET
+    by-side-effect: true
+  pattern-sinks:
+  - pattern-either:
+    - pattern: open($PATH)
+    - pattern: open($PATH, ...)
+    - pattern: send_file($PATH)
+    - pattern: send_file($PATH, ...)
+    - pattern: send_from_directory(..., $PATH)
+    - pattern: FileResponse($PATH)
+    - pattern: FileResponse(open($PATH, ...))

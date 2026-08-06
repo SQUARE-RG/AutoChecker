@@ -1,0 +1,19 @@
+rules:
+- id: c-shell-command-injection-system-popen
+  message: Runtime input is incorporated into a shell command string and executed
+    via system() or popen().
+  severity: WARNING
+  languages:
+  - c
+  mode: taint
+  pattern-sources:
+  - pattern: $ARG
+  pattern-propagators:
+  - pattern: snprintf($DST, ..., $FMT, $ARG)
+    from: $ARG
+    to: $DST
+  pattern-sinks:
+  - pattern: system($CMD)
+  - pattern: popen($CMD, ...)
+  options:
+    taint_unify_mvars: true

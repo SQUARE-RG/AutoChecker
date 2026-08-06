@@ -1,0 +1,78 @@
+{
+    "predicate": [
+        {
+            "name": "isScalarType03",
+            "args": [
+                {
+                    "name": "T",
+                    "type": "Type"
+                }
+            ],
+            "body": "exists(Type ut | ut = t.getUnderlyingType() |\n    ut instanceof ArithmeticType or\n    ut instanceof Enum or\n    ut instanceof FunctionPointerType or\n    ut instanceof PointerToMemberType or\n    ut instanceof PointerType or\n    isScalarType03(ut.(SpecifiedType).getUnspecifiedType())\n  )",
+            "comments": "Holds if `t` is a scalar type, according to the rules specified in C++03 3.9(10):Arithmetic types (3.9.1),     enumeration types, pointer types, and pointer to member types (3.9.2), and cv-qualified versions of these types (3.9.3) are  collectively called scalar types."
+        }
+    ],
+    "class": [
+        {
+            "className": "PragmaOnceIncludeGuard",
+            "extends": [
+                "BadIncludeGuard"
+            ],
+            "comments": "A header file with the `#pragma once` include guard.",
+            "method": [
+                {
+                    "name": "blame",
+                    "type": "Element",
+                    "args": []
+                }
+            ],
+            "predicate": [
+                {
+                    "name": "PragmaOnceIncludeGuard",
+                    "args": [],
+                    "body": "exists(PreprocessorPragma p | p.getFile() = this and p.getHead()= \"once\") "
+        
+                }
+            ]
+        },
+        {
+            "className": "NestedUnion",
+            "extends": [
+                "Union"
+            ],
+            "comments": "/**\n * A C/C++ nested union. For example, the type `MyNestedUnion` in:\n * ```\n * class MyClass {\n * public:\n *   union MyNestedUnion {\n *     int i;\n *     float f;\n *   };\n * };\n * ```\n */",
+            "method": [
+                {
+                    "name": "getAPrimaryQlClass",
+                    "type": "string",
+                    "args": []
+                }
+            ],
+            "predicate": [
+                {
+                    "name": "isPrivate",
+                    "args": [],
+                    "body": "this.hasSpecifier(\"private\") ",
+                    "comments": "Holds if this member is private."
+                },
+                {
+                    "name": "isProtected",
+                    "args": [],
+                    "body": "this.hasSpecifier(\"protected\") ",
+                    "comments": "Holds if this member is protected."
+                },
+                {
+                    "name": "isPublic",
+                    "args": [],
+                    "body": "this.hasSpecifier(\"public\") ",
+                    "comments": "Holds if this member is public."
+                },
+                {
+                    "name": "NestedUnion",
+                    "args": [],
+                    "body": " this.isMember() "
+                }
+            ]
+        }
+    ]
+}

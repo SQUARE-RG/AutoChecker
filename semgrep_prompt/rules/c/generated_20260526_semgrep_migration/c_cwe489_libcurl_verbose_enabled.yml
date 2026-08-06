@@ -1,0 +1,32 @@
+rules:
+- id: c-libcurl-verbose-enabled
+  message: Avoid hardcoding CURLOPT_VERBOSE to an enabled/truthy value in curl_easy_setopt;
+    use an explicit disabled value instead.
+  severity: WARNING
+  languages:
+  - c
+  pattern-not:
+  - pattern: curl_easy_setopt($CURL, CURLOPT_VERBOSE, 0L);
+  pattern-either:
+  - pattern: curl_easy_setopt($CURL, CURLOPT_VERBOSE, 1);
+  - pattern: curl_easy_setopt($CURL, CURLOPT_VERBOSE, 1L);
+  - pattern: curl_easy_setopt($CURL, CURLOPT_VERBOSE, true);
+  - pattern: curl_easy_setopt($CURL, CURLOPT_VERBOSE, (long)1);
+  - patterns:
+    - pattern: curl_easy_setopt($CURL, CURLOPT_VERBOSE, $VAL);
+    - pattern-inside: 'int $VAL = 1;
+
+        ...
+
+        '
+  - patterns:
+    - pattern: curl_easy_setopt($CURL, CURLOPT_VERBOSE, $VAL);
+    - pattern-inside: 'long $VAL = 1;
+
+        ...
+
+        '
+  - patterns:
+    - pattern: curl_easy_setopt($CURL, CURLOPT_VERBOSE, $VAL);
+    - pattern-not: curl_easy_setopt($CURL, CURLOPT_VERBOSE, 0L);
+    - pattern: curl_easy_setopt($CURL, CURLOPT_VERBOSE, CURL_TRUE);

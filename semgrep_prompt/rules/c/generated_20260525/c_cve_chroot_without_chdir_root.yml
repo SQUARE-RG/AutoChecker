@@ -1,0 +1,11 @@
+rules:
+- id: c-chroot-without-post-chdir-root
+  message: Successful chroot() must be followed by chdir("/") before continuing or
+    returning success.
+  severity: WARNING
+  languages:
+  - c
+  patterns:
+  - pattern: "if (chroot($ROOT) == 0) {\n  ...\n}\n"
+  - pattern-not-inside: "if (chroot($ROOT) == 0) {\n  ...\n  chdir(\"/\");\n  ...\n\
+      }\n"

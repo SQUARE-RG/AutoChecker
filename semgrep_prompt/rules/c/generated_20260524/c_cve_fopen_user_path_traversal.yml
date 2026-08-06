@@ -1,0 +1,37 @@
+rules:
+- id: c-fopen-path-traversal-without-basename-validation
+  message: Opening a file path built from a base directory and runtime name without
+    rejecting path traversal or separator characters first.
+  severity: WARNING
+  languages:
+  - c
+  patterns:
+  - pattern: 'snprintf($PATH, sizeof($PATH), "/srv/files/%s", $NAME);
+
+      ...
+
+      FILE *$F = fopen($PATH, $MODE);
+
+      '
+  - pattern-not: 'if (strstr($NAME, "..") || strchr($NAME, ''/'')) return;
+
+      ...
+
+      snprintf($PATH, sizeof($PATH), "/srv/files/%s", $NAME);
+
+      ...
+
+      FILE *$F = fopen($PATH, $MODE);
+
+      '
+  - pattern-not-inside: 'if (strstr($NAME, "..") || strchr($NAME, ''/'')) return;
+
+      ...
+
+      snprintf($PATH, sizeof($PATH), "/srv/files/%s", $NAME);
+
+      ...
+
+      FILE *$F = fopen($PATH, $MODE);
+
+      '

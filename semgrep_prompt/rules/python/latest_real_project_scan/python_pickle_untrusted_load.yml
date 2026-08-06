@@ -1,0 +1,27 @@
+rules:
+- id: python-untrusted-pickle-load
+  message: Avoid deserializing untrusted data with pickle.load/loads; use json or
+    trusted local artifacts only.
+  severity: WARNING
+  languages:
+  - python
+  mode: taint
+  pattern-sources:
+  - pattern: sys.stdin.read(...)
+  - pattern: sys.stdin.buffer.read(...)
+  - pattern: $REQ.data
+  - pattern: $REQ.files[...] .read(...)
+  - pattern: $SOCK.recv(...)
+  - pattern: $ENV[...]
+  - pattern: $X.read(...)
+  pattern-sinks:
+  - pattern-either:
+    - pattern: pickle.load(...)
+    - pattern: pickle.loads(...)
+    - pattern: cPickle.load(...)
+    - pattern: cPickle.loads(...)
+    - pattern: load(...)
+    - pattern: loads(...)
+  pattern-sanitizers:
+  - pattern: json.load(...)
+  - pattern: json.loads(...)

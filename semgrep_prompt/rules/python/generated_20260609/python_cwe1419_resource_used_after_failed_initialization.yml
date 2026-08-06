@@ -1,0 +1,25 @@
+rules:
+- id: python-cwe-1419-resource-used-after-failed-initialization
+  message: Resource initialization failed but execution continued and the resource
+    was used later; return, raise, or install a safe fallback instead.
+  severity: WARNING
+  languages:
+  - python
+  pattern-either:
+  - patterns:
+    - pattern: "try:\n    $RES = $INIT(...)\nexcept $E:\n    $RES = None\n...\n$RES.$METHOD(...)\n"
+    - pattern-not: "try:\n    $RES = $INIT(...)\nexcept $E:\n    return ...\n...\n\
+        $RES.$METHOD(...)\n"
+  - patterns:
+    - pattern: "try:\n    $RES = $INIT(...)\nexcept $E:\n    pass\n...\n$RES.$METHOD(...)\n"
+    - pattern-not: "try:\n    $RES = $INIT(...)\nexcept $E:\n    return ...\n...\n\
+        $RES.$METHOD(...)\n"
+  - patterns:
+    - pattern: "$RES = None\ntry:\n    $RES = $INIT(...)\nexcept $E:\n    ...\n...\n\
+        $RES.$METHOD(...)\n"
+    - pattern-not: "$RES = None\ntry:\n    $RES = $INIT(...)\nexcept $E:\n    ...\n\
+        \    return ...\n...\n$RES.$METHOD(...)\n"
+  - patterns:
+    - pattern: "try:\n    $RES = $INIT(...)\nexcept $E:\n    $RES = None\n...\n$RES.$METHOD(...)\n"
+    - pattern-not: "try:\n    $RES = $INIT(...)\nexcept $E:\n    $RES = $FALLBACK(...)\n\
+        ...\n$RES.$METHOD(...)\n"

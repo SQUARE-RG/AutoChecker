@@ -1,0 +1,11 @@
+rules:
+- id: flask-session-cookie-security-disabled
+  message: Flask session cookie security is explicitly disabled
+  severity: WARNING
+  languages:
+  - python
+  pattern-either:
+  - pattern: app.config["SESSION_COOKIE_SECURE"] = False;
+  - pattern: app.config['SESSION_COOKIE_SECURE'] = False;
+  - pattern: app.config["SESSION_COOKIE_HTTPONLY"] = False;
+  - pattern: app.config['SESSION_COOKIE_HTTPONLY'] = False;
