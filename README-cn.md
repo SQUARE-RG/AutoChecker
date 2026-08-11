@@ -86,6 +86,7 @@ pip install -r requirements.txt
 1. [部署 PMD](/doc/pmd_install_cn.md)
 2. [部署 clang-tidy](/doc/clang_tidy_install_cn.md)
 3. [部署 CodeQL](/doc/codeql_deploy_cn.md)
+4. [部署 Semgrep](/doc/semgrep_deploy_cn.md)
 
 #### 步骤 3：配置大模型
 

@@ -86,6 +86,7 @@ Install the required static analysis engines according to your needs:
 1. [Deploy PMD](/doc/pmd_install_cn.md)
 2. [Deploy clang-tidy](/doc/clang_tidy_install_cn.md)
 3. [Deploy CodeQL](/doc/codeql_deploy_cn.md)
+4. [Deploy Semgrep](/doc/semgrep_deploy.md)
 
 #### Step 3: Configure the LLM
 
