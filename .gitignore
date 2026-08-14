@@ -110,3 +110,9 @@ semgrep_prompt/testcase/guardian/
 !semgrep_prompt/rules/**/*.yml
 semgrep_prompt/v1/collect_rule_library.py
 semgrep_prompt/v1/run_paired_dataset_batch.py
+
+
+codeql-bundle-2.23.3
+docs/
+src/codeql_collect_uniform/chroma_db
+src/codeql_collect_uniform/chroma_db/chroma.sqlite3

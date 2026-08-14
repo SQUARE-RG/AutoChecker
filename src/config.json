@@ -30,7 +30,7 @@
         "base":"/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy"
     },
     "result":{
-        "result_dir":"/root/code_check/result_new/"
+        "result_dir":"/root/code_check/result_generation/"
     },
     "knowledge_base":{
         "astMatcher_api_path":"/root/code_check/clang_tidy_collect/collect_clang_tidy_astMatchers/astMatchers.json",
