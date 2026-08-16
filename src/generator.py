@@ -27,9 +27,44 @@ class Clang_tidy_CheckerGenerator(object):
         self.EMBEDDED_AST_NODES = []
         self.result_dir = rule_result_dir
         self.total_cost =0.0
+        # LLM 用量追踪
+        self._llm_call_count = 0
+        self._total_prompt_tokens = 0
+        self._total_completion_tokens = 0
+        self._total_cached_tokens = 0
+        self._usage_records = []  # 每次 LLM 调用的完整 usage 记录
         self.debug_prompt_dir = self.result_dir + "debug_prompt/"
     def get_total_cost(self):
         return self.total_cost
+    def _track_usage(self, cb, label: str = ""):
+        """记录一次 LLM 调用的完整用量并累积统计。"""
+        usage = calculate_deepseek_cost(cb)
+        self._llm_call_count += 1
+        self._total_prompt_tokens += usage["prompt_tokens"]
+        self._total_completion_tokens += usage["completion_tokens"]
+        self._total_cached_tokens += usage["cached_tokens"]
+        self.total_cost += usage["total_cost"]
+        self._usage_records.append({
+            "call_index": self._llm_call_count,
+            "label": label,
+            **usage,
+        })
+    def get_usage_stats(self) -> dict:
+        """返回当前规则的全部 LLM 用量统计（含每次调用的完整明细）。"""
+        return {
+            "rule_name": self.RULE.get_rule_name(),
+            "llm_calls": self._llm_call_count,
+            "prompt_tokens": self._total_prompt_tokens,
+            "completion_tokens": self._total_completion_tokens,
+            "cached_tokens": self._total_cached_tokens,
+            "total_tokens": self._total_prompt_tokens + self._total_completion_tokens,
+            "total_cost": self.total_cost,
+            "cost_breakdown": {
+                "input_cost": sum(r["cost_breakdown"]["input_cost"] for r in self._usage_records),
+                "output_cost": sum(r["cost_breakdown"]["output_cost"] for r in self._usage_records),
+            },
+            "calls": self._usage_records,
+        }
     def generate_checker(self):
         os.makedirs(self.debug_prompt_dir, exist_ok=True)
         success, init_checker = self.first_checker_generation()
@@ -52,9 +87,7 @@ class Clang_tidy_CheckerGenerator(object):
         )
         for attempt in range(1,config['arguments']['max_llm_tries'] + 1):
             answer,cb = llm_invoke(llm_client, logic_query, system_prompt=system_prompt)
-            cost = calculate_deepseek_cost(cb, model_name="deepseek-chat")
-            self.total_cost += cost['total_cost']
-            # print(f"估算成本 (元): ¥{cost['total_cost']:.6f}")
+            self._track_usage(cb, label=f"logic-neg-attempt{attempt}")
             logger.debug(f"LLM logic for negative case attempt {attempt}:\n {answer}")
             cleaned = re.sub(r'```json|```', '', answer).strip()
             try:
@@ -73,8 +106,7 @@ class Clang_tidy_CheckerGenerator(object):
         )
         for attempt in range(1,config['arguments']['max_llm_tries'] + 1):
             answer,cb = llm_invoke(llm_client, augmentation_query, system_prompt=system_prompt)
-            cost = calculate_deepseek_cost(cb, model_name="deepseek-chat")
-            self.total_cost += cost['total_cost']
+            self._track_usage(cb, label=f"aug-logic-neg-attempt{attempt}")
             logger.debug(f"LLM augmentation logic by negative case attempt {attempt}: {answer}")
             cleaned = re.sub(r'```json|```', '', answer).strip()
             try:
@@ -95,8 +127,7 @@ class Clang_tidy_CheckerGenerator(object):
         )
         for attempt in range(1,config['arguments']['max_llm_tries'] + 1):
             answer,cb = llm_invoke(llm_client, augmentation_query, system_prompt=system_prompt)
-            cost = calculate_deepseek_cost(cb, model_name="deepseek-chat")
-            self.total_cost += cost['total_cost']
+            self._track_usage(cb, label=f"aug-logic-pos-attempt{attempt}")
             logger.debug(f"LLM augmentation logic by positive case attempt {attempt}: {answer}")
             cleaned = re.sub(r'```json|```', '', answer).strip()
             try:
@@ -135,8 +166,7 @@ class Clang_tidy_CheckerGenerator(object):
             with open(self.debug_prompt_dir + "generate_checker_with_single_case.md", 'w',encoding="utf-8") as f:
                 f.write(f"针对负例{current_case.get_case_path()}生成first checker\n"+generation_query)
             answer,cb = llm_invoke(llm_client, generation_query, system_prompt=system_prompt)
-            cost = calculate_deepseek_cost(cb, model_name="deepseek-chat")
-            self.total_cost += cost['total_cost']
+            self._track_usage(cb, label=f"gen-checker-attempt{attempt}")
             logger.debug(f"LLM checker generation attempt {attempt}: \n{answer}")
             # 提取代码块
             generator_cpp_code,generator_h_code = parse_cpp_h_code_from_answer(answer)
@@ -202,8 +232,7 @@ class Clang_tidy_CheckerGenerator(object):
         for attempt in range(1,config['arguments']['max_llm_tries'] + 1):
             logger.info(f"使用增强逻辑生成checker代码，尝试第{attempt}次")
             checker,cb = llm_invoke(llm_client, query, system_prompt=system_prompt)
-            cost = calculate_deepseek_cost(cb, model_name="deepseek-chat")
-            self.total_cost += cost['total_cost']
+            self._track_usage(cb, label=f"gen-with-query-attempt{attempt}")
             with open(self.debug_prompt_dir + "generate_checker_with_query.md", 'w',encoding="utf-8") as f:
                 f.write(f"使用增强逻辑生成checker代码，原始回答:\n"+checker)
             checker_cpp,checker_h = parse_cpp_h_code_from_answer(checker)
@@ -233,8 +262,7 @@ class Clang_tidy_CheckerGenerator(object):
         repair_steps= []
         for attempt in range(1,config['arguments']['max_llm_tries'] + 1):
             answer,cb = llm_invoke(llm_client, analyze_query, system_prompt=system_prompt)
-            cost = calculate_deepseek_cost(cb, model_name="deepseek-chat")
-            self.total_cost += cost['total_cost']
+            self._track_usage(cb, label=f"analyze-error-attempt{attempt}")
             logger.debug(f"LLM analyze compiler error attempt {attempt}: \n{answer}")
             cleaned = re.sub(r'```json|```', '', answer).strip()
             try:

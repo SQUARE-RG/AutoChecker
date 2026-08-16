@@ -116,3 +116,6 @@ codeql-bundle-2.23.3
 docs/
 src/codeql_collect_uniform/chroma_db
 src/codeql_collect_uniform/chroma_db/chroma.sqlite3
+AutoChecker_Performance.xlsx
+result_generation
+logs

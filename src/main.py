@@ -135,7 +135,7 @@ def main(plateform: str = "clang-tidy"):
     init_logger()
     result_dir = global_config['result']['result_dir']
     # os.makedirs(result_dir, exist_ok=True)
-    with open("/root/code_check/experiment/gjb8114/rule_clang-tidy/jgb8114_all_rules_new.json", 'r') as f:
+    with open("/root/code_check/experiment/gjb8114/rule_clang-tidy/jgb8114_all_rules_temp.json", 'r') as f:
         rule_data = json.load(f)
     for rule_package,rule_list in rule_data['data'].items():
         for rule_info in rule_list:
@@ -168,7 +168,7 @@ def main(plateform: str = "clang-tidy"):
                 rule_info['issuccess'] = "False"
                 rule_info['performance']=f"0/{len(Case_List)}"
                 remove_Checker_Template(checker_name=rule.get_rule_name())
-                rule_info['total_cost'] = f"{checker_generator.get_total_cost():.6f}"
+                rule_info['usage'] = checker_generator.get_usage_stats()
                 logger.info(f"已删除Clang仓库中的Checker，规则名：{rule.get_rule_name()}")
             else:
                 logger.info(f"生成了 {len(checkers_list)} 个Checker，规则名：{rule.get_rule_name()}")
@@ -186,7 +186,7 @@ def main(plateform: str = "clang-tidy"):
                 failed_case_list = [case for case in Case_List if case.get_case_path() not in sucess_case_path_list]
                 failed_case_path_list = [case.get_case_path() for case in failed_case_list]
                 rule_info['failed_case_list'] = failed_case_path_list
-                rule_info['total_cost'] = f"{checker_generator.get_total_cost():.6f}"
+                rule_info['usage'] = checker_generator.get_usage_stats()
                 check_success_negative,check_failed_negative = analyze(sucess_case_list,Case_List)
                 rule_info['negative_case_analysis'] = {
                     "check_success_negative": check_success_negative,
@@ -196,6 +196,19 @@ def main(plateform: str = "clang-tidy"):
             end = time.perf_counter()
             logger.info(f"规则 {rule.get_rule_name()} 的Checker生成总共耗时: {end - start:.2f} 秒")
             rule_info['time'] = f"{end - start:.2f}"
+            # 输出 LLM 用量统计
+            usage = checker_generator.get_usage_stats()
+            logger.info("=" * 50)
+            logger.info(f"RULE USAGE: {usage['rule_name']}")
+            logger.info(f"  LLM calls:        {usage['llm_calls']}")
+            logger.info(f"  Prompt tokens:    {usage['prompt_tokens']}")
+            logger.info(f"  Completion tokens:{usage['completion_tokens']}")
+            logger.info(f"  Cached tokens:    {usage['cached_tokens']}")
+            logger.info(f"  Total tokens:     {usage['total_tokens']}")
+            logger.info(f"  Total cost:       ¥{usage['total_cost']:.6f}")
+            logger.info(f"  Input cost:       ¥{usage['cost_breakdown']['input_cost']:.6f}")
+            logger.info(f"  Output cost:      ¥{usage['cost_breakdown']['output_cost']:.6f}")
+            logger.info("=" * 50)
             #再次编译clang tidy
             compiler_clang_tidy()
         

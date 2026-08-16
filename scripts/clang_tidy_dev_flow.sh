@@ -9,6 +9,7 @@ REPO_ROOT=/root/code_check/llvm-project
 CLANG_TIDY_DIR="$REPO_ROOT/clang-tools-extra/clang-tidy"
 MODULE_DIR="$CLANG_TIDY_DIR/ucassaat"
 TEST_CHECKERS_DIR="$CLANG_TIDY_DIR/../test/clang-tidy/checkers/ucassaat"
+DOCS_CHECKERS_DIR="$CLANG_TIDY_DIR/../../docs/clang-tidy/checks/ucassaat"
 WORKFLOW_SRC_DIR=/root/code_check/scripts/clang-tidy-work-flow
 WORKFLOW_CLANG_TIDY_DIR="$WORKFLOW_SRC_DIR/clang-tidy"
 BUILD_DIR="$REPO_ROOT/build"
@@ -23,6 +24,8 @@ fi
 
 mkdir -p "$MODULE_DIR"
 mkdir -p "$TEST_CHECKERS_DIR"
+# add_new_check.py 的 write_docs() 假定 docs 目录已存在，需预先创建
+mkdir -p "$DOCS_CHECKERS_DIR"
 
 # Copy helper scripts from workflow dir into llvm-project locations
 echo "Copying helper workflow scripts into clang-tidy tree"
@@ -88,7 +91,24 @@ OUTPUT=$("$CLANG_TIDY_BIN" --list-checks --checks=-*,ucassaat-* 2>&1 || true)
 echo "$OUTPUT"
 
 if [[ -n "$OUTPUT" ]]; then
-  echo "Development flow appears complete: some ucassaat checks were listed above." 
+  echo "Development flow appears complete: some ucassaat checks were listed above."
+  # 预热 embedding 缓存，避免 main.py 首次运行时边跑边编码
+  PREWARM_SCRIPT=/root/code_check/scripts/prewarm_embeddings.py
+  if [[ -f "$PREWARM_SCRIPT" ]]; then
+    echo "Prewarming embedding caches..."
+    # 激活 conda 虚拟环境（与 prepair_python_env.sh 一致）
+    CONDA_SH=/root/anaconda3/etc/profile.d/conda.sh
+    if [[ -f "$CONDA_SH" ]]; then
+      source "$CONDA_SH"
+      conda activate code_check
+      python "$PREWARM_SCRIPT" || echo "Warning: prewarm failed, main.py will compute embeddings on first run" >&2
+    else
+      echo "Warning: conda.sh not found at $CONDA_SH, falling back to system python" >&2
+      python "$PREWARM_SCRIPT" || echo "Warning: prewarm failed, main.py will compute embeddings on first run" >&2
+    fi
+  else
+    echo "Warning: prewarm script not found: $PREWARM_SCRIPT" >&2
+  fi
   exit 0
 else
   echo "No ucassaat checks listed. Check build logs and CMake configuration." >&2

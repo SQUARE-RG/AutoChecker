@@ -98,11 +98,12 @@ def embedding_ast_api():
     embedding_start_time = time.perf_counter()
     logger.info(f"Total AST API documents to embed: {len(ast_api_documents)}")
 
-    sentence_embeddings = parallel_encode(
+    # 使用 sequential_encode：torch intra-op 线程池会利用全部核心，
+    # 且避免 parallel_encode 在多线程父进程中 fork 导致的 futex 死锁
+    sentence_embeddings = sequential_encode(
         texts=ast_api_documents,
         model_path=config['embedding_model']['bge_model_path'],
-        num_workers=4,
-        batch_size=64,
+        batch_size=128,
     )
     embedding_end_time = time.perf_counter()
     logger.info(f"Completed embedding AST API documents in {embedding_end_time - embedding_start_time:.2f} seconds.")
