@@ -13,20 +13,6 @@ from loguru import logger
 from codeql_language_config import LanguageConfig
 from config import global_config
 
-# qlpack.yml 模板 — 按语言
-QLPACK_TEMPLATES = {
-    "cpp": """name: autochecker-{rule_name}
-version: 0.0.0
-dependencies:
-  codeql/cpp-all: "*"
-""",
-    "python": """name: autochecker-{rule_name}
-version: 0.0.0
-dependencies:
-  codeql/python-all: "*"
-""",
-}
-
 # .ql 查询模板路径
 _QL_TEMPLATE_DIR = "/root/code_check/src/prompt/codeql_prompt/prompt_txt"
 _QL_TEMPLATES = {
@@ -37,10 +23,29 @@ _QL_TEMPLATES = {
 
 # ── qlpack ────────────────────────────────────────────────
 
-def write_qlpack(rule_name: str, output_dir: str, language: str) -> str:
-    """在 output_dir 下按语言生成 qlpack.yml，返回写入路径。"""
-    template = QLPACK_TEMPLATES.get(language, QLPACK_TEMPLATES["cpp"])
-    content = template.format(rule_name=rule_name)
+def write_qlpack(rule_name: str, output_dir: str, lang_config: LanguageConfig,
+                 extra_dependencies: List[str] = None) -> str:
+    """在 output_dir 下按语言生成 qlpack.yml，返回写入路径。
+
+    依赖来源（单一权威）：
+    - 基础依赖：lang_config.qlpack_dependency（按语言区分，缺失直接报错）
+    - 额外依赖：extra_dependencies（规则级可选，如 ["codeql/dataflow"]）
+    """
+    if not lang_config.qlpack_dependency:
+        raise ValueError(
+            f"语言 {lang_config.language} 未配置 qlpack 依赖，拒绝生成 qlpack.yml")
+
+    deps = [lang_config.qlpack_dependency]
+    for dep in (extra_dependencies or []):
+        if dep not in deps:
+            deps.append(dep)
+
+    deps_yaml = "\n".join(f"  {dep}" for dep in deps)
+    content = f"""name: autochecker-{rule_name}
+version: 0.0.0
+dependencies:
+{deps_yaml}
+"""
     path = os.path.join(output_dir, "qlpack.yml")
     os.makedirs(output_dir, exist_ok=True)
     with open(path, "w") as f:
@@ -58,7 +63,16 @@ def _codeql_database_name(case_path: str) -> str:
 
 
 def create_database(case_path: str, lang_config: LanguageConfig) -> str | None:
-    """为单个测试用例创建 CodeQL database。"""
+    """为单个测试用例创建 CodeQL database。
+
+    解释型语言（无 database_build_command，如 Python）：
+      extractor 会扫描整个 --source-root——必须把单个用例复制到隔离目录，
+      否则 database 会混入同目录下其他测试用例的代码（verify 结果失真）。
+    编译型语言（有 --command）：extractor 跟随编译，只提取被编译的文件。
+    """
+    import shutil
+    import tempfile
+
     database_path = _codeql_database_name(case_path)
     if os.path.exists(database_path):
         logger.info(f"Database already exists, skip: {database_path}")
@@ -70,12 +84,26 @@ def create_database(case_path: str, lang_config: LanguageConfig) -> str | None:
         database_path,
         f"--language={lang_config.codeql_language_flag}",
     ]
+
+    isolated_dir = None
     if lang_config.database_build_command:
         cmd.append(f"--command={lang_config.database_build_command.format(case_path=case_path)}")
-    cmd.append(f"--source-root={case_dir}")
+        cmd.append(f"--source-root={case_dir}")
+    else:
+        # 解释型语言：单用例隔离目录
+        isolated_dir = tempfile.mkdtemp(prefix="codeql_case_iso_")
+        isolated_case = os.path.join(isolated_dir, os.path.basename(case_path))
+        shutil.copy(case_path, isolated_case)
+        cmd.append(f"--source-root={isolated_dir}")
+        logger.info(f"隔离目录: {isolated_dir}（只含 {os.path.basename(case_path)}）")
 
     logger.info(f"Creating database: {' '.join(cmd)}")
-    result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    try:
+        result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    finally:
+        if isolated_dir:
+            shutil.rmtree(isolated_dir, ignore_errors=True)
+
     if result.returncode == 0:
         logger.info(f"Database created: {database_path}")
         return database_path

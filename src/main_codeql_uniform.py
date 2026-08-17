@@ -116,8 +116,9 @@ def main(language: str = "cpp", rules_path: str = None):
                 shutil.rmtree(rule_result_dir)
             os.makedirs(rule_result_dir, exist_ok=True)
 
-            # 2. 生成 qlpack.yml
-            write_qlpack(rule.rule_name, rule_result_dir, language)
+            # 2. 生成 qlpack.yml（依赖按语言从 LanguageConfig 读取）
+            write_qlpack(rule.rule_name, rule_result_dir, lang_config,
+                         extra_dependencies=rule_info.get("extra_dependencies"))
 
             # 3. 为测试用例创建 database
             create_databases_for_test_cases(cases, lang_config)

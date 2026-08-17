@@ -82,6 +82,55 @@ def _query_chroma_collections(query_texts: List[str],
     return unique
 
 
+def query_chroma_docs_with_ids(query_texts: List[str],
+                               collection_names: List[str],
+                               top_k: int = 2) -> List[tuple]:
+    """检索并返回 [(chunk_id, doc_text)]，供 agent 工具做 doc-id 去重。
+
+    与 _query_chroma_collections 的区别：保留 ChromaDB 的 chunk id。
+    """
+    if not collection_names or not query_texts:
+        return []
+
+    if len(query_texts) > 1:
+        query_embs = sequential_encode(query_texts, _MODEL_PATH,
+                                       batch_size=min(len(query_texts), 128))
+    else:
+        query_embs = sequential_encode(query_texts, _MODEL_PATH, batch_size=1)
+
+    client = get_chroma_client()
+    collections_cache = {}
+    for coll_name in collection_names:
+        try:
+            collections_cache[coll_name] = client.get_collection(name=coll_name)
+        except Exception:
+            logger.debug(f"Collection '{coll_name}' not found, skipping")
+
+    results: List[tuple] = []
+    for i, query_text in enumerate(query_texts):
+        query_emb = query_embs[i].tolist()
+        for coll_name in collection_names:
+            coll = collections_cache.get(coll_name)
+            if coll is None:
+                continue
+            try:
+                res = coll.query(query_embeddings=[query_emb], n_results=top_k)
+                ids = res.get("ids", [[]])[0]
+                docs = res.get("documents", [[]])[0]
+                results.extend(zip(ids, docs))
+            except Exception:
+                logger.debug(f"Query failed on '{coll_name}', skipping")
+
+    # 按 id 去重保序
+    seen = set()
+    unique = []
+    for cid, text in results:
+        if cid not in seen:
+            seen.add(cid)
+            unique.append((cid, text))
+    return unique
+
+
 # ── 对外接口（与现有函数签名兼容）──────────────────────────
 
 def get_related_api_uniform(logics: List[str], lang_config: LanguageConfig) -> List[str]:
