@@ -148,8 +148,13 @@ def compiler_code_ql(query_path: str) -> Tuple[int, str, str, bool]:
     return result.returncode, result.stdout, result.stderr, success
 
 
-def run_code_ql_with_query(query_path: str, database_path: str, output_path: str) -> Tuple[str, int]:
-    """运行 CodeQL 查询并返回 (输出文本, warning 数量)。warnings=-1 表示运行失败。"""
+def run_code_ql_with_query(query_path: str, database_path: str, output_path: str) -> Tuple[str, int, str]:
+    """运行 CodeQL 查询并返回 (输出文本, warning 数量, 运行错误详情)。
+
+    - 正常运行: warning_count >= 0，error_detail = ""
+    - 运行失败: warning_count = -1，error_detail = 截断的错误输出（如
+      INVALID_RESULT_PATTERNS——select 列数与 @kind 不匹配等）
+    """
     logger.info("---------------------- Running CodeQL ----------------------")
     cmd = [
         "codeql", "database", "analyze",
@@ -162,14 +167,15 @@ def run_code_ql_with_query(query_path: str, database_path: str, output_path: str
     proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     if proc.returncode != 0:
         logger.error(f"Run failed on {database_path}, rc={proc.returncode}")
-        return proc.stdout, -1
+        error_detail = (proc.stderr or proc.stdout or "")[:4000]
+        return proc.stdout, -1, error_detail
 
     with open(output_path, "r") as f:
         output_content = f.read()
     stripped = output_content.strip()
     warning_count = len(stripped.split("\n")) if stripped else 0
     logger.info(f"Run succeeded, warnings: {warning_count}")
-    return proc.stdout, warning_count
+    return proc.stdout, warning_count, ""
 
 
 # ── 查询模板 ──────────────────────────────────────────────

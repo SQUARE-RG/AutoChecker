@@ -201,14 +201,14 @@ class CodeQLDocsFetcher:
 
         # Collect all referenced collection names from source dicts
         used_collections = set()
-        # for src in self.codeql_ql_reference.values():
-        #     used_collections.add(src['collection'])
-        for src in self.java_doc_sources.values():
+        for src in self.codeql_ql_reference.values():
             used_collections.add(src['collection'])
-        for src in self.cpp_doc_sources.values():
-            used_collections.add(src['collection'])
-        # for src in self.python_doc_sources.values():
+        # for src in self.java_doc_sources.values():
         #     used_collections.add(src['collection'])
+        # for src in self.cpp_doc_sources.values():
+        #     used_collections.add(src['collection'])
+        for src in self.python_doc_sources.values():
+            used_collections.add(src['collection'])
 
         for name in used_collections:
             description = collection_descriptions.get(name, f'CodeQL Documentation - {name}')
@@ -578,46 +578,46 @@ class CodeQLDocsFetcher:
         # Setup collections
         collections = self.setup_collections()
 
-        # --- 1. Shared QL Language Reference (disabled - already collected) ---
+        # --- 1. Shared QL Language Reference ---
         all_url_batches = []
 
-        # logger.info("Collecting QL Language Reference URLs...")
-        # ql_ref_src = self.codeql_ql_reference['ql_reference']
-        # ql_ref_links = self.get_all_links(
-        #     ql_ref_src['base_url'],
-        #     url_pattern='/docs/ql-language-reference/'
-        # )
-        # all_url_batches.append((ql_ref_links, ql_ref_src['collection']))
+        logger.info("Collecting QL Language Reference URLs...")
+        ql_ref_src = self.codeql_ql_reference['ql_reference']
+        ql_ref_links = self.get_all_links(
+            ql_ref_src['base_url'],
+            url_pattern='/docs/ql-language-reference/'
+        )
+        all_url_batches.append((ql_ref_links, ql_ref_src['collection']))
 
-        # --- 2. Java documentation sources ---
-        logger.info("Collecting Java Standard Library URLs...")
-        java_stdlib_src = self.java_doc_sources['java_stdlib']
-        java_stdlib_links = self.get_all_links(java_stdlib_src['base_url'])
-        all_url_batches.append((java_stdlib_links, java_stdlib_src['collection']))
-
-        logger.info("Collecting Java Language Guide URLs...")
-        java_guide_src = self.java_doc_sources['language_guides']
-        all_url_batches.append((java_guide_src['urls'], java_guide_src['collection']))
-
-        # --- 3. C++ documentation sources ---
-        logger.info("Collecting C++ Standard Library URLs...")
-        cpp_stdlib_src = self.cpp_doc_sources['cpp_stdlib']
-        cpp_stdlib_links = self.get_all_links(cpp_stdlib_src['base_url'])
-        all_url_batches.append((cpp_stdlib_links, cpp_stdlib_src['collection']))
-
-        logger.info("Collecting C++ Language Guide URLs...")
-        cpp_guide_src = self.cpp_doc_sources['language_guides']
-        all_url_batches.append((cpp_guide_src['urls'], cpp_guide_src['collection']))
-
-        # --- 4. Python documentation sources (disabled - already collected) ---
-        # logger.info("Collecting Python Standard Library URLs...")
-        # python_stdlib_src = self.python_doc_sources['python_stdlib']
-        # python_stdlib_links = self.get_all_links(python_stdlib_src['base_url'])
-        # all_url_batches.append((python_stdlib_links, python_stdlib_src['collection']))
+        # --- 2. Java documentation sources (disabled) ---
+        # logger.info("Collecting Java Standard Library URLs...")
+        # java_stdlib_src = self.java_doc_sources['java_stdlib']
+        # java_stdlib_links = self.get_all_links(java_stdlib_src['base_url'])
+        # all_url_batches.append((java_stdlib_links, java_stdlib_src['collection']))
         #
-        # logger.info("Collecting Python Language Guide URLs...")
-        # python_guide_src = self.python_doc_sources['language_guides']
-        # all_url_batches.append((python_guide_src['urls'], python_guide_src['collection']))
+        # logger.info("Collecting Java Language Guide URLs...")
+        # java_guide_src = self.java_doc_sources['language_guides']
+        # all_url_batches.append((java_guide_src['urls'], java_guide_src['collection']))
+
+        # --- 3. C++ documentation sources (disabled) ---
+        # logger.info("Collecting C++ Standard Library URLs...")
+        # cpp_stdlib_src = self.cpp_doc_sources['cpp_stdlib']
+        # cpp_stdlib_links = self.get_all_links(cpp_stdlib_src['base_url'])
+        # all_url_batches.append((cpp_stdlib_links, cpp_stdlib_src['collection']))
+        #
+        # logger.info("Collecting C++ Language Guide URLs...")
+        # cpp_guide_src = self.cpp_doc_sources['language_guides']
+        # all_url_batches.append((cpp_guide_src['urls'], cpp_guide_src['collection']))
+
+        # --- 4. Python documentation sources ---
+        logger.info("Collecting Python Standard Library URLs...")
+        python_stdlib_src = self.python_doc_sources['python_stdlib']
+        python_stdlib_links = self.get_all_links(python_stdlib_src['base_url'])
+        all_url_batches.append((python_stdlib_links, python_stdlib_src['collection']))
+
+        logger.info("Collecting Python Language Guide URLs...")
+        python_guide_src = self.python_doc_sources['language_guides']
+        all_url_batches.append((python_guide_src['urls'], python_guide_src['collection']))
 
         # Calculate total URLs
         total_urls = sum(len(urls) for urls, _ in all_url_batches)
@@ -632,26 +632,26 @@ class CodeQLDocsFetcher:
                 logger.info(f"Processing batch {i//batch_size + 1} for {collection_name}")
                 self.process_url_batch(batch_urls, collection_name, collections)
 
-        # --- 5. Local CodeQL queries (Java) ---
-        self._fetch_local_queries(
-            library_src=self.java_doc_sources['local_codeql_queries'],
-            security_src=self.java_doc_sources['local_codeql_security_queries'],
-            collections=collections
-        )
-
-        # --- 6. Local CodeQL queries (C++) ---
-        self._fetch_local_queries(
-            library_src=self.cpp_doc_sources['local_codeql_queries'],
-            security_src=self.cpp_doc_sources['local_codeql_security_queries'],
-            collections=collections
-        )
-
-        # --- 7. Local CodeQL queries (Python) (disabled - already collected) ---
+        # --- 5. Local CodeQL queries (Java) (disabled) ---
         # self._fetch_local_queries(
-        #     library_src=self.python_doc_sources['local_codeql_queries'],
-        #     security_src=self.python_doc_sources['local_codeql_security_queries'],
+        #     library_src=self.java_doc_sources['local_codeql_queries'],
+        #     security_src=self.java_doc_sources['local_codeql_security_queries'],
         #     collections=collections
         # )
+
+        # --- 6. Local CodeQL queries (C++) (disabled) ---
+        # self._fetch_local_queries(
+        #     library_src=self.cpp_doc_sources['local_codeql_queries'],
+        #     security_src=self.cpp_doc_sources['local_codeql_security_queries'],
+        #     collections=collections
+        # )
+
+        # --- 7. Local CodeQL queries (Python) ---
+        self._fetch_local_queries(
+            library_src=self.python_doc_sources['local_codeql_queries'],
+            security_src=self.python_doc_sources['local_codeql_security_queries'],
+            collections=collections
+        )
 
         self._print_final_statistics(collections)
 
@@ -756,12 +756,12 @@ def main():
             max_workers=args.workers
         )
 
-        fetcher.java_doc_sources['local_codeql_queries']['local_path'] = args.java_library_path
-        fetcher.java_doc_sources['local_codeql_security_queries']['local_path'] = args.java_security_path
-        fetcher.cpp_doc_sources['local_codeql_queries']['local_path'] = args.cpp_library_path
-        fetcher.cpp_doc_sources['local_codeql_security_queries']['local_path'] = args.cpp_security_path
-        # fetcher.python_doc_sources['local_codeql_queries']['local_path'] = args.python_library_path
-        # fetcher.python_doc_sources['local_codeql_security_queries']['local_path'] = args.python_security_path
+        # fetcher.java_doc_sources['local_codeql_queries']['local_path'] = args.java_library_path
+        # fetcher.java_doc_sources['local_codeql_security_queries']['local_path'] = args.java_security_path
+        # fetcher.cpp_doc_sources['local_codeql_queries']['local_path'] = args.cpp_library_path
+        # fetcher.cpp_doc_sources['local_codeql_security_queries']['local_path'] = args.cpp_security_path
+        fetcher.python_doc_sources['local_codeql_queries']['local_path'] = args.python_library_path
+        fetcher.python_doc_sources['local_codeql_security_queries']['local_path'] = args.python_security_path
 
 
         fetcher.fetch_all_documentation()

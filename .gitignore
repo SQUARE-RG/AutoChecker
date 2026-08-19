@@ -114,8 +114,8 @@ semgrep_prompt/v1/run_paired_dataset_batch.py
 
 codeql-bundle-2.23.3
 docs/
-src/codeql_collect_uniform/chroma_db/
-src/codeql_collect_uniform/chroma_db/chroma.sqlite3
+
+src/codeql_collect_uniform/
 AutoChecker_Performance.xlsx
 result_generation
 logs
