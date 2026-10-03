@@ -15,6 +15,30 @@ from entity.concreteProduct_Clang_Tidy import AbstractChecker, Checker_Clang_Tid
 
 max_round = config['arguments']['max_round']
 max_compiler_trys = config['arguments']['max_compiler_trys']
+
+
+class LLMLogicGenerationError(RuntimeError):
+    """Raised when repeated LLM responses cannot produce usable logic JSON."""
+
+
+def parse_logic_response(answer: str):
+    """Parse and validate the common clang-tidy logic response schema."""
+    cleaned = re.sub(r'```json|```', '', answer or '').strip()
+    if not cleaned:
+        raise ValueError("LLM返回内容为空")
+    payload = json.loads(cleaned)
+    if not isinstance(payload, list) or not payload or not isinstance(payload[0], dict):
+        raise ValueError("逻辑结果必须是包含一个对象的非空JSON数组")
+    logic = payload[0]
+    for key in ("logic_registerMatchers", "logic_check"):
+        steps = logic.get(key)
+        if not isinstance(steps, list) or not steps:
+            raise ValueError(f"{key}必须是非空数组")
+        if any(not isinstance(step, str) or not step.strip() for step in steps):
+            raise ValueError(f"{key}包含无效步骤")
+    return payload
+
+
 class Clang_tidy_CheckerGenerator(object):
     def __init__(self,rule:AbstractRule,all_Test_Case_List: List[AbstractCase]=None,skipped_Test_Cases: List[AbstractCase]=None,rule_result_dir:str=""):
 
@@ -89,13 +113,14 @@ class Clang_tidy_CheckerGenerator(object):
             answer,cb = llm_invoke(llm_client, logic_query, system_prompt=system_prompt)
             self._track_usage(cb, label=f"logic-neg-attempt{attempt}")
             logger.debug(f"LLM logic for negative case attempt {attempt}:\n {answer}")
-            cleaned = re.sub(r'```json|```', '', answer).strip()
             try:
-                json_logic = json.loads(cleaned)
-                return json_logic
-            except json.JSONDecodeError as e:
-                logger.debug(f"JSON解析错误: {e}. 尝试重新生成...")
-        return []
+                return parse_logic_response(answer)
+            except (json.JSONDecodeError, ValueError) as e:
+                logger.debug(f"逻辑JSON无效: {e}. 尝试重新生成...")
+        raise LLMLogicGenerationError(
+            f"规则{self.RULE.get_rule_name()}的负例逻辑连续"
+            f"{config['arguments']['max_llm_tries']}次生成失败"
+        )
     def augmentation_logic_by_negative_case(self,check_cpp_code,check_h_code,passed_test_cases,failed_test_cases):
         system_prompt, user_tmpl = get_prompt_pair("augmentation_logic_by_negative_case")
         augmentation_query = user_tmpl.format(
@@ -108,13 +133,14 @@ class Clang_tidy_CheckerGenerator(object):
             answer,cb = llm_invoke(llm_client, augmentation_query, system_prompt=system_prompt)
             self._track_usage(cb, label=f"aug-logic-neg-attempt{attempt}")
             logger.debug(f"LLM augmentation logic by negative case attempt {attempt}: {answer}")
-            cleaned = re.sub(r'```json|```', '', answer).strip()
             try:
-                json_logic = json.loads(cleaned)
-                return json_logic
-            except json.JSONDecodeError as e:
-                logger.debug(f"JSON解析错误: {e}. 尝试重新生成...")
-        return []
+                return parse_logic_response(answer)
+            except (json.JSONDecodeError, ValueError) as e:
+                logger.debug(f"逻辑JSON无效: {e}. 尝试重新生成...")
+        raise LLMLogicGenerationError(
+            f"规则{self.RULE.get_rule_name()}的负例增强逻辑连续"
+            f"{config['arguments']['max_llm_tries']}次生成失败"
+        )
     
     def augmentation_logic_by_positive_case(self,check_cpp_code,check_h_code,passed_test_cases,failed_test_cases):
         system_prompt, user_tmpl = get_prompt_pair("augmentation_logic_by_positive_case")
@@ -129,13 +155,14 @@ class Clang_tidy_CheckerGenerator(object):
             answer,cb = llm_invoke(llm_client, augmentation_query, system_prompt=system_prompt)
             self._track_usage(cb, label=f"aug-logic-pos-attempt{attempt}")
             logger.debug(f"LLM augmentation logic by positive case attempt {attempt}: {answer}")
-            cleaned = re.sub(r'```json|```', '', answer).strip()
             try:
-                json_logic = json.loads(cleaned)
-                return json_logic
-            except json.JSONDecodeError as e:
-                logger.debug(f"JSON解析错误: {e}. 尝试重新生成...")
-        return []
+                return parse_logic_response(answer)
+            except (json.JSONDecodeError, ValueError) as e:
+                logger.debug(f"逻辑JSON无效: {e}. 尝试重新生成...")
+        raise LLMLogicGenerationError(
+            f"规则{self.RULE.get_rule_name()}的正例增强逻辑连续"
+            f"{config['arguments']['max_llm_tries']}次生成失败"
+        )
     def generate_checker_with_single_case(self,current_case:AbstractCase,current_case_ast_txt,case_ast_node_list):
         logics = self.run_logic_for_negative_case(self.RULE.get_rule_description(), current_case.get_case_code())
         
@@ -604,4 +631,3 @@ class CodeQL_CheckerGenerator(object):
         self.skipped_Test_Cases = skipped_Test_Cases if skipped_Test_Cases is not None else []
         self.RULE = rule
         self.result_dir = rule_result_dir
-

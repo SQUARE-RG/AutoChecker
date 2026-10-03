@@ -130,7 +130,8 @@ def run_one_rule(rule_info: dict, lang_config, result_dir: str) -> dict:
 
     # 检索上下文（run 级，每条规则独立，不跨规则共享）
     ctx = RetrievalContext()
-    tools = build_tools(rule_result_dir, rule_info["rule_test_path"], rule_name, ctx)
+    tools = build_tools(rule_result_dir, rule_info["rule_test_path"], rule_name, ctx,
+                        lang_config)
     usage_records = []
 
     graph = build_graph()
@@ -138,7 +139,8 @@ def run_one_rule(rule_info: dict, lang_config, result_dir: str) -> dict:
     try:
         final_state = graph.invoke(
             initial_state,
-            config={"configurable": {"tools": tools, "usage": usage_records, "ctx": ctx},
+            config={"configurable": {"tools": tools, "usage": usage_records, "ctx": ctx,
+                                     "lang_config": lang_config},
                     "recursion_limit": 300},   # 3 attempt × ~40 步 = 120，留 2.5 倍余量
         )
     except Exception as e:

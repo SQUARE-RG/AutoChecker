@@ -11,22 +11,16 @@ import json
 import os
 from datetime import datetime
 
-from langchain_community.callbacks import get_openai_callback
 from langchain_core.runnables import RunnableConfig
 from loguru import logger
 
 from codeql_language_config import PYTHON_CONFIG
-from llm_interface.llm_provider import calculate_deepseek_cost
+from llm_interface.llm_provider import calculate_deepseek_cost, llm_invoke_messages
 from plateform.code_ql_uniform import (
     compiler_code_ql,
     run_code_ql_with_query,
     case_path_to_database_path,
     write_qlpack,
-)
-from prompt.codeql_prompt.codeql_python_prompt import (
-    build_first_gen_messages,
-    build_repair_compile_messages,
-    build_repair_verify_messages,
 )
 from codeql_agent.parser import find_query_code_block
 from codeql_agent.state import AgentState
@@ -36,13 +30,26 @@ MAX_TEST_ATTEMPTS = 3
 MAX_PARSE_RETRIES = 3
 MAX_LLM_CALLS_PER_ATTEMPT = 16   # attempt 内 LLM 调用预算（耗尽即失败，无豁免）
 MIN_QUERY_CHARS = 200            # query 最小有效长度（防碎片）
-MAX_LLM_RETRIES = 3              # LLM 瞬时错误（500/429/超时）重试次数
 
 # ── prep 节点 ──────────────────────────────────────────────
 
 def _get_ctx(config: RunnableConfig):
     """从 graph config 取 RetrievalContext（run_agent 创建后注入）。"""
     return config["configurable"]["ctx"]
+
+
+def _get_lang_config(config: RunnableConfig):
+    """从 graph config 取 LanguageConfig（run_agent 注入；缺省回退 Python）。"""
+    return config.get("configurable", {}).get("lang_config") or PYTHON_CONFIG
+
+
+def _prompt_module(config: RunnableConfig):
+    """按语言选择 prompt 模块：cpp → codeql_cpp_prompt，其余 → codeql_python_prompt。"""
+    if _get_lang_config(config).language == "cpp":
+        from prompt.codeql_prompt import codeql_cpp_prompt
+        return codeql_cpp_prompt
+    from prompt.codeql_prompt import codeql_python_prompt
+    return codeql_python_prompt
 
 
 def _summaries_block(ctx) -> str:
@@ -56,7 +63,8 @@ def _summaries_block(ctx) -> str:
 
 def prep_first_gen(state: AgentState, config: RunnableConfig) -> AgentState:
     """first_gen 阶段：全新对话（C 方案）+ 注入检索摘要。"""
-    messages = build_first_gen_messages(
+    prompt = _prompt_module(config)
+    messages = prompt.build_first_gen_messages(
         rule_description=state["rule_description"],
         neg_case=state["neg_case_code"],
         pos_case=state["pos_case_code"],
@@ -75,8 +83,9 @@ def prep_repair(state: AgentState, config: RunnableConfig) -> AgentState:
     """repair 阶段：按 step 组装全新对话 + 注入检索摘要。"""
     history = state.get("attempt_history", [])
     retrieved = _summaries_block(_get_ctx(config))
+    prompt = _prompt_module(config)
     if state["step"] == "repair_compile":
-        messages = build_repair_compile_messages(
+        messages = prompt.build_repair_compile_messages(
             rule_name=state["rule_name"],
             query_code=state["query_code"],
             compile_error=state["compile_error"],
@@ -84,7 +93,7 @@ def prep_repair(state: AgentState, config: RunnableConfig) -> AgentState:
             retrieved_summary=retrieved,
         )
     else:  # repair_verify
-        messages = build_repair_verify_messages(
+        messages = prompt.build_repair_verify_messages(
             rule_name=state["rule_name"],
             query_code=state["query_code"],
             case_results=state["case_results"],
@@ -106,22 +115,11 @@ def call_model(state: AgentState, config: RunnableConfig) -> AgentState:
     tools = config["configurable"]["tools"]
     llm_with_tools = llm_client.bind_tools(tools)
 
-    # 瞬时错误（上游 500/429/超时/连接错误）退避重试 3 次
-    last_error = None
-    for attempt in range(1, MAX_LLM_RETRIES + 1):
-        try:
-            with get_openai_callback() as cb:
-                response = llm_with_tools.invoke(state["messages"])
-            break
-        except Exception as e:
-            last_error = e
-            logger.warning(f"LLM 调用瞬时错误（第 {attempt}/{MAX_LLM_RETRIES} 次）: "
-                           f"{type(e).__name__}: {str(e)[:200]}")
-            if attempt < MAX_LLM_RETRIES:
-                import time
-                time.sleep(2 ** attempt)  # 2s / 4s 退避
-    else:
-        raise RuntimeError(f"LLM 调用重试 {MAX_LLM_RETRIES} 次仍失败: {last_error}")
+    response, cb = llm_invoke_messages(
+        llm_with_tools,
+        state["messages"],
+        label=f"codeql-agent:{state.get('rule_name', '-')}",
+    )
 
     # 计费累积
     usage_records = config["configurable"]["usage"]
@@ -206,7 +204,7 @@ def _is_contaminated(code: str) -> bool:
 
 # ── 纯函数节点 ────────────────────────────────────────────
 
-def compile_query(state: AgentState) -> AgentState:
+def compile_query(state: AgentState, config: RunnableConfig) -> AgentState:
     """编译 + qlpack 前置检查。"""
     result_dir = state["result_dir"]
     rule_name = state["rule_name"]
@@ -216,7 +214,7 @@ def compile_query(state: AgentState) -> AgentState:
     # qlpack 前置检查（§9.4 不变量）
     if not os.path.exists(qlpack_path):
         logger.warning("qlpack.yml 缺失，重新生成（防御性）")
-        write_qlpack(rule_name, result_dir, PYTHON_CONFIG)
+        write_qlpack(rule_name, result_dir, _get_lang_config(config))
 
     rc, stdout, stderr, ok = compiler_code_ql(work_path)
     return {
@@ -415,7 +413,7 @@ def verify_target(state: AgentState) -> AgentState:
 
 def prep_augment(state: AgentState, config: RunnableConfig) -> AgentState:
     """组装强化对话（C 方案全新对话）。"""
-    from prompt.codeql_prompt.codeql_python_prompt import build_augment_messages
+    prompt = _prompt_module(config)
 
     target = state["target_case"]
     result_dir = state["result_dir"]
@@ -424,7 +422,7 @@ def prep_augment(state: AgentState, config: RunnableConfig) -> AgentState:
     with open(work_path, "r", encoding="utf-8") as f:
         query_code = f.read()
 
-    messages = build_augment_messages(
+    messages = prompt.build_augment_messages(
         rule_description=state["rule_description"],
         target_case_code=target["code"],
         passed_cases=state["passed_cases"],
@@ -442,7 +440,7 @@ def prep_augment(state: AgentState, config: RunnableConfig) -> AgentState:
 
 def prep_augment_repair_compile(state: AgentState, config: RunnableConfig) -> AgentState:
     """组装强化阶段编译修复对话。"""
-    from prompt.codeql_prompt.codeql_python_prompt import build_augment_repair_compile_messages
+    prompt = _prompt_module(config)
 
     target = state["target_case"]
     result_dir = state["result_dir"]
@@ -451,7 +449,7 @@ def prep_augment_repair_compile(state: AgentState, config: RunnableConfig) -> Ag
     with open(work_path, "r", encoding="utf-8") as f:
         query_code = f.read()
 
-    messages = build_augment_repair_compile_messages(
+    messages = prompt.build_augment_repair_compile_messages(
         target_case_code=target["code"],
         rule_name=rule_name,
         query_code=query_code,
@@ -469,7 +467,7 @@ def prep_augment_repair_compile(state: AgentState, config: RunnableConfig) -> Ag
 
 def prep_augment_repair_verify(state: AgentState, config: RunnableConfig) -> AgentState:
     """组装强化阶段用例修复对话。"""
-    from prompt.codeql_prompt.codeql_python_prompt import build_augment_repair_verify_messages
+    prompt = _prompt_module(config)
 
     target = state["target_case"]
     result_dir = state["result_dir"]
@@ -478,7 +476,7 @@ def prep_augment_repair_verify(state: AgentState, config: RunnableConfig) -> Age
     with open(work_path, "r", encoding="utf-8") as f:
         query_code = f.read()
 
-    messages = build_augment_repair_verify_messages(
+    messages = prompt.build_augment_repair_verify_messages(
         target_case_code=target["code"],
         passed_cases=state["passed_cases"],
         rule_name=rule_name,
@@ -497,7 +495,7 @@ def prep_augment_repair_verify(state: AgentState, config: RunnableConfig) -> Age
 
 def prep_repair_run_error(state: AgentState, config: RunnableConfig) -> AgentState:
     """组装运行失败修复对话（query 编译通过但运行时崩溃）。"""
-    from prompt.codeql_prompt.codeql_python_prompt import build_repair_run_error_messages
+    prompt = _prompt_module(config)
 
     result_dir = state["result_dir"]
     rule_name = state["rule_name"]
@@ -505,7 +503,7 @@ def prep_repair_run_error(state: AgentState, config: RunnableConfig) -> AgentSta
     with open(work_path, "r", encoding="utf-8") as f:
         query_code = f.read()
 
-    messages = build_repair_run_error_messages(
+    messages = prompt.build_repair_run_error_messages(
         rule_name=rule_name,
         query_code=query_code,
         run_error=state.get("verify_run_error", ""),

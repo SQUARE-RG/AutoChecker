@@ -1,13 +1,58 @@
+import json
 import os
+import sys
+import time
+from pathlib import Path
+from typing import Any
+
 from dotenv import load_dotenv
 from loguru import logger
 from langchain_openai import ChatOpenAI
 from langchain_community.callbacks import get_openai_callback
+from langchain_core.messages import message_chunk_to_message
 
 load_dotenv()
 
 
+_DEFAULT_LLM_SETTINGS = {
+    "streaming": False,
+    "stream_output": True,
+    "stream_usage": True,
+    "timeout_seconds": 600,
+    "max_retries": 3,
+    "retry_base_delay_seconds": 2,
+}
+
+
+class EmptyLLMResponseError(RuntimeError):
+    """Raised when a completed model response has no text or tool calls."""
+
+
+def get_llm_settings() -> dict[str, Any]:
+    """Load the shared LLM runtime settings from src/config.json."""
+    config_path = Path(__file__).resolve().parents[1] / "config.json"
+    settings = dict(_DEFAULT_LLM_SETTINGS)
+    try:
+        payload = json.loads(config_path.read_text(encoding="utf-8"))
+        configured = payload.get("llm", {})
+        if isinstance(configured, dict):
+            settings.update(configured)
+    except (OSError, json.JSONDecodeError) as exc:
+        logger.warning(f"读取LLM配置失败，使用默认值: {type(exc).__name__}: {exc}")
+
+    settings["streaming"] = bool(settings["streaming"])
+    settings["stream_output"] = bool(settings["stream_output"])
+    settings["stream_usage"] = bool(settings["stream_usage"])
+    settings["timeout_seconds"] = max(1, int(settings["timeout_seconds"]))
+    settings["max_retries"] = max(0, int(settings["max_retries"]))
+    settings["retry_base_delay_seconds"] = max(
+        0.0, float(settings["retry_base_delay_seconds"])
+    )
+    return settings
+
+
 def get_llm_client():
+    settings = get_llm_settings()
     model_name = os.getenv("MODEL_NAME", "deepseek")
     if "deepseek" in model_name:
         API_KEY = os.getenv("DEEPSEEK_API_KEY", "your_default_api_key_here")
@@ -16,25 +61,186 @@ def get_llm_client():
             model=model_name,
             api_key=API_KEY,
             base_url=BASE_URL,
-            temperature=0.7)
+            temperature=0.7,
+            timeout=settings["timeout_seconds"],
+            # The shared invocation layer owns retries so partial streams can
+            # be discarded deterministically before retrying the whole call.
+            max_retries=0,
+        )
         return client
 
 
-def llm_invoke(llm_provider, prompt: str, system_prompt: str = None) -> str:
+def llm_invoke(llm_provider, prompt: str, system_prompt: str = None):
     messages = build_messages(prompt, system_prompt)
-    with get_openai_callback() as cb:
-        msg = llm_provider.invoke(messages)
-    # 把响应的标准字段附加到 cb 上，供 calculate_deepseek_cost 读取：
-    # - 实际模型名（response_metadata["model_name"]）
-    # - 标准化用量（usage_metadata，含 cache_read / reasoning 细分）
-    cb.llm_model_name = msg.response_metadata.get("model_name") or os.getenv("MODEL_NAME")
-    cb.llm_usage_metadata = msg.usage_metadata
-    return msg.content, cb
+    msg, cb = llm_invoke_messages(llm_provider, messages)
+    return _message_text(msg), cb
+
+
+def llm_invoke_messages(llm_provider, messages, label: str = ""):
+    """Invoke an LLM in configured mode and always return one complete message.
+
+    Streaming chunks are visible while arriving, but callers receive the same
+    complete AIMessage shape as the non-streaming path. This preserves text
+    parsing and LangGraph tool_calls behavior.
+    """
+    settings = get_llm_settings()
+    total_attempts = settings["max_retries"] + 1
+    last_error = None
+    for attempt in range(1, total_attempts + 1):
+        try:
+            with get_openai_callback() as cb:
+                if settings["streaming"]:
+                    msg = _invoke_streaming(
+                        llm_provider,
+                        messages,
+                        stream_usage=settings["stream_usage"],
+                        stream_output=settings["stream_output"],
+                        label=label,
+                        attempt=attempt,
+                    )
+                else:
+                    msg = llm_provider.invoke(messages)
+            _attach_usage(cb, msg)
+            return msg, cb
+        except Exception as exc:
+            last_error = exc
+            if not _is_retryable(exc) or attempt >= total_attempts:
+                raise
+            delay = min(
+                60.0,
+                settings["retry_base_delay_seconds"] * (2 ** (attempt - 1)),
+            )
+            logger.warning(
+                "LLM请求失败，丢弃本次不完整响应并重试 "
+                f"label={label or '-'} attempt={attempt}/{total_attempts} "
+                f"error={type(exc).__name__}: {str(exc)[:200]} delay={delay:.1f}s"
+            )
+            if delay:
+                time.sleep(delay)
+    raise RuntimeError(f"LLM request failed: {last_error}")
+
+
+def _invoke_streaming(
+    llm_provider,
+    messages,
+    *,
+    stream_usage: bool,
+    stream_output: bool,
+    label: str,
+    attempt: int,
+):
+    chunks = []
+    if stream_output:
+        logger.info(f"LLM流式响应开始 label={label or '-'} attempt={attempt}")
+    stream = llm_provider.stream(messages, stream_usage=stream_usage)
+    try:
+        for chunk in stream:
+            chunks.append(chunk)
+            if stream_output:
+                text = _message_text(chunk)
+                if text:
+                    sys.stdout.write(text)
+                    sys.stdout.flush()
+    except BaseException:
+        close = getattr(stream, "close", None)
+        if callable(close):
+            close()
+        if stream_output:
+            sys.stdout.write("\n")
+            sys.stdout.flush()
+        raise
+    if stream_output:
+        sys.stdout.write("\n")
+        sys.stdout.flush()
+        logger.info(f"LLM流式响应结束 label={label or '-'} attempt={attempt}")
+    if not chunks:
+        raise RuntimeError("LLM streaming response contained no events")
+    aggregate = chunks[0]
+    for chunk in chunks[1:]:
+        aggregate += chunk
+    message = message_chunk_to_message(aggregate)
+    # An OpenAI-compatible endpoint may emit role/usage/final SSE events while
+    # returning neither text nor a tool call.  Such a stream is not useful to
+    # any caller and must enter the same whole-request retry path as a broken
+    # connection.  Empty text remains valid for agent tool-call responses.
+    if not _message_text(message).strip() and not getattr(message, "tool_calls", None):
+        logger.warning(
+            "LLM流式响应没有有效内容 "
+            f"events={len(chunks)} "
+            f"response_metadata={getattr(message, 'response_metadata', {})!r} "
+            f"usage_metadata={getattr(message, 'usage_metadata', None)!r} "
+            f"additional_kwargs={getattr(message, 'additional_kwargs', {})!r}"
+        )
+        raise EmptyLLMResponseError(
+            "LLM streaming response contained events but no text or tool calls"
+        )
+    return message
+
+
+def _message_text(message) -> str:
+    content = getattr(message, "content", "")
+    if isinstance(content, str):
+        return content
+    if isinstance(content, list):
+        parts = []
+        for item in content:
+            if isinstance(item, str):
+                parts.append(item)
+            elif isinstance(item, dict):
+                parts.append(str(item.get("text") or ""))
+        return "".join(parts)
+    return str(content or "")
+
+
+def _attach_usage(cb, msg) -> None:
+    response_metadata = getattr(msg, "response_metadata", {}) or {}
+    response_model = response_metadata.get("model_name")
+    cb.llm_response_model_name = response_model
+    # Keep billing based on the configured alias when the provider maps it to
+    # an internal response model that is absent from our price table.
+    cb.llm_model_name = os.getenv("MODEL_NAME") or response_model
+    cb.llm_usage_metadata = getattr(msg, "usage_metadata", None)
+
+
+def _is_retryable(exc: Exception) -> bool:
+    if isinstance(exc, EmptyLLMResponseError):
+        return True
+    response = getattr(exc, "response", None)
+    status_code = getattr(exc, "status_code", None) or getattr(
+        response, "status_code", None
+    )
+    if status_code is not None:
+        return status_code == 429 or status_code >= 500
+    name = type(exc).__name__.lower()
+    return any(
+        token in name
+        for token in ("timeout", "connection", "ratelimit", "internalserver")
+    )
 
 
 # deepseek 系列模型定价表（元 / 百万 tokens）
 DEEPSEEK_PRICE_PER_1M_TOKENS = {
     "deepseek-v4-flash": {
+        "input_cache_hit": 0.05,
+        "input_cache_miss": 1.5,
+        "output": 4.5,
+    },
+    "deepseek-v4-flash-krill": {
+        "input_cache_hit": 0.05,
+        "input_cache_miss": 1.5,
+        "output": 4.5,
+    },
+    "deepseek-v4-flash-itkk":{
+        "input_cache_hit": 0.05,
+        "input_cache_miss": 1.5,
+        "output": 4.5,
+    },
+    "deepseek-v4-flash-ustc-ascend":{
+        "input_cache_hit": 0.05,
+        "input_cache_miss": 1.5,
+        "output": 4.5,
+    },
+    "deepseek-v4.1-flash-itkk":{
         "input_cache_hit": 0.05,
         "input_cache_miss": 1.5,
         "output": 4.5,
@@ -60,7 +266,7 @@ def calculate_deepseek_cost(cb, model_name=None):
         currency, cost_breakdown
     """
     # 1. model：优先从响应读，其次显式参数，最后环境变量
-    model_name = getattr(cb, "llm_model_name", None) or model_name or os.getenv("MODEL_NAME", "deepseek-chat")
+    model_name = os.getenv("MODEL_NAME", "deepseek-chat") or model_name or getattr(cb, "llm_model_name", None)
 
     # 2. token：优先从响应的 usage_metadata 读，fallback 到 callback 属性
     um = getattr(cb, "llm_usage_metadata", None)

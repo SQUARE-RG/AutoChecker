@@ -149,6 +149,7 @@ def remove_Checker_Template(checker_name=config['check']['name']):
     print("返回码:", result.returncode)
     print("标准输出:\n", result.stdout)
     print("错误输出:\n", result.stderr)
+    return result.returncode
 
 def runChecker(checker_name=config['check']['name'],testCase_path=[]):
     """运行Checker"""
@@ -276,7 +277,7 @@ if __name__ == "__main__":
     # compiler_clang_tidy()
 
 
-    remove_Checker_Template(checker_name="use-uncheck-pointer-after-malloc")
+    remove_Checker_Template(checker_name="no-macro-define-identifiers-as-keywords-or-basic-types")
     compiler_clang_tidy()
 
 

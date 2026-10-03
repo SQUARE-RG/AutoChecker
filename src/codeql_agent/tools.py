@@ -19,7 +19,6 @@ from loguru import logger
 
 from retriever.retriever_codeql_uniform import (
     query_chroma_docs_with_ids,
-    _PYTHON_DOC_COLLECTIONS,
 )
 
 _DOC_TRUNCATE = 5120   # 每个文档片段在 answer 中的宽上限截断（5KB：
@@ -63,8 +62,8 @@ def _make_summary(query: str, answer: str) -> str:
 
 
 def build_tools(result_dir: str, test_case_dir: str, rule_name: str,
-                ctx: RetrievalContext) -> list:
-    """构造工具实例（闭包注入：目录路径、规则名、检索上下文）。"""
+                ctx: RetrievalContext, lang_config=None) -> list:
+    """构造工具实例（闭包注入：目录路径、规则名、检索上下文、语言配置）。"""
 
     def _check_path(path: str) -> str:
         real = os.path.realpath(path)
@@ -74,9 +73,13 @@ def build_tools(result_dir: str, test_case_dir: str, rule_name: str,
                 return real
         raise PermissionError(f"路径越界，拒绝访问: {path}")
 
-    @tool
+    # 语言相关的检索集合与展示名（docstring 与检索共用）
+    doc_collections = lang_config.doc_collections if lang_config else []
+    lang_label = {"cpp": "C++", "python": "Python"}.get(
+        lang_config.language if lang_config else "", "Python")
+
     def search_docs(queries: Union[str, list]) -> str:
-        """在 CodeQL Python 文档库（ChromaDB）中检索相关内容。
+        """在 CodeQL 文档库（ChromaDB）中检索相关内容。
 
         参数 queries: 一个或多个检索关键词（英文），可一次检索多个 API 概念，
         例如 ["TaintTracking Configuration", "subprocess.run sink"]。
@@ -89,7 +92,7 @@ def build_tools(result_dir: str, test_case_dir: str, rule_name: str,
 
         sections = []
         for q in queries[:5]:
-            pairs = query_chroma_docs_with_ids([q], _PYTHON_DOC_COLLECTIONS, top_k=2)
+            pairs = query_chroma_docs_with_ids([q], doc_collections, top_k=2)
             if not pairs:
                 sections.append(f"### 检索: {q}\n(未检索到相关文档)")
                 continue
@@ -121,6 +124,11 @@ def build_tools(result_dir: str, test_case_dir: str, rule_name: str,
             sections.append(f"### 检索: {q}\n{answer}")
 
         return "\n\n".join(sections) if sections else "(未检索到相关文档)"
+
+    # 语言化 docstring（f-string 不能直接作为 __doc__，装饰前替换）
+    search_docs.__doc__ = search_docs.__doc__.replace(
+        "在 CodeQL 文档库", f"在 CodeQL {lang_label} 文档库")
+    search_docs = tool(search_docs)
 
     @tool
     def get_doc_detail(query: str) -> str:

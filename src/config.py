@@ -22,7 +22,22 @@ def load_config(config_path: str = "src/config.json") -> Dict[str, Any]:
 global_config = load_config("src/config.json")    
 
 
+
+
+
 AUTOCHECKER_ROOT_DIR = os.environ.get("AUTOCHECKER_ROOT_DIR", os.path.dirname(os.path.abspath(__file__)))
+
+
+
+    
+VULNSYNTH_ROOT_DIR = os.path.join(os.path.dirname(__file__), "..")
+PROJECT_INFO = f"{VULNSYNTH_ROOT_DIR}/autoql_data/project_info.csv"
+FIX_INFO = f"{VULNSYNTH_ROOT_DIR}/autoql_data/fix_info.csv"
+CVES_PATH = f"{VULNSYNTH_ROOT_DIR}/cves"
+LOGS_DIR = f"{VULNSYNTH_ROOT_DIR}/logs"
+
+
+
 
 CODEQL_HOME = os.environ.get("CODEQL_HOME")
 CODEQL_PATH = os.environ.get("CODEQL_PATH", f"{CODEQL_HOME}/codeql")

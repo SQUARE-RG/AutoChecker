@@ -1,0 +1,13 @@
+# Python 3.11; install in code_check_autoql, not the original code_check environment.
+deepagents==0.2.8
+langchain==1.1.0
+langchain-core==1.2.1
+langchain-openai==1.1.0
+langchain-anthropic==1.1.0
+langgraph==1.0.4
+langgraph-prebuilt==1.0.5
+langgraph-checkpoint==3.0.1
+langgraph-sdk==0.2.10
+python-dotenv>=1.0,<2
+PyYAML>=6,<7
+httpx==0.28.1

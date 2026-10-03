@@ -139,6 +139,13 @@ def get_Case_AST(case_path):
 def remove_number_prefix(text):
     return re.sub(r'^\d+\.\s*', '', text)
 def get_logic_json(logics_json):
+    if not isinstance(logics_json, list) or not logics_json:
+        raise ValueError("logics_json必须是非空数组")
+    if not isinstance(logics_json[0], dict):
+        raise ValueError("logics_json第一项必须是对象")
+    for key in ("logic_registerMatchers", "logic_check"):
+        if not isinstance(logics_json[0].get(key), list):
+            raise ValueError(f"logics_json缺少数组字段{key}")
     logic_for_registerMatchers=[]
     logic_for_check = []
     # import json
@@ -161,6 +168,8 @@ def get_repair_steps_string(repair_steps):
         repair_steps_string += f"{i}. {step}\n" 
     return repair_steps_string
 def get_logic_string(logics_json):
+    # Keep this helper safe when called independently from generator.py.
+    get_logic_json(logics_json)
     logic_string= '**logic for registerMatchers**:\n'
     for step in logics_json[0]["logic_registerMatchers"]:
         logic_string += step + "\n"

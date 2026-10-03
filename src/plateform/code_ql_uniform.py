@@ -63,12 +63,14 @@ def _codeql_database_name(case_path: str) -> str:
 
 
 def create_database(case_path: str, lang_config: LanguageConfig) -> str | None:
-    """为单个测试用例创建 CodeQL database。
+    """为单个测试用例创建 CodeQL database（统一临时隔离目录模式）。
 
-    解释型语言（无 database_build_command，如 Python）：
-      extractor 会扫描整个 --source-root——必须把单个用例复制到隔离目录，
-      否则 database 会混入同目录下其他测试用例的代码（verify 结果失真）。
-    编译型语言（有 --command）：extractor 跟随编译，只提取被编译的文件。
+    两种语言都把用例复制到隔离临时目录再建库：
+    - 解释型语言（无 database_build_command，如 Python）：extractor 扫描整个
+      --source-root，隔离目录保证只提取本用例；
+    - 编译型语言（有 --command，如 C++）：extractor 跟随编译，隔离目录同时
+      把编译产物（.o）挡在用例目录之外，随临时目录一起删除。
+    注意：db 内绝对路径前缀指向已删除的临时目录（getRelativePath 不受影响）。
     """
     import shutil
     import tempfile
@@ -78,31 +80,28 @@ def create_database(case_path: str, lang_config: LanguageConfig) -> str | None:
         logger.info(f"Database already exists, skip: {database_path}")
         return database_path
 
-    case_dir = os.path.dirname(case_path)
     cmd = [
         "codeql", "database", "create",
         database_path,
         f"--language={lang_config.codeql_language_flag}",
     ]
 
-    isolated_dir = None
+    isolated_dir = tempfile.mkdtemp(prefix="codeql_case_iso_")
+    isolated_case = os.path.join(isolated_dir, os.path.basename(case_path))
+    shutil.copy(case_path, isolated_case)
     if lang_config.database_build_command:
-        cmd.append(f"--command={lang_config.database_build_command.format(case_path=case_path)}")
-        cmd.append(f"--source-root={case_dir}")
-    else:
-        # 解释型语言：单用例隔离目录
-        isolated_dir = tempfile.mkdtemp(prefix="codeql_case_iso_")
-        isolated_case = os.path.join(isolated_dir, os.path.basename(case_path))
-        shutil.copy(case_path, isolated_case)
-        cmd.append(f"--source-root={isolated_dir}")
-        logger.info(f"隔离目录: {isolated_dir}（只含 {os.path.basename(case_path)}）")
+        # 编译型语言：编译隔离目录里的副本
+        cmd.append(
+            f"--command={lang_config.database_build_command.format(case_path=isolated_case)}"
+        )
+    cmd.append(f"--source-root={isolated_dir}")
+    logger.info(f"隔离目录: {isolated_dir}（只含 {os.path.basename(case_path)}）")
 
     logger.info(f"Creating database: {' '.join(cmd)}")
     try:
         result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     finally:
-        if isolated_dir:
-            shutil.rmtree(isolated_dir, ignore_errors=True)
+        shutil.rmtree(isolated_dir, ignore_errors=True)
 
     if result.returncode == 0:
         logger.info(f"Database created: {database_path}")

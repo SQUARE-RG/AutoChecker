@@ -84,6 +84,8 @@ __pycache__/
 *.venv
 .venv/
 venv/
+.conda
+.claude
 
 # Project-local indexes and models
 src/embedding_db/
@@ -119,3 +121,9 @@ src/codeql_collect_uniform/
 AutoChecker_Performance.xlsx
 result_generation
 logs
+result_input_processing/
+regulations/
+cves/
+codeql-bundle-2.23.3/
+autoql_runs/
+reference/

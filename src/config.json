@@ -30,7 +30,15 @@
         "base":"/root/code_check/llvm-project/clang-tools-extra/test/clang-tidy"
     },
     "result":{
-        "result_dir":"/root/code_check/result_generation/"
+        "result_dir":"/root/code_check/result_generation/clang-tidy/gjb8114_security_rules/"
+    },
+    "llm": {
+        "streaming": true,
+        "stream_output": true,
+        "stream_usage": true,
+        "timeout_seconds": 600,
+        "max_retries": 3,
+        "retry_base_delay_seconds": 2
     },
     "knowledge_base":{
         "astMatcher_api_path":"/root/code_check/clang_tidy_collect/collect_clang_tidy_astMatchers/astMatchers.json",

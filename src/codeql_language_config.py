@@ -44,6 +44,11 @@ class LanguageConfig:
     """"legacy" = 复用现有 C++ 三种检索（.pt + ChromaDB 混合），
        "chromadb" = 全部走 ChromaDB multi-collection"""
 
+    # ---- agent 检索集合 ----
+    doc_collections: List[str] = field(default_factory=list)
+    """codeql_agent search_docs 检索的 ChromaDB 集合（仅本语言，含通用 codeql_ql_reference）。
+    注意：agent 不读 retrieval_mode（那是旧生成器专用），直接按本列表走 ChromaDB。"""
+
 
 # ── C++ 配置 ──────────────────────────────────────────────
 
@@ -56,6 +61,12 @@ CPP_CONFIG = LanguageConfig(
     ql_import_statement="import cpp",
     code_block_marker="cpp",
     retrieval_mode="legacy",
+    doc_collections=[
+        "cpp_codeql_stdlib",
+        "cpp_codeql_language_guides",
+        "cpp_codeql_local_queries",
+        "codeql_ql_reference",
+    ],
 )
 
 # ── Python 配置 ───────────────────────────────────────────
@@ -69,6 +80,12 @@ PYTHON_CONFIG = LanguageConfig(
     ql_import_statement="import python",
     code_block_marker="python",
     retrieval_mode="chromadb",
+    doc_collections=[
+        "python_codeql_stdlib",
+        "python_codeql_language_guides",
+        "python_codeql_local_queries",
+        "codeql_ql_reference",
+    ],
 )
 
 
