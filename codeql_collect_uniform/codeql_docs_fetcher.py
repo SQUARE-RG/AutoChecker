@@ -26,14 +26,14 @@ logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
-# JAVA_SECURITY_QLPACK_PATH="/opt/codeql-bundle-2.23.3/qlpacks/codeql/java-queries/1.8.2/Security/CWE"
-# JAVA_LIBRARY_QLPACK_PATH="/opt/codeql-bundle-2.23.3/qlpacks/codeql/java-all/7.7.2/semmle/code/java"
+JAVA_SECURITY_QLPACK_PATH="/opt/codeql-bundle-2.23.3/qlpacks/codeql/java-queries/1.8.2/Security/CWE"
+JAVA_LIBRARY_QLPACK_PATH="/opt/codeql-bundle-2.23.3/qlpacks/codeql/java-all/7.7.2/semmle/code/java"
 
-# CPP_SECURITY_QLPACK_PATH="/opt/codeql-bundle-2.23.3/qlpacks/codeql/cpp-queries/1.5.2/Security/CWE"
-# CPP_LIBRARY_QLPACK_PATH="/opt/codeql-bundle-2.23.3/qlpacks/codeql/cpp-all/6.0.0/semmle/code/cpp"
+CPP_SECURITY_QLPACK_PATH="/opt/codeql-bundle-2.23.3/qlpacks/codeql/cpp-queries/1.5.2/Security/CWE"
+CPP_LIBRARY_QLPACK_PATH="/opt/codeql-bundle-2.23.3/qlpacks/codeql/cpp-all/6.0.0/semmle/code/cpp"
 
-# PYTHON_SECURITY_QLPACK_PATH="/opt/codeql-bundle-2.23.3/qlpacks/codeql/python-queries/1.6.7/Security"
-# PYTHON_LIBRARY_QLPACK_PATH="/opt/codeql-bundle-2.23.3/qlpacks/codeql/python-all/4.0.17/semmle/python"
+PYTHON_SECURITY_QLPACK_PATH="/opt/codeql-bundle-2.23.3/qlpacks/codeql/python-queries/1.6.7/Security"
+PYTHON_LIBRARY_QLPACK_PATH="/opt/codeql-bundle-2.23.3/qlpacks/codeql/python-all/4.0.17/semmle/python"
 
 
 class CodeQLDocsFetcher:
@@ -45,7 +45,10 @@ class CodeQLDocsFetcher:
         self.data_dir = Path(data_dir)
         self.data_dir.mkdir(parents=True, exist_ok=True)
         
-        self.chroma_client = get_chroma_client()
+        # Honor --data-dir for local PersistentClient mode. Previously this
+        # directory was created here, but get_chroma_client() always opened the
+        # global CHROMA_DB_PATH instead.
+        self.chroma_client = get_chroma_client(str(self.data_dir))
         self.chroma_lock = threading.Lock()
 
         # BGE-large-en-v1.5 model path for pre-computing embeddings via sequential_encode
@@ -201,14 +204,14 @@ class CodeQLDocsFetcher:
 
         # Collect all referenced collection names from source dicts
         used_collections = set()
-        # for src in self.codeql_ql_reference.values():
-        #     used_collections.add(src['collection'])
+        for src in self.codeql_ql_reference.values():
+            used_collections.add(src['collection'])
         for src in self.java_doc_sources.values():
             used_collections.add(src['collection'])
         for src in self.cpp_doc_sources.values():
             used_collections.add(src['collection'])
-        # for src in self.python_doc_sources.values():
-        #     used_collections.add(src['collection'])
+        for src in self.python_doc_sources.values():
+            used_collections.add(src['collection'])
 
         for name in used_collections:
             description = collection_descriptions.get(name, f'CodeQL Documentation - {name}')
@@ -578,16 +581,16 @@ class CodeQLDocsFetcher:
         # Setup collections
         collections = self.setup_collections()
 
-        # --- 1. Shared QL Language Reference (disabled - already collected) ---
+        # --- 1. Shared QL Language Reference ---
         all_url_batches = []
 
-        # logger.info("Collecting QL Language Reference URLs...")
-        # ql_ref_src = self.codeql_ql_reference['ql_reference']
-        # ql_ref_links = self.get_all_links(
-        #     ql_ref_src['base_url'],
-        #     url_pattern='/docs/ql-language-reference/'
-        # )
-        # all_url_batches.append((ql_ref_links, ql_ref_src['collection']))
+        logger.info("Collecting QL Language Reference URLs...")
+        ql_ref_src = self.codeql_ql_reference['ql_reference']
+        ql_ref_links = self.get_all_links(
+            ql_ref_src['base_url'],
+            url_pattern='/docs/ql-language-reference/'
+        )
+        all_url_batches.append((ql_ref_links, ql_ref_src['collection']))
 
         # --- 2. Java documentation sources ---
         logger.info("Collecting Java Standard Library URLs...")
@@ -609,15 +612,15 @@ class CodeQLDocsFetcher:
         cpp_guide_src = self.cpp_doc_sources['language_guides']
         all_url_batches.append((cpp_guide_src['urls'], cpp_guide_src['collection']))
 
-        # --- 4. Python documentation sources (disabled - already collected) ---
-        # logger.info("Collecting Python Standard Library URLs...")
-        # python_stdlib_src = self.python_doc_sources['python_stdlib']
-        # python_stdlib_links = self.get_all_links(python_stdlib_src['base_url'])
-        # all_url_batches.append((python_stdlib_links, python_stdlib_src['collection']))
-        #
-        # logger.info("Collecting Python Language Guide URLs...")
-        # python_guide_src = self.python_doc_sources['language_guides']
-        # all_url_batches.append((python_guide_src['urls'], python_guide_src['collection']))
+        # --- 4. Python documentation sources ---
+        logger.info("Collecting Python Standard Library URLs...")
+        python_stdlib_src = self.python_doc_sources['python_stdlib']
+        python_stdlib_links = self.get_all_links(python_stdlib_src['base_url'])
+        all_url_batches.append((python_stdlib_links, python_stdlib_src['collection']))
+
+        logger.info("Collecting Python Language Guide URLs...")
+        python_guide_src = self.python_doc_sources['language_guides']
+        all_url_batches.append((python_guide_src['urls'], python_guide_src['collection']))
 
         # Calculate total URLs
         total_urls = sum(len(urls) for urls, _ in all_url_batches)
@@ -646,12 +649,12 @@ class CodeQLDocsFetcher:
             collections=collections
         )
 
-        # --- 7. Local CodeQL queries (Python) (disabled - already collected) ---
-        # self._fetch_local_queries(
-        #     library_src=self.python_doc_sources['local_codeql_queries'],
-        #     security_src=self.python_doc_sources['local_codeql_security_queries'],
-        #     collections=collections
-        # )
+        # --- 7. Local CodeQL queries (Python) ---
+        self._fetch_local_queries(
+            library_src=self.python_doc_sources['local_codeql_queries'],
+            security_src=self.python_doc_sources['local_codeql_security_queries'],
+            collections=collections
+        )
 
         self._print_final_statistics(collections)
 
@@ -760,8 +763,8 @@ def main():
         fetcher.java_doc_sources['local_codeql_security_queries']['local_path'] = args.java_security_path
         fetcher.cpp_doc_sources['local_codeql_queries']['local_path'] = args.cpp_library_path
         fetcher.cpp_doc_sources['local_codeql_security_queries']['local_path'] = args.cpp_security_path
-        # fetcher.python_doc_sources['local_codeql_queries']['local_path'] = args.python_library_path
-        # fetcher.python_doc_sources['local_codeql_security_queries']['local_path'] = args.python_security_path
+        fetcher.python_doc_sources['local_codeql_queries']['local_path'] = args.python_library_path
+        fetcher.python_doc_sources['local_codeql_security_queries']['local_path'] = args.python_security_path
 
 
         fetcher.fetch_all_documentation()

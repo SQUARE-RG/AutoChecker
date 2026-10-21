@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import base64
+import ipaddress
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlsplit
 
 import requests
 
@@ -36,11 +38,16 @@ def call_paddleocr(
         "returnMarkdownImages": False,
         "visualize": False,
     }
-    response = requests.post(
-        service_url,
-        json=payload,
-        timeout=(30, timeout_seconds),
-    )
+    with requests.Session() as session:
+        # Loopback OCR traffic must never be sent through HTTP_PROXY/HTTPS_PROXY.
+        # Keep environment proxy support for explicitly configured remote services.
+        if _is_loopback_url(service_url):
+            session.trust_env = False
+        response = session.post(
+            service_url,
+            json=payload,
+            timeout=(30, timeout_seconds),
+        )
     if not response.ok:
         raise RuntimeError(
             f"PaddleOCR returned HTTP {response.status_code}: {response.text[:2000]}"
@@ -51,6 +58,18 @@ def call_paddleocr(
             f"PaddleOCR failed: {result.get('errorCode')} {result.get('errorMsg')}"
         )
     return result
+
+
+def _is_loopback_url(url: str) -> bool:
+    hostname = urlsplit(url).hostname
+    if hostname is None:
+        return False
+    if hostname.lower() == "localhost":
+        return True
+    try:
+        return ipaddress.ip_address(hostname).is_loopback
+    except ValueError:
+        return False
 
 
 def normalize_paddleocr_response(

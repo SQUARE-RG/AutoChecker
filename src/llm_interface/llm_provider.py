@@ -241,9 +241,9 @@ DEEPSEEK_PRICE_PER_1M_TOKENS = {
         "output": 4.5,
     },
     "deepseek-v4.1-flash-itkk":{
-        "input_cache_hit": 0.05,
-        "input_cache_miss": 1.5,
-        "output": 4.5,
+        "input_cache_hit": 0.04,
+        "input_cache_miss": 2.0,
+        "output": 8.0,
     }
 }
 

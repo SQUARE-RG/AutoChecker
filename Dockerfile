@@ -2,6 +2,11 @@ FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
+# Keep loopback HTTP traffic inside the container. Both forms are set because
+# different command-line tools and Python libraries consult different casing.
+ENV NO_PROXY="127.0.0.1,localhost,::1" \
+    no_proxy="127.0.0.1,localhost,::1"
+
 # ============================================================
 # Layer 1: System dependencies
 # ============================================================

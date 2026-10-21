@@ -61,11 +61,12 @@ CHROMA_AUTH_TOKEN = os.environ.get("CHROMA_AUTH_TOKEN", "test")
 CHROMA_DB_PATH = os.environ.get("CHROMA_DB_PATH",os.path.join(AUTOCHECKER_ROOT_DIR,  "codeql_collect_uniform", "chroma_db"))
 
 CHROMA_MCP_PATH='mcp__chroma__'  # Prefix for MCP tool calls to ChromaDB in prompts
-def get_chroma_client():
+def get_chroma_client(persist_path: Optional[str] = None):
     """Return a ChromaDB client based on environment configuration.
 
     - If CHROMA_HOST is set: returns HttpClient (for Docker / remote ChromaDB server)
-    - Otherwise: returns PersistentClient (for local development)
+    - Otherwise: returns PersistentClient (for local development). ``persist_path``
+      overrides CHROMA_DB_PATH when a caller needs a separate local database.
     """
     if chromadb is None:
         raise ImportError("chromadb is required to create a Chroma client")
@@ -76,6 +77,7 @@ def get_chroma_client():
             headers={"Authorization": f"Bearer {CHROMA_AUTH_TOKEN}"} if CHROMA_AUTH_TOKEN else None,
         )
     else:
-        os.makedirs(CHROMA_DB_PATH, exist_ok=True)
-      
-        return chromadb.PersistentClient(path=CHROMA_DB_PATH)
+        local_db_path = persist_path or CHROMA_DB_PATH
+        os.makedirs(local_db_path, exist_ok=True)
+
+        return chromadb.PersistentClient(path=local_db_path)

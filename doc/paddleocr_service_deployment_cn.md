@@ -9,6 +9,7 @@ Conda 环境：paddleocr_service
 服务地址：http://127.0.0.1:18080
 解析接口：POST /layout-parsing
 运行设备：CPU
+oneDNN：关闭（规避 Paddle 3.3.x CPU 推理兼容问题）
 ```
 
 以下命令均在服务器上手动执行。
@@ -29,7 +30,7 @@ conda --version
 ## 2. 创建独立 Conda 环境
 
 ```bash
-conda create -n paddleocr_service python=3.10 
+conda create -n paddleocr_service python=3.10
 ```
 
 如果出现 Anaconda Terms of Service 未接受的错误，先执行：
@@ -103,6 +104,14 @@ paddlex --help
 
 预期 PaddleOCR 版本为 `3.7.0`。
 
+同时确认实际解释器和依赖版本，避免复用到名称相同但 Python 版本不符的旧环境：
+
+```bash
+python -c 'import sys, paddle, paddleocr, paddlex; print(sys.version); print("paddle", paddle.__version__); print("paddleocr", paddleocr.__version__); print("paddlex", paddlex.__version__)'
+```
+
+如果这里不是 Python 3.10，说明 `paddleocr_service` 环境不是按本文档新建的。需要先确认其中没有其他重要依赖，再删除并重建环境；不要仅根据环境名称判断 Python 版本。
+
 ## 5. 安装 HTTP Serving
 
 ```bash
@@ -167,10 +176,19 @@ PY
 
 ## 8. 启动 PaddleOCR HTTP 服务
 
+PaddlePaddle 3.3.x 的 CPU oneDNN 路径在部分 PIR 模型上可能抛出以下异常：
+
+```text
+ConvertPirAttribute2RuntimeAttribute not support
+[pir::ArrayAttribute<pir::DoubleAttribute>]
+```
+
+该异常发生在 Paddle 的 C++ oneDNN 推理路径，与 Python 3.10 或 3.12 没有直接关系。服务启动时设置 `PADDLE_PDX_ENABLE_MKLDNN_BYDEFAULT=0`，使用普通 Paddle CPU 算子绕过该问题。这样会降低 CPU 推理速度，但不会更换 OCR 模型。
+
 ```bash
 conda activate paddleocr_service
 
-paddlex --serve \
+PADDLE_PDX_ENABLE_MKLDNN_BYDEFAULT=0 paddlex --serve \
   --pipeline /opt/autochecker-paddleocr/config/PP-StructureV3.yaml \
   --device cpu \
   --host 127.0.0.1 \
@@ -187,6 +205,59 @@ Uvicorn running on http://127.0.0.1:18080
 保持当前终端运行，打开另一个终端测试接口。
 
 ## 9. 测试解析接口
+
+### 9.1 本地地址与 HTTP 代理
+
+先检查当前终端是否设置了代理：
+
+```bash
+env | grep -iE '^(HTTP|HTTPS|ALL|NO)_PROXY='
+```
+
+本次排查中，执行 OCR 客户端的 Codex 命令进程被运行平台注入了以下变量：
+
+```text
+HTTP_PROXY=http://codex-proxy:2175
+HTTPS_PROXY=http://codex-proxy:2175
+```
+
+这些变量不存在于容器 PID 1、`/etc/environment`、`/root/.bashrc`、`/root/.profile` 或项目 Dockerfile 中，因此不是原镜像的全局配置。不同终端继承到的环境可能不同，应当在实际启动 OCR 客户端的同一个终端中执行上述检查。
+
+如果没有 `NO_PROXY`，Python `requests` 会把 `http://127.0.0.1:18080` 也交给该代理。短请求可能看似正常，长时间 OCR 请求则可能被代理提前断开并返回 HTTP 502。
+
+当前终端可立即设置：
+
+```bash
+export NO_PROXY="127.0.0.1,localhost,::1"
+export no_proxy="$NO_PROXY"
+```
+
+`NO_PROXY` 只让这些回环地址绕过代理，不会关闭访问外网时使用的 `HTTP_PROXY` 或 `HTTPS_PROXY`。
+
+对于本项目构建的容器，应在 Dockerfile 中永久设置：
+
+```dockerfile
+ENV NO_PROXY="127.0.0.1,localhost,::1" \
+    no_proxy="127.0.0.1,localhost,::1"
+```
+
+修改后需要重新构建并创建容器。Dockerfile 的 `ENV` 会由容器内的交互命令和后台进程共同继承，比只修改 `/root/.bashrc` 更可靠。`.bashrc` 只保证交互式 Bash 生效，直接启动的 Python 或后台服务不一定读取它。
+
+对于暂时不能重建的现有容器，可以写入 `/etc/environment`，并在当前终端同步导出：
+
+```bash
+grep -qxF 'NO_PROXY="127.0.0.1,localhost,::1"' /etc/environment || \
+  printf '%s\n' 'NO_PROXY="127.0.0.1,localhost,::1"' >> /etc/environment
+grep -qxF 'no_proxy="127.0.0.1,localhost,::1"' /etc/environment || \
+  printf '%s\n' 'no_proxy="127.0.0.1,localhost,::1"' >> /etc/environment
+
+export NO_PROXY="127.0.0.1,localhost,::1"
+export no_proxy="$NO_PROXY"
+```
+
+`/etc/environment` 主要供新的登录会话读取；它不能修改已经运行的进程，也不保证被 `docker exec ... <command>` 这类非登录进程读取。因此生产部署仍以 Dockerfile `ENV` 或容器启动参数 `-e NO_PROXY=... -e no_proxy=...` 为准。
+
+### 9.2 调用接口
 
 在另一个终端执行：
 
@@ -222,7 +293,11 @@ payload = {
     "visualize": False,
 }
 
-response = requests.post(
+session = requests.Session()
+# 此接口固定为本机回环地址，不应读取 HTTP_PROXY/HTTPS_PROXY。
+session.trust_env = False
+
+response = session.post(
     "http://127.0.0.1:18080/layout-parsing",
     json=payload,
     timeout=(30, 7200),
@@ -261,7 +336,11 @@ python test_paddleocr.py
 ```bash
 mkdir -p /var/log/autochecker-paddleocr
 
-nohup /root/anaconda3/envs/paddleocr_service/bin/paddlex \
+nohup env \
+  PADDLE_PDX_ENABLE_MKLDNN_BYDEFAULT=0 \
+  NO_PROXY="127.0.0.1,localhost,::1" \
+  no_proxy="127.0.0.1,localhost,::1" \
+  /root/anaconda3/envs/paddleocr_service/bin/paddlex \
   --serve \
   --pipeline /opt/autochecker-paddleocr/config/PP-StructureV3.yaml \
   --device cpu \
@@ -269,6 +348,17 @@ nohup /root/anaconda3/envs/paddleocr_service/bin/paddlex \
   --port 18080 \
   > /var/log/autochecker-paddleocr/service.log 2>&1 &
 ```
+
+AutoChecker 的 `src/input_processing/paddle_parser.py` 会在服务地址为 `localhost`、IPv4 回环地址或 IPv6 回环地址时自动忽略环境代理。因此使用默认的 `http://127.0.0.1:18080/layout-parsing` 时，可以直接运行：
+
+```bash
+/root/anaconda3/envs/code_check/bin/python \
+  scripts/parse_regulation_document.py \
+  --input doc/GJB-8114-2013-mini.pdf \
+  --output-dir result_input_processing/gjb8114-2013-mini
+```
+
+调用远程 PaddleOCR 地址时仍保留 `HTTP_PROXY`、`HTTPS_PROXY` 的正常行为。
 
 查询进程：
 
@@ -316,7 +406,9 @@ POST http://127.0.0.1:18080/layout-parsing
 [ ] PaddlePaddle 3.3.0 检查通过
 [ ] PaddleOCR 3.7.0 安装成功
 [ ] PaddleX Serving 安装成功
+[ ] NO_PROXY/no_proxy 包含 127.0.0.1、localhost 和 ::1
 [ ] PP-StructureV3 配置生成成功
+[ ] PaddleX 服务已设置 PADDLE_PDX_ENABLE_MKLDNN_BYDEFAULT=0
 [ ] 18080 端口未被占用
 [ ] 服务首次启动并完成模型下载
 [ ] PDF 接口返回结构化 JSON 和 Markdown

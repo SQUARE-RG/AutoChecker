@@ -4,6 +4,7 @@ from pathlib import Path
 from input_processing.chunker import DocumentChunk, build_chunks
 from input_processing import document_parser
 from input_processing.document_parser import parse_document
+from input_processing.paddle_parser import _is_loopback_url
 from input_processing.rule_extractor import normalize_chunk_result, parse_json_response
 from input_processing.rule_merger import merge_rules
 from input_processing.rule_pipeline import extract_rules
@@ -57,6 +58,13 @@ def test_parse_existing_paddle_response(tmp_path: Path):
     assert "不得使用 gets" in (output / "document.md").read_text(encoding="utf-8")
     blocks = json.loads((output / "blocks.json").read_text(encoding="utf-8"))["blocks"]
     assert blocks[1]["block_id"] == "page-1-block-1"
+
+
+def test_loopback_paddleocr_urls_bypass_environment_proxy():
+    assert _is_loopback_url("http://127.0.0.1:18080/layout-parsing")
+    assert _is_loopback_url("http://localhost:18080/layout-parsing")
+    assert _is_loopback_url("http://[::1]:18080/layout-parsing")
+    assert not _is_loopback_url("https://ocr.example.com/layout-parsing")
 
 
 def test_pdf_batches_are_resumable_and_keep_global_pages(tmp_path: Path, monkeypatch):

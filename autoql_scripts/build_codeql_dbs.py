@@ -146,7 +146,7 @@ def create_codeql_database(cve_dir_path, version_type, cve_base_path, commit_has
         print(f"Using source path: {source_path}")
         print(f"Using build-mode=none (no build required)")
 
-        res = subprocess.run(command, capture_output=True, text=True, timeout=1800)  # 10 min timeout
+        res = subprocess.run(command, capture_output=True, text=True, timeout=3600)  # 10 min timeout
 
         if res.returncode == 0:
             print(f"Successfully created CodeQL database")

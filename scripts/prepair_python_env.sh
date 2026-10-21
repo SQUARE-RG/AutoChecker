@@ -10,7 +10,7 @@ set -euo pipefail
 INSTALL_DIR=/root/anaconda3
 MINICONDA_SH=/tmp/Miniconda3-latest-Linux-x86_64.sh
 CONDA_ENV_NAME=code_check
-PYTHON_VERSION=3.10
+PYTHON_VERSION=3.12
 REPO_DIR=/root/code_check
 REQUIREMENTS=${REPO_DIR}/requirements.txt
 

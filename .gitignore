@@ -127,3 +127,4 @@ cves/
 codeql-bundle-2.23.3/
 autoql_runs/
 reference/
+src/codeql_collect_uniform/chroma_db
