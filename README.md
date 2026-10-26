@@ -9,6 +9,14 @@
 <p align="center">
   Automatically turn coding standards in documents and security knowledge in vulnerability patches into static code checkers that can scan real code
 </p>
+<p align="center">
+  <a href="https://autochecker.veilaxis.com/">
+    <img src="https://img.shields.io/badge/🚀_在线体验-AutoChecker-2563eb?style=for-the-badge" alt="在线体验" />
+  </a>
+  <a href="https://github.com/SQUARE-RG/AutoChecker">
+    <img src="https://img.shields.io/badge/GitHub-查看源码-24292f?style=for-the-badge&logo=github" alt="查看源码" />
+  </a>
+</p>
 
 <p align="center">
   <a href="./README.md"><img src="https://img.shields.io/badge/lang-English-b0e8ff?style=flat-square&labelColor=0a0e14" alt="English"></a>
