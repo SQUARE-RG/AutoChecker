@@ -38,6 +38,30 @@
 - 🔍 **AutoChecker 生成的检查器已在 13 个开源代码仓库中发现并报告 16 项漏洞，全部获得项目开发者确认。**
 
 
+<h3 align="center">真实开源项目验证</h3>
+
+<p align="center">
+  AutoChecker 已在多个真实开源项目中发现并报告安全缺陷。
+</p>
+
+<table align="center">
+  <tr>
+    <td align="center" width="180">
+      <h2>16</h2>
+      <p>项真实代码缺陷</p>
+    </td>
+    <td align="center" width="180">
+      <h2>13</h2>
+      <p>个开源仓库</p>
+    </td>
+    <td align="center" width="180">
+      <h2>2</h2>
+      <p>项 CVE 编号</p>
+    </td>
+  </tr>
+</table>
+
+
 ### 为什么需要 AutoChecker？
 
 CodeQL、Clang-Tidy、PMD 等静态分析工具提供了丰富的内置检查规则，但这些规则难以覆盖企业内部编码规范、项目特定约束以及不断出现的新型漏洞模式。
@@ -87,12 +111,14 @@ AutoChecker 将传统上依赖静态分析专家完成的检查器开发过程�
 
 ## 安装指南
 
-AutoChecker 目前提供两种安装方式：
+AutoChecker 包含两条相互独立的检查器生成路线。请根据输入类型选择对应的安装与运行流程：
 
-- **手动安装**：手动安装依赖、配置环境变量并编译运行，可用于生成 `PMD`、`clang-tidy`、`CodeQL` 等工具的检查器。
-- **Docker 部署**：通过 Docker 一键完成环境配置和工具链准备，目前支持生成 `clang-tidy` 和 `CodeQL` 检查器。
+- **规范与测试用例驱动**：输入自然语言规则以及合规、违规代码示例，生成面向多种静态分析工具的检查器。
+- **漏洞与补丁驱动**：输入漏洞信息、修复补丁以及修复前后的源码，生成用于检测同类缺陷的安全检查器。
 
-### 手动安装
+### 路线一：规范与测试用例驱动的检查器生成
+
+该路线目前仅保留手动安装说明。Docker 部署流程仍在调整，暂不建议使用。
 
 #### 环境要求
 
@@ -104,12 +130,13 @@ AutoChecker 目前提供两种安装方式：
 | 操作系统 | Ubuntu 22.04（推荐） |
 | LLM API 密钥 | 需要一个大语言模型的 API Key，例如 DeepSeek、OpenAI 等 |
 
-#### 步骤 1：准备环境
+#### 步骤 1：准备 Python 环境
 
-克隆仓库：
+克隆仓库并进入项目根目录：
 
 ```bash
 git clone https://github.com/SQUARE-RG/AutoChecker.git
+cd AutoChecker
 ```
 
 创建虚拟环境并安装依赖：
@@ -118,9 +145,6 @@ git clone https://github.com/SQUARE-RG/AutoChecker.git
 # 创建虚拟环境
 conda create -n autochecker python=3.10
 conda activate autochecker
-
-# 进入项目根目录
-cd AutoChecker
 pip install -r requirements.txt
 ```
 
@@ -133,17 +157,15 @@ pip install -r requirements.txt
 3. [部署 CodeQL](/doc/codeql_deploy_cn.md)
 4. [部署 Semgrep](/doc/semgrep_deploy_cn.md)
 
-#### 步骤 3：配置大模型
+#### 步骤 3：配置模型与工具路径
 
-在项目根目录下创建 `.env` 文件，并填写你的大模型 API 信息：
+复制项目提供的环境变量模板：
 
-```env
-API_KEY=你的API密钥
-MODEL=模型名称（如 deepseek、gpt-4 等）
-BASE_URL=API接口地址（如 https://api.deepseek.com）
+```bash
+cp .env.example .env
 ```
 
-完成配置后，即可开始准备规则和测试用例。
+然后编辑 `.env`，至少填写所使用模型对应的模型名称、API Key 和 API 地址；如果使用 CodeQL，还需要根据实际安装位置更新 `CODEQL_HOME` 及相应的 QL pack 路径。请勿将包含密钥的 `.env` 提交到版本控制系统。
 
 #### 步骤 4：准备规则与测试套件
 
@@ -176,9 +198,8 @@ python src/main.py --rule_file rule.json --language cpp --analyzer clang-tidy
 
 生成结果默认保存在 `result-generation` 目录中。
 
----
-
-### Docker 部署
+<!--
+### 路线一的 Docker 部署（暂不开放）
 
 #### 环境要求
 
@@ -259,6 +280,153 @@ python src/main.py --rule_file rule.json --language cpp --analyzer clang-tidy
 #### 步骤 7：集成生成的检查器
 
 生成的检查器代码可直接放入对应静态分析工具的检查器目录中，重新编译后即可使用。
+-->
+
+---
+
+### 路线二：漏洞与补丁驱动的检查器生成
+
+> **当前支持范围：该路线暂时只支持为 Java 漏洞生成 CodeQL 安全查询。** 输入的漏洞必须记录在 `autoql_data/project_info.csv` 中，运行时需要提供完整的 40 位修复提交 SHA。
+
+#### 环境要求
+
+| 项目 | 要求 |
+| --- | --- |
+| 磁盘空间 | 至少 64 GB |
+| 内存 | 至少 16 GB |
+| 处理器 | 至少 4 核 |
+| 操作系统 | Ubuntu 22.04（推荐） |
+| Python | 3.11 |
+| CodeQL | CodeQL CLI 及 Java QL packs |
+| LLM API 密钥 | 当前使用项目 `.env.example` 中定义的模型配置 |
+
+#### 步骤 1：准备项目与 Python 环境
+
+```bash
+git clone https://github.com/SQUARE-RG/AutoChecker.git
+cd AutoChecker
+
+conda create -n autochecker-autoql python=3.11
+conda activate autochecker-autoql
+python -m pip install -r requirements.txt -r src/autoql/requirements.txt
+```
+
+漏洞与补丁驱动路线依赖 Python 3.11，建议使用独立环境，不要直接升级路线一使用的 Python 3.10 环境。
+
+#### 步骤 2：安装 CodeQL
+
+以下流程参考了 [QLCoder 的 Linux 安装说明](https://github.com/neuralprogram/qlcoder#native-linux)，并按 AutoChecker 的目录结构和脚本进行了调整。从 [CodeQL Action Releases](https://github.com/github/codeql-action/releases) 下载适用于 Linux 的 `codeql-bundle-linux64.tar.gz`。项目的 `.env.example` 以 CodeQL bundle 2.23.3 为示例；也可以使用其他版本，但必须同步修改 QL pack 路径。
+
+以下示例将 CodeQL 解压到项目内的 `codeql-bundle-2.23.3` 目录：
+
+```bash
+mkdir -p codeql-bundle-2.23.3
+tar -xzf /path/to/codeql-bundle-linux64.tar.gz \
+  -C codeql-bundle-2.23.3 --strip-components=1
+
+export PATH="$PWD/codeql-bundle-2.23.3:$PATH"
+codeql version
+```
+
+如需在新终端中继续使用 CodeQL，请将其可执行文件目录永久加入 `PATH`，或在运行前重新执行上面的 `export` 命令。
+
+#### 步骤 3：配置环境变量
+
+项目已经提供 `.env.example`，无需从其他项目复制配置文件：
+
+```bash
+cp .env.example .env
+```
+
+编辑 `.env`，填写模型配置，并将 `CODEQL_HOME` 改为 CodeQL 的绝对路径，例如：
+
+```env
+MODEL_NAME=你的模型名称
+DEEPSEEK_API_KEY=你的API密钥
+DEEPSEEK_BASE_URL=你的API地址
+
+CODEQL_HOME=/absolute/path/to/AutoChecker/codeql-bundle-2.23.3
+```
+
+不同 CodeQL bundle 中 QL pack 的版本目录可能不同。先查看实际版本：
+
+```bash
+set -a
+source .env
+set +a
+
+ls "$CODEQL_HOME/qlpacks/codeql/java-queries/"
+ls "$CODEQL_HOME/qlpacks/codeql/java-all/"
+```
+
+然后在 `.env` 中更新 Java QL pack 路径：
+
+```env
+JAVA_SECURITY_QLPACK_PATH=/absolute/path/to/codeql-bundle/qlpacks/codeql/java-queries/<version>/Security/CWE
+JAVA_LIBRARY_QLPACK_PATH=/absolute/path/to/codeql-bundle/qlpacks/codeql/java-all/<version>/semmle/code/java
+```
+
+`.env.example` 还包含 C/C++ 和 Python QL pack 的配置项，保留并按所安装 bundle 的实际版本更新即可。请勿将包含密钥的 `.env` 提交到版本控制系统。
+
+#### 步骤 4：准备漏洞仓库与补丁
+
+确认目标漏洞已经记录在 `autoql_data/project_info.csv` 中，然后使用本项目 `autoql_scripts` 目录下的脚本拉取仓库并生成修复差异：
+
+```bash
+CVE_ID="CVE-YYYY-NNNN"
+python3 autoql_scripts/get_cve_repos.py --cve "$CVE_ID"
+```
+
+该脚本也支持批量处理：
+
+```bash
+# 多个 CVE
+python3 autoql_scripts/get_cve_repos.py --cves "CVE-YYYY-NNNN,CVE-YYYY-MMMM"
+
+# 处理 autoql_data/project_info.csv 中的全部 CVE
+python3 autoql_scripts/get_cve_repos.py --all
+```
+
+#### 步骤 5：创建漏洞版本与修复版本的 CodeQL 数据库
+
+```bash
+# 为指定 CVE 创建数据库
+python3 autoql_scripts/build_codeql_dbs.py --cve-id "$CVE_ID"
+
+# 或为已准备的全部 CVE 创建数据库
+python3 autoql_scripts/build_codeql_dbs.py
+```
+
+数据库使用 `--build-mode=none` 创建，无需运行目标 Java 项目的构建工具。对于指定 CVE，脚本会在 `cves/<CVE-ID>/` 下生成 `<CVE-ID>-vul` 和 `<CVE-ID>-fix` 两个数据库。
+
+#### 步骤 6：构建 CodeQL 文档知识库
+
+```bash
+python3 autoql_scripts/codeql_docs_fetcher.py
+```
+
+本项目不需要执行 QLCoder 中的以下两个命令：
+
+```text
+python3 scripts/cwe_fetcher.py
+python3 scripts/cves_fetcher.py
+```
+
+#### 步骤 7：生成并验证 CodeQL 检查器
+
+将目标漏洞的完整修复提交 SHA 传给 AutoQL：
+
+```bash
+FIX_COMMIT_SHA="填写40位修复提交SHA"
+PYTHONPATH=src python -m autoql.run_patch --commit "$FIX_COMMIT_SHA"
+```
+
+默认输出目录为 `autoql_runs/`。运行结果包含漏洞规格、生成及修复过程、CodeQL 编译与执行日志、评估结果，以及验证成功后的 `final.ql`。如需先检查输入、仓库版本和 CodeQL 数据库是否正确，而不调用大模型，可以运行：
+
+```bash
+PYTHONPATH=src python -m autoql.run_patch \
+  --commit "$FIX_COMMIT_SHA" --preflight-only
+```
 
 ## 当前支持的静态分析工具
 

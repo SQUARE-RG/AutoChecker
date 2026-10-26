@@ -39,6 +39,31 @@
 - 🎉 **Two real-world vulnerabilities discovered by AutoChecker-generated checkers have received CVE identifiers: [CVE-2026-103754](https://www.cve.org/CVERecord?id=CVE-2026-103754) and [CVE-2026-71364](https://www.cve.org/CVERecord?id=CVE-2026-71364).**
 - 🔍 **AutoChecker-generated checkers have discovered and reported 16 vulnerabilities across 13 open-source repositories, all confirmed by project maintainers.**
 
+
+<h3 align="center">Validation on Real-World Open-Source Projects</h3>
+
+<p align="center">
+  AutoChecker has discovered and reported security flaws in multiple real-world open-source projects.
+</p>
+
+<table align="center">
+  <tr>
+    <td align="center" width="180">
+      <h2>16</h2>
+      <p>Real-World Code Flaws</p>
+    </td>
+    <td align="center" width="180">
+      <h2>13</h2>
+      <p>Open-Source Repositories</p>
+    </td>
+    <td align="center" width="180">
+      <h2>2</h2>
+      <p>CVE Identifiers</p>
+    </td>
+  </tr>
+</table>
+
+
 ### Why AutoChecker?
 
 Static analysis tools such as CodeQL, Clang-Tidy, and PMD provide many built-in checks, but these checks cannot cover every organization-specific coding standard, project-specific constraint, or newly emerging vulnerability pattern.
@@ -87,12 +112,14 @@ Ultimately, AutoChecker outputs checker code for the target static analysis tool
 
 ## Installation Guide
 
-AutoChecker currently provides two installation methods:
+AutoChecker provides two independent checker-generation paths. Choose the installation and execution workflow that matches your input:
 
-- **Manual installation**: install dependencies, configure environment variables, and build manually. This mode can be used to generate checkers for `PMD`, `clang-tidy`, `CodeQL`, and more.
-- **Docker deployment**: use Docker to complete environment setup and toolchain preparation in one step. This mode currently supports generating `clang-tidy` and `CodeQL` checkers.
+- **Specification and test case driven**: provide a natural-language rule plus compliant and violating code examples to generate checkers for multiple static analysis tools.
+- **Vulnerability and patch driven**: provide vulnerability information, a repair patch, and the source code before and after the fix to generate a security checker for similar defects.
 
-### Manual Installation
+### Path 1: Specification-and-Test-Case-Driven Checker Generation
+
+Only manual installation is currently documented for this path. The Docker workflow is being revised and is not recommended at this time.
 
 #### Environment Requirements
 
@@ -104,12 +131,13 @@ AutoChecker currently provides two installation methods:
 | Operating System | Ubuntu 22.04 (recommended) |
 | LLM API Key | An API key for a large language model is required, such as DeepSeek or OpenAI |
 
-#### Step 1: Prepare the Environment
+#### Step 1: Prepare the Python Environment
 
-Clone the repository:
+Clone the repository and enter the project root directory:
 
 ```bash
 git clone https://github.com/SQUARE-RG/AutoChecker.git
+cd AutoChecker
 ```
 
 Create a virtual environment and install dependencies:
@@ -118,9 +146,6 @@ Create a virtual environment and install dependencies:
 # Create a virtual environment
 conda create -n autochecker python=3.10
 conda activate autochecker
-
-# Enter the project root directory
-cd AutoChecker
 pip install -r requirements.txt
 ```
 
@@ -133,17 +158,15 @@ Install the required static analysis engines according to your needs:
 3. [Deploy CodeQL](/doc/codeql_deploy_cn.md)
 4. [Deploy Semgrep](/doc/semgrep_deploy_cn.md)
 
-#### Step 3: Configure the LLM
+#### Step 3: Configure the Model and Tool Paths
 
-Create a `.env` file in the project root directory and fill in your LLM API information:
+Copy the environment variable template provided by the project:
 
-```env
-API_KEY=your_api_key
-MODEL=model_name (e.g. deepseek, gpt-4)
-BASE_URL=api_endpoint (e.g. https://api.deepseek.com)
+```bash
+cp .env.example .env
 ```
 
-After the configuration is complete, you can move on to preparing rules and test cases.
+Edit `.env` and provide at least the model name, API key, and API endpoint required by your model provider. If you use CodeQL, also update `CODEQL_HOME` and the relevant QL pack paths to match your installation. Never commit an `.env` file containing credentials to version control.
 
 #### Step 4: Prepare Rules and Test Suites
 
@@ -176,9 +199,8 @@ python src/main.py --rule_file rule.json --language cpp --analyzer clang-tidy
 
 The generated results are saved to the `result-generation` directory by default.
 
----
-
-### Docker Deployment
+<!--
+### Docker Deployment for Path 1 (Temporarily Unavailable)
 
 #### Environment Requirements
 
@@ -259,6 +281,153 @@ The program prints progress information during execution. After generation finis
 #### Step 7: Integrate the Generated Checker
 
 The generated checker code can be placed directly into the checker directory of the target static analysis tool and used after recompilation.
+-->
+
+---
+
+### Path 2: Vulnerability-and-Patch-Driven Checker Generation
+
+> **Current scope: this path currently supports only CodeQL security query generation for Java vulnerabilities.** The vulnerability must be listed in `autoql_data/project_info.csv`, and execution requires the complete 40-character SHA of the fix commit.
+
+#### Environment Requirements
+
+| Item | Requirement |
+| --- | --- |
+| Disk Space | At least 64 GB |
+| Memory | At least 16 GB |
+| CPU | At least 4 cores |
+| Operating System | Ubuntu 22.04 (recommended) |
+| Python | 3.11 |
+| CodeQL | CodeQL CLI and the Java QL packs |
+| LLM API Key | Model configuration as defined in the project's `.env.example` |
+
+#### Step 1: Prepare the Project and Python Environment
+
+```bash
+git clone https://github.com/SQUARE-RG/AutoChecker.git
+cd AutoChecker
+
+conda create -n autochecker-autoql python=3.11
+conda activate autochecker-autoql
+python -m pip install -r requirements.txt -r src/autoql/requirements.txt
+```
+
+The vulnerability-and-patch-driven path requires Python 3.11. Use a separate environment instead of upgrading the Python 3.10 environment used by Path 1.
+
+#### Step 2: Install CodeQL
+
+This workflow is adapted from the [QLCoder installation guide for Linux](https://github.com/neuralprogram/qlcoder#native-linux) to use AutoChecker's directory structure and scripts. Download `codeql-bundle-linux64.tar.gz` from [CodeQL Action Releases](https://github.com/github/codeql-action/releases). The project's `.env.example` uses CodeQL bundle 2.23.3 as an example. Other versions can be used, but the QL pack paths must be updated accordingly.
+
+The following example extracts CodeQL into `codeql-bundle-2.23.3` within the project:
+
+```bash
+mkdir -p codeql-bundle-2.23.3
+tar -xzf /path/to/codeql-bundle-linux64.tar.gz \
+  -C codeql-bundle-2.23.3 --strip-components=1
+
+export PATH="$PWD/codeql-bundle-2.23.3:$PATH"
+codeql version
+```
+
+To use CodeQL in a new terminal, add its executable directory to `PATH` permanently or run the `export` command above again.
+
+#### Step 3: Configure Environment Variables
+
+The project already provides `.env.example`; you do not need to copy a configuration file from another project:
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env`, configure the model, and set `CODEQL_HOME` to the absolute CodeQL installation path. For example:
+
+```env
+MODEL_NAME=your_model_name
+DEEPSEEK_API_KEY=your_api_key
+DEEPSEEK_BASE_URL=your_api_endpoint
+
+CODEQL_HOME=/absolute/path/to/AutoChecker/codeql-bundle-2.23.3
+```
+
+QL pack version directories may differ between CodeQL bundles. Inspect the installed versions first:
+
+```bash
+set -a
+source .env
+set +a
+
+ls "$CODEQL_HOME/qlpacks/codeql/java-queries/"
+ls "$CODEQL_HOME/qlpacks/codeql/java-all/"
+```
+
+Then update the Java QL pack paths in `.env`:
+
+```env
+JAVA_SECURITY_QLPACK_PATH=/absolute/path/to/codeql-bundle/qlpacks/codeql/java-queries/<version>/Security/CWE
+JAVA_LIBRARY_QLPACK_PATH=/absolute/path/to/codeql-bundle/qlpacks/codeql/java-all/<version>/semmle/code/java
+```
+
+`.env.example` also contains C/C++ and Python QL pack settings. Keep them and update their versioned paths to match the installed bundle. Never commit an `.env` file containing credentials to version control.
+
+#### Step 4: Prepare the Vulnerability Repository and Patch
+
+Confirm that the target vulnerability is listed in `autoql_data/project_info.csv`, then use the scripts in this project's `autoql_scripts` directory to retrieve the repository and generate the fix diff:
+
+```bash
+CVE_ID="CVE-YYYY-NNNN"
+python3 autoql_scripts/get_cve_repos.py --cve "$CVE_ID"
+```
+
+The script also supports batch processing:
+
+```bash
+# Multiple CVEs
+python3 autoql_scripts/get_cve_repos.py --cves "CVE-YYYY-NNNN,CVE-YYYY-MMMM"
+
+# Every CVE in autoql_data/project_info.csv
+python3 autoql_scripts/get_cve_repos.py --all
+```
+
+#### Step 5: Create CodeQL Databases for the Vulnerable and Fixed Versions
+
+```bash
+# Create databases for one CVE
+python3 autoql_scripts/build_codeql_dbs.py --cve-id "$CVE_ID"
+
+# Or create databases for every prepared CVE
+python3 autoql_scripts/build_codeql_dbs.py
+```
+
+The databases are created with `--build-mode=none`, so the target Java project's build toolchain is not required. For a selected CVE, the script creates `<CVE-ID>-vul` and `<CVE-ID>-fix` under `cves/<CVE-ID>/`.
+
+#### Step 6: Build the CodeQL Documentation Knowledge Base
+
+```bash
+python3 autoql_scripts/codeql_docs_fetcher.py
+```
+
+AutoChecker does not require the following two QLCoder commands:
+
+```text
+python3 scripts/cwe_fetcher.py
+python3 scripts/cves_fetcher.py
+```
+
+#### Step 7: Generate and Validate the CodeQL Checker
+
+Pass the complete fix commit SHA for the target vulnerability to AutoQL:
+
+```bash
+FIX_COMMIT_SHA="enter_the_40_character_fix_commit_SHA"
+PYTHONPATH=src python -m autoql.run_patch --commit "$FIX_COMMIT_SHA"
+```
+
+The default output directory is `autoql_runs/`. Its artifacts include the vulnerability specification, generation and repair history, CodeQL compilation and execution logs, evaluation results, and `final.ql` after successful validation. To verify the input, repository revisions, and CodeQL databases without calling the LLM, run:
+
+```bash
+PYTHONPATH=src python -m autoql.run_patch \
+  --commit "$FIX_COMMIT_SHA" --preflight-only
+```
 
 ## Currently Supported Static Analysis Tools
 
