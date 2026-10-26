@@ -144,7 +144,7 @@ Create a virtual environment and install dependencies:
 
 ```shell
 # Create a virtual environment
-conda create -n autochecker python=3.10
+conda create -n autochecker python=3.11
 conda activate autochecker
 pip install -r requirements.txt
 ```
@@ -312,7 +312,7 @@ conda activate autochecker-autoql
 python -m pip install -r requirements.txt -r src/autoql/requirements.txt
 ```
 
-The vulnerability-and-patch-driven path requires Python 3.11. Use a separate environment instead of upgrading the Python 3.10 environment used by Path 1.
+
 
 #### Step 2: Install CodeQL
 
@@ -406,12 +406,6 @@ The databases are created with `--build-mode=none`, so the target Java project's
 python3 autoql_scripts/codeql_docs_fetcher.py
 ```
 
-AutoChecker does not require the following two QLCoder commands:
-
-```text
-python3 scripts/cwe_fetcher.py
-python3 scripts/cves_fetcher.py
-```
 
 #### Step 7: Generate and Validate the CodeQL Checker
 

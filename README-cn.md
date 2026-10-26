@@ -143,7 +143,7 @@ cd AutoChecker
 
 ```shell
 # 创建虚拟环境
-conda create -n autochecker python=3.10
+conda create -n autochecker python=3.11
 conda activate autochecker
 pip install -r requirements.txt
 ```
@@ -311,7 +311,6 @@ conda activate autochecker-autoql
 python -m pip install -r requirements.txt -r src/autoql/requirements.txt
 ```
 
-漏洞与补丁驱动路线依赖 Python 3.11，建议使用独立环境，不要直接升级路线一使用的 Python 3.10 环境。
 
 #### 步骤 2：安装 CodeQL
 
@@ -403,13 +402,6 @@ python3 autoql_scripts/build_codeql_dbs.py
 
 ```bash
 python3 autoql_scripts/codeql_docs_fetcher.py
-```
-
-本项目不需要执行 QLCoder 中的以下两个命令：
-
-```text
-python3 scripts/cwe_fetcher.py
-python3 scripts/cves_fetcher.py
 ```
 
 #### 步骤 7：生成并验证 CodeQL 检查器
