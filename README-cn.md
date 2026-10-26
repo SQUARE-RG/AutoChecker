@@ -3,13 +3,20 @@
 </p>
 
 <p align="center">
-  <strong>Write Your Own Checker</strong>
+  <strong>From Specs and Patches to Checkers</strong>
 </p>
 
 <p align="center">
-  面向主流静态分析工具的自动检查器生成框架
+  把写在文档里的编码规范、藏在漏洞补丁里的安全经验，自动变成能扫描代码的静态代码检查器
 </p>
-
+<p align="center">
+  <a href="https://autochecker.veilaxis.com/">
+    <img src="https://img.shields.io/badge/🚀_在线体验-AutoChecker-2563eb?style=for-the-badge" alt="在线体验" />
+  </a>
+  <a href="https://github.com/SQUARE-RG/AutoChecker">
+    <img src="https://img.shields.io/badge/GitHub-查看源码-24292f?style=for-the-badge&logo=github" alt="查看源码" />
+  </a>
+</p>
 <p align="center">
   <a href="./README.md"><img src="https://img.shields.io/badge/lang-English-b0e8ff?style=flat-square&labelColor=0a0e14" alt="English"></a>
   <a href="./README-cn.md"><img src="https://img.shields.io/badge/lang-%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-b0e8ff?style=flat-square&labelColor=0a0e14" alt="简体中文"></a>
@@ -19,26 +26,64 @@
 ---
 
 # AutoChecker
+> **From Specs and Patches to Checkers.**
 
-**AutoChecker 是一个根据用户给出的规则需求，自动为主流静态分析工具生成代码检查器的工具。**
+**AutoChecker 是一个基于大语言模型的智能静态代码检查器生成系统，能够将自然语言编码规范、代码测试用例以及漏洞修复补丁，自动转化为可在主流静态分析工具中执行的检查器。**
 
-在日常开发中，我们经常需要检查代码是否符合规范，例如是否存在空指针风险、资源是否正确释放、命名是否符合约定等。虽然静态分析工具提供了部分内置检查器，但这些检查器往往无法完全覆盖真实场景中的个性化需求；如果手动开发新的检查器，不仅成本高，而且容易出错。
+> **你只需定义“要检查什么”，AutoChecker 负责实现“如何检查”。** 从需求理解、检查器生成，到编译验证与迭代修复，让定制化静态代码检查器开发变得更加简单。
 
-AutoChecker 为这一场景提供了新的解决方案：**用户只需给出规则描述和示例，AutoChecker 就能自动生成对应静态分析工具可用的检查器**。对于同一条规则，AutoChecker 还可以生成面向多个分析工具的检查器，方便用户按需选用。
+### News
+
+- 🎉 **AutoChecker 生成的检查器发现的两项真实漏洞已获得 CVE 编号： [CVE-2026-103754](https://www.cve.org/CVERecord?id=CVE-2026-103754) 和 [CVE-2026-71364](https://www.cve.org/CVERecord?id=CVE-2026-71364)。**
+- 🔍 **AutoChecker 生成的检查器已在 13 个开源代码仓库中发现并报告 16 项漏洞，全部获得项目开发者确认。**
+
+
+### 为什么需要 AutoChecker？
+
+CodeQL、Clang-Tidy、PMD 等静态分析工具提供了丰富的内置检查规则，但这些规则难以覆盖企业内部编码规范、项目特定约束以及不断出现的新型漏洞模式。
+
+当现有规则无法满足需求时，开发者通常需要手动编写检查器，不仅要理解抽象语法树、控制流和数据流等程序分析技术，还需要熟悉不同静态分析框架的 API 与实现机制。**即使只是增加一条检测规则，也可能需要投入大量开发与调试工作。**
+
+**AutoChecker 让开发者不再需要从零实现每一条检查规则。** 无论是希望将一条编码规范转化为自动化检查，还是从一次漏洞修复中提取可复用的检测逻辑，AutoChecker 都能够自动生成相应的检查器，并通过真实工具链进行验证和迭代优化。
+
+### AutoChecker 能做什么？
+
+AutoChecker 提供两种互补的检查器生成方式，满足软件质量与安全检测的不同需求。
+
+| 生成方式 | 你需要提供 | AutoChecker 为你完成 |
+| --- | --- | --- |
+| **从规范生成检查器** | 自然语言规则描述、合规与违规代码示例 | 自动生成适用于 Clang-Tidy、CodeQL、PMD、Semgrep 等静态分析工具的检查器，让编码规范真正落地 |
+| **从漏洞生成检查器** | CVE 或漏洞信息、修复补丁及相关代码仓库 | 分析漏洞根因，自动生成 CodeQL 安全检查器，将历史漏洞转化为可复用的同类缺陷检测能力 |
+
+两种方式均采用**自动生成、真实验证、反馈修复**的工作流程。AutoChecker 不只是生成检查器代码，还会实际调用静态分析工具进行编译与测试，并根据编译错误、漏报和误报反馈迭代修复，最终输出经过验证的检查器及其测试结果。
+
+### 典型应用场景
+
+- **编码规范自动化落地**：将国家及行业标准、开源安全编码指南等自然语言规则转化为自动化检查器，让编码规范从文档走向实际执行。
+- **企业与项目定制检查**：针对企业内部框架、专用 API、业务安全约束和团队编码约定，快速生成现有静态分析工具尚未覆盖的定制化检查器。
+- **漏洞变体与同类缺陷检测**：从 CVE 及修复补丁中分析漏洞机制，生成可复用的安全检查器，帮助开发者在其他代码仓库中发现潜在的同类漏洞。
+- **持续代码质量与安全保障**：将生成的检查器集成到代码审查、CI/CD 和安全扫描流程中，让定制化检查能力持续服务于软件研发过程。
+
+### AutoChecker 如何工作？
+
+AutoChecker 将传统上依赖静态分析专家完成的检查器开发过程，转化为由 AI 驱动的自动化工作流。
+
+对于**规范与测试用例驱动**的生成方式，AutoChecker 首先理解自然语言规则及合规、违规代码示例，提取关键检测条件；随后检索目标静态分析框架的 API 和实现知识，生成候选检查器，并通过编译和测试验证其检测行为。如果出现编译失败、漏报或误报，系统会根据反馈自动修复，直至满足验证条件或达到预设迭代上限。
 
 ![Overview](AutoChecker.png)
 
-## 核心能力
+对于**漏洞与补丁驱动**的生成方式，AutoChecker 从漏洞信息及修复补丁出发，自动探索相关源码，分析漏洞触发条件、根本原因与修复机制，将分析结果转化为结构化漏洞规格，并据此生成 CodeQL 检查器。系统通过漏洞版本与修复版本的差分验证，结合关键谓词的匹配反馈，持续定位和修复检查器中的检测逻辑问题。
 
-- **根据规则描述和测试用例自动生成检查器**：用户输入规则描述以及正反测试用例，工具即可输出在目标静态分析工具中可直接使用的检查器代码。
-- **一次编写规约，多工具复用**：同一份规则描述和测试用例可复用于不同分析工具，减少重复工作，提高规则迁移效率。
-- **面向多类静态分析工具扩展**：当前文档覆盖 `PMD`、`clang-tidy` 和 `CodeQL`，并将继续扩展更多工具支持。
+最终，AutoChecker 输出可供目标静态分析工具使用的检查器代码，将**编码规范和历史漏洞知识转化为可持续复用的自动化检测能力**。
 
-## 在线体验
+### 核心优势
 
-现在可以直接在浏览器中体验 AutoChecker：
+- **无需从零编写检查器**：以自然语言、代码示例或历史漏洞为输入，自动完成检测逻辑分析、检查器生成与验证，降低定制化静态分析规则的开发门槛。
+- **知识增强的智能生成**：结合检测逻辑引导的知识检索（LGKR）与 Agentic RAG，按需获取静态分析框架的 API、分析操作及实现示例，提高检查器生成的可靠性。
+- **真实工具链验证与自动修复**：在实际静态分析环境中编译和运行候选检查器，利用测试反馈与差分谓词探测（DPP）定位问题，指导针对性修复。
+- **多语言、多分析引擎支持**：支持面向 Clang-Tidy、Clang Static Analyzer、CodeQL、Semgrep 等分析引擎生成检查器，覆盖 C/C++、Java、Python、JavaScript、TypeScript、Rust 等语言，并提供 PMD 检查器生成能力。
+- **让检测能力持续复用**：既能将相同规范应用于不同静态分析工具，也能将历史漏洞的修复经验转化为可复用的安全检查器，减少重复开发成本。
 
-[AutoChecker.platform](https://autochecker.veilaxis.com/)
 
 ## 安装指南
 
@@ -217,16 +262,29 @@ python src/main.py --rule_file rule.json --language cpp --analyzer clang-tidy
 
 ## 当前支持的静态分析工具
 
-| 工具 | 支持语言 |
-| --- | --- |
-| PMD | Java |
-| Clang-tidy | C/C++ |
-| CodeQL | 多语言 |
+AutoChecker 的两条检查器生成路线面向不同输入和检测目标，因此具有不同的静态分析工具与语言支持范围。
 
-计划支持：
+### 规范与测试用例驱动的检查器生成
 
-- Semgrep
-- Clang Static Analyzer
+该路线以自然语言规则描述及合规、违规测试用例为输入，面向编码规范、项目约束和定制化质量检查需求生成检查器。目前支持情况如下：
+
+| 静态分析工具 | 支持语言 | 生成结果 | 当前状态 |
+| --- | --- | --- | --- |
+| PMD | Java | Java 检查器 | 已支持，参见 [PMD 部署说明](doc/pmd_install_cn.md) |
+| Clang-Tidy | C/C++ | C++ 检查器源码 | 已支持，参见 [Clang-Tidy 部署说明](doc/clang_tidy_install_cn.md) |
+| CodeQL | C/C++、Python | CodeQL 查询 | 已支持，参见 [CodeQL 部署说明](doc/codeql_deploy_cn.md) |
+| Semgrep | C/C++、Java、Python、JavaScript、TypeScript、Rust | Semgrep YAML 规则 | 已支持，参见 [Semgrep 部署说明](doc/semgrep_deploy_cn.md) |
+| Clang Static Analyzer | C/C++ | Clang Static Analyzer 检查器 | 实验性支持，安装和统一运行入口仍在完善 |
+
+### 漏洞与补丁驱动的检查器生成
+
+该路线以漏洞信息、修复补丁及修复前后的源码为输入，通过分析漏洞触发条件、根本原因和修复机制，生成用于检测同类缺陷的安全检查器。目前支持情况如下：
+
+| 静态分析工具 | 支持语言 | 生成结果 | 当前状态 |
+| --- | --- | --- | --- |
+| CodeQL | Java | CodeQL 安全查询 | 已支持，可在漏洞版本与修复版本上进行差分验证 |
+
+其中，“已支持”表示仓库中已有相应的生成与验证实现；“实验性支持”表示已经完成原型和实验验证，但工程化接口或部署文档仍需继续完善。各后端目前并非全部通过同一个命令入口调用，运行前请先阅读对应部署文档和源码入口。若希望完善现有后端，或增加新的静态分析工具与语言支持，请参阅[开发者指南](doc/Developer_Guide.md)。
 
 ## 配置说明
 

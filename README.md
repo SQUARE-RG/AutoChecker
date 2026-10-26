@@ -3,11 +3,11 @@
 </p>
 
 <p align="center">
-  <strong>Write Your Own Checker</strong>
+  <strong>From Specs and Patches to Checkers</strong>
 </p>
 
 <p align="center">
-  An automated checker generation framework for mainstream static analysis tools
+  Automatically turn coding standards in documents and security knowledge in vulnerability patches into static code checkers that can scan real code
 </p>
 
 <p align="center">
@@ -20,25 +20,62 @@
 
 # AutoChecker
 
-**AutoChecker is a tool that automatically generates code checkers for mainstream static analysis tools based on user-defined rule requirements.**
+> **From Specs and Patches to Checkers.**
 
-In day-to-day development, we often need to check whether code follows specific rules, such as whether there are null pointer risks, whether resources are released correctly, or whether naming conventions are followed. Although static analysis tools provide some built-in checkers, those built-in rules often do not fully cover real-world, customized requirements. Writing a new checker manually is both time-consuming and error-prone.
+**AutoChecker is an LLM-powered intelligent static code checker generation system. It automatically transforms natural-language coding standards, code test cases, and vulnerability patches into executable checkers for mainstream static analysis tools.**
 
-AutoChecker offers a new solution for this scenario: **users only need to provide a rule description and examples, and AutoChecker can automatically generate a usable checker for the target static analysis tool**. For the same rule, AutoChecker can also generate checkers for multiple analysis tools, allowing users to choose the one that best fits their workflow.
+> **You define what to check; AutoChecker implements how to check it.** From requirement understanding and checker generation to compilation, validation, and iterative repair, AutoChecker makes custom static checker development substantially easier.
+
+### News
+
+- 🎉 **Two real-world vulnerabilities discovered by AutoChecker-generated checkers have received CVE identifiers: [CVE-2026-103754](https://www.cve.org/CVERecord?id=CVE-2026-103754) and [CVE-2026-71364](https://www.cve.org/CVERecord?id=CVE-2026-71364).**
+- 🔍 **AutoChecker-generated checkers have discovered and reported 16 vulnerabilities across 13 open-source repositories, all confirmed by project maintainers.**
+
+### Why AutoChecker?
+
+Static analysis tools such as CodeQL, Clang-Tidy, and PMD provide many built-in checks, but these checks cannot cover every organization-specific coding standard, project-specific constraint, or newly emerging vulnerability pattern.
+
+When existing checks are insufficient, developers generally have to implement new checkers manually. This requires knowledge of program-analysis techniques—including abstract syntax trees, control flow, and data flow—as well as familiarity with the APIs and implementation model of each static analysis framework. **Even adding a single check may require substantial development and debugging effort.**
+
+**AutoChecker removes the need to implement every checker from scratch.** Whether the goal is to turn a coding standard into an automated check or extract reusable detection logic from a vulnerability fix, AutoChecker generates the corresponding checker and improves it through validation and iterative repair in a real toolchain.
+
+### What Can AutoChecker Do?
+
+AutoChecker provides two complementary checker-generation approaches for different software quality and security needs.
+
+| Generation approach | What you provide | What AutoChecker does |
+| --- | --- | --- |
+| **Generate from specifications** | A natural-language rule description plus compliant and violating code examples | Generates checkers for tools such as Clang-Tidy, CodeQL, PMD, and Semgrep, turning coding standards into executable checks |
+| **Generate from vulnerabilities** | A CVE or vulnerability description, its patch, and the relevant source repository | Analyzes the root cause and generates a CodeQL security checker, turning a historical vulnerability into reusable detection capability for similar defects |
+
+Both approaches follow an **automated generation, real-world validation, and feedback-driven repair** workflow. AutoChecker invokes the target static analysis tool to compile and test each candidate, then iteratively repairs compilation errors, false negatives, and false positives before returning the validated checker and its test results.
+
+### Typical Use Cases
+
+- **Operationalizing coding standards**: transform natural-language rules from national or industry standards and open-source secure coding guides into executable checkers.
+- **Organization- and project-specific checks**: rapidly generate custom checkers for internal frameworks, specialized APIs, business security constraints, and team conventions that existing tools do not cover.
+- **Vulnerability variants and similar-defect detection**: analyze a CVE and its patch, extract the vulnerability mechanism, and generate a reusable security checker for finding related defects in other repositories.
+- **Continuous code quality and security assurance**: integrate generated checkers into code review, CI/CD, and security scanning workflows so custom checks continuously protect the development process.
+
+### How Does AutoChecker Work?
+
+AutoChecker turns checker development—traditionally performed by static analysis experts—into an AI-driven automated workflow.
+
+For **specification-and-test-case-driven generation**, AutoChecker first interprets the natural-language rule and its compliant and violating examples to extract the relevant detection conditions. It then retrieves APIs and implementation knowledge for the target static analysis framework, generates a candidate checker, and validates its behavior through compilation and test execution. If compilation fails or a false negative or false positive occurs, the system uses the feedback to repair the checker until it satisfies the validation conditions or reaches the configured iteration limit.
 
 ![Overview](AutoChecker.png)
 
-## Core Capabilities
+For **vulnerability-and-patch-driven generation**, AutoChecker starts from vulnerability information and its patch, explores the relevant source code, and analyzes the trigger conditions, root cause, and repair mechanism. It converts the findings into a structured vulnerability specification and uses it to generate a CodeQL checker. The system validates the checker on the vulnerable and fixed program versions, then uses matching feedback from key predicates to locate and repair errors in its detection logic.
 
-- **Automatically generate checkers from rule descriptions and test cases**: users provide a rule description together with positive and negative test cases, and the tool outputs checker code that can be used directly in the target static analysis tool.
-- **Write once, reuse across multiple tools**: the same rule specification and test cases can be reused for different analysis tools, reducing duplicated effort and improving portability.
-- **Extensible to multiple static analysis tools**: the current documentation covers `PMD`, `clang-tidy`, and `CodeQL`, with support for more tools planned in the future.
+Ultimately, AutoChecker outputs checker code for the target static analysis tool, turning **coding standards and historical vulnerability knowledge into sustainable, reusable automated detection capabilities**.
 
-## Online Demo
+### Key Advantages
 
-You can now try AutoChecker directly in the browser:
-
-[AutoChecker.platform](https://autochecker.veilaxis.com/)
+- **No need to write checkers from scratch**: use natural language, code examples, or historical vulnerabilities as input and automate detection-logic analysis, checker generation, and validation.
+- **Knowledge-enhanced intelligent generation**: combine Logic-Guided Knowledge Retrieval (LGKR) with Agentic RAG to obtain relevant static analysis APIs, analysis operations, and implementation examples on demand.
+- **Real-toolchain validation and automatic repair**: compile and execute candidates in actual static analysis environments, then use test feedback and Differential Predicate Probing (DPP) to diagnose and repair problems.
+- **Multiple languages and analysis engines**: generate checkers for Clang-Tidy, Clang Static Analyzer, CodeQL, and Semgrep across C/C++, Java, Python, JavaScript, TypeScript, and Rust, with additional PMD checker generation support.
+- **Reusable detection capabilities**: apply the same specification to different static analysis tools or transform experience from historical vulnerability fixes into reusable security checkers.
 
 ## Installation Guide
 
@@ -86,7 +123,7 @@ Install the required static analysis engines according to your needs:
 1. [Deploy PMD](/doc/pmd_install_cn.md)
 2. [Deploy clang-tidy](/doc/clang_tidy_install_cn.md)
 3. [Deploy CodeQL](/doc/codeql_deploy_cn.md)
-4. [Deploy Semgrep](/doc/semgrep_deploy.md)
+4. [Deploy Semgrep](/doc/semgrep_deploy_cn.md)
 
 #### Step 3: Configure the LLM
 
@@ -217,16 +254,29 @@ The generated checker code can be placed directly into the checker directory of 
 
 ## Currently Supported Static Analysis Tools
 
-| Tool | Supported Languages |
-| --- | --- |
-| PMD | Java |
-| Clang-tidy | C/C++ |
-| CodeQL | Multiple languages |
+AutoChecker's two checker-generation approaches accept different inputs and target different detection goals, so they have different tool and language coverage.
 
-Planned support:
+### Specification-and-Test-Case-Driven Checker Generation
 
-- Semgrep
-- Clang Static Analyzer
+This approach takes a natural-language rule description plus compliant and violating test cases as input. It targets coding standards, project-specific constraints, and custom quality checks.
+
+| Static analysis tool | Supported languages | Generated artifact | Current status |
+| --- | --- | --- | --- |
+| PMD | Java | Java checker | Supported; see the [PMD deployment guide](doc/pmd_install_cn.md) |
+| Clang-Tidy | C/C++ | C++ checker source code | Supported; see the [Clang-Tidy deployment guide](doc/clang_tidy_install_cn.md) |
+| CodeQL | C/C++, Python | CodeQL query | Supported; see the [CodeQL deployment guide](doc/codeql_deploy_cn.md) |
+| Semgrep | C/C++, Java, Python, JavaScript, TypeScript, Rust | Semgrep YAML rule | Supported; see the [Semgrep deployment guide](doc/semgrep_deploy_cn.md) |
+| Clang Static Analyzer | C/C++ | Clang Static Analyzer checker | Experimental; installation and a unified execution interface are still being improved |
+
+### Vulnerability-and-Patch-Driven Checker Generation
+
+This approach takes vulnerability information, a repair patch, and the source code before and after the fix as input. It analyzes the vulnerability's trigger conditions, root cause, and repair mechanism to generate a security checker for similar defects.
+
+| Static analysis tool | Supported languages | Generated artifact | Current status |
+| --- | --- | --- | --- |
+| CodeQL | Java | CodeQL security query | Supported, including differential validation on vulnerable and fixed versions |
+
+“Supported” means that the repository contains the corresponding generation and validation implementation. “Experimental” means that a prototype has been implemented and evaluated, while its engineering interface or deployment documentation still requires improvement. Not all backends currently share a single command-line entry point; read the relevant deployment guide and source entry point before running one. To improve an existing backend or add another static analysis tool or language, see the [Developer Guide](doc/Developer_Guide.md).
 
 ## Configuration
 
