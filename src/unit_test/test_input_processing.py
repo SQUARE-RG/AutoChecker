@@ -5,7 +5,11 @@ from input_processing.chunker import DocumentChunk, build_chunks
 from input_processing import document_parser
 from input_processing.document_parser import parse_document
 from input_processing.paddle_parser import _is_loopback_url
-from input_processing.rule_extractor import normalize_chunk_result, parse_json_response
+from input_processing.rule_extractor import (
+    extract_chunk_rules,
+    normalize_chunk_result,
+    parse_json_response,
+)
 from input_processing.rule_merger import merge_rules
 from input_processing.rule_pipeline import extract_rules
 from input_processing.schemas import DocumentBlock, RuleCandidate, RuleExample
@@ -116,6 +120,30 @@ def test_chunker_overlaps_pages():
 
 def test_parse_json_fence():
     assert parse_json_response('```json\n{"rules": []}\n```') == {"rules": []}
+
+
+def test_rule_extraction_retries_timeout(tmp_path: Path):
+    chunk = DocumentChunk("chunk-0001", [1], ["page-1-block-1"], "不得使用 gets。", 10)
+    calls = 0
+
+    def flaky_invoke(prompt: str, system: str) -> str:
+        nonlocal calls
+        calls += 1
+        if calls == 1:
+            raise TimeoutError("temporary timeout")
+        return '{"rules": []}'
+
+    result = extract_chunk_rules(
+        chunk,
+        tmp_path / "extractions",
+        flaky_invoke,
+        retries=3,
+        retry_base_delay=0,
+        retry_max_delay=0,
+    )
+
+    assert calls == 2
+    assert result.rules == []
 
 
 def test_advisory_rule_type_and_duplicate_examples_are_normalized():

@@ -460,6 +460,10 @@ The `config.json` file in the project root directory can be adjusted as needed:
 | `top_key` | Number of most relevant code snippets retrieved | 2 |
 | `result_dir` | Output directory for generated results | result-generation/ |
 
+## Best Practices
+
+- [Case Study 1: Generating Clang-Tidy Checkers from the GJB 8114 Coding Standard](doc/bestPractice/GJB8114-en.md)
+
 ## Citation
 
 If you use our work in your research or project, please consider citing:

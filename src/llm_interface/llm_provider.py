@@ -244,6 +244,11 @@ DEEPSEEK_PRICE_PER_1M_TOKENS = {
         "input_cache_hit": 0.04,
         "input_cache_miss": 2.0,
         "output": 8.0,
+    },
+    "deepseek-v4.1-flash-ark-eco":{
+        "input_cache_hit": 0.04,
+        "input_cache_miss": 2.0,
+        "output": 8.0, 
     }
 }
 

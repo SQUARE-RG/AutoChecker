@@ -457,6 +457,10 @@ AutoChecker 的两条检查器生成路线面向不同输入和检测目标，�
 | `top_key` | 检索最相关代码片段的数量 | 2 |
 | `result_dir` | 结果输出目录 | result-generation/ |
 
+## 最佳实践
+
+- [案例一：从 GJB 8114 编码规范自动生成 Clang-Tidy 检查器](doc/bestPractice/GJB8114.md)
+
 ## 论文引用
 
 如果你的研究或项目使用了我们的工作，欢迎引用：

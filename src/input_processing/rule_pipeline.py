@@ -21,9 +21,22 @@ def extract_rules(
     base_url: str | None = None,
     max_chunk_tokens: int = 12000,
     overlap_pages: int = 1,
+    llm_timeout: int = 900,
+    llm_max_retries: int = 3,
+    retry_base_delay: float = 5.0,
+    retry_max_delay: float = 60.0,
     force: bool = False,
     invoke: Callable[[str, str], str] | None = None,
 ) -> dict[str, Any]:
+    if llm_timeout < 1:
+        raise ValueError("llm_timeout must be positive")
+    if llm_max_retries < 1:
+        raise ValueError("llm_max_retries must be positive")
+    if retry_base_delay < 0 or retry_max_delay < 0:
+        raise ValueError("retry delays cannot be negative")
+    if retry_base_delay > retry_max_delay:
+        raise ValueError("retry_base_delay cannot exceed retry_max_delay")
+
     parsed_dir = parsed_dir.resolve()
     block_payload = read_json(parsed_dir / "blocks.json")
     blocks = [DocumentBlock.from_dict(item) for item in block_payload.get("blocks", [])]
@@ -40,7 +53,13 @@ def extract_rules(
         write_text(chunks_dir / f"{chunk.chunk_id}.md", chunk.text.rstrip() + "\n")
 
     if invoke is None:
-        client = create_llm_client(model=model, api_key=api_key, base_url=base_url)
+        client = create_llm_client(
+            model=model,
+            api_key=api_key,
+            base_url=base_url,
+            timeout_seconds=llm_timeout,
+            max_retries=0,
+        )
         invoke = lambda prompt, system: invoke_text(client, prompt, system)
 
     all_candidates = []
@@ -49,12 +68,16 @@ def extract_rules(
     for index, chunk in enumerate(chunks, start=1):
         print(
             f"[{index}/{len(chunks)}] extracting {chunk.chunk_id}, "
-            f"pages={chunk.pages[0]}-{chunk.pages[-1]}, tokens={chunk.token_count}"
+            f"pages={chunk.pages[0]}-{chunk.pages[-1]}, tokens={chunk.token_count}",
+            flush=True,
         )
         result = extract_chunk_rules(
             chunk,
             checkpoint_dir,
             invoke,
+            retries=llm_max_retries,
+            retry_base_delay=retry_base_delay,
+            retry_max_delay=retry_max_delay,
             force=force,
         )
         if not result.rules:

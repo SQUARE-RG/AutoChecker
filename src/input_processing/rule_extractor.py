@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import hashlib
 import json
+import random
 import re
+import sys
 import time
 from pathlib import Path
 from typing import Any, Callable
@@ -25,6 +27,8 @@ def extract_chunk_rules(
     invoke: InvokeFunction,
     *,
     retries: int = 3,
+    retry_base_delay: float = 5.0,
+    retry_max_delay: float = 60.0,
     force: bool = False,
 ) -> ChunkExtractionResult:
     checkpoint_dir.mkdir(parents=True, exist_ok=True)
@@ -35,7 +39,13 @@ def extract_chunk_rules(
             return ChunkExtractionResult.from_dict(saved)
 
     prompt = build_extraction_prompt(chunk.text)
-    payload, raw_response = _invoke_json(invoke, prompt, retries)
+    payload, raw_response = _invoke_json(
+        invoke,
+        prompt,
+        retries,
+        retry_base_delay=retry_base_delay,
+        retry_max_delay=retry_max_delay,
+    )
     result = normalize_chunk_result(payload, chunk)
     completed = result.to_dict()
     completed["schema_version"] = 3
@@ -104,18 +114,56 @@ def parse_json_response(text: str) -> dict[str, Any]:
 
 
 def _invoke_json(
-    invoke: InvokeFunction, prompt: str, retries: int
+    invoke: InvokeFunction,
+    prompt: str,
+    retries: int,
+    *,
+    retry_base_delay: float = 5.0,
+    retry_max_delay: float = 60.0,
 ) -> tuple[dict[str, Any], str]:
+    if retries < 1:
+        raise ValueError("LLM retries must be positive")
     last_error: Exception | None = None
     for attempt in range(1, retries + 1):
-        raw = invoke(prompt, RULE_EXTRACTION_SYSTEM_PROMPT)
         try:
+            raw = invoke(prompt, RULE_EXTRACTION_SYSTEM_PROMPT)
             return parse_json_response(raw), raw
         except (json.JSONDecodeError, ValueError) as exc:
             last_error = exc
-            if attempt < retries:
-                time.sleep(min(attempt * 2, 5))
-    raise RuntimeError(f"LLM did not return valid rule JSON after {retries} attempts") from last_error
+            retryable = True
+            error_kind = "invalid_json"
+        except Exception as exc:
+            last_error = exc
+            retryable = _is_retryable_llm_error(exc)
+            error_kind = type(exc).__name__
+        if not retryable or attempt >= retries:
+            break
+        delay = min(retry_max_delay, retry_base_delay * (2 ** (attempt - 1)))
+        delay += random.uniform(0, min(1.0, delay * 0.2))
+        print(
+            f"LLM retry attempt={attempt}/{retries} error_type={error_kind} "
+            f"error={last_error} next_delay={delay:.2f}s",
+            file=sys.stderr,
+            flush=True,
+        )
+        time.sleep(delay)
+    raise RuntimeError(
+        f"LLM request failed after {retries} attempts: {last_error}"
+    ) from last_error
+
+
+def _is_retryable_llm_error(exc: Exception) -> bool:
+    response = getattr(exc, "response", None)
+    status_code = getattr(exc, "status_code", None) or getattr(
+        response, "status_code", None
+    )
+    if status_code is not None:
+        return status_code == 429 or status_code >= 500
+    name = type(exc).__name__.lower()
+    return isinstance(exc, (TimeoutError, ConnectionError)) or any(
+        token in name
+        for token in ("timeout", "connection", "ratelimit", "internalserver")
+    )
 
 
 def _clean_string(value: Any) -> str:

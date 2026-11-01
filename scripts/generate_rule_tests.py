@@ -40,7 +40,7 @@ def main() -> None:
     parser.add_argument("--c-standard", default="c11")
     parser.add_argument("--cpp-standard", default="c++17")
     parser.add_argument("--validation-timeout", type=int, default=30)
-    parser.add_argument("--llm-timeout", type=int, default=300)
+    parser.add_argument("--llm-timeout", type=int, default=600)
     parser.add_argument("--llm-max-retries", type=int, default=5)
     parser.add_argument("--retry-base-delay", type=float, default=2.0)
     parser.add_argument("--retry-max-delay", type=float, default=60.0)
