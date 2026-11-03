@@ -1,0 +1,48 @@
+{
+  "data": {
+    "ucassaat": [
+      {
+        "rule_id": "R-1-1-3",
+        "main_title": "no-typedef-redefinition",
+        "description": "用typedef自定义的类型禁止被重新定义。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0001"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "typedef int mytype;\n\nint main(void)\n{\n    typedef float mytype; // 违背1\n    mytype x = 1.0;\n    return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-typedef-redefinition",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-1-8",
+        "main_title": "require-tag-name-for-struct-union-enum",
+        "description": "结构、联合、枚举的定义中必须定义标识名。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0001"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "struct // 违背1\n{\n    int data1;\n    int data2;\n} sData;\n\nunion // 违背2\n{\n    unsigned char cd[4];\n    int id;\n} uData;\n\nenum // 违背3\n{\n    A_Level = 0,\n    B_Level,\n    C_Level,\n    D_Level\n} eLevel;\n\nint main(void)\n{\n    eLevel = B_Level;\n    sData.data1 = 2000;\n    uData.id = sData.data1;\n    return (0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "struct S_Data // 遵循1\n{\n    int data1;\n    int data2;\n} sData;\n\nunion U_Data // 遵循2\n{\n    unsigned char cd[4];\n    int id;\n} uData;\n\nenum E_Level // 遵循3\n{\n    A_Level = 0,\n    B_Level,\n    C_Level,\n    D_Level\n} eLevel;\n\nint main(void)\n{\n    eLevel = B_Level;\n    sData.data1 = 2000;\n    uData.id = sData.data1;\n    return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/require-tag-name-for-struct-union-enum",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      }
+    ]
+  }
+}

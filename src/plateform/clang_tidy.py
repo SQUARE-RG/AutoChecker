@@ -6,6 +6,8 @@ from pathlib import Path
 import time
 import re
 
+from help.runtime_paths import runtime_temp_file
+
 #实现Checker的增删改查
 config = {}
 with open("/root/code_check/src/config.json", 'r') as f:
@@ -191,7 +193,11 @@ def run_Checker_with_Check_clang_tidy(
     所有参数均用绝对路径，不调用 os.chdir。
     """
     # include_dir = include_dir or "/root/cw-base/clang-tools-extra/test/clang-tidy/checkers/abseil"
-    log_name = log_name or f"{rule_name}-test.log"
+    if log_name is None:
+        log_name = runtime_temp_file("logs", f"{rule_name}-test.log")
+    else:
+        log_name = Path(log_name)
+        log_name.parent.mkdir(parents=True, exist_ok=True)
 
     cmd = [
         "python", script_path,
@@ -212,7 +218,7 @@ def run_Checker_with_Check_clang_tidy(
     full_output = proc.stdout
     # 同时打印 & 写日志
     
-    Path(log_name).write_text(full_output, encoding="utf-8")
+    log_name.write_text(full_output, encoding="utf-8")
     #成功就是返回码为0
     
     print("输出日志已保存到:", log_name)

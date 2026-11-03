@@ -11,6 +11,7 @@ import json
 from prompt.clang_tidy_prompt.build_prompt import get_prompt_pair
 from llm_interface.llm_provider import llm_client,llm_invoke,calculate_deepseek_cost
 from plateform.clang_tidy import compiler_clang_tidy,run_Checker_with_Check_clang_tidy, clean_compiler_output
+from help.runtime_paths import runtime_temp_file
 from entity.concreteProduct_Clang_Tidy import AbstractChecker, Checker_Clang_Tidy
 
 max_round = config['arguments']['max_round']
@@ -461,7 +462,10 @@ class Clang_tidy_CheckerGenerator(object):
             """每个用例独立 temp 文件，避免并发写冲突"""
             case_basename = os.path.splitext(os.path.basename(case.get_case_path()))[0]
             temp_file = f"{base_temp}tmp_{self.RULE.get_rule_name()}_{case_basename}"
-            log_file = f"{base_temp}tmp_{self.RULE.get_rule_name()}_{case_basename}.log"
+            log_file = runtime_temp_file(
+                "logs",
+                f"tmp_{self.RULE.get_rule_name()}_{case_basename}.log",
+            )
             _, warning_count = run_Checker_with_Check_clang_tidy(
                 test_case_path=case.get_case_path(),
                 rule_name=rule_name,

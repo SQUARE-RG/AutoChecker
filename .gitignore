@@ -29,9 +29,7 @@ src/embedding_db/
 logs/
 src/retriever/vector_db
 temp_validate/
-temp_test_dir/
 commit_to_test_cases/kparser/tree-sitter-cpp
-temp_test_dir
 result-generation/
 
 ## build目录
@@ -53,7 +51,7 @@ tmp/
 logs/
 result-generation/
 temp_validate/
-temp_test_dir/
+/temp_test_dir/
 *.log
 *.tmp
 

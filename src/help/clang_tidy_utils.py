@@ -12,6 +12,7 @@ from retriever.retrieve_from_astMatchers import get_related_astMatchers
 from retriever.retrieve_from_astMatchers_meta_op import get_related_astMatchers_meta_op
 from retriever.retrieve_from_check_op import get_related_check_op
 from retriever.retrieve_from_ast_api import get_related_ast_api
+from help.runtime_paths import runtime_temp_file
 # Clang tidy check name utils
 #只适用于clang tidy的checker生成过程
 def get_camel_name(check_name):
@@ -119,8 +120,9 @@ def get_Case_AST(case_path):
         if found_dash_line:
             output_lines.append(line)
 
-    # 仅保存最终清洗后的文件
-    with open("./selected_case_ast_cleaned1.txt","w",encoding='utf-8') as output_file:
+    # 仅保存最近一次清洗后的 AST，并与其他运行时临时产物统一管理。
+    ast_snapshot = runtime_temp_file("ast", "selected_case_ast_cleaned1.txt")
+    with ast_snapshot.open("w", encoding="utf-8") as output_file:
         output_file.writelines(output_lines)
 
     content = "".join(output_lines)
