@@ -1,10 +1,12 @@
-"""Structural and evidence-backed semantic validation for analysis output."""
+"""Deterministic validation and static evidence binding for Analysis V2."""
 import json
 import re
+import subprocess
 
-from pydantic import BaseModel, ValidationError
+from pydantic import ValidationError
 
-from .schemas import AnalysisBrief, REQUIRED_NONEMPTY, SPEC_SCHEMAS
+from .evidence_registry import location_key, raw_location
+from .schemas import AnalysisBrief, VulnerabilitySpec
 from autoql.timing import timed
 
 
@@ -24,122 +26,86 @@ def issue(path, code, message, expected=None, actual=None):
 
 
 def parse_json(text):
+    """Shared Query-Agent parser retained independently of the Analysis schema."""
     matches = re.findall(r'```json\s*([\s\S]*?)```', text)
     return json.loads(matches[-1] if matches else text.strip())
 
 
-def _raw(value):
-    return value.model_dump(exclude_none=True) if isinstance(value, BaseModel) else value
+def _parse(value):
+    try:
+        return value if isinstance(value, AnalysisBrief) else AnalysisBrief.model_validate(value)
+    except ValidationError as exc:
+        raise SpecValidationError([
+            issue('.'.join(str(part) for part in error['loc']) or '$', error['type'],
+                  error['msg'], actual=error.get('input'))
+            for error in exc.errors(include_url=False)
+        ]) from exc
+
+
+def _location_issues(brief):
+    problems = []
+    ids = [entry.id for entry in brief.evidence]
+    if any(not value.strip() for value in ids):
+        problems.append(issue('evidence', 'blank_id', 'Evidence IDs must not be blank'))
+    duplicates = sorted({value for value in ids if ids.count(value) > 1})
+    if duplicates:
+        problems.append(issue('evidence', 'duplicate_id', 'Evidence IDs must be unique', actual=duplicates))
+    keys = [location_key(entry) for entry in brief.evidence]
+    if len(set(keys)) != len(keys):
+        problems.append(issue('evidence', 'duplicate_location',
+                              'Evidence locations must not be repeated'))
+    if not any(entry.revision == 'buggy' for entry in brief.evidence):
+        problems.append(issue('evidence', 'missing_buggy_evidence',
+                              'At least one buggy evidence location is required'))
+    return problems
 
 
 def validate_brief(value, registry):
-    brief = value if isinstance(value, AnalysisBrief) else AnalysisBrief.model_validate(value)
-    if brief.status != 'finding':
-        return brief
-    problems = []
-    selected = set(brief.evidence_ids)
-    unknown = sorted(selected - set(registry.entries))
-    if unknown:
-        problems.append(issue('evidence_ids', 'unknown_evidence',
-            'Analysis brief references evidence that was not registered', actual=unknown))
-    for index, fact in enumerate(brief.key_facts):
-        missing = sorted(set(fact.evidence_ids) - selected)
-        if missing:
-            problems.append(issue(f'key_facts[{index}].evidence_ids', 'unselected_evidence',
-                'Key fact must cite evidence selected by the brief', actual=missing))
-    known = selected & set(registry.entries)
-    if known and not any(registry.entries[key]['revision'] == 'buggy' for key in known):
-        problems.append(issue('evidence_ids', 'missing_buggy_evidence',
-            'A finding needs buggy evidence for detection'))
+    """Validate explorer coordinates and materialize their immutable source text."""
+    brief = _parse(value)
+    problems = _location_issues(brief)
     if problems:
         raise SpecValidationError(problems)
+    try:
+        registry.materialize(brief.evidence)
+    except (KeyError, TypeError, UnicodeDecodeError, ValueError,
+            OSError, subprocess.CalledProcessError) as exc:
+        raise SpecValidationError([
+            issue('evidence', 'invalid_source_location', str(exc))
+        ]) from exc
     return brief
 
 
-def validate_structure(value):
-    raw = _raw(value)
-    if not isinstance(raw, dict):
-        raise SpecValidationError([issue('$', 'invalid_type', 'Spec must be an object')])
-    kind = raw.get('analysis_kind')
-    schema = SPEC_SCHEMAS.get(kind)
-    if schema is None:
-        raise SpecValidationError([issue('analysis_kind', 'invalid_enum',
-            'Unknown analysis kind', expected=sorted(SPEC_SCHEMAS), actual=kind)])
-    try:
-        return schema.model_validate(raw)
-    except ValidationError as exc:
-        problems = []
-        for error in exc.errors(include_url=False):
-            path = '.'.join(str(part) for part in error['loc']) or '$'
-            problems.append(issue(path, error['type'], error['msg'], actual=error.get('input')))
-        raise SpecValidationError(problems) from exc
-
-
-def _semantic_entries(value, path='$'):
-    if isinstance(value, dict):
-        if 'description' in value:
-            yield path, value
-        for key, child in value.items():
-            if key not in ('api', 'evidence_ids'):
-                yield from _semantic_entries(child, f'{path}.{key}')
-    elif isinstance(value, list):
-        for index, child in enumerate(value):
-            yield from _semantic_entries(child, f'{path}[{index}]')
+def enriched_brief(brief, registry):
+    return {
+        'vulnerability_summary': brief.vulnerability_summary,
+        'evidence': [registry.entries[entry.id] for entry in brief.evidence],
+    }
 
 
 @timed('analysis.spec_validation')
-def finalize(value, registry):
-    raw = _raw(value)
-    if isinstance(raw, dict) and raw.get('status') in (
-        'no_security_finding', 'needs_evidence', 'unsupported'
-    ):
-        if not raw.get('reason'):
-            raise SpecValidationError([issue('reason', 'missing', 'Terminal status needs a reason')])
-        return raw
-
-    parsed = validate_structure(raw)
-    raw = parsed.model_dump(exclude_none=True)
-    kind, model = raw['analysis_kind'], raw['model']
-    selected = raw['evidence_ids']
-    selected_set = set(selected)
-    problems = []
-
-    unknown = sorted(selected_set - set(registry.entries))
-    if unknown:
-        problems.append(issue('evidence_ids', 'unknown_evidence',
-            'Use registered evidence IDs only', actual=unknown))
-
-    for key in REQUIRED_NONEMPTY[kind]:
-        if not model[key]:
-            problems.append(issue(f'model.{key}', 'empty_required_field',
-                'Required detection condition must not be empty'))
-
-    if kind == 'stateful_protocol' and not (
-        model['invalid_sequences'] or model['terminal_effects']
-    ):
-        problems.append(issue('model', 'missing_protocol_failure',
-            'Stateful protocol needs invalid_sequences or terminal_effects'))
-
-    for path, entry in _semantic_entries(model, 'model'):
-        citations = set(entry['evidence_ids'])
-        missing = sorted(citations - selected_set)
-        if missing:
-            problems.append(issue(path + '.evidence_ids', 'unselected_evidence',
-                'Semantic entry must cite evidence selected by the spec', actual=missing))
-        for field in ('expression', 'pattern'):
-            if re.search(r'\bexists\s*\([^)]*\|', str(entry.get(field, ''))):
-                problems.append(issue(path + '.' + field, 'generated_ql',
-                    'Analysis model must not contain generated QL'))
-
-    known = selected_set & set(registry.entries)
-    if known and not any(registry.entries[key]['revision'] == 'buggy' for key in known):
-        problems.append(issue('evidence_ids', 'missing_buggy_evidence',
-            'Spec needs buggy evidence for detection'))
-
+def finalize(value, original_brief, registry):
+    """Accept only composer-selected original locations and reattach canonical code."""
+    composed = _parse(value)
+    problems = _location_issues(composed)
+    allowed = {location_key(entry) for entry in original_brief.evidence}
+    for index, entry in enumerate(composed.evidence):
+        if location_key(entry) not in allowed:
+            problems.append(issue(f'evidence[{index}]', 'altered_or_new_evidence',
+                                  'Composer must use an unchanged AnalysisBrief evidence location'))
     if problems:
         raise SpecValidationError(problems)
 
-    result = dict(raw)
-    result.pop('evidence_ids')
-    result['evidence'] = [registry.entries[key] for key in dict.fromkeys(selected)]
-    return result
+    evidence = []
+    for entry in composed.evidence:
+        canonical = registry.entries.get(entry.id)
+        if canonical is None or location_key(canonical) != location_key(entry):
+            raise SpecValidationError([
+                issue('evidence', 'missing_canonical_evidence',
+                      'Composer evidence has no matching statically extracted source')
+            ])
+        evidence.append(canonical)
+    return VulnerabilitySpec.model_validate({
+        'vulnerability_summary': composed.vulnerability_summary,
+        'evidence': evidence,
+    }).model_dump()

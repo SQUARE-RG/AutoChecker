@@ -32,16 +32,28 @@ class EvidenceTests(unittest.TestCase):
         self.temp.cleanup()
 
     def test_coordinates_and_repetition(self):
-        result = self.registry.capture('buggy', 'a.java', 'unique\r\n')['evidence']
+        result, last = self.registry.materialize([
+            {'id': 'E1', 'revision': 'buggy', 'file': 'a.java',
+             'start_line': 3, 'end_line': 3},
+            {'id': 'E2', 'revision': 'buggy', 'file': 'a.java',
+             'start_line': 5, 'end_line': 5},
+        ])
         self.assertEqual((result['start_line'], result['end_line']), (3, 3))
         self.assertEqual(result['code'], 'unique\r\n')
-        self.assertEqual(self.registry.capture('buggy', 'a.java', 'unique')['evidence']['id'], result['id'])
-        self.assertEqual(self.registry.capture('buggy', 'a.java', 'repeat')['error'], 'AMBIGUOUS')
-        self.assertEqual(self.registry.capture('buggy', 'a.java', 'last')['evidence']['end_line'], 5)
+        self.assertEqual(last['code'], 'last')
 
     def test_fail_closed(self):
-        for revision, path, snippet in [('parent', 'a.java', 'first'), ('buggy', '../a.java', 'first'), ('buggy', 'a.java', ''), ('buggy', 'a.java', '+unique')]:
-            self.assertFalse(self.registry.capture(revision, path, snippet)['ok'])
+        invalid = [
+            {'id': 'E1', 'revision': 'parent', 'file': 'a.java',
+             'start_line': 1, 'end_line': 1},
+            {'id': 'E1', 'revision': 'buggy', 'file': '../a.java',
+             'start_line': 1, 'end_line': 1},
+            {'id': 'E1', 'revision': 'buggy', 'file': 'a.java',
+             'start_line': 9, 'end_line': 9},
+        ]
+        for location in invalid:
+            with self.assertRaises((KeyError, ValueError)):
+                self.registry.materialize([location])
 
 
 class EvaluationTests(unittest.TestCase):
@@ -113,6 +125,39 @@ class InputTemplateTests(unittest.TestCase):
                 with self.assertRaises(UnsupportedInput):
                     load_task(commit, root, root / 'run')
                 self.assertFalse((root / 'run').exists())
+
+    def test_analysis_task_loading_does_not_require_databases(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            dataset = root / 'autoql_data'
+            repo = root / 'cves' / 'CVE-2022-25842' / 'example'
+            dataset.mkdir()
+            repo.mkdir(parents=True)
+
+            def git(*args):
+                return subprocess.check_output(
+                    ['git', '-C', str(repo), *args], text=True).strip()
+
+            git('init', '-q')
+            git('config', 'user.email', 'tests@example.invalid')
+            git('config', 'user.name', 'Tests')
+            (repo / 'A.java').write_text('class A { void unsafe() {} }\n')
+            git('add', 'A.java')
+            git('commit', '-qm', 'buggy')
+            buggy = git('rev-parse', 'HEAD')
+            (repo / 'A.java').write_text('class A {}\n')
+            git('commit', '-qam', 'fix')
+            fixed = git('rev-parse', 'HEAD')
+            (dataset / 'project_info.csv').write_text(
+                'cve_id,github_repository_name,buggy_commit_id,fix_commit_ids\n'
+                f'CVE-2022-25842,example,{buggy},{fixed}\n')
+
+            task = load_task(None, root, root / 'run', dataset,
+                             cve='CVE-2022-25842')
+            self.assertEqual(task.fix_commit, fixed)
+            self.assertFalse(Path(task.buggy_db_path).exists())
+            self.assertFalse(Path(task.fixed_db_path).exists())
+            self.assertFalse((root / 'run' / 'vuln_spec.json').exists())
 
     def test_templates(self):
         for kind in supported_analysis_kinds():

@@ -1,4 +1,4 @@
-"""The model selects text; immutable Git blobs determine all coordinates."""
+"""Materialize model-selected source coordinates from immutable Git blobs."""
 from pathlib import Path
 import hashlib
 import json
@@ -7,6 +7,17 @@ import threading
 from autoql.runtime import write_json
 from autoql.task_loader import blob, safe_relative
 from autoql.timing import timed
+
+
+def raw_location(value):
+    if hasattr(value, 'model_dump'):
+        value = value.model_dump()
+    return {key: value[key] for key in ('id', 'revision', 'file', 'start_line', 'end_line')}
+
+
+def location_key(value):
+    value = raw_location(value)
+    return tuple(value[key] for key in ('id', 'revision', 'file', 'start_line', 'end_line'))
 
 
 class EvidenceRegistry:
@@ -20,47 +31,41 @@ class EvidenceRegistry:
             if path.exists():
                 setattr(self, attr, json.loads(path.read_text()))
 
-    @timed('analysis.capture_evidence')
-    def capture(self, revision: str, file: str, snippet: str) -> dict:
-        with self.lock:
-            return self._capture(revision, file, snippet)
-
-    def _capture(self, revision: str, file: str, snippet: str) -> dict:
+    def _extract(self, location):
+        location = raw_location(location)
+        revision = location['revision']
         if revision not in ('buggy', 'fix'):
-            return {'ok': False, 'error': 'INVALID_REVISION'}
-        if not snippet or not snippet.strip():
-            return {'ok': False, 'error': 'EMPTY_SNIPPET'}
-        try:
-            file = safe_relative(file)
-            sha = self.task.buggy_commit if revision == 'buggy' else self.task.fix_commit
-            raw = blob(Path(self.task.repo_path), sha, file)
-            text = raw.decode('utf-8')
-        except Exception:
-            return {'ok': False, 'error': 'FILE_UNAVAILABLE_OR_UNSUPPORTED_ENCODING'}
-        positions = []
-        start = 0
-        while (start := text.find(snippet, start)) >= 0:
-            positions.append(start)
-            start += 1
-        if not positions:
-            return {'ok': False, 'error': 'NOT_FOUND', 'hint': 'Copy original text, without display line numbers.'}
-        if len(positions) != 1:
-            return {'ok': False, 'error': 'AMBIGUOUS',
-                    'candidate_lines': [text.count('\n', 0, p) + 1 for p in positions[:20]]}
-        start = positions[0]
-        end = start + len(snippet.rstrip('\r\n'))
-        first = text.rfind('\n', 0, start) + 1
-        last = text.find('\n', end)
-        last = len(text) if last < 0 else last + 1
-        entry = {'revision': revision, 'file': file, 'start_line': text.count('\n', 0, first) + 1,
-                 'end_line': text.count('\n', 0, end) + 1, 'code': text[first:last]}
-        for existing in self.entries.values():
-            if all(existing[k] == v for k, v in entry.items()):
-                return {'ok': True, 'evidence': existing}
-        key = 'E' + str(len(self.entries) + 1)
-        entry = {'id': key, **entry}
-        self.entries[key] = entry
-        self.blobs[key] = {'commit': sha, 'sha256': hashlib.sha256(raw).hexdigest()}
-        write_json(Path(self.task.output_dir) / 'evidence_registry.json', self.entries)
-        write_json(Path(self.task.output_dir) / 'evidence_blobs.json', self.blobs)
-        return {'ok': True, 'evidence': entry}
+            raise ValueError('Evidence revision must be buggy or fix')
+        file = safe_relative(location['file'])
+        start, end = location['start_line'], location['end_line']
+        if start < 1 or end < start:
+            raise ValueError('Invalid evidence line range')
+
+        sha = self.task.buggy_commit if revision == 'buggy' else self.task.fix_commit
+        raw = blob(Path(self.task.repo_path), sha, file)
+        text = raw.decode('utf-8')
+        lines = text.splitlines(keepends=True)
+        if end > len(lines):
+            raise ValueError(
+                f"Evidence range {start}-{end} exceeds {file} line count {len(lines)}")
+        code = ''.join(lines[start - 1:end])
+        if not code:
+            raise ValueError('Evidence range produced empty source text')
+        entry = {**location, 'file': file, 'code': code}
+        return entry, {'commit': sha, 'sha256': hashlib.sha256(raw).hexdigest()}
+
+    @timed('analysis.extract_evidence')
+    def materialize(self, locations):
+        """Replace the registry only after every selected location is valid."""
+        with self.lock:
+            entries, blobs = {}, {}
+            for location in locations:
+                entry, metadata = self._extract(location)
+                if entry['id'] in entries:
+                    raise ValueError('Duplicate evidence id: ' + entry['id'])
+                entries[entry['id']] = entry
+                blobs[entry['id']] = metadata
+            self.entries, self.blobs = entries, blobs
+            write_json(Path(self.task.output_dir) / 'evidence_registry.json', entries)
+            write_json(Path(self.task.output_dir) / 'evidence_blobs.json', blobs)
+            return [entries[raw_location(location)['id']] for location in locations]

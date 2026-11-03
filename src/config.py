@@ -37,7 +37,7 @@ CVES_PATH = f"{VULNSYNTH_ROOT_DIR}/cves"
 LOGS_DIR = f"{VULNSYNTH_ROOT_DIR}/logs"
 
 
-
+NVD_CACHE="nist_cve_cache"
 
 CODEQL_HOME = os.environ.get("CODEQL_HOME")
 CODEQL_PATH = os.environ.get("CODEQL_PATH", f"{CODEQL_HOME}/codeql")

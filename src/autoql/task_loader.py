@@ -8,8 +8,6 @@ from pathlib import Path, PurePosixPath
 import re
 import subprocess
 
-import yaml
-
 from .runtime import command, write_json, write_text
 from .timing import timed
 
@@ -128,13 +126,11 @@ def load_task(commit: str | None, root: Path, output: Path,
             raise UnsupportedInput(f"No fix commit is declared for {row['cve_id']}")
         requested_commit = latest_fix_commit(repo, fix_commits)
     fixed = git(repo, 'rev-parse', requested_commit + '^{commit}').strip()
+    # Analysis only needs the repository revisions. Keep the conventional
+    # database paths in the task manifest so full/query mode can validate and
+    # consume them later, but do not touch the databases while preparing an
+    # analysis task.
     dbs = [case_dir / (row['cve_id'] + suffix) for suffix in ('-vul', '-fix')]
-    for db, sha in zip(dbs, (buggy, fixed)):
-        meta = yaml.safe_load((db / 'codeql-database.yml').read_text())
-        if meta.get('creationMetadata', {}).get('sha') != sha or not meta.get('finalised'):
-            raise ValueError('Database revision/finalization mismatch: ' + str(db))
-        if meta.get('primaryLanguage') != 'java':
-            raise ValueError('First release supports Java databases only')
 
     output = output.resolve()
     output.mkdir(parents=True, exist_ok=False)
@@ -145,7 +141,6 @@ def load_task(commit: str | None, root: Path, output: Path,
     message = git(repo, 'show', '-s', '--format=%B', fixed).strip()
     diff_path = workspace / 'input' / 'patch.diff'
     write_text(diff_path, diff)
-    write_text(workspace / 'input' / 'fix_commit_message.txt', message)
     (workspace / 'work').mkdir(parents=True)
     task = PatchTask('patch-' + fixed[:12], 'java', str(repo), buggy, fixed, message,
                      str(diff_path), str(dbs[0]), str(dbs[1]), str(output), str(workspace),
