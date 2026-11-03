@@ -1,0 +1,206 @@
+{
+    "data": {
+        "ucassaat": [
+            {
+                "rule_id": "R-1-1-3",
+                "main_title": "no-typedef-redefinition",
+                "description": "用typedef自定义的类型禁止被重新定义。",
+                "rule_type": "required",
+                "source_chunks": [
+                    "chunk-0001"
+                ],
+                "examples": [
+                    {
+                        "type": "violation",
+                        "code": "typedef int mytype;\n\nint main(void)\n{\n    typedef float mytype; // 违背1\n    mytype x = 1.0;\n    return (0);\n}"
+                    }
+                ],
+                "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-typedef-redefinition",
+                "negative_case_amount": 10,
+                "positive_case_amount": 10,
+                "category": "ucassaat",
+                "issuccess": "True",
+                "performance": "20/20",
+                "success_case_list": [
+                    "/root/code_check/experiment/gjb8114-all/test_cases/no-typedef-redefinition/negative_05.cpp",
+                    "/root/code_check/experiment/gjb8114-all/test_cases/no-typedef-redefinition/negative_10.cpp",
+                    "/root/code_check/experiment/gjb8114-all/test_cases/no-typedef-redefinition/negative_03.cpp",
+                    "/root/code_check/experiment/gjb8114-all/test_cases/no-typedef-redefinition/positive_06.cpp",
+                    "/root/code_check/experiment/gjb8114-all/test_cases/no-typedef-redefinition/positive_08.cpp",
+                    "/root/code_check/experiment/gjb8114-all/test_cases/no-typedef-redefinition/positive_01.cpp",
+                    "/root/code_check/experiment/gjb8114-all/test_cases/no-typedef-redefinition/negative_06.cpp",
+                    "/root/code_check/experiment/gjb8114-all/test_cases/no-typedef-redefinition/positive_07.cpp",
+                    "/root/code_check/experiment/gjb8114-all/test_cases/no-typedef-redefinition/negative_02.cpp",
+                    "/root/code_check/experiment/gjb8114-all/test_cases/no-typedef-redefinition/positive_03.cpp",
+                    "/root/code_check/experiment/gjb8114-all/test_cases/no-typedef-redefinition/negative_07.cpp",
+                    "/root/code_check/experiment/gjb8114-all/test_cases/no-typedef-redefinition/positive_09.cpp",
+                    "/root/code_check/experiment/gjb8114-all/test_cases/no-typedef-redefinition/positive_04.cpp",
+                    "/root/code_check/experiment/gjb8114-all/test_cases/no-typedef-redefinition/positive_02.cpp",
+                    "/root/code_check/experiment/gjb8114-all/test_cases/no-typedef-redefinition/negative_09.cpp",
+                    "/root/code_check/experiment/gjb8114-all/test_cases/no-typedef-redefinition/negative_04.cpp",
+                    "/root/code_check/experiment/gjb8114-all/test_cases/no-typedef-redefinition/negative_01.cpp",
+                    "/root/code_check/experiment/gjb8114-all/test_cases/no-typedef-redefinition/positive_05.cpp",
+                    "/root/code_check/experiment/gjb8114-all/test_cases/no-typedef-redefinition/negative_08.cpp",
+                    "/root/code_check/experiment/gjb8114-all/test_cases/no-typedef-redefinition/positive_10.cpp"
+                ],
+                "failed_case_list": [],
+                "negative_case_analysis": {
+                    "check_success_negative": 10,
+                    "check_failed_negative": 0
+                },
+                "usage": {
+                    "rule_name": "no-typedef-redefinition",
+                    "llm_calls": 8,
+                    "prompt_tokens": 33808,
+                    "completion_tokens": 85179,
+                    "cached_tokens": 0,
+                    "total_tokens": 118987,
+                    "total_cost": 0.749048,
+                    "cost_breakdown": {
+                        "input_cost": 0.067616,
+                        "output_cost": 0.681432
+                    },
+                    "calls": [
+                        {
+                            "call_index": 1,
+                            "label": "logic-neg-attempt1",
+                            "model": "deepseek-v4.1-flash-ark-eco",
+                            "prompt_tokens": 1793,
+                            "completion_tokens": 6754,
+                            "cached_tokens": 0,
+                            "reasoning_tokens": 6129,
+                            "total_tokens": 8547,
+                            "total_cost": 0.057617999999999996,
+                            "pricing_source": "deepseek_table",
+                            "currency": "CNY",
+                            "cost_breakdown": {
+                                "input_cost": 0.003586,
+                                "output_cost": 0.054032
+                            }
+                        },
+                        {
+                            "call_index": 2,
+                            "label": "gen-checker-attempt1",
+                            "model": "deepseek-v4.1-flash-ark-eco",
+                            "prompt_tokens": 3246,
+                            "completion_tokens": 10013,
+                            "cached_tokens": 0,
+                            "reasoning_tokens": 8944,
+                            "total_tokens": 13259,
+                            "total_cost": 0.08659599999999999,
+                            "pricing_source": "deepseek_table",
+                            "currency": "CNY",
+                            "cost_breakdown": {
+                                "input_cost": 0.006492,
+                                "output_cost": 0.080104
+                            }
+                        },
+                        {
+                            "call_index": 3,
+                            "label": "analyze-error-attempt1",
+                            "model": "deepseek-v4.1-flash-ark-eco",
+                            "prompt_tokens": 1640,
+                            "completion_tokens": 3029,
+                            "cached_tokens": 0,
+                            "reasoning_tokens": 2593,
+                            "total_tokens": 4669,
+                            "total_cost": 0.027512,
+                            "pricing_source": "deepseek_table",
+                            "currency": "CNY",
+                            "cost_breakdown": {
+                                "input_cost": 0.00328,
+                                "output_cost": 0.024232
+                            }
+                        },
+                        {
+                            "call_index": 4,
+                            "label": "gen-with-query-attempt1",
+                            "model": "deepseek-v4.1-flash-ark-eco",
+                            "prompt_tokens": 2637,
+                            "completion_tokens": 2063,
+                            "cached_tokens": 0,
+                            "reasoning_tokens": 992,
+                            "total_tokens": 4700,
+                            "total_cost": 0.021778000000000002,
+                            "pricing_source": "deepseek_table",
+                            "currency": "CNY",
+                            "cost_breakdown": {
+                                "input_cost": 0.005274,
+                                "output_cost": 0.016504
+                            }
+                        },
+                        {
+                            "call_index": 5,
+                            "label": "aug-logic-neg-attempt1",
+                            "model": "deepseek-v4.1-flash-ark-eco",
+                            "prompt_tokens": 2269,
+                            "completion_tokens": 20357,
+                            "cached_tokens": 0,
+                            "reasoning_tokens": 19835,
+                            "total_tokens": 22626,
+                            "total_cost": 0.167394,
+                            "pricing_source": "deepseek_table",
+                            "currency": "CNY",
+                            "cost_breakdown": {
+                                "input_cost": 0.004538,
+                                "output_cost": 0.162856
+                            }
+                        },
+                        {
+                            "call_index": 6,
+                            "label": "gen-with-query-attempt1",
+                            "model": "deepseek-v4.1-flash-ark-eco",
+                            "prompt_tokens": 6763,
+                            "completion_tokens": 33790,
+                            "cached_tokens": 0,
+                            "reasoning_tokens": 30750,
+                            "total_tokens": 40553,
+                            "total_cost": 0.283846,
+                            "pricing_source": "deepseek_table",
+                            "currency": "CNY",
+                            "cost_breakdown": {
+                                "input_cost": 0.013526,
+                                "output_cost": 0.27032
+                            }
+                        },
+                        {
+                            "call_index": 7,
+                            "label": "analyze-error-attempt1",
+                            "model": "deepseek-v4.1-flash-ark-eco",
+                            "prompt_tokens": 7215,
+                            "completion_tokens": 4884,
+                            "cached_tokens": 0,
+                            "reasoning_tokens": 4452,
+                            "total_tokens": 12099,
+                            "total_cost": 0.053502,
+                            "pricing_source": "deepseek_table",
+                            "currency": "CNY",
+                            "cost_breakdown": {
+                                "input_cost": 0.01443,
+                                "output_cost": 0.039072
+                            }
+                        },
+                        {
+                            "call_index": 8,
+                            "label": "gen-with-query-attempt1",
+                            "model": "deepseek-v4.1-flash-ark-eco",
+                            "prompt_tokens": 8245,
+                            "completion_tokens": 4289,
+                            "cached_tokens": 0,
+                            "reasoning_tokens": 1387,
+                            "total_tokens": 12534,
+                            "total_cost": 0.050802,
+                            "pricing_source": "deepseek_table",
+                            "currency": "CNY",
+                            "cost_breakdown": {
+                                "input_cost": 0.01649,
+                                "output_cost": 0.034312
+                            }
+                        }
+                    ]
+                },
+                "time": "1365.81"
+            }
+        ]
+    }
+}

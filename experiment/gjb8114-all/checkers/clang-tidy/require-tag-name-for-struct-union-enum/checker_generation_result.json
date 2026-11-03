@@ -1,0 +1,108 @@
+{
+    "data": {
+        "ucassaat": [
+            {
+                "rule_id": "R-1-1-8",
+                "main_title": "require-tag-name-for-struct-union-enum",
+                "description": "结构、联合、枚举的定义中必须定义标识名。",
+                "rule_type": "required",
+                "source_chunks": [
+                    "chunk-0001"
+                ],
+                "examples": [
+                    {
+                        "type": "violation",
+                        "code": "struct // 违背1\n{\n    int data1;\n    int data2;\n} sData;\n\nunion // 违背2\n{\n    unsigned char cd[4];\n    int id;\n} uData;\n\nenum // 违背3\n{\n    A_Level = 0,\n    B_Level,\n    C_Level,\n    D_Level\n} eLevel;\n\nint main(void)\n{\n    eLevel = B_Level;\n    sData.data1 = 2000;\n    uData.id = sData.data1;\n    return (0);\n}"
+                    },
+                    {
+                        "type": "compliant",
+                        "code": "struct S_Data // 遵循1\n{\n    int data1;\n    int data2;\n} sData;\n\nunion U_Data // 遵循2\n{\n    unsigned char cd[4];\n    int id;\n} uData;\n\nenum E_Level // 遵循3\n{\n    A_Level = 0,\n    B_Level,\n    C_Level,\n    D_Level\n} eLevel;\n\nint main(void)\n{\n    eLevel = B_Level;\n    sData.data1 = 2000;\n    uData.id = sData.data1;\n    return (0);\n}"
+                    }
+                ],
+                "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/require-tag-name-for-struct-union-enum",
+                "negative_case_amount": 10,
+                "positive_case_amount": 10,
+                "category": "ucassaat",
+                "issuccess": "True",
+                "performance": "20/20",
+                "success_case_list": [
+                    "/root/code_check/experiment/gjb8114-all/test_cases/require-tag-name-for-struct-union-enum/positive_06.cpp",
+                    "/root/code_check/experiment/gjb8114-all/test_cases/require-tag-name-for-struct-union-enum/negative_10.cpp",
+                    "/root/code_check/experiment/gjb8114-all/test_cases/require-tag-name-for-struct-union-enum/negative_03.cpp",
+                    "/root/code_check/experiment/gjb8114-all/test_cases/require-tag-name-for-struct-union-enum/negative_05.cpp",
+                    "/root/code_check/experiment/gjb8114-all/test_cases/require-tag-name-for-struct-union-enum/negative_06.cpp",
+                    "/root/code_check/experiment/gjb8114-all/test_cases/require-tag-name-for-struct-union-enum/positive_01.cpp",
+                    "/root/code_check/experiment/gjb8114-all/test_cases/require-tag-name-for-struct-union-enum/positive_08.cpp",
+                    "/root/code_check/experiment/gjb8114-all/test_cases/require-tag-name-for-struct-union-enum/positive_07.cpp",
+                    "/root/code_check/experiment/gjb8114-all/test_cases/require-tag-name-for-struct-union-enum/negative_07.cpp",
+                    "/root/code_check/experiment/gjb8114-all/test_cases/require-tag-name-for-struct-union-enum/positive_03.cpp",
+                    "/root/code_check/experiment/gjb8114-all/test_cases/require-tag-name-for-struct-union-enum/positive_09.cpp",
+                    "/root/code_check/experiment/gjb8114-all/test_cases/require-tag-name-for-struct-union-enum/negative_02.cpp",
+                    "/root/code_check/experiment/gjb8114-all/test_cases/require-tag-name-for-struct-union-enum/positive_04.cpp",
+                    "/root/code_check/experiment/gjb8114-all/test_cases/require-tag-name-for-struct-union-enum/negative_09.cpp",
+                    "/root/code_check/experiment/gjb8114-all/test_cases/require-tag-name-for-struct-union-enum/negative_04.cpp",
+                    "/root/code_check/experiment/gjb8114-all/test_cases/require-tag-name-for-struct-union-enum/positive_02.cpp",
+                    "/root/code_check/experiment/gjb8114-all/test_cases/require-tag-name-for-struct-union-enum/positive_05.cpp",
+                    "/root/code_check/experiment/gjb8114-all/test_cases/require-tag-name-for-struct-union-enum/positive_10.cpp",
+                    "/root/code_check/experiment/gjb8114-all/test_cases/require-tag-name-for-struct-union-enum/negative_01.cpp",
+                    "/root/code_check/experiment/gjb8114-all/test_cases/require-tag-name-for-struct-union-enum/negative_08.cpp"
+                ],
+                "failed_case_list": [],
+                "negative_case_analysis": {
+                    "check_success_negative": 10,
+                    "check_failed_negative": 0
+                },
+                "usage": {
+                    "rule_name": "require-tag-name-for-struct-union-enum",
+                    "llm_calls": 2,
+                    "prompt_tokens": 5972,
+                    "completion_tokens": 10570,
+                    "cached_tokens": 0,
+                    "total_tokens": 16542,
+                    "total_cost": 0.09650399999999999,
+                    "cost_breakdown": {
+                        "input_cost": 0.011944,
+                        "output_cost": 0.08456
+                    },
+                    "calls": [
+                        {
+                            "call_index": 1,
+                            "label": "logic-neg-attempt1",
+                            "model": "deepseek-v4.1-flash-ark-eco",
+                            "prompt_tokens": 1773,
+                            "completion_tokens": 3730,
+                            "cached_tokens": 0,
+                            "reasoning_tokens": 3329,
+                            "total_tokens": 5503,
+                            "total_cost": 0.033386,
+                            "pricing_source": "deepseek_table",
+                            "currency": "CNY",
+                            "cost_breakdown": {
+                                "input_cost": 0.003546,
+                                "output_cost": 0.02984
+                            }
+                        },
+                        {
+                            "call_index": 2,
+                            "label": "gen-checker-attempt1",
+                            "model": "deepseek-v4.1-flash-ark-eco",
+                            "prompt_tokens": 4199,
+                            "completion_tokens": 6840,
+                            "cached_tokens": 0,
+                            "reasoning_tokens": 6051,
+                            "total_tokens": 11039,
+                            "total_cost": 0.063118,
+                            "pricing_source": "deepseek_table",
+                            "currency": "CNY",
+                            "cost_breakdown": {
+                                "input_cost": 0.008398,
+                                "output_cost": 0.05472
+                            }
+                        }
+                    ]
+                },
+                "time": "172.09"
+            }
+        ]
+    }
+}
