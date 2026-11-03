@@ -1,0 +1,8 @@
+int main()
+{
+    int value = 1;
+    switch (value)
+    {
+    }
+    return value;
+}

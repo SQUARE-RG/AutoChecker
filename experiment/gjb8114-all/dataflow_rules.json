@@ -1,0 +1,589 @@
+{
+  "data": {
+    "ucassaat": [
+      {
+        "rule_id": "R-1-3-5",
+        "main_title": "prohibit-use-or-free-unallocated-or-freed-pointer",
+        "description": "禁止使用或释放未分配空间或已被释放的指针。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0002"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include<stdlib.h>\n#include<malloc.h>\nint main(void)\n{\n    int *x=NULL;\n    int *y=(int *)malloc(sizeof(int));\n    *x=1; //违背1\n    free(x); //违背2\n    free(y);\n    free(y); //违背3\n    return(0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include<stdlib.h>\n#include<malloc.h>\nint main(void)\n{\n    int *x=(int *)malloc(sizeof(int));\n    int *y=(int *)malloc(sizeof(int));\n    if((NULL!=x)&&(NULL!=y))\n    {\n        *x=1; //遵循1\n        free(x); //遵循2\n        free(y); //遵循3\n    }\n    else\n    {\n        //...\n    }\n    return(0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/prohibit-use-or-free-unallocated-or-freed-pointer",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-3-6",
+        "main_title": "set-freed-pointer-null",
+        "description": "指针变量被释放后必须置为NULL。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0002"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include<stdlib.h>\n#include<malloc.h>\nint main(void)\n{\n    int *x=(int *)malloc(sizeof(int));\n    if(NULL!=x)\n    {\n        *x=1;\n        //...\n        free(x); //违背1\n    }\n    else\n    {\n        return(-1);\n    }\n    //...\n    return(0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include<stdlib.h>\n#include<malloc.h>\nint main(void)\n{\n    int *x=(int *)malloc(sizeof(int));\n    if(NULL!=x)\n    {\n        *x=1;\n        //...\n        free(x);\n        x=NULL; //遵循1\n    }\n    else\n    {\n        return(-1);\n    }\n    //...\n    return(0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/set-freed-pointer-null",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-3-8",
+        "main_title": "check-dynamic-pointer-null-before-first-use",
+        "description": "动态分配的指针变量第一次使用前必须进行是否为NULL的判别。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0002"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include<malloc.h>\nint main(void)\n{\n    int *x=(int *)malloc(sizeof(int));\n    *x=1; //违背1\n    return(0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include<stdlib.h>\n#include<malloc.h>\nint main(void)\n{\n    int *x=(int *)malloc(sizeof(int));\n    if(NULL!=x) //遵循1\n    {\n        *x=1;\n    }\n    else\n    {\n        return(-1);\n    }\n    return(0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/check-dynamic-pointer-null-before-first-use",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-3-10",
+        "main_title": "close-file-pointers-on-exit",
+        "description": "禁止文件指针在退出时没有关闭文件。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0002"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include<stdio.h>\nint fr(void);\nint main(void)\n{\n    int ret;\n    ret=fr();\n    //...\n    return(0);\n}\nint fr(void)\n{\n    FILE *stream=NULL;\n    char s[100];\n    int n;\n    if(NULL==(stream=fopen(\"data\",\"r\")))\n    {\n        printf(\"The file 'data' was not opened\\n\");\n        return(-1);\n    }\n    else\n    {\n        printf(\"The file 'data' was opened\\n\");\n        n=fscanf(stream,\"%s\",s);\n        //...\n        return(0); //违背1\n    }\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include<stdio.h>\nint fr(void);\nint main(void)\n{\n    int ret;\n    ret=fr();\n    //...\n    return(0);\n}\nint fr(void)\n{\n    FILE *stream=NULL;\n    char s[100];\n    int n;\n    if(NULL==(stream=fopen(\"data\",\"r\")))\n    {\n        printf(\"The file 'data' was not opened\\n\");\n        return(-1);\n    }\n    else\n    {\n        printf(\"The file 'data' was opened\\n\");\n        n=fscanf(stream,\"%s\",s);\n        //...\n        fclose(stream); //遵循1\n        return(0);\n    }\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/close-file-pointers-on-exit",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-6-6",
+        "main_title": "prohibit-shift-beyond-variable-width",
+        "description": "对变量进行移位运算禁止超出变量长度。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0002"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n    unsigned int x,y,z;\n    x=0x00000001;\n    y=x<<33; //违背1\n    x=0x80000000;\n    z=x>>33; //违背2\n    return(0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "int main(void)\n{\n    unsigned int x,y,z;\n    x=0x00000001;\n    y=x<<1; //遵循1\n    x=0x80000000;\n    z=x>>1; //遵循2\n    return(0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/prohibit-shift-beyond-variable-width",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-6-7",
+        "main_title": "prohibit-negative-shift-count",
+        "description": "禁止移位操作中的移位数为负数。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0002"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n    unsigned int xdata=2,ydata=3;\n    int sn=-2;\n    xdata=xdata<<-1; //违背1\n    ydata=ydata>>sn; //违背2\n    return(0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/prohibit-negative-shift-count",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-6-8",
+        "main_title": "prohibit-array-out-of-bounds",
+        "description": "数组禁止越界使用。注：对经过复杂运算所得出的数组下标，在使用时无法断言一定不会越界的情况下，应对数组下标进行范围判断。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0002"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "void comp(int a[],int n) //n为数组长度\n{\n    int i;\n    for(i=0;i<=n;i++) //违背1\n    {\n        a[i]=0;\n    }\n}\nint main(void)\n{\n    int array[100];\n    comp(array,100);\n    array[100]=1; //违背2\n    return(0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "void comp(int a[],int n) //n为数组长度\n{\n    int i;\n    for(i=0;i<n;i++) //遵循1\n    {\n        a[i]=0;\n    }\n}\nint main(void)\n{\n    int array[100];\n    comp(array,100);\n    array[99]=1; //遵循2\n    return(0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/prohibit-array-out-of-bounds",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-6-9",
+        "main_title": "array-index-nonnegative-integer",
+        "description": "数组下标必须是大于等于零的整型数。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0002",
+          "chunk-0003"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n    int Data[3]={0,0,0};\n    int i=-1;\n    Data[i]=1; //违背1\n    return(0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/array-index-nonnegative-integer",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-6-12",
+        "main_title": "no-division-by-zero",
+        "description": "除法运算中禁止被零除。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0003"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n    int a = 5;\n    int b = 0;\n    int c, d;\n    c = a / b; // 违背1\n    d = a % b; // 违背2\n    return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-division-by-zero",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-6-14",
+        "main_title": "no-buffer-read-overflow",
+        "description": "缓存区读取操作禁止越界。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0003"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include <string.h>\n\nint main(void)\n{\n    int src[2] = {1, 2};\n    int des[4] = {0, 0, 0, 0};\n    memcpy(des, src, sizeof(des)); // 违背1\n    return (0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include <string.h>\n\nint main(void)\n{\n    int src[2] = {1, 2};\n    int des[4] = {0, 0, 0, 0};\n    memcpy(des, src, sizeof(src)); // 遵循1\n    return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-buffer-read-overflow",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-6-15",
+        "main_title": "no-buffer-write-overflow",
+        "description": "缓存区写入操作禁止越界。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0003"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include <string.h>\n\nint main(void)\n{\n    int src[4] = {1, 2, 3, 4};\n    int des[2] = {0, 0};\n    memcpy(des, src, sizeof(src)); // 违背1\n    return (0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include <string.h>\n\nint main(void)\n{\n    int src[4] = {1, 2, 3, 4};\n    int des[2] = {0, 0};\n    memcpy(des, src, sizeof(des)); // 遵循1\n    return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-buffer-write-overflow",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-6-16",
+        "main_title": "no-use-after-free",
+        "description": "禁止使用已被释放了的内存空间。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0003"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include <stdlib.h>\n#include <malloc.h>\n\nint main(void)\n{\n    int *x = (int *)malloc(sizeof(int));\n    int y;\n    if (NULL != x)\n    {\n        *x = 1;\n        //\n        free(x);\n        x = NULL;\n    }\n    else\n    {\n        return(-1);\n    }\n\n    y = (*x); // 违背1\n    return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-use-after-free",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-6-17",
+        "main_title": "free-original-malloc-pointer",
+        "description": "被 free 的指针必须指向最初 malloc、calloc 分配的地址。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0003"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include <stdlib.h>\n#include <malloc.h>\n\nint fun(void);\n\nint main(void)\n{\n    int i;\n    i = fun();\n    return (0);\n}\n\nint fun(void)\n{\n    int *p = (int *)malloc(3 * sizeof(int));\n    if (NULL == p)\n    {\n        return(-1);\n    }\n    else\n    {\n        *p = 1;\n        p++;\n        *p = 2;\n        free(p); // 违背1\n        p = NULL;\n    }\n    return(0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include <stdlib.h>\n#include <malloc.h>\n\nint fun(void);\n\nint main(void)\n{\n    int i;\n    i = fun();\n    return (0);\n}\n\nint fun(void)\n{\n    int *p = (int *)malloc(3 * sizeof(int));\n    int *pbak = p;\n    if (NULL == p)\n    {\n        return(-1);\n    }\n    else\n    {\n        *p = 1;\n        p++;\n        *p = 2;\n        free(pbak); // 遵循1\n        pbak = NULL;\n    }\n    return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/free-original-malloc-pointer",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-6-19",
+        "main_title": "string-function-no-overflow",
+        "description": "使用字符串赋值、拷贝、追加等函数时，禁止目标字符串存储空间越界。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0003"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include <string.h>\n#include <stdio.h>\n\nvoid main(void)\n{\n    char string1[10] = {0};\n    char string2[10] = {0};\n    strncpy(string1, \"Hello world\", 11); // 违背1\n    strncpy(string2, \"Hello\", 6);\n    strncat(string2, \"world\", 5); // 违背2\n    printf(\"string1=%s, string2=%s\\n\", string1, string2);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include <string.h>\n#include <stdio.h>\n\nvoid main(void)\n{\n    char string1[12] = {0};\n    char string2[12] = {0};\n    strncpy(string1, \"Hello world\", 11); // 遵循1\n    strncpy(string2, \"Hello\", 6);\n    strncat(string2, \"world\", 5); // 遵循2\n    printf(\"string1=%s, string2=%s\\n\", string1, string2);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/string-function-no-overflow",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-1-6-3",
+        "main_title": "release-dynamic-memory-promptly",
+        "description": "动态申请的内存空间用完后及时释放。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0003",
+          "chunk-0007"
+        ],
+        "examples": [],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/release-dynamic-memory-promptly",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-7-14",
+        "main_title": "no-multiple-order-dependent-calls-in-expression",
+        "description": "禁止同一个表达式中调用多个顺序相关函数。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0003"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "unsigned int Vel(unsigned int *pcData);\nunsigned int Acc(unsigned int *pcData);\n\nint main(void)\n{\n    unsigned int dis, hei;\n    dis = 3;\n    hei = Vel(&dis) + Acc(&dis); // 违背1\n    return(0);\n}\n\nunsigned int Vel(unsigned int *pcData)\n{\n    unsigned int x = (*pcData);\n    (*pcData) = x * x;\n    return x;\n}\n\nunsigned int Acc(unsigned int *pcData)\n{\n    unsigned int x = (*pcData);\n    (*pcData) = 2 * x;\n    return x;\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "unsigned int Vel(unsigned int *pcData);\nunsigned int Acc(unsigned int *pcData);\n\nint main(void)\n{\n    unsigned int dis, hei, temp1, temp2;\n    dis = 3;\n    temp1 = Vel(&dis);\n    temp2 = Acc(&dis);\n    hei = temp1 + temp2; // 遵循1\n    return (0);\n}\n\nunsigned int Vel(unsigned int *pcData)\n{\n    unsigned int x = (*pcData);\n    (*pcData) = x * x;\n    return x;\n}\n\nunsigned int Acc(unsigned int *pcData)\n{\n    unsigned int x = (*pcData);\n    (*pcData) = 2 * x;\n    return x;\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-multiple-order-dependent-calls-in-expression",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-7-16",
+        "main_title": "no-direct-indirect-recursion",
+        "description": "禁止使用直接或间接自调用函数。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0003"
+        ],
+        "examples": [],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-direct-indirect-recursion",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-1-7-4",
+        "main_title": "check-system-function-return-status",
+        "description": "对系统函数的调用，建议调用后对其返回状态的有效性进行判别。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0003",
+          "chunk-0007"
+        ],
+        "examples": [],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/check-system-function-return-status",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-8-1",
+        "main_title": "no-unreachable-statements",
+        "description": "禁止不可达语句。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0003"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n    int local = 0;\n    int para = 0;\n    //...\n    switch(para)\n    {\n        local = para; // 违背1\n        case 1:\n            //...\n            break;\n        case 2:\n            //...\n            break;\n        default:\n            //...\n            break;\n    }\n    return local;\n    para++; // 违背2\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-unreachable-statements",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-8-2",
+        "main_title": "no-unreachable-branches",
+        "description": "禁止不可达分支。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0003"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n    unsigned int local = 0;\n    unsigned int para = 0;\n    //...\n    if (1 == para)\n    {\n        //...\n    }\n    else\n    {\n        //...\n    }\n    if (local >= 0)\n    {\n        para = 1;\n    }\n    else\n    {\n        para = 2; // 违背1\n        //...\n    }\n    return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-unreachable-branches",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-11-1",
+        "main_title": "no-uninitialized-variable-use",
+        "description": "变量禁止未赋值就使用。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0004"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n int i;\n float x, y, z;\n x = z; //违背1\n if (0 == i) //违背2\n {\n  y = z; //违背3\n }\n return (0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "int main(void)\n{\n int i = 0;\n float x, y, z;\n z = 0.0;\n x = z; //遵循1\n if (0 == i) //遵循2\n {\n }\n return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-uninitialized-variable-use",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-1-11-2",
+        "main_title": "centralized-global-variable-initialization",
+        "description": "建议所有全局变量在统一设计的初始化模块中进行初始化。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0004",
+          "chunk-0007"
+        ],
+        "examples": [],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/centralized-global-variable-initialization",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-13-12",
+        "main_title": "volatile-for-externally-writable-variables",
+        "description": "程序外部可改写的变量，必须使用volatile类型说明；例如寄存器变量、双口存储器变量、与其他线程共享的变量，应使用volatile类型说明。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0004"
+        ],
+        "examples": [],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/volatile-for-externally-writable-variables",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-13-16",
+        "main_title": "nul-terminated-string-array",
+        "description": "用于表示字符串的数组必须以'\\0'结束。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0004"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include <stdio.h>\nint main(void)\n{\n char buf[8];\n buf[0] = 'y';\n buf[1] = 'e';\n buf[2] = 's'; //违背1\n printf(\"%s\\n\", buf);\n return (0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include <stdio.h>\nint main(void)\n{\n char buf[8];\n buf[0] = 'y';\n buf[1] = 'e';\n buf[2] = 's';\n buf[3] = '\\0'; //遵循1\n return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/nul-terminated-string-array",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-2-3-2",
+        "main_title": "destructor-exception-caught-by-itself",
+        "description": "析构函数中禁止存在不是由自身捕获处理的异常。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0005",
+          "chunk-0007"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include <iostream>\nusing namespace std;\nclass Foo {\npublic:\n    int a;\n    Foo(void);\n    ~Foo(void);\n};\nFoo::Foo(void) {\n    a = 1;\n}\nFoo::~Foo(void) {\n    if(1 == a) {\n        throw 0; //违背1\n    }\n}\nint main(void) {\n    try {\n        Foo f;\n    } catch(int e) {\n        //...\n    }\n    return 0;\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include <iostream>\nusing namespace std;\nclass Foo {\npublic:\n    int a;\n    Foo(void);\n    ~Foo(void);\n};\nFoo::Foo(void) {\n    a = 1;\n}\nFoo::~Foo(void) {\n    try {\n        if(1 == a) {\n            throw 0; //遵循1\n        }\n    } catch(int e) {\n        //...\n    }\n}\nint main(void) {\n    try {\n        Foo f;\n    } catch(int e) {\n        //...\n    }\n    return 0;\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/destructor-exception-caught-by-itself",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-2-6-1",
+        "main_title": "delete-new-allocated-memory",
+        "description": "使用 new 分配的内存空间，用完后必须使用 delete 释放。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0005",
+          "chunk-0007"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include <iostream>\nusing namespace std;\nvoid fun1(void) {\n    int *p = new int; //违背1\n    *p = 1;\n    //...\n}\nvoid fun2(void) {\n    int *p = new int[3]; //违背2\n    p[0] = 1;\n    p[1] = 2;\n    p[2] = 3;\n    //...\n}\nint main(void) {\n    fun1();\n    fun2();\n    return 0;\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include <iostream>\nusing namespace std;\nvoid fun1(void) {\n    int *p = new int;\n    *p = 1;\n    delete p; //遵循1\n    p = NULL;\n}\nvoid fun2(void) {\n    int *p = new int[3];\n    p[0] = 1;\n    p[1] = 2;\n    p[2] = 3;\n    delete[] p; //遵循2\n    p = NULL;\n}\nint main(void) {\n    fun1();\n    fun2();\n    return 0;\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/delete-new-allocated-memory",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-2-6-2",
+        "main_title": "use-delete-array-for-new-array",
+        "description": "必须使用 delete[] 释放 new[] 分配的内存空间。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0005",
+          "chunk-0007"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include <iostream>\nusing namespace std;\nvoid fun(void) {\n    int *p = new int[3];\n    p[0] = 1;\n    p[1] = 2;\n    p[2] = 3;\n    delete p; //违背1\n    p = NULL;\n}\nint main(void) {\n    fun();\n    return 0;\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include <iostream>\nusing namespace std;\nvoid fun(void) {\n    int *p = new int[3];\n    p[0] = 1;\n    p[1] = 2;\n    p[2] = 3;\n    delete[] p; //遵循1\n    p = NULL;\n}\nint main(void) {\n    fun();\n    return 0;\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/use-delete-array-for-new-array",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-2-6-3",
+        "main_title": "delete-pointer-original-new-address",
+        "description": "被 delete 的指针必须指向最初 new 分配的地址。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0005",
+          "chunk-0007"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include <iostream>\nusing namespace std;\nint fun(void);\nint main(void) {\n    int i;\n    i = fun();\n    return 0;\n}\nint fun(void) {\n    int *p = new int[3];\n    if(NULL == p) {\n        return -1;\n    } else {\n        *p = 1;\n        p++;\n        *p = 2;\n        delete[] p; //违背1\n        p = NULL;\n        return 0;\n    }\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include <iostream>\nusing namespace std;\nint fun(void);\nint main(void) {\n    int i;\n    i = fun();\n    return 0;\n}\nint fun(void) {\n    int *p = new int[3];\n    int *pbak = p;\n    if(NULL == p) {\n        return -1;\n    } else {\n        *p = 1;\n        p++;\n        *p = 2;\n        delete[] pbak; //遵循1\n        pbak = NULL;\n        return 0;\n    }\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/delete-pointer-original-new-address",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      }
+    ]
+  }
+}

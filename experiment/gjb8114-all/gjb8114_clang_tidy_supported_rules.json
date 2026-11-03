@@ -1,0 +1,3919 @@
+{
+  "data": {
+    "ucassaat": [
+      {
+        "rule_id": "R-1-1-2",
+        "main_title": "no-macro-alias-to-keyword-basic-type",
+        "description": "禁止将其他标识宏定义为关键字和基本类型。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0001"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#define JUDGE if // 违背1\n#define int64 long // 违背2\n\nint main(void)\n{\n    int64 i = 0;\n    JUDGE(0 == i)\n    {\n        i = 1;\n    }\n    return (0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#define JUDGE_ZERO(i) if (0 == (i)) // 遵循1\ntypedef long int64; // 遵循2\n\nint main(void)\n{\n    int64 i = 0;\n    JUDGE_ZERO(i)\n    {\n        i = 1;\n    }\n    return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-macro-alias-to-keyword-basic-type",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-1-3",
+        "main_title": "no-typedef-redefinition",
+        "description": "用typedef自定义的类型禁止被重新定义。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0001"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "typedef int mytype;\n\nint main(void)\n{\n    typedef float mytype; // 违背1\n    mytype x = 1.0;\n    return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-typedef-redefinition",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-1-4",
+        "main_title": "no-keyword-redefinition",
+        "description": "禁止重新定义C或C++的关键字。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0001"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n    unsigned int FILE = 0; // 违背1\n    unsigned int cout = 0; // 违背2\n    unsigned int cin = 0; // 违背3\n    unsigned int endl = 0; // 违背4\n    // ......\n    return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-keyword-redefinition",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-1-5",
+        "main_title": "no-duplicate-macro-definition",
+        "description": "禁止#define被重复定义。注：条件编译的不同条件中的定义，以及定义了删除后的再定义均不算违背。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0001"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#define BLOCKDEF 1U\n\nunsigned int fun1(void);\nunsigned int fun2(void);\n\nint main(void)\n{\n    unsigned int a1 = 0U;\n    unsigned int a2 = 0U;\n    unsigned int a3 = 0U;\n    unsigned int a4 = 0U;\n\n    a1 = fun1();\n    a2 = a1 + BLOCKDEF;\n    a3 = fun2();\n    a4 = a3 + BLOCKDEF;\n    return (0);\n}\n\n#define BLOCKDEF 2U // 违背1\n\nunsigned int fun1(void)\n{\n    unsigned int x = 0U;\n    x = x + BLOCKDEF;\n    return x;\n}\n\nunsigned int fun2(void)\n{\n    unsigned int x = 0U;\n    x = x + BLOCKDEF;\n    return x;\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#define BLOCKDEF 1U\n\nunsigned int fun1(void);\nunsigned int fun2(void);\n\nint main(void)\n{\n    unsigned int a1 = 0U;\n    unsigned int a2 = 0U;\n    unsigned int a3 = 0U;\n    unsigned int a4 = 0U;\n\n    a1 = fun1();\n    a2 = a1 + BLOCKDEF;\n    a3 = fun2();\n    a4 = a3 + BLOCKDEF;\n    return (0);\n}\n\n#undef BLOCKDEF\n#define BLOCKDEF 2U // 遵循1\n\nunsigned int fun1(void)\n{\n    unsigned int x = 0U;\n    x = x + BLOCKDEF;\n    return x;\n}\n\nunsigned int fun2(void)\n{\n    unsigned int x = 0U;\n    x = x + BLOCKDEF;\n    return x;\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-duplicate-macro-definition",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-1-6",
+        "main_title": "paired-define-undef-in-function",
+        "description": "函数中的#define和#undef必须配对使用。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0001"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "unsigned int fun1(void);\nunsigned int fun2(void);\n\nint main(void)\n{\n    unsigned int a1 = 0U;\n    unsigned int a2 = 0U;\n    unsigned int a3 = 0U;\n\n    a1 = fun1();\n    a2 = fun2();\n    a3 = a1 + a2;\n    return (0);\n}\n\nunsigned int fun1(void)\n{\n    unsigned int x = 0U;\n#define BLOCKDEF 2U // 违背1\n    x = x + BLOCKDEF;\n    return x;\n}\n\nunsigned int fun2(void)\n{\n    unsigned int x = 0U;\n    x = x + BLOCKDEF;\n#undef BLOCKDEF // 违背2\n    return x;\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "unsigned int fun1(void);\nunsigned int fun2(void);\n\nint main(void)\n{\n    unsigned int a1 = 0U;\n    unsigned int a2 = 0U;\n    unsigned int a3 = 0U;\n    a1 = fun1();\n    a2 = fun2();\n    a3 = a1 + a2;\n    return (0);\n}\n\nunsigned int fun1(void)\n{\n    unsigned int x = 0U;\n#define BLOCKDEF1 2U // 遵循1\n    x = x + BLOCKDEF1;\n#undef BLOCKDEF1 // 遵循2\n    return x;\n}\n\nunsigned int fun2(void)\n{\n    unsigned int x = 0U;\n#define BLOCKDEF2 2U // 遵循3\n    x = x + BLOCKDEF2;\n#undef BLOCKDEF2 // 遵循4\n    return x;\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/paired-define-undef-in-function",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-1-7",
+        "main_title": "parenthesize-function-like-macro-params-result",
+        "description": "以函数形式定义的宏，参数和结果必须用括号括起来。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0001"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#define pabs(x) x >= 0 ? x : -x // 违背1\n\nint main(void)\n{\n    unsigned int result;\n    int a = 6;\n    /* … */\n    result = pabs(a) + 1;\n    return (0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#define pabs(x) ((x) >= 0 ? (x) : -(x)) // 遵循1\n\nint main(void)\n{\n    unsigned int result;\n    int a = 6;\n    /* … */\n    result = pabs(a) + 1;\n    return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/parenthesize-function-like-macro-params-result",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-1-8",
+        "main_title": "require-tag-name-for-struct-union-enum",
+        "description": "结构、联合、枚举的定义中必须定义标识名。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0001"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "struct // 违背1\n{\n    int data1;\n    int data2;\n} sData;\n\nunion // 违背2\n{\n    unsigned char cd[4];\n    int id;\n} uData;\n\nenum // 违背3\n{\n    A_Level = 0,\n    B_Level,\n    C_Level,\n    D_Level\n} eLevel;\n\nint main(void)\n{\n    eLevel = B_Level;\n    sData.data1 = 2000;\n    uData.id = sData.data1;\n    return (0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "struct S_Data // 遵循1\n{\n    int data1;\n    int data2;\n} sData;\n\nunion U_Data // 遵循2\n{\n    unsigned char cd[4];\n    int id;\n} uData;\n\nenum E_Level // 遵循3\n{\n    A_Level = 0,\n    B_Level,\n    C_Level,\n    D_Level\n} eLevel;\n\nint main(void)\n{\n    eLevel = B_Level;\n    sData.data1 = 2000;\n    uData.id = sData.data1;\n    return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/require-tag-name-for-struct-union-enum",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-1-9",
+        "main_title": "no-unnamed-nested-struct",
+        "description": "结构体定义中禁止含有无名结构体。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0001"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "struct Sdata\n{\n    unsigned char id;\n    struct Scoor\n    {\n        unsigned char xs;\n        unsigned char ys;\n        unsigned char zs;\n    }; // 违背1\n};\n\nint main(void)\n{\n    struct Sdata data;\n    data.id = 1;\n    return (0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "struct Sdata\n{\n    unsigned char id;\n    struct Scoor\n    {\n        unsigned char xs;\n        unsigned char ys;\n        unsigned char zs;\n    } coor; // 遵循1\n};\n\nint main(void)\n{\n    struct Sdata data;\n    data.id = 1;\n    return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-unnamed-nested-struct",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-1-10",
+        "main_title": "signed-bitfield-width-greater-than-one",
+        "description": "位定义的有符号整型变量位长必须大于1。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0001"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "typedef struct\n{\n    signed int si01 : 1; // 违背1\n    signed int si02 : 2;\n    unsigned int serv : 29;\n} sData;\n\nint main(void)\n{\n    sData my_data;\n    my_data.si01 = -1;\n    my_data.si02 = -1;\n    return (0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "typedef struct\n{\n    signed int si01 : 2; // 遵循1\n    signed int si02 : 2;\n    unsigned int serv : 28;\n} sData;\n\nint main(void)\n{\n    sData my_data;\n    my_data.si01 = -1;\n    my_data.si02 = -1;\n    return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/signed-bitfield-width-greater-than-one",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-1-11",
+        "main_title": "bitfield-must-explicit-signedness",
+        "description": "位定义的整数型变量必须明确定义是有符号还是无符号的。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0001"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "typedef struct\n{\n    short d01 : 2; // 违背1\n    short d02 : 2; // 违背2\n    short res : 12; // 违背3\n} sData;\n\nint main(void)\n{\n    sData my_data;\n    my_data.d01 = 1;\n    my_data.d02 = 1;\n    my_data.res = 0;\n    return (0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "typedef struct\n{\n    signed short d01 : 2; // 遵循1\n    unsigned short d02 : 2; // 遵循2\n    unsigned short res : 12; // 遵循3\n} sData;\n\nint main(void)\n{\n    sData my_data;\n    my_data.d01 = 1;\n    my_data.d02 = 1;\n    my_data.res = 0;\n    return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/bitfield-must-explicit-signedness",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-1-12",
+        "main_title": "bitfield-homogeneous-width-within-type",
+        "description": "位定义的变量必须是同长度的类型且定义位禁止跨越类型的长度。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0001"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "typedef struct\n{\n    unsigned char d01 : 2;\n    unsigned char d02 : 2;\n    unsigned char d03 : 2;\n    unsigned short d04 : 2; // 违背1\n} stData1;\n\ntypedef struct\n{\n    unsigned short d01 : 2;\n    unsigned short d02 : 2;\n    unsigned short d03 : 2;\n    unsigned short d04 : 12; // 违背2\n    unsigned short d05 : 2;\n    unsigned short d06 : 2;\n    unsigned short d07 : 2;\n    unsigned short d08 : 8;\n} stData2;\n\nint main(void)\n{\n    stData1 my_data1;\n    stData2 my_data2;\n    return (0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "typedef struct\n{\n    unsigned char d01 : 2;\n    unsigned char d02 : 2;\n    unsigned char d03 : 2;\n    unsigned char d04 : 2; // 遵循1\n} stData1;\n\ntypedef struct\n{\n    unsigned short d01 : 2;\n    unsigned short d02 : 2;\n    unsigned short d03 : 2;\n    unsigned short d04 : 10; // 遵循2\n    unsigned short d05 : 2;\n    unsigned short d06 : 2;\n    unsigned short d07 : 2;\n    unsigned short d08 : 10;\n} stData2;\n\nint main(void)\n{\n    stData1 my_data1;\n    stData2 my_data2;\n    return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/bitfield-homogeneous-width-within-type",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-1-13",
+        "main_title": "function-decl-param-type-and-name",
+        "description": "函数声明中必须对参数类型进行声明，并带有变量名。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0001"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int fun1(); // 违背1\nint fun2(int, int); // 违背2\n\nint main(void)\n{\n    int a, b, c, d;\n    a = 10;\n    b = 5;\n    c = fun1(a, b);\n    d = fun2(a, b);\n    return (0);\n}\n\nint fun1(int a, int b)\n{\n    int ret;\n    ret = a + b;\n    return ret;\n}\n\nint fun2(int a, int b)\n{\n    int ret;\n    ret = a - b;\n    return ret;\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "int fun1(int a, int b); // 遵循1\nint fun2(int a, int b); // 遵循2\n\nint main(void)\n{\n    int a, b, c, d;\n    a = 10;\n    b = 5;\n    c = fun1(a, b);\n    d = fun2(a, b);\n    return (0);\n}\n\nint fun1(int a, int b)\n{\n    int ret;\n    ret = a + b;\n    return ret;\n}\n\nint fun2(int a, int b)\n{\n    int ret;\n    ret = a - b;\n    return ret;\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/function-decl-param-type-and-name",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-1-14",
+        "main_title": "function-decl-match-prototype",
+        "description": "函数声明必须与函数原型一致。注：一致性要求包括函数类型、参数类型、参数名。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0001"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int fun1(short height); // 违背1\nfloat fun2(int height); // 违背2\nint fun3(int height); // 违背3\n\nint main(void)\n{\n    int i, j1, j2, j3;\n    i = 1000;\n    j1 = fun1(i);\n    j2 = fun2(i);\n    j3 = fun3(i);\n    return (0);\n}\n\nint fun1(int height)\n{\n    int h;\n    h = height + 10;\n    return h;\n}\n\nint fun2(int height)\n{\n    int h;\n    h = height - 10;\n    return h;\n}\n\nint fun3(int width)\n{\n    int w;\n    w = width - 10;\n    return w;\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "int fun1(int height); // 遵循1\nint fun2(int height); // 遵循2\nint fun3(int width); // 遵循3\n\nint main(void)\n{\n    int i, j1, j2, j3;\n    i = 1000;\n    j1 = fun1(i);\n    j2 = fun2(i);\n    j3 = fun3(i);\n    return (0);\n}\n\nint fun1(int height)\n{\n    int h;\n    h = height + 10;\n    return h;\n}\n\nint fun2(int height)\n{\n    int h;\n    h = height - 10;\n    return h;\n}\n\nint fun3(int width)\n{\n    int w;\n    w = width - 10;\n    return w;\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/function-decl-match-prototype",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-1-17",
+        "main_title": "no-extern-declaration-in-function-body",
+        "description": "禁止在函数体内使用外部声明。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0001"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "// 程序文件1\nint zdata = 0;\nint fadd(int x, int y)\n{\n    int z;\n    z = x + y;\n    return z;\n}\n\n// 程序文件2\nint main(void)\n{\n    extern int zdata; // 违背1\n    extern int fadd(int, int); // 违背2\n    int x, y;\n    x = 1;\n    y = 2;\n    zdata = fadd(x, y);\n    return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-extern-declaration-in-function-body",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-1-18",
+        "main_title": "array-explicit-bound",
+        "description": "数组定义禁止没有显式的边界限定。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0001"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n    int array[] = {0, 1, 2}; // 违背1\n    int i;\n    int data = 0;\n    for (i = 0; i < 3; i++)\n    {\n        data = data + array[i];\n    }\n    return (0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "int main(void)\n{\n    int array[3] = {0, 1, 2}; // 遵循1\n    int i;\n    int data = 0;\n    for (i = 0; i < 3; i++)\n    {\n        data = data + array[i];\n    }\n    return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/array-explicit-bound",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-1-19",
+        "main_title": "no-extern-initializer",
+        "description": "禁止使用extern声明对变量初始化。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0001"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "文件1：\nint a;\n\n文件2：\nextern int a = 2; // 违背1\n\nint main(void)\n{\n    a = 3;\n    return (0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "文件1：\nint a = 2;\n\n文件2：\nextern int a; // 遵循1\n\nint main(void)\n{\n    a = 3;\n    return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-extern-initializer",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-1-20",
+        "main_title": "numeric-char-explicit-signedness",
+        "description": "用于数值计算的字符型变量必须明确定义是有符号还是无符号。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0001"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n    char i; // 违背1\n    int j;\n    i = (char)0xFF; // 违背2\n    j = i + 1;\n    return (0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "int main(void)\n{\n    unsigned char i; // 遵循1\n    int j;\n    i = (unsigned char)0xFF; // 遵循2\n    j = i + 1;\n    return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/numeric-char-explicit-signedness",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-1-21",
+        "main_title": "no-absolute-path-in-include",
+        "description": "禁止在#include语句中使用绝对路径。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0001"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include \"D:\\RuleStandard\\053\\053.h\" // 违背1\n\nint main(void)\n{\n    int idata = 0;\n    return (0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include \"..\\053\\053.h\" // 遵循1\n\nint main(void)\n{\n    int idata = 0;\n    return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-absolute-path-in-include",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-1-23",
+        "main_title": "void-for-empty-parameter-list",
+        "description": "函数参数表为空时，必须使用void明确说明。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0001"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int fun(); // 违背1\nint datax = 0;\nint datay = 0;\n\nint main(void)\n{\n    int iz;\n    datax = 1;\n    datay = 2;\n    iz = fun();\n    return (0);\n}\n\nint fun() // 违背2\n{\n    int temp;\n    temp = 2 * datax + 3 * datay;\n    return temp;\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "int fun(void); // 遵循1\nint datax = 0;\nint datay = 0;\n\nint main(void)\n{\n    int iz;\n    datax = 1;\n    datay = 2;\n    iz = fun();\n    return (0);\n}\n\nint fun(void) // 遵循2\n{\n    int temp;\n    temp = 2 * datax + 3 * datay;\n    return temp;\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/void-for-empty-parameter-list",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-1-1-1",
+        "main_title": "typedef-basic-types",
+        "description": "建议使用 typedef 对基本变量类型重新定义。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0001",
+          "chunk-0007"
+        ],
+        "examples": [
+          {
+            "type": "compliant",
+            "code": "typedef unsigned int UINT_32;\ntypedef int SINT_32;\ntypedef unsigned short UINT_16;\ntypedef unsigned char UCHAR;\ntypedef float FLOAT_32;\ntypedef double FLOAT_64;"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/typedef-basic-types",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-1-1-2",
+        "main_title": "caution-macro-brace-mismatch",
+        "description": "谨慎由于宏中括号不匹配造成使用上的误解。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0001",
+          "chunk-0007"
+        ],
+        "examples": [
+          {
+            "type": "illustrative",
+            "code": "#define IF0(x) if (0 == (x)) { // 提示1\n\nint main(void)\n{\n    int test = 0;\n    IF0(test)\n    test = test + 1;\n}\n\nreturn (0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#define IF0(x) if (0 == (x)) // 遵循1\n\nint main(void)\n{\n    int test = 0;\n    IF0(test)\n    {\n        test = test + 1;\n    }\n    return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/caution-macro-brace-mismatch",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-1-1-3",
+        "main_title": "cautious-macro-token-paste-stringize",
+        "description": "宏定义中谨慎使用 ## 或 #。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0001",
+          "chunk-0007"
+        ],
+        "examples": [],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/cautious-macro-token-paste-stringize",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-1-1-4",
+        "main_title": "define-locals-at-function-start",
+        "description": "建议函数内部变量在函数体开始处统一定义。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0001",
+          "chunk-0007"
+        ],
+        "examples": [],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/define-locals-at-function-start",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-1-1-5",
+        "main_title": "limit-struct-nesting-three",
+        "description": "建议结构体嵌套定义不超过 3 层。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0001",
+          "chunk-0007"
+        ],
+        "examples": [],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/limit-struct-nesting-three",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-1-1-6",
+        "main_title": "define-constants-with-macro-or-const",
+        "description": "建议用宏或 const 定义常数。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0001",
+          "chunk-0007"
+        ],
+        "examples": [],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/define-constants-with-macro-or-const",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-2-1",
+        "main_title": "braces-for-loop-body",
+        "description": "循环体必须用大括号括起来。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0001"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n    int i;\n    int data[10];\n    for (i = 0; i < 10; i++)\n        data[i] = 0; // 违背1\n    return (0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "int main(void)\n{\n    int i;\n    int data[10];\n    for (i = 0; i < 10; i++)\n    {\n        data[i] = 0; // 遵循1\n    }\n    return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/braces-for-loop-body",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-2-2",
+        "main_title": "braces-for-if-else-if-else",
+        "description": "if、else if、else必须用大括号括起来。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0001"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n    int i = 0;\n    int j;\n    // ......\n    if (0 == i)\n        j = 1; // 违背1\n    else if (1 == i)\n        j = 3; // 违背2\n    else\n        j = 5; // 违背3\n    return (0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "int main(void)\n{\n    int i = 0;\n    int j;\n    // ......\n    if (0 == i)\n    {\n        j = 1; // 遵循1\n    }\n    else if (1 == i)\n    {\n        j = 3; // 遵循2\n    }\n    else\n    {\n        j = 5; // 遵循3\n    }\n    return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/braces-for-if-else-if-else",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-2-3",
+        "main_title": "no-executable-code-before-header-include",
+        "description": "禁止在头文件前有可执行代码。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0001"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n#include \"..\\061\\061.h\" // 违背1\n    int ix = 0;\n    int iy = 1;\n    int iz = 2;\n    int idata = ix + iy + iz;\n    return (0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include \"..\\061\\061.h\" // 遵循1\n\nint main(void)\n{\n    int ix = 0;\n    int iy = 1;\n    int iz = 2;\n    int idata = ix + iy + iz;\n    return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-executable-code-before-header-include",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-2-4",
+        "main_title": "explicit-parentheses-ambiguous-logical-expressions",
+        "description": "引起二义性理解的逻辑表达式，必须使用括号显式说明优先级顺序。注：可能引起二义性理解的逻辑表达式示例如下：a) a&&b||c；b) a||b&&c；c) !a&&b；d) !a||b。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0001",
+          "chunk-0002"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n    int i = 0, j = 1, k = 2;\n    int a = 0, b = 0;\n    // ......\n    if ((0 == i) || (1 == j) && (2 == k)) // 违背1\n    {\n        a = 0;\n    }\n    else\n    {\n        a = 1;\n    }\n    return (0);\n}"
+          },
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n    int i=0,j=1,k=2;\n    int a=0,b=0;\n    //...\n    if((0==i)||(1==j)&&(2==k)) //违背1\n    {\n        a=0;\n    }\n    else\n    {\n        a=1;\n    }\n    return(0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "int main(void)\n{\n    int i=0,j=1,k=2;\n    int a=0,b=0;\n    //...\n    if(((0==i)||(1==j))&&(2==k)) //遵循1\n    {\n        a=0;\n    }\n    else\n    {\n        a=1;\n    }\n    return(0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/explicit-parentheses-ambiguous-logical-expressions",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-2-5",
+        "main_title": "parenthesize-logical-operands",
+        "description": "逻辑判别表达式中的运算项必须要使用括号。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0002"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n    unsigned int i, tbc;\n    tbc=0x80;\n    if(tbc&0x80==0x80) //违背1\n    {\n        i=1;\n    }\n    else\n    {\n        i=2;\n    }\n    return(0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "int main(void)\n{\n    unsigned int i, tbc;\n    tbc=0x80;\n    if((tbc&0x80)==0x80) //遵循1\n    {\n        i=1;\n    }\n    else\n    {\n        i=2;\n    }\n    return(0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/parenthesize-logical-operands",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-2-6",
+        "main_title": "prohibit-nested-comments",
+        "description": "禁止嵌套注释。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0002"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n    int local=0;\n    int sign=0;\n    /*\n    note for code1\n    /* //违背1\n    note for code2\n    */\n    return(0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/prohibit-nested-comments",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-1-2-1",
+        "main_title": "file-statements-max-2000",
+        "description": "一个文件中的语句总行不超过 2000 行。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0002",
+          "chunk-0007"
+        ],
+        "examples": [],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/file-statements-max-2000",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-1-2-2",
+        "main_title": "function-statements-max-200",
+        "description": "一个函数中的语句总行不超过 200 行。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0002",
+          "chunk-0007"
+        ],
+        "examples": [],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/function-statements-max-200",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-1-2-3",
+        "main_title": "c-standard-comments-cautious-slash",
+        "description": "C 语言程序建议使用标准 C 的注释符，谨慎使用 // 注释。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0002",
+          "chunk-0007"
+        ],
+        "examples": [],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/c-standard-comments-cautious-slash",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-3-1",
+        "main_title": "limit-pointer-to-pointer-depth",
+        "description": "禁止指针的指针超过两级。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0002"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include<stdlib.h>\nint main(void)\n{\n    unsigned int array[5]={0,1,2,3,4};\n    unsigned int *p1_ptr=NULL, **p2_ptr=NULL;\n    unsigned int ***p3_ptr=NULL; //违背1\n    unsigned int data[5];\n    unsigned int i;\n    p1_ptr=array;\n    p2_ptr=&p1_ptr;\n    p3_ptr=&p2_ptr;\n    for(i=0;i<5;i++)\n    {\n        data[i]=*(**p3_ptr+i);\n    }\n    return(0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/limit-pointer-to-pointer-depth",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-3-2",
+        "main_title": "ampersand-function-pointer-use",
+        "description": "函数指针的使用必须加以&明确说明。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0002"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include<stdlib.h>\nint fun(int para1,int para2);\nint main(void)\n{\n    int a=2,b=1,c=0;\n    if(NULL==fun) //违背1\n    {\n        return(-1);\n    }\n    else\n    {\n        int (*p)(int,int)=fun; //违背2\n        c=p(a,b);\n    }\n    return(0);\n}\nint fun(int para1,int para2)\n{\n    return(para1-para2);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include<stdlib.h>\nint fun(int para1,int para2);\nint main(void)\n{\n    int a=2,b=1,c=0;\n    if(NULL==&fun) //遵循1\n    {\n        return(-1);\n    }\n    else\n    {\n        int (*p)(int,int)=&fun; //遵循2\n        c=p(a,b);\n    }\n    return(0);\n}\nint fun(int para1, int para2)\n{\n    return(para1-para2);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/ampersand-function-pointer-use",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-3-3",
+        "main_title": "prohibit-parameter-pointer-assignment",
+        "description": "禁止对参数指针进行赋值。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0002"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include<stdlib.h>\nunsigned int pfun(unsigned int *pa);\nint main(void)\n{\n    unsigned int data;\n    unsigned int result;\n    result=pfun(&data);\n    return(0);\n}\nunsigned int pfun(unsigned int *pa)\n{\n    static unsigned int i=10;\n    pa=&i; //违背1\n    i=i+1;\n    return i;\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include<stdlib.h>\nunsigned int pfun(unsigned int **pa);\nint main(void)\n{\n    unsigned int *data=NULL;\n    unsigned int result;\n    result=pfun(&data);\n    return(0);\n}\nunsigned int pfun(unsigned int **pa)\n{\n    static unsigned int i=10;\n    i=i+1;\n    *pa=&i; //遵循1\n    return i;\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/prohibit-parameter-pointer-assignment",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-3-4",
+        "main_title": "prohibit-returning-local-address",
+        "description": "禁止将局部变量地址做为函数返回值返回。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0002"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include<stdlib.h>\nunsigned int *pfun(unsigned int *pa);\nint main(void)\n{\n    unsigned int data;\n    unsigned int *result=NULL;\n    result=pfun(&data);\n    return(0);\n}\nunsigned int *pfun(unsigned int *pa)\n{\n    unsigned int temp=0;\n    *pa=10;\n    temp=*pa;\n    return &temp; //违背1\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include<stdlib.h>\nunsigned int *pfun(unsigned int *pa);\nunsigned int Gdata=0;\nint main(void)\n{\n    unsigned int data;\n    unsigned int *result=NULL;\n    result=pfun(&data);\n    return(0);\n}\nunsigned int *pfun(unsigned int *pa)\n{\n    *pa=10;\n    Gdata=*pa;\n    return &Gdata; //遵循1\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/prohibit-returning-local-address",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-3-5",
+        "main_title": "prohibit-use-or-free-unallocated-or-freed-pointer",
+        "description": "禁止使用或释放未分配空间或已被释放的指针。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0002"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include<stdlib.h>\n#include<malloc.h>\nint main(void)\n{\n    int *x=NULL;\n    int *y=(int *)malloc(sizeof(int));\n    *x=1; //违背1\n    free(x); //违背2\n    free(y);\n    free(y); //违背3\n    return(0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include<stdlib.h>\n#include<malloc.h>\nint main(void)\n{\n    int *x=(int *)malloc(sizeof(int));\n    int *y=(int *)malloc(sizeof(int));\n    if((NULL!=x)&&(NULL!=y))\n    {\n        *x=1; //遵循1\n        free(x); //遵循2\n        free(y); //遵循3\n    }\n    else\n    {\n        //...\n    }\n    return(0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/prohibit-use-or-free-unallocated-or-freed-pointer",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-3-6",
+        "main_title": "set-freed-pointer-null",
+        "description": "指针变量被释放后必须置为NULL。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0002"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include<stdlib.h>\n#include<malloc.h>\nint main(void)\n{\n    int *x=(int *)malloc(sizeof(int));\n    if(NULL!=x)\n    {\n        *x=1;\n        //...\n        free(x); //违背1\n    }\n    else\n    {\n        return(-1);\n    }\n    //...\n    return(0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include<stdlib.h>\n#include<malloc.h>\nint main(void)\n{\n    int *x=(int *)malloc(sizeof(int));\n    if(NULL!=x)\n    {\n        *x=1;\n        //...\n        free(x);\n        x=NULL; //遵循1\n    }\n    else\n    {\n        return(-1);\n    }\n    //...\n    return(0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/set-freed-pointer-null",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-3-7",
+        "main_title": "initialize-unallocated-dynamic-pointer-null",
+        "description": "动态分配的指针变量定义时如未被分配空间必须初始化为NULL。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0002"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include<stdlib.h>\n#include<malloc.h>\nint main(void)\n{\n    int *x; //违背1\n    //...\n    x=(int *)malloc(sizeof(int));\n    if(NULL!=x)\n    {\n        *x=1;\n    }\n    else\n    {\n        return(-1);\n    }\n    return(0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include<stdlib.h>\n#include<malloc.h>\nint main(void)\n{\n    int *x=NULL; //遵循1\n    //...\n    x=(int *)malloc(sizeof(int));\n    if(NULL!=x)\n    {\n        *x=1;\n    }\n    else\n    {\n        return(-1);\n    }\n    return(0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/initialize-unallocated-dynamic-pointer-null",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-3-8",
+        "main_title": "check-dynamic-pointer-null-before-first-use",
+        "description": "动态分配的指针变量第一次使用前必须进行是否为NULL的判别。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0002"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include<malloc.h>\nint main(void)\n{\n    int *x=(int *)malloc(sizeof(int));\n    *x=1; //违背1\n    return(0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include<stdlib.h>\n#include<malloc.h>\nint main(void)\n{\n    int *x=(int *)malloc(sizeof(int));\n    if(NULL!=x) //遵循1\n    {\n        *x=1;\n    }\n    else\n    {\n        return(-1);\n    }\n    return(0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/check-dynamic-pointer-null-before-first-use",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-3-9",
+        "main_title": "use-null-for-null-pointer",
+        "description": "空指针必须使用NULL，禁止使用整型数0。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0002"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include<stdlib.h>\n#include<malloc.h>\nint main(void)\n{\n    int *x=(int *)malloc(sizeof(int));\n    if(x!=0) //违背1\n    {\n        *x=1;\n    }\n    else\n    {\n        return(-1);\n    }\n    return(0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include<stdlib.h>\n#include<malloc.h>\nint main(void)\n{\n    int *x=(int *)malloc(sizeof(int));\n    if(NULL!=x) //遵循1\n    {\n        *x=1;\n    }\n    else\n    {\n        return(-1);\n    }\n    return(0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/use-null-for-null-pointer",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-3-10",
+        "main_title": "close-file-pointers-on-exit",
+        "description": "禁止文件指针在退出时没有关闭文件。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0002"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include<stdio.h>\nint fr(void);\nint main(void)\n{\n    int ret;\n    ret=fr();\n    //...\n    return(0);\n}\nint fr(void)\n{\n    FILE *stream=NULL;\n    char s[100];\n    int n;\n    if(NULL==(stream=fopen(\"data\",\"r\")))\n    {\n        printf(\"The file 'data' was not opened\\n\");\n        return(-1);\n    }\n    else\n    {\n        printf(\"The file 'data' was opened\\n\");\n        n=fscanf(stream,\"%s\",s);\n        //...\n        return(0); //违背1\n    }\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include<stdio.h>\nint fr(void);\nint main(void)\n{\n    int ret;\n    ret=fr();\n    //...\n    return(0);\n}\nint fr(void)\n{\n    FILE *stream=NULL;\n    char s[100];\n    int n;\n    if(NULL==(stream=fopen(\"data\",\"r\")))\n    {\n        printf(\"The file 'data' was not opened\\n\");\n        return(-1);\n    }\n    else\n    {\n        printf(\"The file 'data' was opened\\n\");\n        n=fscanf(stream,\"%s\",s);\n        //...\n        fclose(stream); //遵循1\n        return(0);\n    }\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/close-file-pointers-on-exit",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-1-3-1",
+        "main_title": "use-function-pointers-cautiously",
+        "description": "谨慎使用函数指针。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0002",
+          "chunk-0007"
+        ],
+        "examples": [],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/use-function-pointers-cautiously",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-1-3-2",
+        "main_title": "use-void-pointers-cautiously",
+        "description": "谨慎使用无类型指针。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0002",
+          "chunk-0007"
+        ],
+        "examples": [],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/use-void-pointers-cautiously",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-1-3-3",
+        "main_title": "use-pointer-arithmetic-cautiously",
+        "description": "谨慎对指针进行算术运算。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0002",
+          "chunk-0007"
+        ],
+        "examples": [],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/use-pointer-arithmetic-cautiously",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-4-1",
+        "main_title": "require-else-in-if-elseif",
+        "description": "在if-elseif语句中必须使用else分支。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0002"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n    int i=0,j=0;\n    double x=0.0;\n    //...\n    if(0==i)\n    {\n        x=1.0;\n    }\n    else if(1==i)\n    {\n        x=2.0;\n    }\n    if(0==j)\n    {\n        x=x+5.0;\n    }\n    return(0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "int main(void)\n{\n    int i=0,j=0;\n    double x=0.0;\n    //...\n    if(0==i)\n    {\n        x=1.0;\n    }\n    else if(1==i)\n    {\n        x=2.0;\n    }\n    else //遵循1\n    {\n        x=0.0;\n    }\n    if(0==j)\n    {\n        x=x+5.0;\n    }\n    return(0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/require-else-in-if-elseif",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-4-2",
+        "main_title": "empty-branch-semicolon-and-comment",
+        "description": "条件判定分支如果为空，必须以单独一行的分号加注释进行明确说明。注：注释必须以“/*no deal with*/”明确说明，此准则中的分号加注释不视为空语句。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0002"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n    int i=0,j=0,k=0;\n    double x=0.0;\n    //...\n    if(0==i)\n    {\n        x=1.0;\n    }\n    else if(1==i)\n    {\n        x=x-1.0;\n    }\n    else\n    {\n        ; //违背1：缺少注释\n    }\n    if(0==j)\n    {\n        x=x+1.0;\n    }\n    else if(1==j)\n    {\n        //违背2：空分支仅有注释，缺少单独一行的分号\n    }\n    else\n    {\n        //违背3：空分支为空\n    }\n    if(0==k)\n    {\n        x=x/2.0;\n    }\n    else if(1==k)\n    {\n        x=x/3.0;\n    }\n    else\n    {\n        /* no deal with */ //违背4：缺少分号\n    }\n    return(0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "int main(void)\n{\n    int i=0,j=0,k=0;\n    double x=0.0;\n    //...\n    if(0==i)\n    {\n        x=1.0;\n    }\n    else if(1==i)\n    {\n        x=x-1.0;\n    }\n    else\n    {\n        ;/* no deal with */ //遵循1\n    }\n    if(0==j)\n    {\n        x=x+1.0;\n    }\n    else if(1==j)\n    {\n        ;/* no deal with */ //遵循2\n    }\n    else\n    {\n        ;/* no deal with */ //遵循3\n    }\n    if(0==k)\n    {\n        x=x/2.0;\n    }\n    else if(1==k)\n    {\n        x=x/3.0;\n    }\n    else\n    {\n        ;/* no deal with */ //遵循4\n    }\n    return(0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/empty-branch-semicolon-and-comment",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-4-3",
+        "main_title": "prohibit-empty-switch",
+        "description": "禁止使用空switch语句。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0002"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n    int i=0;\n    switch(i)\n    {\n    } //违背1\n    return(0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/prohibit-empty-switch",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-4-4",
+        "main_title": "prohibit-switch-on-bool",
+        "description": "禁止对bool量使用switch语句。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0002"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n    int x=0;\n    int y=0;\n    //...\n    switch(0==x) //违背1\n    {\n        case 1:\n            y=1;\n            break;\n        default:\n            y=2;\n            break;\n    }\n    return(0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/prohibit-switch-on-bool",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-4-5",
+        "main_title": "prohibit-default-only-switch",
+        "description": "禁止switch语句中只包含default语句。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0002"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n    int i=0;\n    switch(i)\n    {\n        default:\n            break;\n    } //违背1\n    return(0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/prohibit-default-only-switch",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-4-6",
+        "main_title": "require-switch-default-unless-fully-enumerated",
+        "description": "除枚举类型列举完全外，switch必须要有default。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0002"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "enum WorkMode {INI=0,FIGHT,MAINTAIN,TRAIN} work_state;\nint main(void)\n{\n    int i=0;\n    int j=0;\n    //...\n    switch(work_state) //违背1\n    {\n        case INI:\n            i=1;\n            break;\n        case FIGHT:\n            break;\n        case MAINTAIN:\n            break;\n    }\n    switch(i) //违背2\n    {\n        case 0:\n            j=0;\n            break;\n        case 1: /*共用*/\n        case 2:\n            j=1;\n            break;\n    }\n    return(0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "enum WorkMode {INI=0,FIGHT,MAINTAIN,TRAIN} work_state;\nint main(void)\n{\n    int i=0;\n    int j=0;\n    //...\n    switch(work_state) //遵循1\n    {\n        case INI:\n            i=1;\n            break;\n        case FIGHT:\n            i=2;\n            break;\n        case MAINTAIN:\n            i=3;\n            break;\n        case TRAIN:\n            i=0;\n            break;\n    }\n    switch(i) //遵循2\n    {\n        case 0:\n            j=0;\n            break;\n        case 1: /*共用*/\n        case 2:\n            j=1;\n            break;\n        default:\n            j=-1;\n            break;\n    }\n    return(0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/require-switch-default-unless-fully-enumerated",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-4-7",
+        "main_title": "switch-case-default-termination-and-shared-comment",
+        "description": "switch中的case和default必须以break或return终止，共用case必须加以明确注释。注：共用case必须加以“/*shared*/”明确注释。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0002"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n    int i=0;\n    int j=0;\n    int k=0;\n    //...\n    switch(i)\n    {\n        case 1: //违背1\n            if(j>0)\n            {\n                k=1;\n                break;\n            }\n            k=2;\n        case 2: //违背2\n        case 3: //违背3\n        {\n            j=3;\n        }\n        case 4: //违背4\n            k=4;\n        case 5:\n            j=5;\n            break;\n        default: //违背5\n            j=-1;\n    }\n    return(0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "int main(void)\n{\n    int i=0;\n    int j=0;\n    int k=0;\n    //...\n    switch(i)\n    {\n        case 1: //遵循1\n            if(j>0)\n            {\n                k=1;\n                break;\n            }\n            k=2;\n            break;\n        case 2: /*shared */ //遵循2\n        case 3: //遵循3\n        {\n            j=3;\n        }\n        break;\n        case 4: /*shared */ //遵循4\n            k=4;\n        case 5:\n            j=5;\n            break;\n        default: //遵循5\n            j=-1;\n            break;\n    }\n    return(0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/switch-case-default-termination-and-shared-comment",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-4-8",
+        "main_title": "switch-branches-same-scope-level",
+        "description": "switch语句的所有分支必须具有相同的层次范围。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0002"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n    int x=2;\n    int y=0;\n    int z=0;\n    //...\n    switch(x)\n    {\n        case 1:\n            if(0==y)\n            {\n                z=2;\n                break;\n            }\n            break;\n        case 2:\n            z=1;\n            break;\n        default:\n        {\n            case 3: //违背1：分支位于不同层次\n                z=3;\n                break;\n        }\n    }\n    return(0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/switch-branches-same-scope-level",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-1-4-1",
+        "main_title": "limit-branch-nesting-seven",
+        "description": "避免层数过多的分支嵌套，建议最多不超过 7 层。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0002",
+          "chunk-0007"
+        ],
+        "examples": [],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/limit-branch-nesting-seven",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-5-1",
+        "main_title": "prohibit-goto-into-compound-or-upward",
+        "description": "禁止从复合语句外goto到复合语句内，或由下向上goto。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0002"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n    int i=-2,j=-2;\n    int k;\n    //...\nL0:\n    i=i+1;\n    if(i<0)\n    {\n        //...\n        goto L0; //违背1\n    }\n    if(j<0)\n    {\n        k=-10;\n        j=0;\n        goto L1; //违背2\n    }\n    for(k=0;k<10;k++)\n    {\nL1:\n        j=j+k;\n    }\n    return(0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/prohibit-goto-into-compound-or-upward",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-5-2",
+        "main_title": "prohibit-setjmp-longjmp",
+        "description": "禁止使用setjmp/longjmp。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0002"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include<math.h>\n#include<setjmp.h>\njmp_buf mark;\ndouble fdiv(double a,double b);\nint main(void)\n{\n    int jmpret;\n    double r,n1=1.0,n2=0.0;\n    jmpret=setjmp(mark); //违背1\n    if(0==jmpret)\n    {\n        r=fdiv(n1,n2);\n    }\n    else\n    {\n        return(-1);\n    }\n    return(0);\n}\ndouble fdiv(double a,double b)\n{\n    double div=a/b;\n    if(fabs(b)<1e-10)\n    {\n        longjmp(mark,-1); //违背2\n    }\n    return div;\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/prohibit-setjmp-longjmp",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-1-5-1",
+        "main_title": "cautious-goto",
+        "description": "谨慎使用 goto 语句。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0002",
+          "chunk-0007"
+        ],
+        "examples": [],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/cautious-goto",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-6-1",
+        "main_title": "prohibit-float-constant-to-integer-variable",
+        "description": "禁止将浮点常数赋给整型变量。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0002"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n    int idata=2.5; //违背1\n    idata=idata+1;\n    return(0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "int main(void)\n{\n    int idata=3; //遵循1\n    idata=idata+1;\n    return(0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/prohibit-float-constant-to-integer-variable",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-6-2",
+        "main_title": "prohibit-out-of-range-integer-assignment",
+        "description": "禁止将越界整数赋给整型变量。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0002"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n    unsigned char data1=256; //违背1\n    signed char data2=-129; //违背2\n    //...\n    return(0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "int main(void)\n{\n    unsigned short data1=256; //遵循1\n    short data2=-129; //遵循2\n    //...\n    return(0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/prohibit-out-of-range-integer-assignment",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-6-3",
+        "main_title": "prohibit-assignment-in-logical-expression",
+        "description": "禁止在逻辑表达式中使用赋值语句。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0002"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n    int i=0,j=0;\n    if(i=1) //违背1\n    {\n        j=j+1;\n    }\n    return(0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/prohibit-assignment-in-logical-expression",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-6-4",
+        "main_title": "prohibit-bitwise-operation-on-logical-expression",
+        "description": "禁止对逻辑表达式进行位运算。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0002"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n    int x=0,y=1,z=2;\n    if((x==1)|(y==2)) //违背1\n    {\n        z=3;\n    }\n    if((x==3)&(y==4)) //违背2\n    {\n        z=5;\n    }\n    return(0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "int main(void)\n{\n    int x=0,y=1,z=2;\n    if((x==1)||(y==2)) //遵循1\n    {\n        z=3;\n    }\n    if((x==3)&&(y==4)) //遵循2\n    {\n        z=5;\n    }\n    return(0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/prohibit-bitwise-operation-on-logical-expression",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-6-5",
+        "main_title": "prohibit-incdec-in-expressions-or-arguments",
+        "description": "禁止在运算表达式中或函数调用参数中使用++或--操作符。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0002"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int fun(int p);\nint main(void)\n{\n    int x=1,y=2,z=3;\n    int r;\n    y=y+(x++); //违背1\n    z=z+(++y); //违背2\n    z=fun(--z); //违背3\n    r=fun(z--); //违背4\n    return(0);\n}\nint fun(int p)\n{\n    int ret;\n    ret=2*p;\n    return ret;\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "int fun(int p);\nint main(void)\n{\n    int x=1,y=2,z=3;\n    int r;\n    y=y+x;\n    x++; //遵循1\n    y++; //遵循2\n    z=z+y;\n    z--; //遵循3\n    z=fun(z);\n    r=fun(z);\n    z--; //遵循4\n    return(0);\n}\nint fun(int p)\n{\n    int ret;\n    ret=2*p;\n    return ret;\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/prohibit-incdec-in-expressions-or-arguments",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-6-6",
+        "main_title": "prohibit-shift-beyond-variable-width",
+        "description": "对变量进行移位运算禁止超出变量长度。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0002"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n    unsigned int x,y,z;\n    x=0x00000001;\n    y=x<<33; //违背1\n    x=0x80000000;\n    z=x>>33; //违背2\n    return(0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "int main(void)\n{\n    unsigned int x,y,z;\n    x=0x00000001;\n    y=x<<1; //遵循1\n    x=0x80000000;\n    z=x>>1; //遵循2\n    return(0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/prohibit-shift-beyond-variable-width",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-6-7",
+        "main_title": "prohibit-negative-shift-count",
+        "description": "禁止移位操作中的移位数为负数。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0002"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n    unsigned int xdata=2,ydata=3;\n    int sn=-2;\n    xdata=xdata<<-1; //违背1\n    ydata=ydata>>sn; //违背2\n    return(0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/prohibit-negative-shift-count",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-6-8",
+        "main_title": "prohibit-array-out-of-bounds",
+        "description": "数组禁止越界使用。注：对经过复杂运算所得出的数组下标，在使用时无法断言一定不会越界的情况下，应对数组下标进行范围判断。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0002"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "void comp(int a[],int n) //n为数组长度\n{\n    int i;\n    for(i=0;i<=n;i++) //违背1\n    {\n        a[i]=0;\n    }\n}\nint main(void)\n{\n    int array[100];\n    comp(array,100);\n    array[100]=1; //违背2\n    return(0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "void comp(int a[],int n) //n为数组长度\n{\n    int i;\n    for(i=0;i<n;i++) //遵循1\n    {\n        a[i]=0;\n    }\n}\nint main(void)\n{\n    int array[100];\n    comp(array,100);\n    array[99]=1; //遵循2\n    return(0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/prohibit-array-out-of-bounds",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-6-9",
+        "main_title": "array-index-nonnegative-integer",
+        "description": "数组下标必须是大于等于零的整型数。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0002",
+          "chunk-0003"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n    int Data[3]={0,0,0};\n    int i=-1;\n    Data[i]=1; //违背1\n    return(0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/array-index-nonnegative-integer",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-6-10",
+        "main_title": "prohibit-logical-not-on-constant",
+        "description": "禁止对常数值做逻辑非的运算。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0002",
+          "chunk-0003"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n    int i=0,j=0;\n    if(i=!1) //违背1\n    {\n        j=1;\n    }\n    return(0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "int main(void)\n{\n    int i=0,j=0;\n    if(i!=1) //遵循1\n    {\n        j=1;\n    }\n    return(0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/prohibit-logical-not-on-constant",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-6-11",
+        "main_title": "prohibit-enum-value-for-nonenum-variable",
+        "description": "禁止非枚举类型变量使用枚举类型的值。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0002",
+          "chunk-0003"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n    enum Edata {Enum1=0,Enum2,Enum3};\n    unsigned int data;\n    data=Enum1; //违背1\n    return(0);\n}"
+          },
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n    enum Edata { Enum1 = 0, Enum2, Enum3 };\n    unsigned int data;\n    data = Enum2; // 违背1\n    return (0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "int main(void)\n{\n    enum Edata { Enum1 = 0, Enum2, Enum3 } data;\n    data = Enum2; // 遵循1\n    return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/prohibit-enum-value-for-nonenum-variable",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-6-12",
+        "main_title": "no-division-by-zero",
+        "description": "除法运算中禁止被零除。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0003"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n    int a = 5;\n    int b = 0;\n    int c, d;\n    c = a / b; // 违背1\n    d = a % b; // 违背2\n    return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-division-by-zero",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-6-13",
+        "main_title": "no-assignment-in-sizeof",
+        "description": "禁止在 sizeof 中使用赋值。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0003"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n    int x = 1, y = 2;\n    int ilen;\n    ilen = sizeof(x = y); // 违背1\n    return (0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "int main(void)\n{\n    int x = 1, y = 2;\n    int ilen;\n    x = y;\n    ilen = sizeof(x); // 遵循1\n    return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-assignment-in-sizeof",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-6-14",
+        "main_title": "no-buffer-read-overflow",
+        "description": "缓存区读取操作禁止越界。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0003"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include <string.h>\n\nint main(void)\n{\n    int src[2] = {1, 2};\n    int des[4] = {0, 0, 0, 0};\n    memcpy(des, src, sizeof(des)); // 违背1\n    return (0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include <string.h>\n\nint main(void)\n{\n    int src[2] = {1, 2};\n    int des[4] = {0, 0, 0, 0};\n    memcpy(des, src, sizeof(src)); // 遵循1\n    return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-buffer-read-overflow",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-6-15",
+        "main_title": "no-buffer-write-overflow",
+        "description": "缓存区写入操作禁止越界。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0003"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include <string.h>\n\nint main(void)\n{\n    int src[4] = {1, 2, 3, 4};\n    int des[2] = {0, 0};\n    memcpy(des, src, sizeof(src)); // 违背1\n    return (0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include <string.h>\n\nint main(void)\n{\n    int src[4] = {1, 2, 3, 4};\n    int des[2] = {0, 0};\n    memcpy(des, src, sizeof(des)); // 遵循1\n    return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-buffer-write-overflow",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-6-16",
+        "main_title": "no-use-after-free",
+        "description": "禁止使用已被释放了的内存空间。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0003"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include <stdlib.h>\n#include <malloc.h>\n\nint main(void)\n{\n    int *x = (int *)malloc(sizeof(int));\n    int y;\n    if (NULL != x)\n    {\n        *x = 1;\n        //\n        free(x);\n        x = NULL;\n    }\n    else\n    {\n        return(-1);\n    }\n\n    y = (*x); // 违背1\n    return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-use-after-free",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-6-17",
+        "main_title": "free-original-malloc-pointer",
+        "description": "被 free 的指针必须指向最初 malloc、calloc 分配的地址。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0003"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include <stdlib.h>\n#include <malloc.h>\n\nint fun(void);\n\nint main(void)\n{\n    int i;\n    i = fun();\n    return (0);\n}\n\nint fun(void)\n{\n    int *p = (int *)malloc(3 * sizeof(int));\n    if (NULL == p)\n    {\n        return(-1);\n    }\n    else\n    {\n        *p = 1;\n        p++;\n        *p = 2;\n        free(p); // 违背1\n        p = NULL;\n    }\n    return(0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include <stdlib.h>\n#include <malloc.h>\n\nint fun(void);\n\nint main(void)\n{\n    int i;\n    i = fun();\n    return (0);\n}\n\nint fun(void)\n{\n    int *p = (int *)malloc(3 * sizeof(int));\n    int *pbak = p;\n    if (NULL == p)\n    {\n        return(-1);\n    }\n    else\n    {\n        *p = 1;\n        p++;\n        *p = 2;\n        free(pbak); // 遵循1\n        pbak = NULL;\n    }\n    return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/free-original-malloc-pointer",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-6-18",
+        "main_title": "replace-gets-with-fgets",
+        "description": "禁止使用 gets 函数，应使用 fgets 函数替代。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0003"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include <stdio.h>\n\nint main(void)\n{\n    char line[5] = {0};\n    printf(\"Input a string:\");\n    if (NULL == gets(line)) // 违背1\n    {\n        printf(\"gets error\\n\");\n        return (-1);\n    }\n    else\n    {\n        printf(\"The line entered was:%s\\n\", line);\n    }\n    return (0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include <stdio.h>\n\nint main(void)\n{\n    char line[5] = {0};\n    printf(\"Input a string:\");\n    if (NULL == fgets(line, 5, stdin)) // 遵循1\n    {\n        printf(\"fgets error\\n\");\n        return(-1);\n    }\n    else\n    {\n        printf(\"The line entered was:%s\\n\", line);\n    }\n    return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/replace-gets-with-fgets",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-6-19",
+        "main_title": "string-function-no-overflow",
+        "description": "使用字符串赋值、拷贝、追加等函数时，禁止目标字符串存储空间越界。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0003"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include <string.h>\n#include <stdio.h>\n\nvoid main(void)\n{\n    char string1[10] = {0};\n    char string2[10] = {0};\n    strncpy(string1, \"Hello world\", 11); // 违背1\n    strncpy(string2, \"Hello\", 6);\n    strncat(string2, \"world\", 5); // 违背2\n    printf(\"string1=%s, string2=%s\\n\", string1, string2);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include <string.h>\n#include <stdio.h>\n\nvoid main(void)\n{\n    char string1[12] = {0};\n    char string2[12] = {0};\n    strncpy(string1, \"Hello world\", 11); // 遵循1\n    strncpy(string2, \"Hello\", 6);\n    strncat(string2, \"world\", 5); // 遵循2\n    printf(\"string1=%s, string2=%s\\n\", string1, string2);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/string-function-no-overflow",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-1-6-1",
+        "main_title": "signed-bitwise-operation-caution",
+        "description": "谨慎对有符号整型量进行位运算。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0003",
+          "chunk-0007"
+        ],
+        "examples": [],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/signed-bitwise-operation-caution",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-1-6-2",
+        "main_title": "integer-division-caution",
+        "description": "谨慎做整型量除以整型变量的除法。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0003",
+          "chunk-0007"
+        ],
+        "examples": [],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/integer-division-caution",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-1-6-3",
+        "main_title": "release-dynamic-memory-promptly",
+        "description": "动态申请的内存空间用完后及时释放。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0003",
+          "chunk-0007"
+        ],
+        "examples": [],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/release-dynamic-memory-promptly",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-1-6-4",
+        "main_title": "avoid-strcpy-use-strncpy",
+        "description": "避免使用 strcpy 函数，应使用 strncpy 函数替代。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0003",
+          "chunk-0007"
+        ],
+        "examples": [],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/avoid-strcpy-use-strncpy",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-1-6-5",
+        "main_title": "avoid-strcat-use-strncat",
+        "description": "避免使用 strcat 函数，应使用 strncat 函数替代。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0003",
+          "chunk-0007"
+        ],
+        "examples": [],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/avoid-strcat-use-strncat",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-1-6-6",
+        "main_title": "comma-operator-caution",
+        "description": "谨慎使用逗号操作符。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0003",
+          "chunk-0007"
+        ],
+        "examples": [
+          {
+            "type": "illustrative",
+            "code": "int main(void)\n{\n    int datax, datay, dataz;\n    datax = (datay = 1, dataz = 2); // 提示1\n    return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/comma-operator-caution",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-7-1",
+        "main_title": "do-not-override-standard-library",
+        "description": "禁止覆盖标准函数库的函数。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0003"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int printf(int a, int b) // 违背1\n{\n    return ((a > b) ? a : b);\n}\n\nint main(void)\n{\n    int ret;\n    ret = printf(2, 3);\n    return(0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/do-not-override-standard-library",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-7-2",
+        "main_title": "actual-parameter-type-matching",
+        "description": "禁止函数的实参和形参类型不一致。C++ 的基类形参以派生类实参调用的多态性不在本准则的范围之内。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0003"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "unsigned int sum(unsigned int p1, unsigned short p2);\n\nint main(void)\n{\n    unsigned int ix, iy, iz;\n    ix = 1;\n    iy = 2;\n    iz = sum(ix, iy); // 违背1\n    return (0);\n}\n\nunsigned int sum(unsigned int p1, unsigned short p2)\n{\n    unsigned int ret;\n    ret = (unsigned int)(p1 + p2);\n    return ret;\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "unsigned int sum(unsigned int p1, unsigned short p2);\n\nint main(void)\n{\n    unsigned int ix, iy, iz;\n    ix = 1;\n    iy = 2;\n    iz = sum(ix, (unsigned short)iy); // 遵循1\n    return (0);\n}\n\nunsigned int sum(unsigned int p1, unsigned short p2)\n{\n    unsigned int ret;\n    ret = (unsigned int)(p1 + p2);\n    return ret;\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/actual-parameter-type-matching",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-7-5",
+        "main_title": "declaration-definition-parameter-type-consistent",
+        "description": "函数声明和函数定义中的参数类型必须一致。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0003"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int comp(float data1, float data2); // 违背1\n\nint main(void)\n{\n    int v, d, h;\n    v = 10;\n    d = 20;\n    h = comp(v, d);\n    return (0);\n}\n\nint comp(int data1, int data2) // 违背2\n{\n    int data;\n    data = 2 * data1 + data2;\n    return data;\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "int comp(int data1, int data2); // 遵循1\n\nint main(void)\n{\n    int v, d, h;\n    v = 10;\n    d = 20;\n    h = comp(v, d);\n    return (0);\n}\n\nint comp(int data1, int data2) // 遵循2\n{\n    int data;\n    data = 2 * data1 + data2;\n    return data;\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/declaration-definition-parameter-type-consistent",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-7-7",
+        "main_title": "value-returning-function-must-return",
+        "description": "有返回值的函数必须通过返回语句返回。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0003"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int fun(int a, int *b);\n\nint main(void)\n{\n    int i = 1, j = 2;\n    int k;\n    k = fun(i, &j);\n    return (0);\n}\n\nint fun(int a, int *b)\n{\n    if (1 == a)\n    {\n        *b = *b + a;\n        return(1);\n    }\n    else\n    {\n        *b = *b - a;\n    } // 违背1\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/value-returning-function-must-return",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-7-10",
+        "main_title": "return-value-type-consistent-with-definition",
+        "description": "函数返回值的类型必须与定义一致。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0003"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "unsigned int fun(unsigned int par);\n\nint main(void)\n{\n    unsigned int i = 1;\n    unsigned int j;\n    j = fun(i);\n    return (0);\n}\n\nunsigned int fun(unsigned int par)\n{\n    if (1 == par)\n    {\n        return (-1); // 违背1\n    }\n    else if (2 == par)\n    {\n        return (1.5); // 违背2\n    }\n    else\n    {\n        return (2 * par);\n    }\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/return-value-type-consistent-with-definition",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-7-11",
+        "main_title": "unused-return-cast-to-void",
+        "description": "具有返回值的函数，其返回值如果不被使用，调用时应有（void）说明。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0003"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int func(int para)\n{\n    int stat;\n    if (para >= 0)\n    {\n        //...\n        stat = 1;\n    }\n    else\n    {\n        //...\n        stat = -1;\n    }\n    return(stat);\n}\n\nint main(void)\n{\n    int local = 0;\n    //...\n    func(local); // 违背1\n    //...\n    return (0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "int func(int para)\n{\n    int stat;\n    if (para >= 0)\n    {\n        //...\n        stat = 1;\n    }\n    else\n    {\n        //...\n        stat = -1;\n    }\n    return(stat);\n}\n\nint main(void)\n{\n    int sign = 0;\n    int local = 0;\n    //...\n    sign = func(local); // 遵循1\n    //...\n    (void)func(local); // 遵循2\n    //...\n    return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/unused-return-cast-to-void",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-7-12",
+        "main_title": "no-void-cast-for-void-function",
+        "description": "无返回值的函数，调用时禁止再用（void）重复说明。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0003"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "void func(int para)\n{\n    int i = para + 1;\n    //...\n}\n\nint main(void)\n{\n    int local = 0;\n    (void)func(local); // 违背1\n    return (0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "void func(int para)\n{\n    int i = para + 1;\n    //...\n}\n\nint main(void)\n{\n    int local = 0;\n    func(local); // 遵循1\n    return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-void-cast-for-void-function",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-7-13",
+        "main_title": "static-function-must-be-used",
+        "description": "静态函数必须被使用。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0003"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "static int fun(int paData);\n\nint main(void)\n{\n    int i, thData;\n    thData = 2;\n    i = 2 * thData;\n    return(0);\n}\n\nstatic int fun(int paData) // 违背1\n{\n    int i;\n    i = 2 * paData;\n    return i;\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/static-function-must-be-used",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-7-14",
+        "main_title": "no-multiple-order-dependent-calls-in-expression",
+        "description": "禁止同一个表达式中调用多个顺序相关函数。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0003"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "unsigned int Vel(unsigned int *pcData);\nunsigned int Acc(unsigned int *pcData);\n\nint main(void)\n{\n    unsigned int dis, hei;\n    dis = 3;\n    hei = Vel(&dis) + Acc(&dis); // 违背1\n    return(0);\n}\n\nunsigned int Vel(unsigned int *pcData)\n{\n    unsigned int x = (*pcData);\n    (*pcData) = x * x;\n    return x;\n}\n\nunsigned int Acc(unsigned int *pcData)\n{\n    unsigned int x = (*pcData);\n    (*pcData) = 2 * x;\n    return x;\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "unsigned int Vel(unsigned int *pcData);\nunsigned int Acc(unsigned int *pcData);\n\nint main(void)\n{\n    unsigned int dis, hei, temp1, temp2;\n    dis = 3;\n    temp1 = Vel(&dis);\n    temp2 = Acc(&dis);\n    hei = temp1 + temp2; // 遵循1\n    return (0);\n}\n\nunsigned int Vel(unsigned int *pcData)\n{\n    unsigned int x = (*pcData);\n    (*pcData) = x * x;\n    return x;\n}\n\nunsigned int Acc(unsigned int *pcData)\n{\n    unsigned int x = (*pcData);\n    (*pcData) = 2 * x;\n    return x;\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-multiple-order-dependent-calls-in-expression",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-7-15",
+        "main_title": "no-ellipsis-in-parameter-list",
+        "description": "禁止在函数参数表中使用省略号。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0003"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int fun(int datax, ...); // 违背1\n\nint main(void)\n{\n    int ix, iy, iz;\n    ix = 1;\n    iy = 2;\n    iz = fun(ix, iy);\n    return (0);\n}\n\nint fun(int datax, ...) // 违背2\n{\n    int temp;\n    temp = 2 * datax;\n    return temp;\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-ellipsis-in-parameter-list",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-7-16",
+        "main_title": "no-direct-indirect-recursion",
+        "description": "禁止使用直接或间接自调用函数。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0003"
+        ],
+        "examples": [],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-direct-indirect-recursion",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-1-7-1",
+        "main_title": "function-parameters-max-10",
+        "description": "函数中避免使用过多的参数，建议不要超过 10 个。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0003",
+          "chunk-0007"
+        ],
+        "examples": [],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/function-parameters-max-10",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-1-7-2",
+        "main_title": "no-unused-call-parameters",
+        "description": "函数中避免存在未被使用的调用参数。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0003",
+          "chunk-0007"
+        ],
+        "examples": [],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-unused-call-parameters",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-1-7-3",
+        "main_title": "abort-exit-caution",
+        "description": "谨慎使用 abort、exit 函数。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0003",
+          "chunk-0007"
+        ],
+        "examples": [],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/abort-exit-caution",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-1-7-4",
+        "main_title": "check-system-function-return-status",
+        "description": "对系统函数的调用，建议调用后对其返回状态的有效性进行判别。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0003",
+          "chunk-0007"
+        ],
+        "examples": [],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/check-system-function-return-status",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-1-7-5",
+        "main_title": "pass-array-length-with-pointer",
+        "description": "函数中数组变量作为参数指针传递时，建议同时传递数组长度。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0003",
+          "chunk-0007"
+        ],
+        "examples": [
+          {
+            "type": "illustrative",
+            "code": "void fun1(int p[]) // 提示1\n{\n    int i;\n    for(i = 0; i < 6; i++)\n    {\n        p[i] = p[i] + 1;\n    }\n}\n\nvoid fun2(int *p) // 提示2\n{\n    int i;\n    for(i = 0; i < 6; i++)\n    {\n        p[i] = p[i] + 1;\n    }\n}\n\nint main(void)\n{\n    int a[6] = {0, 1, 2, 3, 4, 5};\n    fun1(a);\n    fun2(a);\n    return (0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "void fun1(int p[], int n)\n{\n    int i;\n    for(i = 0; i < n; i++)\n    {\n        p[i] = p[i] + 1; // 遵循1\n    }\n}\n\nvoid fun2(int *p, int n)\n{\n    int i;\n    for(i = 0; i < n; i++)\n    {\n        p[i] = p[i] + 1; // 遵循2\n    }\n}\n\nint main(void)\n{\n    int i;\n    int a[6] = {0, 1, 2, 3, 4, 5};\n    i = sizeof(a) / sizeof(int);\n    fun1(a, i);\n    fun2(a, i);\n    return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/pass-array-length-with-pointer",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-8-1",
+        "main_title": "no-unreachable-statements",
+        "description": "禁止不可达语句。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0003"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n    int local = 0;\n    int para = 0;\n    //...\n    switch(para)\n    {\n        local = para; // 违背1\n        case 1:\n            //...\n            break;\n        case 2:\n            //...\n            break;\n        default:\n            //...\n            break;\n    }\n    return local;\n    para++; // 违背2\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-unreachable-statements",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-8-2",
+        "main_title": "no-unreachable-branches",
+        "description": "禁止不可达分支。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0003"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n    unsigned int local = 0;\n    unsigned int para = 0;\n    //...\n    if (1 == para)\n    {\n        //...\n    }\n    else\n    {\n        //...\n    }\n    if (local >= 0)\n    {\n        para = 1;\n    }\n    else\n    {\n        para = 2; // 违背1\n        //...\n    }\n    return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-unreachable-branches",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-8-3",
+        "main_title": "no-invalid-statements",
+        "description": "禁止使用无效语句。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0003"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n    unsigned int local = 0;\n    unsigned int para = 0;\n    //...\n    local; // 违背1\n    para - 0; // 违背2\n    local = para; // 违背3\n    local > para; // 违背4\n    return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-invalid-statements",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-8-4",
+        "main_title": "annotate-octal-literals",
+        "description": "使用八进制数必须明确注释。八进制数必须加以 /* octal */ 明确注释。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0003"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n    int code[3];\n    code[0] = 109;\n    code[1] = 100;\n    code[2] = 011; // 违背1\n    return (0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "int main(void)\n{\n    int code[3];\n    code[0] = 109;\n    code[1] = 100;\n    code[2] = 011; /* octal */ // 遵循1\n    return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/annotate-octal-literals",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-8-5",
+        "main_title": "uppercase-numeric-type-suffix",
+        "description": "数字类型后缀必须使用大写字母。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0003"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "unsigned int ucV2 = 0u; // 违背\nlong lV2 = 0l; // 违背\nfloat fV2 = 0.0f; // 违背\ndouble ldV2 = 0.0l; // 违背"
+          },
+          {
+            "type": "compliant",
+            "code": "unsigned int ucV1 = 0U; // 遵循\nlong lV1 = 0L; // 遵循\nfloat fV1 = 0.0F; // 遵循\ndouble ldV1 = 0.0L; // 遵循"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/uppercase-numeric-type-suffix",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-1-8-1",
+        "main_title": "avoid-empty-statements",
+        "description": "避免使用空语句。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0003",
+          "chunk-0007"
+        ],
+        "examples": [],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/avoid-empty-statements",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-1-8-2",
+        "main_title": "avoid-unused-variables",
+        "description": "避免无用的多余变量。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0003",
+          "chunk-0007"
+        ],
+        "examples": [],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/avoid-unused-variables",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-1-8-3",
+        "main_title": "avoid-unused-functions",
+        "description": "避免无用的多余函数。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0003",
+          "chunk-0007"
+        ],
+        "examples": [],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/avoid-unused-functions",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-1-8-4",
+        "main_title": "recommend-numeric-type-suffix",
+        "description": "推荐使用数字类型后缀。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0003",
+          "chunk-0007"
+        ],
+        "examples": [
+          {
+            "type": "illustrative",
+            "code": "unsigned int ucV = 0U;\nlong lV = 0L;\nfloat fV = 0.0F;\ndouble ldV = 0.0L;"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/recommend-numeric-type-suffix",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-9-1",
+        "main_title": "for-control-variable-local",
+        "description": "for 循环控制变量必须使用局部变量。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0003"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "unsigned int Ginum = 0;\n\nint main(void)\n{\n    int i = 10;\n    for(Ginum = 0; Ginum < 10; Ginum++) // 违背1\n    {\n        i = i - 1;\n    }\n    return(0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/for-control-variable-local",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-9-2",
+        "main_title": "for-control-variable-integer",
+        "description": "for 循环控制变量必须使用整数型变量。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0003"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n    float f = 0.0, g = 1.0;\n    for (f = 0.0; f < 10.0; f = f + 1.0) // 违背1\n    {\n        g = f + g;\n    }\n    return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/for-control-variable-integer",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-9-3",
+        "main_title": "no-modify-for-control-variable-in-body",
+        "description": "禁止在 for 循环体内部修改循环控制变量。若循环过程中步长需依据处理情况改变，应在 for 循环体内部另用变量进行控制。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0003"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n    int i, j, k;\n    j = 100;\n    k = 0;\n    for(i = 0; i < j; i++)\n    {\n        i = 2 * i; // 违背1\n        k = k + 1;\n    }\n    return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-modify-for-control-variable-in-body",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-9-4",
+        "main_title": "infinite-loop-use-while-one",
+        "description": "无限循环必须使用 while(1) 语句，禁止使用 for(;;) 等其他形式的语句。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0003"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int Gstate = 0;\n\nint main(void)\n{\n    for(;;) // 违背1\n    {\n        //...\n        if (1 == Gstate)\n        {\n            break;\n        }\n    }\n    return (0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "int Gstate = 0;\n\nint main(void)\n{\n    while(1) // 遵循1\n    {\n        //...\n        if (1 == Gstate)\n        {\n            break;\n        }\n    }\n    return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/infinite-loop-use-while-one",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-1-9-1",
+        "main_title": "infinite-loop-caution",
+        "description": "谨慎使用无限循环语句。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0003",
+          "chunk-0007"
+        ],
+        "examples": [],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/infinite-loop-caution",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-1-9-2",
+        "main_title": "multiple-break-in-loop-caution",
+        "description": "谨慎在循环中使用多个 break 语句。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0003",
+          "chunk-0007"
+        ],
+        "examples": [],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/multiple-break-in-loop-caution",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-1-9-3",
+        "main_title": "multiple-continue-in-loop-caution",
+        "description": "谨慎在循环中使用多个 continue 语句。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0003",
+          "chunk-0007"
+        ],
+        "examples": [],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/multiple-continue-in-loop-caution",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-10-1",
+        "main_title": "float-to-integer-explicit-cast",
+        "description": "浮点数变量赋给整型变量必须强制转换。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0003"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n    int ix, iy;\n    float fx = 1.85;\n    float fy = -1.85;\n    ix = fx; // 违背1\n    iy = fy; // 违背2\n    return(0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#define Round(x) (((x) >= 0) ? (int)((x) + 0.5) : (int)((x) - 0.5))\n\nint main(void)\n{\n    int ix, iy;\n    float fx = 1.85;\n    float fy = -1.85;\n    ix = (int)(fx); // 遵循1\n    ix = Round(fx); // 遵循2\n    iy = (int)(fy); // 遵循3\n    iy = Round(fy); // 遵循4\n    return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/float-to-integer-explicit-cast",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-10-2",
+        "main_title": "long-to-short-explicit-cast",
+        "description": "长整数变量赋给短整数变量必须强制转换。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0003",
+          "chunk-0004"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n    signed char cVar = 0;\n    short sVar = 0;\n    int iVar = 0;\n    long lVar = 0;\n    cVar = sVar; // 违背1\n    sVar = iVar; // 违背2\n    iVar = lVar; // 违背3\n    return (0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "int main(void)\n{\n    signed char cVar = 0;\n    short sVar = 0;"
+          },
+          {
+            "type": "compliant",
+            "code": "int main(void)\n{\n signed char cVar = 0;\n short sVar = 0;\n int iVar = 0;\n long lVar = 0;\n cVar = (signed char)sVar; //遵循1\n sVar = (short)iVar; //遵循2\n iVar = (int)lVar; //遵循3\n return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/long-to-short-explicit-cast",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-10-3",
+        "main_title": "double-to-float-explicit-cast",
+        "description": "double型变量赋给float型变量必须强制转换。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0004"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n double dData = 0.0;\n float fData;\n fData = dData; //违背1\n return (0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "int main(void)\n{\n double dData = 0.0;\n float fData;\n fData = (float)dData; //遵循1\n return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/double-to-float-explicit-cast",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-10-5",
+        "main_title": "pointer-nonpointer-explicit-cast",
+        "description": "将指针量赋予非指针变量或非指针量赋予指针变量，必须使用强制转换。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0004"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include <stdlib.h>\nint main(void)\n{\n unsigned int *ptr = NULL;\n unsigned int adr = 0;\n unsigned int uid = 0;\n ptr = adr; //违背1\n adr = &uid; //违背2\n return (0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include <stdlib.h>\nint main(void)\n{\n unsigned int *ptr = NULL;\n unsigned int adr = 0;\n unsigned int uid = 0;\n ptr = (unsigned int *)adr; //遵循1\n adr = (unsigned int)(&uid); //遵循2\n return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/pointer-nonpointer-explicit-cast",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-10-6",
+        "main_title": "no-meaningless-type-cast",
+        "description": "禁止使用无实质作用的类型转换。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0004"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n unsigned int sx, sy = 10, sz;\n sx = (unsigned int)sy + 2; //违背1\n sz = (unsigned int)((float)((sx + sy) * 2 / 3)) + 0.5; //违背2\n return (0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "int main(void)\n{\n unsigned int sx, sy = 10, sz;\n sx = sy + 2; //遵循1\n sz = (unsigned int)(((float)(sx + sy) * 2 / 3) + 0.5); //遵循2\n return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-meaningless-type-cast",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-1-10-1",
+        "main_title": "float-to-integer-rounding-consideration",
+        "description": "浮点型数转换成整型数应考虑是否需要四舍五入。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0004",
+          "chunk-0007"
+        ],
+        "examples": [],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/float-to-integer-rounding-consideration",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-1-10-2",
+        "main_title": "cautious-double-to-float",
+        "description": "谨慎将 double 型数转换成 float 型数。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0004",
+          "chunk-0007"
+        ],
+        "examples": [],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/cautious-double-to-float",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-1-10-3",
+        "main_title": "cautious-long-to-short-integer-conversion",
+        "description": "谨慎将长整型数转换成短整型数。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0004",
+          "chunk-0007"
+        ],
+        "examples": [],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/cautious-long-to-short-integer-conversion",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-1-10-4",
+        "main_title": "cautious-pointer-nonpointer-conversion",
+        "description": "谨慎将指针量赋予非指针变量或非指针量赋予指针变量。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0004",
+          "chunk-0007"
+        ],
+        "examples": [],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/cautious-pointer-nonpointer-conversion",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-11-1",
+        "main_title": "no-uninitialized-variable-use",
+        "description": "变量禁止未赋值就使用。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0004"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n int i;\n float x, y, z;\n x = z; //违背1\n if (0 == i) //违背2\n {\n  y = z; //违背3\n }\n return (0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "int main(void)\n{\n int i = 0;\n float x, y, z;\n z = 0.0;\n x = z; //遵循1\n if (0 == i) //遵循2\n {\n }\n return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-uninitialized-variable-use",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-11-2",
+        "main_title": "no-implicit-system-default-initialization",
+        "description": "变量初始化禁止隐含依赖于系统的缺省值。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0004"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int Gstate; //违背1\nint main(void)\n{\n static int StateN; //违背2\n if (1 == Gstate)\n {\n  StateN = StateN + 1;\n }\n return (0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "int Gstate = 0; //遵循1\nint main(void)\n{\n static int StateN = 0; //遵循2\n if (1 == Gstate)\n {\n  StateN = StateN + 1;\n }\n return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-implicit-system-default-initialization",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-11-3",
+        "main_title": "nested-struct-initializer-match-definition",
+        "description": "结构体初始化的嵌套结构必须与定义一致。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0004"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "struct Spixel\n{\n unsigned int colour;\n struct Scoords\n {\n  unsigned int x;\n  unsigned int y;\n } coords;\n};\nint main(void)\n{\n struct Spixel pixel = {1, 2, 3}; //违背1\n return (0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "struct Spixel\n{\n unsigned int colour;\n struct Scoords\n {\n  unsigned int x;\n  unsigned int y;\n } coords;\n};\nint main(void)\n{\n struct Spixel pixel = {1, {2, 3}}; //遵循1\n return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/nested-struct-initializer-match-definition",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-11-4",
+        "main_title": "complete-enum-element-initialization",
+        "description": "枚举元素定义中的初始化必须完整；规范的枚举元素初始化方法是，或初始化第一个元素，或初始化所有元素。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0004"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n enum Etype\n {\n  RED,\n  WHITE = 0, //违背1\n  BLUE\n } edata;\n edata = BLUE;\n return (0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "int main(void)\n{\n enum Etype1\n {\n  RED = 0, //遵循1\n  WHITE,\n  BLUE\n } edata1;\n enum Etype2 //遵循2\n {\n  BLACK = 3,\n  GREEN = 4,\n  YELLOW = 5\n } edata2;\n edata1 = BLUE;\n edata2 = GREEN;\n return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/complete-enum-element-initialization",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-1-11-1",
+        "main_title": "initialize-variable-at-declaration",
+        "description": "建议变量在声明的同时进行初始化。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0004",
+          "chunk-0007"
+        ],
+        "examples": [],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/initialize-variable-at-declaration",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-1-11-2",
+        "main_title": "centralized-global-variable-initialization",
+        "description": "建议所有全局变量在统一设计的初始化模块中进行初始化。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0004",
+          "chunk-0007"
+        ],
+        "examples": [],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/centralized-global-variable-initialization",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-12-1",
+        "main_title": "no-relational-comparison-on-logical-values",
+        "description": "禁止对逻辑量进行大于或小于的逻辑比较。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0004"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "typedef unsigned int bool;\nint main(void)\n{\n bool outReg1, outReg2;\n int r = 100, h = 500, flag = 0;\n outReg1 = (r > 100);\n outReg2 = (h > 300);\n if (outReg1 > outReg2) //违背1\n {\n  flag = 1;\n }\n if (outReg1 < outReg2) //违背2\n {\n  flag = 2;\n }\n return (0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "typedef unsigned int bool;\nint main(void)\n{\n bool outReg1, outReg2;\n int r = 100, h = 500, flag = 0;\n outReg1 = (r > 100);\n outReg2 = (h > 300);\n if (outReg1 && (!outReg2)) //遵循1\n {\n  flag = 1;\n }\n if ((!outReg1) && outReg2) //遵循2\n {\n  flag = 2;\n }\n return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-relational-comparison-on-logical-values",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-12-2",
+        "main_title": "no-relational-comparison-on-pointers",
+        "description": "禁止对指针进行大于或小于的逻辑比较。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0004"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int fsub(int *a, int *b);\nint main(void)\n{\n int sub = 0;\n int a = 1, b = 2;\n sub = fsub(&a, &b);\n return (0);\n}\nint fsub(int *a, int *b)\n{\n int sub = 0;\n if (a > b) //违背1\n {\n  sub = (*a) - (*b);\n }\n else if (a < b) //违背2\n {\n  sub = (*b) - (*a);\n }\n else\n {\n  sub = 0;\n }\n return sub;\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "int fsub(int *a, int *b);\nint main(void)\n{\n int sub = 0;\n int a = 1, b = 2;\n sub = fsub(&a, &b);\n return (0);\n}\nint fsub(int *a, int *b)\n{\n int sub = 0;\n if ((*a) > (*b)) //遵循1\n {\n  sub = (*a) - (*b);\n }\n else if ((*a) < (*b)) //遵循2\n {\n  sub = (*b) - (*a);\n }\n else\n {\n  sub = 0;\n }\n return sub;\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-relational-comparison-on-pointers",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-12-3",
+        "main_title": "no-floating-point-equality-comparison",
+        "description": "禁止对浮点数进行是否相等的比较；浮点数是否相等的比较包括“==”或“!=”两种情况，应该使用两数之差绝对值是否小于给定精度的判别。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0004"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n int i, j;\n int P = 1000;\n float d = 0.435;\n if (435 == (P * d)) //违背1\n {\n  i = 1;\n }\n else\n {\n  i = 2;\n }\n if (435 != (P * d)) //违背2\n {\n  j = 1;\n }\n else\n {\n  j = 2;\n }\n return (0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include <math.h>\nint main(void)\n{\n int i, j;\n int P = 1000;\n float d = 0.435;\n if (fabs(435 - (P * d)) < 1e-4) //遵循1\n {\n  i = 1;\n }\n else\n {\n  i = 2;\n }\n if ((435 >= (P * d) + 1e-4) || (435 <= (P * d) - 1e-4)) //遵循2\n {\n  j = 1;\n }\n else\n {\n  j = 2;\n }\n return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-floating-point-equality-comparison",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-12-4",
+        "main_title": "no-zero-comparison-on-unsigned-values",
+        "description": "禁止对无符号数进行大于等于零或小于零的比较。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0004"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n unsigned int x = 1, y = 2;\n int flag = 0;\n if (x >= 0) //违背1\n {\n  flag = flag + 1;\n }\n if (y <= 0) //违背2\n {\n  flag = flag + 1;\n }\n return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-zero-comparison-on-unsigned-values",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-12-5",
+        "main_title": "no-direct-signed-unsigned-comparison",
+        "description": "禁止无符号数与有符号数之间的直接比较。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0004"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n unsigned int x;\n int y, i;\n x = 2;\n y = -2;\n if (y < x) //违背1\n {\n  i = 0;\n }\n else\n {\n  i = 1;\n }\n return (0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "int main(void)\n{\n unsigned int x;\n int y, i;\n x = 2;\n y = -2;\n if (y < (int)x) //遵循1\n {\n  i = 0;\n }\n else\n {\n  i = 1;\n }\n return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-direct-signed-unsigned-comparison",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-1-12-1",
+        "main_title": "constant-left-in-equality-comparison",
+        "description": "与常数进行是否相等的判别，建议常数在左，变量在右。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0004",
+          "chunk-0007"
+        ],
+        "examples": [],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/constant-left-in-equality-comparison",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-13-1",
+        "main_title": "no-local-global-variable-name-shadowing",
+        "description": "禁止局部变量与全局变量同名。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0004"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int sign = 0;\nint main(void)\n{\n int local = 0;\n int sign = 0; //违背1\n //...\n return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-local-global-variable-name-shadowing",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-13-2",
+        "main_title": "no-parameter-global-variable-name-shadowing",
+        "description": "禁止函数形参与全局变量同名。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0004"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int sign = 0;\nint func(int sign) //违背1\n{\n int local = 0;\n local = sign;\n //...\n return local;\n}\nint main(void)\n{\n //...\n return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-parameter-global-variable-name-shadowing",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-13-3",
+        "main_title": "no-variable-function-name-collision",
+        "description": "禁止变量名与函数名同名。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0004"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "void misdis(void)\n{\n //...\n}\nint main(void)\n{\n int misdis; //违背1\n misdis = 0;\n return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-variable-function-name-collision",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-13-4",
+        "main_title": "no-variable-tag-name-collision",
+        "description": "禁止变量名与标识名同名。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0004"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "struct POINTA\n{\n unsigned int x;\n unsigned int y;\n};\nstruct POINTB\n{\n unsigned int y;\n unsigned int z;\n};\nint main(void)\n{\n unsigned int POINTA; //违背1\n struct POINTB POINTB; //违背2\n POINTA = 1;\n POINTB.y = POINTA;\n return (0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "struct POINTA\n{\n unsigned int x;\n unsigned int y;\n};\nstruct POINTB\n{\n unsigned int y;\n unsigned int z;\n};\nint main(void)\n{\n unsigned int pot_y; //遵循1\n struct POINTB spotb; //遵循2\n pot_y = 1;\n spotb.y = pot_y;\n return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-variable-tag-name-collision",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-13-5",
+        "main_title": "no-variable-enumerator-name-collision",
+        "description": "禁止变量名与枚举元素同名。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0004"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "enum Name_type { first = 0, second } EnumVar;\nint main(void)\n{\n unsigned int second = 0; //违背1\n EnumVar = second;\n return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-variable-enumerator-name-collision",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-13-6",
+        "main_title": "no-variable-typedef-name-collision",
+        "description": "禁止变量名与typedef自定义的类型名同名。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0004"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "typedef unsigned int TData;\nunsigned int fun(unsigned int var);\nint main(void)\n{\n unsigned int datax = 1, datay;\n datay = fun(datax);\n return (0);\n}\nunsigned int fun(unsigned int var)\n{\n unsigned int TData = var + 1; //违背1\n return (2 * TData);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-variable-typedef-name-collision",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-13-7",
+        "main_title": "no-inner-block-variable-redefinition",
+        "description": "禁止在内部块中重定义已有的变量名。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0004"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n int i, ix, iy, ip;\n ix = 1;\n ip = 1;\n if (1 == ix)\n {\n  int ip = 0; //违背1\n  for (i = 0; i < 10; i++)\n  {\n   ip = ip + ix;\n  }\n }\n iy = ip;\n return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-inner-block-variable-redefinition",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-13-8",
+        "main_title": "no-case-only-variable-distinction",
+        "description": "禁止仅依赖大小写区分的变量。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0004"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int fSpeed;\nint fspeed; //违背1"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-case-only-variable-distinction",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-13-9",
+        "main_title": "no-lowercase-l-vs-digit-one-variable-distinction",
+        "description": "禁止仅依赖小写字母“l”与数字“1”区分的变量。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0004"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int fSpeedl;\nint fSpeed1; //违背1"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-lowercase-l-vs-digit-one-variable-distinction",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-13-10",
+        "main_title": "no-uppercase-o-vs-digit-zero-variable-distinction",
+        "description": "禁止仅依赖大写字母“O”与数字“0”区分的变量。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0004"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int fSpeedO;\nint fSpeed0; //违背1"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-uppercase-o-vs-digit-zero-variable-distinction",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-13-11",
+        "main_title": "no-single-lowercase-l-or-uppercase-o-variable-name",
+        "description": "禁止单独使用小写字母“l”或大写字母“O”作为变量名。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0004"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n int l = 1; //违背1\n int O = 0; //违背2\n l = 0;\n O = 1;\n return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-single-lowercase-l-or-uppercase-o-variable-name",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-13-12",
+        "main_title": "volatile-for-externally-writable-variables",
+        "description": "程序外部可改写的变量，必须使用volatile类型说明；例如寄存器变量、双口存储器变量、与其他线程共享的变量，应使用volatile类型说明。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0004"
+        ],
+        "examples": [],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/volatile-for-externally-writable-variables",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-13-13",
+        "main_title": "no-multiple-volatile-accesses-in-one-expression",
+        "description": "禁止在表达式中出现多个同一volatile类型变量的运算。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0004"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n unsigned int i, z[100];\n volatile unsigned int v = 1;\n for (i = 0; i < 100; i++)\n {\n  z[i] = 3 * v * v + 2 * v + i; //违背1\n }\n return (0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "int main(void)\n{\n unsigned int i, j, z[100];\n volatile unsigned int v = 1;\n for (i = 0; i < 100; i++)\n {\n  j = v; //遵循1\n  z[i] = 3 * j * j + 2 * j + i;\n }\n return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-multiple-volatile-accesses-in-one-expression",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-13-14",
+        "main_title": "no-null-as-integer-zero",
+        "description": "禁止将NULL做为整型数0使用。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0004"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include <stdlib.h>\nint fun(int width);\nint main(void)\n{\n int i;\n i = fun(NULL); //违背1\n return (0);\n}\nint fun(int width)\n{\n int w;\n w = width - 10;\n return w;\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include <stdlib.h>\nint fun(int width);\nint main(void)\n{\n int i;\n i = fun(0); //遵循1\n return (0);\n}\nint fun(int width)\n{\n int w;\n w = width - 10;\n return w;\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-null-as-integer-zero",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-13-15",
+        "main_title": "no-negative-assignment-to-unsigned-variable",
+        "description": "禁止给无符号类型变量赋负值。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0004"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n unsigned short usX;\n usX = -10; //违背1\n //...\n return (0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "int main(void)\n{\n unsigned short usX;\n usX = (unsigned short)(-10); //遵循1\n //...\n return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-negative-assignment-to-unsigned-variable",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-13-16",
+        "main_title": "nul-terminated-string-array",
+        "description": "用于表示字符串的数组必须以'\\0'结束。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0004"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include <stdio.h>\nint main(void)\n{\n char buf[8];\n buf[0] = 'y';\n buf[1] = 'e';\n buf[2] = 's'; //违背1\n printf(\"%s\\n\", buf);\n return (0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include <stdio.h>\nint main(void)\n{\n char buf[8];\n buf[0] = 'y';\n buf[1] = 'e';\n buf[2] = 's';\n buf[3] = '\\0'; //遵循1\n return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/nul-terminated-string-array",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-1-13-1",
+        "main_title": "type-prefix-variable-naming",
+        "description": "推荐使用带类型前缀的变量命名。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0004",
+          "chunk-0007"
+        ],
+        "examples": [
+          {
+            "type": "illustrative",
+            "code": "unsigned int uiLaunchButton; // 发射按钮\nlong lLaunchTime; // 发射时间\ndouble dLaunchAzim; // 发射方位角"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/type-prefix-variable-naming",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-1-13-2",
+        "main_title": "cautious-use-of-register-variables",
+        "description": "谨慎使用寄存器变量。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0004",
+          "chunk-0007"
+        ],
+        "examples": [],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/cautious-use-of-register-variables",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-2-1-1",
+        "main_title": "dynamic-member-copy-constructor-and-assignment",
+        "description": "含有动态分配成员的类，必须编写拷贝构造函数，并重载赋值操作符。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0004",
+          "chunk-0007"
+        ],
+        "examples": [
+          {
+            "type": "compliant",
+            "code": "#include <iostream>\nusing namespace std;\nclass A\n{\npublic:\n A(char *cstr);\n A(const A &ca);\n A(void);\n ~A(void);\n A& operator=(const A &ca);\nprivate:\n char *str;\n};\nA::A(char *cstr)\n{\n str = new char[20];\n strncpy(str, cstr, 20);\n}\nA::A(const A &ca) //遵循1\n{\n str = new char[20];\n strncpy(str, ca.str, 20);\n}\nA& A::operator=(const A &ca) //遵循2\n{\n if (NULL == str)\n {\n  str = new char[20];\n }\n strncpy(str, ca.str, 20);\n return *this;\n}\nA::~A(void)\n{\n delete[] str;\n}\nA::A(void) : str(new char[20])\n{\n strncpy(str, \"Welcome!\", 20);\n}\nint main(void)\n{\n A a(\"Hello world!\");\n A b(a);\n A c;\n c = b;\n return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/dynamic-member-copy-constructor-and-assignment",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-2-1-2",
+        "main_title": "virtual-base-to-derived-dynamic-cast",
+        "description": "虚拟基类指针转换为派生类指针必须使用 dynamic_cast 转换。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0004",
+          "chunk-0007"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include <iostream>\nusing namespace std;\nclass B\n{\npublic:\n B(void);\n virtual ~B(void);\n virtual int g(int a = 0);\nprivate:\n int b;\n};\nB::B(void) : b(1)\n{\n}\nB::~B(void)\n{\n}\nint B::g(int a)\n{\n return (a + b);\n}\nclass D : public virtual B\n{\npublic:\n D(void);\n virtual ~D(void);\n virtual int g(int a = 0);\nprivate:\n int d;\n};\nD::D(void) : B(), d(2)\n{\n}\nD::~D(void)\n{\n}\nint D::g(int a)\n{\n return (a + d);\n}\nint main(void)\n{\n D d;\n B &b = d;\n B *pb = &d;\n D *pd1 = reinterpret_cast<D *>(pb); //违背1\n D &pd2 = reinterpret_cast<D &>(*pb); //违背2\n return (0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include <iostream>\nusing namespace std;\nclass B\n{\npublic:\n B(void);\n virtual ~B(void);\n virtual int g(int a = 0);\nprivate:\n int b;\n};\nB::B(void) : b(1)\n{\n}\nB::~B(void)\n{\n}\nint B::g(int a)\n{\n return (a + b);\n}\nclass D : public virtual B\n{\npublic:\n D(void);\n virtual ~D(void);\n virtual int g(int a = 0);\nprivate:\n int d;\n};\nD::D(void) : B(), d(2)\n{\n}\nD::~D(void)\n{\n}\nint D::g(int a)\n{\n return (a + d);\n}\nint main(void)\n{\n D d;\n B &b = d;\n B *pb = &d;\n D *pd1 = dynamic_cast<D *>(pb); //遵循1\n D &pd2 = dynamic_cast<D &>(*pb); //遵循2\n return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/virtual-base-to-derived-dynamic-cast",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-2-1-3",
+        "main_title": "diamond-hierarchy-virtual-base-inheritance",
+        "description": "菱形层次结构的派生设计，对基类派生必须使用 virtual 说明。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0004",
+          "chunk-0007"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include <iostream>\nusing namespace std;\nclass A\n{\npublic:\n A(void);\n void SetA(int);\nprivate:\n int a;\n};\nA::A(void) : a(0)\n{\n}\nvoid A::SetA(int va)\n{\n a = va;\n}\nclass B1 : public A //违背1\n{\npublic:\n B1(void);\n void SetB1(int);\nprivate:\n int b1;\n};\nB1::B1(void) : A(), b1(0)\n{\n}\nvoid B1::SetB1(int vb)\n{\n b1 = vb;\n SetA(b1 + 1);\n}\nclass B2 : public A //违背2\n{\npublic:\n B2(void);\n void SetB2(int);\nprivate:\n int b2;\n};\nB2::B2(void) : A(), b2(0)\n{\n}\nvoid B2::SetB2(int vb)\n{\n b2 = vb;\n SetA(b2 + 2);\n}\nclass D : public B1, public B2\n{\npublic:\n D(void);\nprivate:\n int d;\n};\nD::D(void) : B1(), B2(), d(0)\n{\n}\nint main(void)\n{\n D thed;\n thed.SetB1(1);\n thed.SetB2(2);\n return (0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include <iostream>\nusing namespace std;\nclass A\n{\npublic:\n A(void);\n void SetA(int);\nprivate:\n int a;\n};\nA::A(void) : a(0)\n{\n}\nvoid A::SetA(int va)\n{\n a = va;\n}\nclass B1 : public virtual A //遵循1\n{\npublic:\n B1(void);\n void SetB1(int);\nprivate:\n int b1;\n};\nB1::B1(void) : A(), b1(0)\n{\n}\nvoid B1::SetB1(int vb)\n{\n b1 = vb;\n SetA(b1 + 1);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/diamond-hierarchy-virtual-base-inheritance",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-2-1-4",
+        "main_title": "abstract-class-copy-operator-protected-or-private",
+        "description": "抽象类中的复制操作符重载（operator=）必须是保护的或私有的。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0005",
+          "chunk-0007"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include <iostream>\nusing namespace std;\nclass B {\npublic:\n    B(void);\n    virtual ~B(void);\n    virtual void f(void)=0;\n    B& operator=(B const &rhs); //违背1\nprivate:\n    int kind;\n};\nB::B(void):kind(0) {}\nB::~B(void) {}\nB& B::operator=(B const &rhs) {\n    kind=rhs.kind;\n    return *this;\n}\nclass D : public B {\npublic:\n    D(void);\n    virtual ~D(void);\n    virtual void f(void) {}\n    D& operator=(D const &rhs);\nprivate:\n    int member;\n};\nD::D(void):B(),member(0) {}\nD::~D(void) {}\nD& D::operator=(D const &rhs) {\n    member=rhs.member;\n    return *this;\n}\nint main(void) {\n    D d1;\n    D d2;\n    B &b1=d1;\n    B &b2=d2;\n    b1=b2; //违背2\n    return 0;\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include <iostream>\nusing namespace std;\nclass B {\npublic:\n    B(void);\n    virtual ~B(void);\n    virtual void f(void)=0;\nprotected:\n    B& operator=(B const &rhs); //遵循1\nprivate:\n    int kind;\n};\nB::B(void):kind(0) {}\nB::~B(void) {}\nB& B::operator=(B const &rhs) {\n    kind=rhs.kind;\n    return *this;\n}\nclass D : public B {\npublic:\n    D(void);\n    virtual ~D(void);\n    virtual void f(void) {}\n    D& operator=(D const &rhs);\nprivate:\n    int member;\n};\nD::D(void):B(),member(0) {}\nD::~D(void) {}\nD& D::operator=(D const &rhs) {\n    member=rhs.member;\n    return *this;\n}\nint main(void) {\n    D d1;\n    D d2;\n    B &b1=d1;\n    B &b2=d2;\n    b1=b2; //由于采取了保护，此用法被禁止，编译报错\n    return 0;\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/abstract-class-copy-operator-protected-or-private",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-2-1-1",
+        "main_title": "caution-virtual-base-derived-class",
+        "description": "谨慎使用派生类由虚拟基类派生。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0005",
+          "chunk-0007"
+        ],
+        "examples": [],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/caution-virtual-base-derived-class",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-2-2-1",
+        "main_title": "no-global-variables-in-constructor",
+        "description": "构造函数中禁止使用全局变量。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0005",
+          "chunk-0007"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include <iostream>\nusing namespace std;\nint gVar = 10;\nclass Foo {\npublic:\n    Foo(void);\n    ~Foo(void);\nprivate:\n    int a;\n};\nFoo::Foo(void) {\n    a = gVar; //违背1\n}\nFoo::~Foo(void) {}\nint main(void) {\n    Foo thef;\n    return 0;\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include <iostream>\nusing namespace std;\nint gVar = 10;\nclass Foo {\npublic:\n    Foo(void);\n    explicit Foo(int);\n    ~Foo(void);\nprivate:\n    int a;\n};\nFoo::Foo(void):a(0) {}\nFoo::Foo(int var) {\n    a = var;\n}\nFoo::~Foo(void) {}\nint main(void) {\n    Foo thef(gVar); //遵循1\n    return 0;\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-global-variables-in-constructor",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-2-2-2",
+        "main_title": "explicit-default-constructor",
+        "description": "类中必须明确定义缺省构造函数。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0005",
+          "chunk-0007"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include <iostream>\nusing namespace std;\nclass Foo {\npublic:\n    ~Foo(void);\n    void SetVar(int);\nprivate:\n    int a;\n};\nFoo::~Foo(void) {}\nvoid Foo::SetVar(int var) {\n    a = var;\n}\nint main(void) {\n    Foo thef;\n    thef.SetVar(2);\n    return 0;\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include <iostream>\nusing namespace std;\nclass Foo {\npublic:\n    Foo(void); //遵循1\n    ~Foo(void);\n    void SetVar(int);\nprivate:\n    int a;\n};\nFoo::Foo(void) {\n    a = 0;\n}\nFoo::~Foo(void) {}\nvoid Foo::SetVar(int var) {\n    a = var;\n}\nint main(void) {\n    Foo thef;\n    thef.SetVar(2);\n    return 0;\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/explicit-default-constructor",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-2-2-3",
+        "main_title": "single-parameter-constructor-explicit",
+        "description": "单参数构造函数必须使用 explicit 声明。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0005",
+          "chunk-0007"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include <iostream>\nusing namespace std;\nclass Foo {\npublic:\n    Foo(void);\n    Foo(int var); //违背1\n    int getVar(void);\n    ~Foo(void);\nprivate:\n    int a;\n};\nFoo::Foo(void) {\n    a = 0;\n}\nFoo::Foo(int var) {\n    a = var;\n}\nint Foo::getVar(void) {\n    return a;\n}\nFoo::~Foo(void) {}\nvoid f(Foo);\nint main(void) {\n    int i=1;\n    f(i);\n    return 0;\n}\nvoid f(Foo thef) {\n    int j;\n    j = thef.getVar();\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include <iostream>\nusing namespace std;\nclass Foo {\npublic:\n    Foo(void);\n    explicit Foo(int var); //遵循1\n    int getVar(void);\n    ~Foo(void);\nprivate:\n    int a;\n};\nFoo::Foo(void) {\n    a = 0;\n}\nFoo::Foo(int var) {\n    a = var;\n}\nint Foo::getVar(void) {\n    return a;\n}\nFoo::~Foo(void) {}\nvoid f(int);\nint main(void) {\n    Foo thef(1);\n    int i=1;\n    f(i);\n    return 0;\n}\nvoid f(int i) {\n    int j;\n    Foo thef(i);\n    j = thef.getVar();\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/single-parameter-constructor-explicit",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-2-2-4",
+        "main_title": "initialize-all-member-variables-in-constructors",
+        "description": "类中所有成员变量必须在构造函数中初始化。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0005",
+          "chunk-0007"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include <iostream>\nusing namespace std;\nclass Foo {\npublic:\n    int a;\n    Foo(void);\n    explicit Foo(int);\nprivate:\n    int b;\n};\nFoo::Foo(void) { //违背1\n    a = 0;\n}\nFoo::Foo(int varb) { //违背2\n    b = varb;\n}\nint main(void) {\n    Foo thef1, thef2(1);\n    return 0;\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include <iostream>\nusing namespace std;\nclass Foo {\npublic:\n    int a;\n    Foo(void);\n    explicit Foo(int);\nprivate:\n    int b;\n};\nFoo::Foo(void) { //遵循1\n    a = 0;\n    b = 0;\n}\nFoo::Foo(int varb) { //遵循2\n    a = 0;\n    b = varb;\n}\nint main(void) {\n    Foo thef1, thef2(1);\n    return 0;\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/initialize-all-member-variables-in-constructors",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-2-2-5",
+        "main_title": "derived-constructor-initialize-direct-base",
+        "description": "派生类构造函数必须在初始化列表中说明直接基类构造函数。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0005",
+          "chunk-0007"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include <iostream>\nusing namespace std;\nclass Document {\npublic:\n    int docid;\n    Document(void):docid(0) {}\n    explicit Document(int);\n};\nDocument::Document(int var) {\n    docid = var;\n}\nclass Book : public Document {\npublic:\n    int bookid;\n    Book(void):bookid(1) //违背1\n    {}\n};\nint main(void) {\n    Book mybook;\n    return 0;\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include <iostream>\nusing namespace std;\nclass Document {\npublic:\n    int docid;\n    Document(void):docid(0) {}\n    explicit Document(int);\n};\nDocument::Document(int var) {\n    docid = var;\n}\nclass Book : public Document {\npublic:\n    int bookid;\n    Book(void):Document(1),bookid(1) //遵循1\n    {}\n};\nint main(void) {\n    Book mybook;\n    return 0;\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/derived-constructor-initialize-direct-base",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-2-3-1",
+        "main_title": "virtual-destructor-for-virtual-member-functions",
+        "description": "具有虚拟成员函数的类，析构函数必须是虚拟的。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0005",
+          "chunk-0007"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include <iostream>\nusing namespace std;\nclass B {\npublic:\n    B(void);\n    ~B(void); //违背1\n    virtual void f(int a)=0;\nprotected:\n    B(const B&);\n    B& operator=(const B&);\n};\nB::B(void) {}\nB::~B(void) {}\nclass D : public B {\npublic:\n    D(void);\n    explicit D(int a);\n    ~D(void); //违背2\n    virtual void f(int a);\nprivate:\n    int* md;\n    D(const D&);\n    D& operator=(const D&);\n};\nD::D(int a):B(),md(new int) {\n    *md = a;\n}\nvoid D::f(int a) {\n    *md = a;\n}\nD::~D(void) {\n    delete md;\n    md = NULL;\n}\nint main(void) {\n    B* d = new D(1);\n    d->f(2);\n    delete d;\n    d = NULL;\n    return 0;\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include <iostream>\nusing namespace std;\nclass B {\npublic:\n    B(void);\n    virtual ~B(void); //遵循1\n    virtual void f(int a)=0;\nprotected:\n    B(const B&);\n    B& operator=(const B&);\n};\nB::B(void) {}\nB::~B(void) {}\nclass D : public B {\npublic:\n    D(void);\n    explicit D(int a);\n    virtual ~D(void); //遵循2\n    virtual void f(int a);\nprivate:\n    int* md;\n    D(const D&);\n    D& operator=(const D&);\n};\nD::D(int a):B(),md(new int) {\n    *md = a;\n}\nvoid D::f(int a) {\n    *md = a;\n}\nD::~D(void) {\n    delete md;\n    md = NULL;\n}\nint main(void) {\n    B* d = new D(1);\n    d->f(2);\n    delete d;\n    d = NULL;\n    return 0;\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/virtual-destructor-for-virtual-member-functions",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-2-3-2",
+        "main_title": "destructor-exception-caught-by-itself",
+        "description": "析构函数中禁止存在不是由自身捕获处理的异常。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0005",
+          "chunk-0007"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include <iostream>\nusing namespace std;\nclass Foo {\npublic:\n    int a;\n    Foo(void);\n    ~Foo(void);\n};\nFoo::Foo(void) {\n    a = 1;\n}\nFoo::~Foo(void) {\n    if(1 == a) {\n        throw 0; //违背1\n    }\n}\nint main(void) {\n    try {\n        Foo f;\n    } catch(int e) {\n        //...\n    }\n    return 0;\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include <iostream>\nusing namespace std;\nclass Foo {\npublic:\n    int a;\n    Foo(void);\n    ~Foo(void);\n};\nFoo::Foo(void) {\n    a = 1;\n}\nFoo::~Foo(void) {\n    try {\n        if(1 == a) {\n            throw 0; //遵循1\n        }\n    } catch(int e) {\n        //...\n    }\n}\nint main(void) {\n    try {\n        Foo f;\n    } catch(int e) {\n        //...\n    }\n    return 0;\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/destructor-exception-caught-by-itself",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-2-4-1",
+        "main_title": "do-not-change-virtual-default-arguments",
+        "description": "基类虚拟函数的参数缺省值在派生类重写函数中禁止被改变。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0005",
+          "chunk-0007"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include <iostream>\nusing namespace std;\nclass Base {\npublic:\n    Base(void);\n    virtual ~Base(void);\n    virtual int g(int a=0);\n};\nBase::Base(void) {}\nBase::~Base(void) {}\nint Base::g(int a) {\n    return a + 1;\n}\nclass Derived : public virtual Base {\npublic:\n    Derived(void);\n    virtual ~Derived(void);\n    virtual int g(int a=1); //违背1\n};\nDerived::Derived(void) {}\nDerived::~Derived(void) {}\nint Derived::g(int a) {\n    return a + 11;\n}\nint main(void) {\n    int i;\n    Derived d;\n    Base &b=d;\n    i=b.g();\n    i=d.g();\n    return 0;\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include <iostream>\nusing namespace std;\nclass Base {\npublic:\n    Base(void);\n    virtual ~Base(void);\n    virtual int g1(int a=0);\n    virtual int g2(int a=0);\n};\nBase::Base(void) {}\nBase::~Base(void) {}\nint Base::g1(int a) {\n    return a + 1;\n}\nint Base::g2(int a) {\n    return a + 2;\n}\nclass Derived : public Base {\npublic:\n    Derived(void);\n    virtual ~Derived(void);\n    virtual int g1(int a=0);\n    virtual int g2(int a);\n};\nDerived::Derived(void) {}\nDerived::~Derived(void) {}\nint Derived::g1(int a) {\n    return a + 11;\n}\nint Derived::g2(int a) {\n    return a + 12;\n}\nint main(void) {\n    int i,j;\n    Derived d;\n    Base &b=d;\n    i=b.g1();\n    i=d.g1();\n    j=b.g2();\n    j=d.g2(0);\n    return 0;\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/do-not-change-virtual-default-arguments",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-2-4-2",
+        "main_title": "virtual-specifier-on-override-declaration",
+        "description": "派生类对基类虚拟函数重写的声明必须使用 virtual 显式说明。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0005",
+          "chunk-0007"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include <iostream>\nusing namespace std;\nclass Base {\npublic:\n    Base(void);\n    virtual ~Base(void);\n    virtual int g(int a=0);\n};\nBase::Base(void) {}\nBase::~Base(void) {}\nint Base::g(int a) {\n    return a + 1;\n}\nclass Derived : public Base {\npublic:\n    Derived(void);\n    virtual ~Derived(void);\n    int g(int a=0); //违背1\n};\nDerived::Derived(void) {}\nDerived::~Derived(void) {}\nint Derived::g(int a) {\n    return a + 2;\n}\nint main(void) {\n    int i,j;\n    Derived d;\n    Base &b=d;\n    i=b.g();\n    j=d.g();\n    return 0;\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include <iostream>\nusing namespace std;\nclass Base {\npublic:\n    Base(void);\n    virtual ~Base(void);\n    virtual int g(int a=0);\n};\nBase::Base(void) {}\nBase::~Base(void) {}\nint Base::g(int a) {\n    return a + 1;\n}\nclass Derived : public Base {\npublic:\n    Derived(void);\n    virtual ~Derived(void);\n    virtual int g(int a=0); //遵循1\n};\nDerived::Derived(void) {}\nDerived::~Derived(void) {}\nint Derived::g(int a) {\n    return a + 2;\n}\nint main(void) {\n    int i,j;\n    Derived d;\n    Base &b=d;\n    i=b.g();\n    j=d.g();\n    return 0;\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/virtual-specifier-on-override-declaration",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-2-4-3",
+        "main_title": "no-pure-virtual-overrides-non-pure",
+        "description": "禁止非纯虚函数被纯虚拟函数重写。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0005",
+          "chunk-0007"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include <iostream>\nusing namespace std;\nclass A {\npublic:\n    A(void);\n    virtual ~A(void);\n    virtual void foo(void)=0;\n};\nA::A(void) {}\nA::~A(void) {}\nclass B : public A {\npublic:\n    B(void);\n    virtual ~B(void);\n    virtual void foo(void);\n};\nB::B(void) {}\nB::~B(void) {}\nvoid B::foo(void) {}\nclass C : public B {\npublic:\n    C(void);\n    virtual ~C(void);\n    virtual void foo(void)=0; //违背1\n};\nC::C(void) {}\nC::~C(void) {}\nint main(void) {\n    B myb;\n    myb.foo();\n    return 0;\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-pure-virtual-overrides-non-pure",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-2-5-1",
+        "main_title": "no-unrelated-pointer-to-object-cast",
+        "description": "禁止将不相关的指针类型强制转换为对象指针类型。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0005",
+          "chunk-0007"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include <iostream>\nusing namespace std;\nstruct S {\n    int i;\n    int j;\n    int k;\n};\nclass C {\npublic:\n    C(void);\n    virtual ~C(void);\n    int i;\n};\nC::C(void):i(0) {}\nC::~C(void) {}\nint main(void) {\n    S *s = new S;\n    s->i = 0;\n    s->j = 0;\n    s->k = 0;\n    C *c = reinterpret_cast<C*>(s); //违背1\n    //...\n    return 0;\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-unrelated-pointer-to-object-cast",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-2-5-2",
+        "main_title": "no-const-volatile-removal-in-casts",
+        "description": "指针或引用的类型转换中禁止移除 const 或 volatile 属性。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0005",
+          "chunk-0007"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include <iostream>\nusing namespace std;\nclass A {\npublic:\n    A(void);\n    ~A(void);\n    explicit A(int);\n    int ma;\n};\nA::A(void) {\n    ma = 0;\n}\nA::A(int a) {\n    ma = a;\n}\nA::~A(void) {}\nint main(void) {\n    A const a1 = A(10);\n    A* a2 = const_cast<A*>(&a1); //违背1\n    a2->ma = 11;\n    A& a3 = const_cast<A&>(a1); //违背2\n    a3.ma = 12;\n    return 0;\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-const-volatile-removal-in-casts",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-2-5-1",
+        "main_title": "prefer-cpp-style-casts",
+        "description": "建议使用 C++ 的类型转换操作符，避免使用 C 的类型转换形式。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0005",
+          "chunk-0007"
+        ],
+        "examples": [],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/prefer-cpp-style-casts",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-2-6-1",
+        "main_title": "delete-new-allocated-memory",
+        "description": "使用 new 分配的内存空间，用完后必须使用 delete 释放。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0005",
+          "chunk-0007"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include <iostream>\nusing namespace std;\nvoid fun1(void) {\n    int *p = new int; //违背1\n    *p = 1;\n    //...\n}\nvoid fun2(void) {\n    int *p = new int[3]; //违背2\n    p[0] = 1;\n    p[1] = 2;\n    p[2] = 3;\n    //...\n}\nint main(void) {\n    fun1();\n    fun2();\n    return 0;\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include <iostream>\nusing namespace std;\nvoid fun1(void) {\n    int *p = new int;\n    *p = 1;\n    delete p; //遵循1\n    p = NULL;\n}\nvoid fun2(void) {\n    int *p = new int[3];\n    p[0] = 1;\n    p[1] = 2;\n    p[2] = 3;\n    delete[] p; //遵循2\n    p = NULL;\n}\nint main(void) {\n    fun1();\n    fun2();\n    return 0;\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/delete-new-allocated-memory",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-2-6-2",
+        "main_title": "use-delete-array-for-new-array",
+        "description": "必须使用 delete[] 释放 new[] 分配的内存空间。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0005",
+          "chunk-0007"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include <iostream>\nusing namespace std;\nvoid fun(void) {\n    int *p = new int[3];\n    p[0] = 1;\n    p[1] = 2;\n    p[2] = 3;\n    delete p; //违背1\n    p = NULL;\n}\nint main(void) {\n    fun();\n    return 0;\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include <iostream>\nusing namespace std;\nvoid fun(void) {\n    int *p = new int[3];\n    p[0] = 1;\n    p[1] = 2;\n    p[2] = 3;\n    delete[] p; //遵循1\n    p = NULL;\n}\nint main(void) {\n    fun();\n    return 0;\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/use-delete-array-for-new-array",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-2-6-3",
+        "main_title": "delete-pointer-original-new-address",
+        "description": "被 delete 的指针必须指向最初 new 分配的地址。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0005",
+          "chunk-0007"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include <iostream>\nusing namespace std;\nint fun(void);\nint main(void) {\n    int i;\n    i = fun();\n    return 0;\n}\nint fun(void) {\n    int *p = new int[3];\n    if(NULL == p) {\n        return -1;\n    } else {\n        *p = 1;\n        p++;\n        *p = 2;\n        delete[] p; //违背1\n        p = NULL;\n        return 0;\n    }\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include <iostream>\nusing namespace std;\nint fun(void);\nint main(void) {\n    int i;\n    i = fun();\n    return 0;\n}\nint fun(void) {\n    int *p = new int[3];\n    int *pbak = p;\n    if(NULL == p) {\n        return -1;\n    } else {\n        *p = 1;\n        p++;\n        *p = 2;\n        delete[] pbak; //遵循1\n        pbak = NULL;\n        return 0;\n    }\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/delete-pointer-original-new-address",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-2-7-1",
+        "main_title": "pass-fixed-length-array-by-reference",
+        "description": "函数中固定长度数组变量的传递必须使用引用方式。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0005",
+          "chunk-0007"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include <iostream>\nusing namespace std;\nvoid fun1(int p[10]) //违背1\n{\n    int i;\n    for(i=0;i<10;i++) {\n        p[i] = p[i] + 1;\n    }\n}\nvoid fun2(int *p) //违背2\n{\n    int i;\n    for(i=0;i<10;i++) {\n        p[i] = p[i] + 1;\n    }\n}\nint main(void) {\n    int a[10]={0,1,2,3,4,5,6,7,8,9};\n    fun1(a);\n    fun2(a);\n    return 0;\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include <iostream>\nusing namespace std;\nvoid fun(int (&p)[10]) //遵循1\n{\n    int i;\n    for(i=0;i<10;i++) {\n        p[i] = p[i] + 1;\n    }\n}\nint main(void) {\n    int a[10]={0,1,2,3,4,5,6,7,8,9};\n    fun(a);\n    return 0;\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/pass-fixed-length-array-by-reference",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-2-7-2",
+        "main_title": "const-member-function-no-nonconst-pointer-return",
+        "description": "定义为 const 的成员函数禁止返回非 const 的指针或引用。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0005",
+          "chunk-0007"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include <iostream>\nusing namespace std;\nclass A {\npublic:\n    A(int n_, int *b_);\n    A(const A &ca);\n    A(void);\n    ~A(void);\n    A& operator=(const A &ca);\n    int *get_b(void) const; //违背1\nprivate:\n    int n;\n    int *b;\n};\nA::A(int n_, int *b_) {\n    n = n_;\n    b = new int[n];\n    for(int i=0;i<n;i++) {\n        b[i] = b_[i];\n    }\n}\nA::A(const A &ca) {\n    n = ca.n;\n    b = new int[n];\n    for(int i=0;i<n;i++) {\n        b[i] = ca.b[i];\n    }\n}\nA::A(void):b(new int[0]),n(1) {\n    b[0] = 0;\n}\nA::~A(void) {\n    delete[] b;\n    b = NULL;\n}\nA& A::operator=(const A &ca) {\n    n = ca.n;\n    b = new int[n];\n    for(int i=0;i<n;i++) {\n        b[i] = ca.b[i];\n    }\n    return *this;\n}\nint *A::get_b(void) const {\n    return b;\n}\nint main(void) {\n    int i = 0;\n    int b[2] = {1,2};\n    A const a(2,b);\n    a.get_b()[0] = i;\n    return 0;\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include <iostream>\nusing namespace std;\nclass A {\npublic:\n    A(int n_, int *b_);\n    A(const A &ca);\n    A(void);\n    ~A(void);\n    A& operator=(const A &ca);\n    const int *get_b(void) const; //遵循1\nprivate:\n    int n;\n    int *b;\n};\nA::A(int n_, int *b_) {\n    n = n_;\n    b = new int[n];\n    for(int i=0;i<n;i++) {\n        b[i] = b_[i];\n    }\n}\nA::A(const A &ca) {\n    n = ca.n;\n    b = new int[n];\n    for(int i=0;i<n;i++) {\n        b[i] = ca.b[i];\n    }\n}\nA::A(void):b(new int[0]),n(1) {\n    b[0] = 0;\n}\nA::~A(void) {\n    delete[] b;\n    b = NULL;\n}\nA& A::operator=(const A &ca) {\n    n = ca.n;\n    b = new int[n];\n    for(int i=0;i<n;i++) {\n        b[i] = ca.b[i];\n    }\n    return *this;\n}\nconst int *A::get_b(void) const {\n    return b;\n}\nint main(void) {\n    int i = 0;\n    int b[2] = {1,2};\n    A const a(2,b);\n    i = a.get_b()[0];\n    return 0;\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/const-member-function-no-nonconst-pointer-return",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-2-7-3",
+        "main_title": "no-nonresource-data-return-for-external-modification",
+        "description": "禁止可导致非资源性对象数据被外部修改的成员函数返回。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0005",
+          "chunk-0007"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include <iostream>\nusing namespace std;\nclass A {\npublic:\n    A(int n_, int *b_);\n    A(const A &ca);\n    A(void);\n    ~A(void);\n    A& operator=(const A &ca);\n    int &get_n(void); //违背1\nprivate:\n    int n;\n    int *b;\n};\nA::A(int n_, int *b_) {\n    n = n_;\n    b = new int[n];\n    for(int i=0;i<n;i++) {\n        b[i] = b_[i];\n    }\n}\nA::A(const A &ca) {\n    n = ca.n;\n    b = new int[n];\n    for(int i=0;i<n;i++) {\n        b[i] = ca.b[i];\n    }\n}\nA::A(void):b(new int[0]),n(1) {\n    b[0] = 0;\n}\nA::~A(void) {\n    delete[] b;\n    b = NULL;\n}\nA& A::operator=(const A &ca) {\n    n = ca.n;\n    b = new int[n];\n    for(int i=0;i<n;i++) {\n        b[i] = ca.b[i];\n    }\n    return *this;\n}\nint &A::get_n(void) {\n    return n;\n}\nint main(void) {\n    int b[2] = {1,2};\n    A a(2,b);\n    int &n = a.get_n();\n    n = 10;\n    return 0;\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include <iostream>\nusing namespace std;\nclass A {\npublic:\n    A(int n_, int *b_);\n    A(const A &ca);\n    A(void);\n    ~A(void);\n    A& operator=(const A &ca);\n    int get_n(void); //遵循1\nprivate:\n    int n;\n    int *b;\n};\nA::A(int n_, int *b_) {\n    n = n_;\n    b = new int[n];\n    for(int i=0;i<n;i++) {\n        b[i] = b_[i];\n    }\n}\nA::A(const A &ca) {\n    n = ca.n;\n    b = new int[n];\n    for(int i=0;i<n;i++) {\n        b[i] = ca.b[i];\n    }\n}\nA::A(void):b(new int[0]),n(1) {\n    b[0] = 0;\n}\nA::~A(void) {\n    delete[] b;\n    b = NULL;\n}\nA& A::operator=(const A &ca) {\n    n = ca.n;\n    b = new int[n];\n    for(int i=0;i<n;i++) {\n        b[i] = ca.b[i];\n    }\n    return *this;\n}\nint A::get_n(void) {\n    return n;\n}\nint main(void) {\n    int b[2] = {1,2};\n    A a(2,b);\n    int n = a.get_n();\n    //...\n    return 0;\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-nonresource-data-return-for-external-modification",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-2-7-1",
+        "main_title": "avoid-in-class-function-definitions",
+        "description": "类中函数的实现代码避免在类定义的内部定义。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0005",
+          "chunk-0007"
+        ],
+        "examples": [
+          {
+            "type": "illustrative",
+            "code": "#include <iostream>\nusing namespace std;\nclass Foo {\npublic:\n    Foo(void);\n    ~Foo(void);\n    void SetVar(int var) //提示1\n    {\n        a = var;\n    }\nprivate:\n    int a;\n};\nFoo::Foo(void) {\n    a = 0;\n}\nFoo::~Foo(void) {}\nint main(void) {\n    Foo thef;\n    thef.SetVar(2);\n    return 0;\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include <iostream>\nusing namespace std;\nclass Foo {\npublic:\n    Foo(void);\n    ~Foo(void);\n    void SetVar(int var); //遵循1\nprivate:\n    int a;\n};\nFoo::Foo(void) {\n    a = 0;\n}\nFoo::~Foo(void) {}\nvoid Foo::SetVar(int var) {\n    a = var;\n}\nint main(void) {\n    Foo thef;\n    thef.SetVar(2);\n    return 0;\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/avoid-in-class-function-definitions",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-2-7-2",
+        "main_title": "const-pointer-reference-parameters-if-not-modified",
+        "description": "函数中的指针或引用参数如果不是修改项建议使用 const 说明。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0005",
+          "chunk-0007"
+        ],
+        "examples": [],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/const-pointer-reference-parameters-if-not-modified",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-2-8-1",
+        "main_title": "catch-derived-before-base",
+        "description": "捕获的顺序必须按由派生类到基类的次序排序。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0005",
+          "chunk-0006",
+          "chunk-0007"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include <iostream>\nusing namespace std;\nclass Document {\npublic:\n    Document(void):docid(0) {}\n    int get_docid(void);\nprivate:\n    int docid;\n};\nint Document::get_docid(void) {\n    return docid;\n}\nclass Book : public Document {\npublic:\n    Book(void):Document(),bookid(0) {}\n    int get_bookid(void);\nprivate:\n    int bookid;\n};\nint Book::get_bookid(void) {\n    return bookid;\n}\nint main(void) {\n    Book mybook;\n    try {\n        throw mybook;\n    }\n    catch(Document &d) { //违背1\n        cout << d.get_docid() << endl;\n    }\n    catch(Book &b) { //违背2\n        cout << b.get_bookid() << endl;\n    }\n    return 0;\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include <iostream>\nusing namespace std;\nclass Document {\npublic:\n    Document(void):docid(0) {}\n    int get_docid(void);\nprivate:\n    int docid;\n};\nint Document::get_docid(void) {\n    return docid;\n}\nclass Book : public Document {\npublic:\n    Book(void):Document(),bookid(0) {}\n    int get_bookid(void);\nprivate:\n    int bookid;\n};\nint Book::get_bookid(void) {\n    return bookid;\n}\nint main(void) {\n    Book mybook;\n    try {\n        throw mybook;\n    }\n    catch(Book &b) { //遵循1\n        cout << b.get_bookid() << endl;\n    }\n    catch(Document &d) { //遵循2\n        cout << d.get_docid() << endl;\n    }\n    return 0;\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include<iostream>\nusing namespace std;\nclass Document\n{\npublic:\n    Document(void):docid(0)\n    {\n    }\n    int get_docid(void);\nprivate:\n    int docid;\n};\nint Document::get_docid(void)\n{\n    return docid;\n}\nclass Book: public Document\n{\npublic:\n    Book(void):Document(),bookid(0)\n    {\n    }\n    int get_bookid(void);\nprivate:\n    int bookid;\n};\nint Book::get_bookid(void)\n{\n    return bookid;\n}\nint main(void)\n{\n    Book mybook;\n    try\n    {\n        throw mybook;\n    }\n    catch(Book &b)//遵循1\n    {\n        cout<<b.get_bookid()<<endl;\n    }\n    catch (Document &d)//遵循2\n    {\n        cout<<d.get_docid()<<endl;\n    }\n    return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/catch-derived-before-base",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-2-8-2",
+        "main_title": "matched-throw-catch",
+        "description": "每个指定的抛出必须有与之匹配的捕获。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0006",
+          "chunk-0007"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include<iostream>\nusing namespace std;\nclass A1\n{\npublic:\n    A1(void) {}\n};\nclass A2\n{\npublic:\n    A2(void) {}\n};\nint main(void)\n{\n    int i=0;\n    //...\n    try\n    {\n        if(i>0)\n        {\n            throw A1();\n        }\n        else\n        {\n            throw A2();//违背1\n        }\n    }\n    catch (A1 &)\n    {\n        cout<<\"exception:A1\"<<endl;\n    }\n    return (0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include<iostream>\nusing namespace std;\nclass A1\n{\npublic:\n    A1(void){}\n};\nclass A2\n{\npublic:\n    A2(void){}\n};\nint main(void)\n{\n    int i=0;\n    //...\n    try\n    {\n        if(i>0)\n        {\n            throw A1();//遵循1\n        }\n        else\n        {\n            throw A2();//遵循2\n        }\n    }\n    catch(A2 &)\n    {\n        cout<<\"exception:A2\"<<endl;\n    }\n    catch (A1 &)\n    {\n        cout<<\"exception:A1\"<<endl;\n    }\n    return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/matched-throw-catch",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-2-8-3",
+        "main_title": "catch-thrown-object-by-reference",
+        "description": "异常抛出的对象必须使用引用方式捕获。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0006",
+          "chunk-0007"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include<iostream>\nusing namespace std;\nclass Document\n{\npublic:\n    Document(void):docid(0)\n    {\n    }\n    int get_docid(void);\nprivate:\n    int docid;\n};\nint Document::get_docid(void)\n{\n    return docid;\n}\nint main(void)\n{\n    try\n    {\n        Document mydoc1;\n        throw &mydoc1;//违背1\n    }\n    catch (Document *d)//违背2\n    {\n        cout<<d->get_docid()<<endl;\n    }\n    return(0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include<iostream>\nusing namespace std;\nclass Document\n{\npublic:\n    Document(void):docid(0)\n    {\n    }\n    int get_docid(void);\nprivate:\n    int docid;\n};\nint Document::get_docid(void)\n{\n    return docid;\n}\nint main(void)\n{\n    try\n    {\n        Document mydoc1;\n        throw mydoc1;//遵循1\n    }\n    catch (Document &d)//遵循2\n    {\n        cout<<d.get_docid()<<endl;\n    }\n    return(0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/catch-thrown-object-by-reference",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-2-8-5",
+        "main_title": "no-explicit-throw-null",
+        "description": "禁止显式直接抛出 NULL。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0006",
+          "chunk-0007"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include<iostream>\nusing namespace std;\nint main(void)\n{\n    try\n    {\n        throw NULL;//违背1\n    }\n    catch (int)\n    {\n        //...\n    }\n    catch (const char *)\n    {\n        //...\n    }\n    return (0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include<iostream>\nusing namespace std;\nint main(void)\n{\n    char *p=NULL;\n    try\n    {\n        throw (p);//遵循1\n        throw (static_cast<const char *>(NULL));//遵循2\n    }\n    catch (int)\n    {\n        //...\n    }\n    catch (const char *)\n    {\n        //...\n    }\n    return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-explicit-throw-null",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-2-8-1",
+        "main_title": "default-catch-to-prevent-missed-exceptions",
+        "description": "建议在所有指定捕获之后使用缺省捕获防范遗漏的异常。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0006",
+          "chunk-0007"
+        ],
+        "examples": [],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/default-catch-to-prevent-missed-exceptions",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-2-8-2",
+        "main_title": "caution-pointer-type-throw-catch",
+        "description": "谨慎对指针类型进行抛出捕获。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0006",
+          "chunk-0007"
+        ],
+        "examples": [
+          {
+            "type": "illustrative",
+            "code": "#include<iostream>\nusing namespace std;\nint main(void)\n{\n    int i;\n    try\n    {\n        int a1=1;\n        int *a2=new int(2);\n        if(i>10)\n        {\n            throw &a1;\n        }\n        else\n        {\n            throw a2;\n        }\n    }\n    catch (int *b)\n    {\n        cout<<b<<endl;\n        //提示1：是否需要释放动态分配的内存？\n    }\n    return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/caution-pointer-type-throw-catch",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-2-9-1",
+        "main_title": "use-typename-for-template-type-parameters",
+        "description": "建议模板参数列表中的类型参数使用 typename 关键字说明。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0006",
+          "chunk-0007"
+        ],
+        "examples": [],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/use-typename-for-template-type-parameters",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-2-9-2",
+        "main_title": "place-const-at-outermost-except-const-pointer",
+        "description": "建议除常数指针外，const 说明均在类型说明的最外层。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0006",
+          "chunk-0007"
+        ],
+        "examples": [
+          {
+            "type": "illustrative",
+            "code": "const int *p1=&a; //推荐，指针常数\nint const *p2=&a; //不推荐，指针常数\nint *const p3=&a; //只能如此，常数指针\nint const b=1; //不推荐\nconst int c=2; //推荐"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/place-const-at-outermost-except-const-pointer",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-2-9-3",
+        "main_title": "avoid-overloading-logical-and-or-comma-operators",
+        "description": "建议不要对“&&”、“||”、“,”进行操作符重载。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0006",
+          "chunk-0007"
+        ],
+        "examples": [],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/avoid-overloading-logical-and-or-comma-operators",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-2-9-4",
+        "main_title": "avoid-header-files-with-h-suffix",
+        "description": "建议不使用以 .h 为后缀的头文件。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0006",
+          "chunk-0007"
+        ],
+        "examples": [
+          {
+            "type": "illustrative",
+            "code": "#include<iostream.h>//提示1\nint main(void)\n{\n    cout<<\"Hello!\"<<endl;\n    return (0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include<iostream>//遵循1\nusing namespace std;\nint main(void)\n{\n    cout<<\"Hello!\"<<endl;\n    return(0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/avoid-header-files-with-h-suffix",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      }
+    ]
+  }
+}

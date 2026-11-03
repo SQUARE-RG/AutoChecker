@@ -1,0 +1,2 @@
+project_slug,cve_id,github_username,github_repository_name,commit,file,class,class_start,class_end,method,method_start,method_end,signature,Done
+alibaba__one-java-agent_CVE-2022-25842_0.0.1,CVE-2022-25842,alibaba,one-java-agent,b911af2bb779917c84a016350700745dc31c642a,one-java-agent-plugin/src/main/java/com/alibaba/oneagent/utils/IOUtils.java,IOUtils,24,162,unzip,106,161,"unzip(String zipFile, String extractFolder)",

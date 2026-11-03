@@ -1,0 +1,146 @@
+{
+  "data": {
+    "ucassaat": [
+      {
+        "rule_id": "R-1-7-7",
+        "main_title": "value-returning-function-must-return",
+        "description": "有返回值的函数必须通过返回语句返回。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0003"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int fun(int a, int *b);\n\nint main(void)\n{\n    int i = 1, j = 2;\n    int k;\n    k = fun(i, &j);\n    return (0);\n}\n\nint fun(int a, int *b)\n{\n    if (1 == a)\n    {\n        *b = *b + a;\n        return(1);\n    }\n    else\n    {\n        *b = *b - a;\n    } // 违背1\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/value-returning-function-must-return",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-7-13",
+        "main_title": "static-function-must-be-used",
+        "description": "静态函数必须被使用。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0003"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "static int fun(int paData);\n\nint main(void)\n{\n    int i, thData;\n    thData = 2;\n    i = 2 * thData;\n    return(0);\n}\n\nstatic int fun(int paData) // 违背1\n{\n    int i;\n    i = 2 * paData;\n    return i;\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/static-function-must-be-used",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-1-7-2",
+        "main_title": "no-unused-call-parameters",
+        "description": "函数中避免存在未被使用的调用参数。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0003",
+          "chunk-0007"
+        ],
+        "examples": [],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-unused-call-parameters",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-2-2-4",
+        "main_title": "initialize-all-member-variables-in-constructors",
+        "description": "类中所有成员变量必须在构造函数中初始化。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0005",
+          "chunk-0007"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include <iostream>\nusing namespace std;\nclass Foo {\npublic:\n    int a;\n    Foo(void);\n    explicit Foo(int);\nprivate:\n    int b;\n};\nFoo::Foo(void) { //违背1\n    a = 0;\n}\nFoo::Foo(int varb) { //违背2\n    b = varb;\n}\nint main(void) {\n    Foo thef1, thef2(1);\n    return 0;\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include <iostream>\nusing namespace std;\nclass Foo {\npublic:\n    int a;\n    Foo(void);\n    explicit Foo(int);\nprivate:\n    int b;\n};\nFoo::Foo(void) { //遵循1\n    a = 0;\n    b = 0;\n}\nFoo::Foo(int varb) { //遵循2\n    a = 0;\n    b = varb;\n}\nint main(void) {\n    Foo thef1, thef2(1);\n    return 0;\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/initialize-all-member-variables-in-constructors",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-2-7-3",
+        "main_title": "no-nonresource-data-return-for-external-modification",
+        "description": "禁止可导致非资源性对象数据被外部修改的成员函数返回。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0005",
+          "chunk-0007"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include <iostream>\nusing namespace std;\nclass A {\npublic:\n    A(int n_, int *b_);\n    A(const A &ca);\n    A(void);\n    ~A(void);\n    A& operator=(const A &ca);\n    int &get_n(void); //违背1\nprivate:\n    int n;\n    int *b;\n};\nA::A(int n_, int *b_) {\n    n = n_;\n    b = new int[n];\n    for(int i=0;i<n;i++) {\n        b[i] = b_[i];\n    }\n}\nA::A(const A &ca) {\n    n = ca.n;\n    b = new int[n];\n    for(int i=0;i<n;i++) {\n        b[i] = ca.b[i];\n    }\n}\nA::A(void):b(new int[0]),n(1) {\n    b[0] = 0;\n}\nA::~A(void) {\n    delete[] b;\n    b = NULL;\n}\nA& A::operator=(const A &ca) {\n    n = ca.n;\n    b = new int[n];\n    for(int i=0;i<n;i++) {\n        b[i] = ca.b[i];\n    }\n    return *this;\n}\nint &A::get_n(void) {\n    return n;\n}\nint main(void) {\n    int b[2] = {1,2};\n    A a(2,b);\n    int &n = a.get_n();\n    n = 10;\n    return 0;\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include <iostream>\nusing namespace std;\nclass A {\npublic:\n    A(int n_, int *b_);\n    A(const A &ca);\n    A(void);\n    ~A(void);\n    A& operator=(const A &ca);\n    int get_n(void); //遵循1\nprivate:\n    int n;\n    int *b;\n};\nA::A(int n_, int *b_) {\n    n = n_;\n    b = new int[n];\n    for(int i=0;i<n;i++) {\n        b[i] = b_[i];\n    }\n}\nA::A(const A &ca) {\n    n = ca.n;\n    b = new int[n];\n    for(int i=0;i<n;i++) {\n        b[i] = ca.b[i];\n    }\n}\nA::A(void):b(new int[0]),n(1) {\n    b[0] = 0;\n}\nA::~A(void) {\n    delete[] b;\n    b = NULL;\n}\nA& A::operator=(const A &ca) {\n    n = ca.n;\n    b = new int[n];\n    for(int i=0;i<n;i++) {\n        b[i] = ca.b[i];\n    }\n    return *this;\n}\nint A::get_n(void) {\n    return n;\n}\nint main(void) {\n    int b[2] = {1,2};\n    A a(2,b);\n    int n = a.get_n();\n    //...\n    return 0;\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-nonresource-data-return-for-external-modification",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-2-7-2",
+        "main_title": "const-pointer-reference-parameters-if-not-modified",
+        "description": "函数中的指针或引用参数如果不是修改项建议使用 const 说明。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0005",
+          "chunk-0007"
+        ],
+        "examples": [],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/const-pointer-reference-parameters-if-not-modified",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-2-8-2",
+        "main_title": "matched-throw-catch",
+        "description": "每个指定的抛出必须有与之匹配的捕获。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0006",
+          "chunk-0007"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include<iostream>\nusing namespace std;\nclass A1\n{\npublic:\n    A1(void) {}\n};\nclass A2\n{\npublic:\n    A2(void) {}\n};\nint main(void)\n{\n    int i=0;\n    //...\n    try\n    {\n        if(i>0)\n        {\n            throw A1();\n        }\n        else\n        {\n            throw A2();//违背1\n        }\n    }\n    catch (A1 &)\n    {\n        cout<<\"exception:A1\"<<endl;\n    }\n    return (0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include<iostream>\nusing namespace std;\nclass A1\n{\npublic:\n    A1(void){}\n};\nclass A2\n{\npublic:\n    A2(void){}\n};\nint main(void)\n{\n    int i=0;\n    //...\n    try\n    {\n        if(i>0)\n        {\n            throw A1();//遵循1\n        }\n        else\n        {\n            throw A2();//遵循2\n        }\n    }\n    catch(A2 &)\n    {\n        cout<<\"exception:A2\"<<endl;\n    }\n    catch (A1 &)\n    {\n        cout<<\"exception:A1\"<<endl;\n    }\n    return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/matched-throw-catch",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      }
+    ]
+  }
+}

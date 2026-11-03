@@ -1,0 +1,329 @@
+{
+  "data": {
+    "ucassaat": [
+      {
+        "rule_id": "R-1-1-2",
+        "main_title": "no-macro-alias-to-keyword-basic-type",
+        "description": "禁止将其他标识宏定义为关键字和基本类型。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0001"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#define JUDGE if // 违背1\n#define int64 long // 违背2\n\nint main(void)\n{\n    int64 i = 0;\n    JUDGE(0 == i)\n    {\n        i = 1;\n    }\n    return (0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#define JUDGE_ZERO(i) if (0 == (i)) // 遵循1\ntypedef long int64; // 遵循2\n\nint main(void)\n{\n    int64 i = 0;\n    JUDGE_ZERO(i)\n    {\n        i = 1;\n    }\n    return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-macro-alias-to-keyword-basic-type",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-1-4",
+        "main_title": "no-keyword-redefinition",
+        "description": "禁止重新定义C或C++的关键字。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0001"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n    unsigned int FILE = 0; // 违背1\n    unsigned int cout = 0; // 违背2\n    unsigned int cin = 0; // 违背3\n    unsigned int endl = 0; // 违背4\n    // ......\n    return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-keyword-redefinition",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-1-5",
+        "main_title": "no-duplicate-macro-definition",
+        "description": "禁止#define被重复定义。注：条件编译的不同条件中的定义，以及定义了删除后的再定义均不算违背。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0001"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#define BLOCKDEF 1U\n\nunsigned int fun1(void);\nunsigned int fun2(void);\n\nint main(void)\n{\n    unsigned int a1 = 0U;\n    unsigned int a2 = 0U;\n    unsigned int a3 = 0U;\n    unsigned int a4 = 0U;\n\n    a1 = fun1();\n    a2 = a1 + BLOCKDEF;\n    a3 = fun2();\n    a4 = a3 + BLOCKDEF;\n    return (0);\n}\n\n#define BLOCKDEF 2U // 违背1\n\nunsigned int fun1(void)\n{\n    unsigned int x = 0U;\n    x = x + BLOCKDEF;\n    return x;\n}\n\nunsigned int fun2(void)\n{\n    unsigned int x = 0U;\n    x = x + BLOCKDEF;\n    return x;\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#define BLOCKDEF 1U\n\nunsigned int fun1(void);\nunsigned int fun2(void);\n\nint main(void)\n{\n    unsigned int a1 = 0U;\n    unsigned int a2 = 0U;\n    unsigned int a3 = 0U;\n    unsigned int a4 = 0U;\n\n    a1 = fun1();\n    a2 = a1 + BLOCKDEF;\n    a3 = fun2();\n    a4 = a3 + BLOCKDEF;\n    return (0);\n}\n\n#undef BLOCKDEF\n#define BLOCKDEF 2U // 遵循1\n\nunsigned int fun1(void)\n{\n    unsigned int x = 0U;\n    x = x + BLOCKDEF;\n    return x;\n}\n\nunsigned int fun2(void)\n{\n    unsigned int x = 0U;\n    x = x + BLOCKDEF;\n    return x;\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-duplicate-macro-definition",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-1-6",
+        "main_title": "paired-define-undef-in-function",
+        "description": "函数中的#define和#undef必须配对使用。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0001"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "unsigned int fun1(void);\nunsigned int fun2(void);\n\nint main(void)\n{\n    unsigned int a1 = 0U;\n    unsigned int a2 = 0U;\n    unsigned int a3 = 0U;\n\n    a1 = fun1();\n    a2 = fun2();\n    a3 = a1 + a2;\n    return (0);\n}\n\nunsigned int fun1(void)\n{\n    unsigned int x = 0U;\n#define BLOCKDEF 2U // 违背1\n    x = x + BLOCKDEF;\n    return x;\n}\n\nunsigned int fun2(void)\n{\n    unsigned int x = 0U;\n    x = x + BLOCKDEF;\n#undef BLOCKDEF // 违背2\n    return x;\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "unsigned int fun1(void);\nunsigned int fun2(void);\n\nint main(void)\n{\n    unsigned int a1 = 0U;\n    unsigned int a2 = 0U;\n    unsigned int a3 = 0U;\n    a1 = fun1();\n    a2 = fun2();\n    a3 = a1 + a2;\n    return (0);\n}\n\nunsigned int fun1(void)\n{\n    unsigned int x = 0U;\n#define BLOCKDEF1 2U // 遵循1\n    x = x + BLOCKDEF1;\n#undef BLOCKDEF1 // 遵循2\n    return x;\n}\n\nunsigned int fun2(void)\n{\n    unsigned int x = 0U;\n#define BLOCKDEF2 2U // 遵循3\n    x = x + BLOCKDEF2;\n#undef BLOCKDEF2 // 遵循4\n    return x;\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/paired-define-undef-in-function",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-1-7",
+        "main_title": "parenthesize-function-like-macro-params-result",
+        "description": "以函数形式定义的宏，参数和结果必须用括号括起来。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0001"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#define pabs(x) x >= 0 ? x : -x // 违背1\n\nint main(void)\n{\n    unsigned int result;\n    int a = 6;\n    /* … */\n    result = pabs(a) + 1;\n    return (0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#define pabs(x) ((x) >= 0 ? (x) : -(x)) // 遵循1\n\nint main(void)\n{\n    unsigned int result;\n    int a = 6;\n    /* … */\n    result = pabs(a) + 1;\n    return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/parenthesize-function-like-macro-params-result",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-1-21",
+        "main_title": "no-absolute-path-in-include",
+        "description": "禁止在#include语句中使用绝对路径。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0001"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "#include \"D:\\RuleStandard\\053\\053.h\" // 违背1\n\nint main(void)\n{\n    int idata = 0;\n    return (0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include \"..\\053\\053.h\" // 遵循1\n\nint main(void)\n{\n    int idata = 0;\n    return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-absolute-path-in-include",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-1-1-2",
+        "main_title": "caution-macro-brace-mismatch",
+        "description": "谨慎由于宏中括号不匹配造成使用上的误解。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0001",
+          "chunk-0007"
+        ],
+        "examples": [
+          {
+            "type": "illustrative",
+            "code": "#define IF0(x) if (0 == (x)) { // 提示1\n\nint main(void)\n{\n    int test = 0;\n    IF0(test)\n    test = test + 1;\n}\n\nreturn (0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#define IF0(x) if (0 == (x)) // 遵循1\n\nint main(void)\n{\n    int test = 0;\n    IF0(test)\n    {\n        test = test + 1;\n    }\n    return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/caution-macro-brace-mismatch",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-1-1-3",
+        "main_title": "cautious-macro-token-paste-stringize",
+        "description": "宏定义中谨慎使用 ## 或 #。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0001",
+          "chunk-0007"
+        ],
+        "examples": [],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/cautious-macro-token-paste-stringize",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-2-3",
+        "main_title": "no-executable-code-before-header-include",
+        "description": "禁止在头文件前有可执行代码。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0001"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n#include \"..\\061\\061.h\" // 违背1\n    int ix = 0;\n    int iy = 1;\n    int iz = 2;\n    int idata = ix + iy + iz;\n    return (0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include \"..\\061\\061.h\" // 遵循1\n\nint main(void)\n{\n    int ix = 0;\n    int iy = 1;\n    int iz = 2;\n    int idata = ix + iy + iz;\n    return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/no-executable-code-before-header-include",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-2-6",
+        "main_title": "prohibit-nested-comments",
+        "description": "禁止嵌套注释。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0002"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n    int local=0;\n    int sign=0;\n    /*\n    note for code1\n    /* //违背1\n    note for code2\n    */\n    return(0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/prohibit-nested-comments",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-1-2-3",
+        "main_title": "c-standard-comments-cautious-slash",
+        "description": "C 语言程序建议使用标准 C 的注释符，谨慎使用 // 注释。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0002",
+          "chunk-0007"
+        ],
+        "examples": [],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/c-standard-comments-cautious-slash",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-4-2",
+        "main_title": "empty-branch-semicolon-and-comment",
+        "description": "条件判定分支如果为空，必须以单独一行的分号加注释进行明确说明。注：注释必须以“/*no deal with*/”明确说明，此准则中的分号加注释不视为空语句。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0002"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n    int i=0,j=0,k=0;\n    double x=0.0;\n    //...\n    if(0==i)\n    {\n        x=1.0;\n    }\n    else if(1==i)\n    {\n        x=x-1.0;\n    }\n    else\n    {\n        ; //违背1：缺少注释\n    }\n    if(0==j)\n    {\n        x=x+1.0;\n    }\n    else if(1==j)\n    {\n        //违背2：空分支仅有注释，缺少单独一行的分号\n    }\n    else\n    {\n        //违背3：空分支为空\n    }\n    if(0==k)\n    {\n        x=x/2.0;\n    }\n    else if(1==k)\n    {\n        x=x/3.0;\n    }\n    else\n    {\n        /* no deal with */ //违背4：缺少分号\n    }\n    return(0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "int main(void)\n{\n    int i=0,j=0,k=0;\n    double x=0.0;\n    //...\n    if(0==i)\n    {\n        x=1.0;\n    }\n    else if(1==i)\n    {\n        x=x-1.0;\n    }\n    else\n    {\n        ;/* no deal with */ //遵循1\n    }\n    if(0==j)\n    {\n        x=x+1.0;\n    }\n    else if(1==j)\n    {\n        ;/* no deal with */ //遵循2\n    }\n    else\n    {\n        ;/* no deal with */ //遵循3\n    }\n    if(0==k)\n    {\n        x=x/2.0;\n    }\n    else if(1==k)\n    {\n        x=x/3.0;\n    }\n    else\n    {\n        ;/* no deal with */ //遵循4\n    }\n    return(0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/empty-branch-semicolon-and-comment",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-4-7",
+        "main_title": "switch-case-default-termination-and-shared-comment",
+        "description": "switch中的case和default必须以break或return终止，共用case必须加以明确注释。注：共用case必须加以“/*shared*/”明确注释。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0002"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n    int i=0;\n    int j=0;\n    int k=0;\n    //...\n    switch(i)\n    {\n        case 1: //违背1\n            if(j>0)\n            {\n                k=1;\n                break;\n            }\n            k=2;\n        case 2: //违背2\n        case 3: //违背3\n        {\n            j=3;\n        }\n        case 4: //违背4\n            k=4;\n        case 5:\n            j=5;\n            break;\n        default: //违背5\n            j=-1;\n    }\n    return(0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "int main(void)\n{\n    int i=0;\n    int j=0;\n    int k=0;\n    //...\n    switch(i)\n    {\n        case 1: //遵循1\n            if(j>0)\n            {\n                k=1;\n                break;\n            }\n            k=2;\n            break;\n        case 2: /*shared */ //遵循2\n        case 3: //遵循3\n        {\n            j=3;\n        }\n        break;\n        case 4: /*shared */ //遵循4\n            k=4;\n        case 5:\n            j=5;\n            break;\n        default: //遵循5\n            j=-1;\n            break;\n    }\n    return(0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/switch-case-default-termination-and-shared-comment",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "R-1-8-4",
+        "main_title": "annotate-octal-literals",
+        "description": "使用八进制数必须明确注释。八进制数必须加以 /* octal */ 明确注释。",
+        "rule_type": "required",
+        "source_chunks": [
+          "chunk-0003"
+        ],
+        "examples": [
+          {
+            "type": "violation",
+            "code": "int main(void)\n{\n    int code[3];\n    code[0] = 109;\n    code[1] = 100;\n    code[2] = 011; // 违背1\n    return (0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "int main(void)\n{\n    int code[3];\n    code[0] = 109;\n    code[1] = 100;\n    code[2] = 011; /* octal */ // 遵循1\n    return (0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/annotate-octal-literals",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      },
+      {
+        "rule_id": "A-2-9-4",
+        "main_title": "avoid-header-files-with-h-suffix",
+        "description": "建议不使用以 .h 为后缀的头文件。",
+        "rule_type": "advisory",
+        "source_chunks": [
+          "chunk-0006",
+          "chunk-0007"
+        ],
+        "examples": [
+          {
+            "type": "illustrative",
+            "code": "#include<iostream.h>//提示1\nint main(void)\n{\n    cout<<\"Hello!\"<<endl;\n    return (0);\n}"
+          },
+          {
+            "type": "compliant",
+            "code": "#include<iostream>//遵循1\nusing namespace std;\nint main(void)\n{\n    cout<<\"Hello!\"<<endl;\n    return(0);\n}"
+          }
+        ],
+        "rule_test_path": "/root/code_check/experiment/gjb8114-all/test_cases/avoid-header-files-with-h-suffix",
+        "negative_case_amount": 10,
+        "positive_case_amount": 10,
+        "category": "ucassaat"
+      }
+    ]
+  }
+}

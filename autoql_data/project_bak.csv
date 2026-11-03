@@ -1,0 +1,2 @@
+id,project_slug,cve_id,cwe_id,cwe_name,github_username,github_repository_name,github_tag,github_url,advisory_id,buggy_commit_id,fix_commit_ids
+20,alibaba__one-java-agent_CVE-2022-25842_0.0.1,CVE-2022-25842,CWE-022,Improper Limitation of a Pathname to a Restricted Directory ('Path Traversal'),alibaba,one-java-agent,0.0.1,https://github.com/alibaba/one-java-agent,GHSA-9hr3-j9mc-xmq2,b911af2bb779917c84a016350700745dc31c642a,a0ab2fa9f492b13667810b94b5feeb86268fde9e

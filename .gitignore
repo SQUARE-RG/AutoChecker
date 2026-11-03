@@ -43,7 +43,9 @@ codeql-linux64.zip
 codeql/
 codeql-linux64.zip
 linux-db/
-experiment/
+# experiment/
+experiment/gjb8114-all/test_cases/.checkpoints
+experiment/gjb8114-all/test_cases/.staging
 commit_to_test_cases/kparser/tree-sitter-cpp
 
 # Runtime output and temporary files

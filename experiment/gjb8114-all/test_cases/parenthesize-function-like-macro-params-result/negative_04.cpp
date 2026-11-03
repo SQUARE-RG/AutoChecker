@@ -1,0 +1,8 @@
+#define LOW_BIT(x) (x) | 1 // CHECK-MESSAGES: :[[@LINE]]:{{[0-9]+}}: warning: {{.*}} [ucassaat-r-1-1-7]
+
+int main()
+{
+    int value = 2;
+    bool result = (LOW_BIT(value) == 0);
+    return result ? 0 : 1;
+}
