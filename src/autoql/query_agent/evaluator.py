@@ -84,8 +84,8 @@ class Evaluator:
         self.methods = {'buggy': buggy_methods, 'fixed': fixed_methods}
         with (Path(task.dataset_dir) / 'fix_info.csv').open() as handle:
             self.truth = [r for r in csv.DictReader(handle) if r['cve_id'] == task.cve_id]
-        if not self.truth or any(r['commit'] != task.buggy_commit for r in self.truth):
-            raise ValueError('Missing ground truth or mismatched buggy revision')
+        if not self.truth:
+            raise ValueError('Missing method-level ground truth')
         self.files = {r['file'] for r in self.truth}
         self.granularity = 'function' if all(r.get('method') for r in self.truth) else 'file'
         self.targets = []

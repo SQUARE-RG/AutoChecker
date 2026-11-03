@@ -17,8 +17,24 @@ with user approval. Deep Agents requires Python 3.11. Do not upgrade the origina
 ```bash
 conda run -n code_check_autoql python -m pip install -r src/autoql/requirements.txt
 PYTHONPATH=src conda run --no-capture-output -n code_check_autoql python -m autoql.run_patch \
-  --commit a0ab2fa9f492b13667810b94b5feeb86268fde9e
+  --commit 359603b63fc6c59d8b57e061c171954bab3433bf
 ```
+
+The CLI also accepts a CVE ID. It resolves the project through `project_info.csv` and requires
+all matching `fix_info.csv` rows to identify one fix revision declared by that project:
+
+```bash
+PATH="/opt/codeql-bundle-2.23.3:$PATH" PYTHONPATH=src \
+conda run --no-capture-output -n code_check_autoql python -m autoql.run_patch \
+  --cve CVE-2022-25842
+
+
+PYTHONPATH=src python -m autoql.run_patch --cve CVE-2022-25842
+```
+
+`--commit` and `--cve` are mutually exclusive. The selected fix commit, repository snapshot,
+generated diff, `fix_info.csv` ground truth and finalized fixed CodeQL database must all use
+the same SHA. AutoQL fails before analysis if any of these artifacts disagree.
 
 Model name, endpoint and credentials use the existing project `.env` (`MODEL_NAME`,
 `DEEPSEEK_BASE_URL`, `DEEPSEEK_API_KEY`). Credentials are never included in prompts.

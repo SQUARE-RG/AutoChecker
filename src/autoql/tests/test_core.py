@@ -8,7 +8,7 @@ import unittest
 from autoql.analysis_agent.evidence_registry import EvidenceRegistry
 from autoql.query_agent.evaluator import location_points, enclosing, normalize_uri, Evaluator
 from autoql.query_agent.graph import extract_query
-from autoql.task_loader import safe_relative, load_task, UnsupportedInput
+from autoql.task_loader import safe_relative, load_task, select_project, UnsupportedInput
 from autoql.prompt.codeql_template_prompt import supported_analysis_kinds, query_skeleton
 
 
@@ -89,6 +89,18 @@ class EvaluationTests(unittest.TestCase):
 
 
 class InputTemplateTests(unittest.TestCase):
+    def test_select_project_by_cve_or_commit(self):
+        commit = 'a' * 40
+        rows = [{'cve_id': 'CVE-2022-25842', 'fix_commit_ids': commit}]
+        self.assertEqual(select_project(rows, commit=commit)[0], rows[0])
+        row, selected = select_project(rows, cve='cve-2022-25842')
+        self.assertEqual(row, rows[0])
+        self.assertIsNone(selected)
+        with self.assertRaises(UnsupportedInput):
+            select_project(rows, commit=commit, cve='CVE-2022-25842')
+        with self.assertRaises(UnsupportedInput):
+            select_project(rows, cve='not-a-cve')
+
     def test_dataset_requires_unique_exact_match(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

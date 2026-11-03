@@ -16,7 +16,9 @@ from autoql.timing import TimingRecorder, CURRENT, timing_span
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--commit', required=True)
+    source = parser.add_mutually_exclusive_group(required=True)
+    source.add_argument('--commit', help='Complete 40-character fix commit SHA')
+    source.add_argument('--cve', help='CVE ID resolved through project_info.csv, for example CVE-2022-25842')
     parser.add_argument('--root', type=Path, default=Path(__file__).resolve().parents[2])
     parser.add_argument('--output', type=Path)
     parser.add_argument('--dataset', type=Path)
@@ -24,7 +26,8 @@ def main():
     parser.add_argument('--preflight-only', action='store_true')
     parser.add_argument('--resume', action='store_true', help='Resume --output without resetting budgets/deadline')
     args = parser.parse_args()
-    output = args.output or args.root / 'autoql_runs' / (args.commit[:12] + '-' + time.strftime('%Y%m%d-%H%M%S'))
+    input_label = args.commit[:12] if args.commit else args.cve.upper()
+    output = args.output or args.root / 'autoql_runs' / (input_label + '-' + time.strftime('%Y%m%d-%H%M%S'))
     limits = Limits(**json.loads(args.limits.read_text())) if args.limits else Limits()
     deadline = time.time() + limits.task_wall_timeout_seconds
     final = {'final_status': 'infrastructure_error', 'manual_review': 'pending'}
@@ -40,8 +43,10 @@ def main():
             if not args.output:
                 raise ValueError('--resume requires --output')
             manifest = json.loads((output / 'manifest.json').read_text())
-            if manifest['fix_commit'] != args.commit:
+            if args.commit and manifest['fix_commit'] != args.commit.lower():
                 raise ValueError('Resume commit does not match manifest')
+            if args.cve and manifest['cve_id'].upper() != args.cve.upper():
+                raise ValueError('Resume CVE does not match manifest')
             task = PatchTask(**{k: v for k, v in manifest.items() if k in PatchTask.__dataclass_fields__})
             limits = Limits(**json.loads((output / 'limits.json').read_text()))
             if (output / 'run_control.json').exists():
@@ -53,7 +58,7 @@ def main():
                 final = prior
                 return 0 
         else:
-            task = load_task(args.commit, args.root.resolve(), output, args.dataset)
+            task = load_task(args.commit, args.root.resolve(), output, args.dataset, cve=args.cve)
         run_lock = (output / '.run.lock').open('a')
         fcntl.flock(run_lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         owned_run = True

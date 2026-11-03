@@ -67,22 +67,67 @@ def snapshot(repo: Path, sha: str, destination: Path):
         target.chmod(0o444)
 
 
+def select_project(rows: list[dict], commit: str | None = None,
+                   cve: str | None = None) -> tuple[dict, str | None]:
+    """Resolve exactly one project row from either a fix commit or CVE ID.
+
+    For CVE input the concrete fix revision is selected later using the same
+    timestamp rule as the database builder, so this returns ``None`` here.
+    """
+    if (commit is None) == (cve is None):
+        raise UnsupportedInput('Provide exactly one of commit or CVE')
+
+    if commit is not None:
+        if not re.fullmatch(r'[0-9a-fA-F]{40}', commit):
+            raise UnsupportedInput('Input must be a complete 40-character fix commit SHA')
+        commit = commit.lower()
+        matches = [row for row in rows
+                   if commit in re.findall(r'\b[0-9a-fA-F]{40}\b',
+                                           row.get('fix_commit_ids', '').lower())]
+        if len(matches) != 1:
+            raise UnsupportedInput(f'Expected one dataset match, found {len(matches)}')
+        return matches[0], commit
+
+    cve = cve.upper()
+    if not re.fullmatch(r'CVE-\d{4}-\d{4,}', cve):
+        raise UnsupportedInput('CVE input must use the form CVE-YYYY-NNNN')
+    matches = [row for row in rows if row.get('cve_id', '').upper() == cve]
+    if len(matches) != 1:
+        raise UnsupportedInput(f'Expected one dataset match for {cve}, found {len(matches)}')
+    return matches[0], None
+
+
+def latest_fix_commit(repo: Path, commit_ids: list[str]) -> str:
+    """Mirror build_codeql_dbs.py: select the commit with the latest timestamp."""
+    latest = None
+    latest_timestamp = 0
+    for commit_id in commit_ids:
+        try:
+            timestamp = int(git(repo, 'show', '-s', '--format=%ct', commit_id).strip())
+        except (subprocess.CalledProcessError, ValueError):
+            continue
+        if timestamp > latest_timestamp:
+            latest_timestamp = timestamp
+            latest = commit_id
+    return latest or commit_ids[-1]
+
+
 @timed('input.prepare', 'stage')
-def load_task(commit: str, root: Path, output: Path, dataset: Path | None = None) -> PatchTask:
-    if not re.fullmatch(r'[0-9a-fA-F]{40}', commit):
-        raise UnsupportedInput('Input must be a complete 40-character fix commit SHA')
-    commit = commit.lower()
+def load_task(commit: str | None, root: Path, output: Path,
+              dataset: Path | None = None, cve: str | None = None) -> PatchTask:
     dataset = (dataset or root / 'autoql_data').resolve()
     with (dataset / 'project_info.csv').open(newline='') as handle:
-        matches = [r for r in csv.DictReader(handle)
-                   if commit in re.findall(r'\b[0-9a-fA-F]{40}\b', r['fix_commit_ids'].lower())]
-    if len(matches) != 1:
-        raise UnsupportedInput(f'Expected one dataset match, found {len(matches)}')
-    row = matches[0]
+        rows = list(csv.DictReader(handle))
+    row, requested_commit = select_project(rows, commit=commit, cve=cve)
     case_dir = root / 'cves' / safe_relative(row['cve_id'])
     repo = case_dir / safe_relative(row['github_repository_name'])
     buggy = git(repo, 'rev-parse', row['buggy_commit_id'] + '^{commit}').strip()
-    fixed = git(repo, 'rev-parse', commit + '^{commit}').strip()
+    if requested_commit is None:
+        fix_commits = [value.strip() for value in row['fix_commit_ids'].split(';') if value.strip()]
+        if not fix_commits:
+            raise UnsupportedInput(f"No fix commit is declared for {row['cve_id']}")
+        requested_commit = latest_fix_commit(repo, fix_commits)
+    fixed = git(repo, 'rev-parse', requested_commit + '^{commit}').strip()
     dbs = [case_dir / (row['cve_id'] + suffix) for suffix in ('-vul', '-fix')]
     for db, sha in zip(dbs, (buggy, fixed)):
         meta = yaml.safe_load((db / 'codeql-database.yml').read_text())
@@ -90,6 +135,7 @@ def load_task(commit: str, root: Path, output: Path, dataset: Path | None = None
             raise ValueError('Database revision/finalization mismatch: ' + str(db))
         if meta.get('primaryLanguage') != 'java':
             raise ValueError('First release supports Java databases only')
+
     output = output.resolve()
     output.mkdir(parents=True, exist_ok=False)
     workspace = output / 'workspace'
