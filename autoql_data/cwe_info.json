@@ -1,0 +1,1949 @@
+{
+  "_meta": {
+    "catalog_date": "2026-10-28",
+    "catalog_missing_ids": [
+      "CWE-264"
+    ],
+    "catalog_name": "CWE",
+    "catalog_version": "5.0",
+    "dataset": "/root/code_check/autoql_data/project_info.csv",
+    "dataset_cwe_count": 46,
+    "generated_at": "2026-11-03T17:22:45.458495Z",
+    "item_count": 46,
+    "schema_version": 1,
+    "source": "MITRE CWE",
+    "source_url": "https://cwe.mitre.org/data/xml/cwec_latest.xml.zip"
+  },
+  "items": {
+    "CWE-113": {
+      "abstraction": "Variant",
+      "catalog_present": true,
+      "common_consequences": [
+        {
+          "impacts": "Modify Application Data, Gain Privileges or Assume Identity",
+          "note": "CR and LF characters in an HTTP header may give attackers control of the remaining headers and body of the message that the application intends to send/receive, as well as allowing them to create additional messages entirely under their control.",
+          "scopes": "Integrity, Access Control"
+        }
+      ],
+      "cwe_id": "CWE-113",
+      "description": "The product receives data from an HTTP agent/component (e.g., web server, proxy, browser, etc.), but it does not neutralize or incorrectly neutralizes CR and LF characters before the data is included in outgoing HTTP headers.",
+      "entry_type": "weakness",
+      "extended_description": "HTTP agents or components may include a web server, load balancer, reverse proxy, web caching proxy, application firewall, web browser, etc. Regardless of the role, they are expected to maintain coherent, consistent HTTP communication state across all components. However, including unexpected data in an HTTP header allows an attacker to specify the entirety of the HTTP message that is rendered by the client HTTP agent (e.g., web browser) or back-end HTTP agent (e.g., web server), whether the message is part of a request or a response. When an HTTP request contains unexpected CR and LF characters, the server may respond with an output stream that is interpreted as \"splitting\" the stream into two different HTTP messages instead of one. CR is carriage return, also given by %0d or \\r, and LF is line feed, also given by %0a or \\n. In addition to CR and LF characters, other valid/RFC compliant special characters and unique character encodings can be utilized, such as HT (horizontal tab, also given by %09 or \\t) and SP (space, also given as + sign or %20). These types of unvalidated and unexpected data in HTTP message headers allow an attacker to control the second \"split\" message to mount attacks such as server-side request forgery, cross-site scripting, and cache poisoning attacks.",
+      "likelihood_of_exploit": "",
+      "name": "Improper Neutralization of CRLF Sequences in HTTP Headers",
+      "potential_mitigations": [
+        {
+          "description": "Construct HTTP headers very carefully, avoiding the use of non-validated input data.",
+          "phases": "Implementation"
+        },
+        {
+          "description": "Assume all input is malicious. Use an \"accept known good\" input validation strategy, i.e., use a list of acceptable inputs that strictly conform to specifications. If an input does not strictly conform to specifications, reject it or transform it into something that conforms. When performing input validation, consider all potentially relevant properties, including length, type of input, the full range of acceptable values, missing or extra inputs, syntax, consistency across related fields, and conformance to business rules. As an example of business rule logic, \"boat\" may be syntactically valid because it only contains alphanumeric characters, but it is not valid if the input is only expected to contain colors such as \"red\" or \"blue.\" Do not rely exclusively on looking for malicious or malformed inputs. This is likely to miss at least one undesirable input, especially if the code's environment changes. This can give attackers enough room to bypass the intended validation. However, denylists can be useful for detecting potential attacks or determining which inputs are so malformed that they should be rejected outright.",
+          "phases": "Implementation"
+        },
+        {
+          "description": "Use and specify an output encoding that can be handled by the downstream component that is reading the output. Common encodings include ISO-8859-1, UTF-7, and UTF-8. When an encoding is not specified, a downstream component may choose a different encoding, either by assuming a default encoding or automatically inferring which encoding is being used, which can be erroneous. When the encodings are inconsistent, the downstream component might treat some character or byte sequences as special, even if they are not special in the original encoding. Attackers might then be able to exploit this discrepancy and conduct injection attacks; they even might be able to bypass protection mechanisms that assume the original encoding is also being used by the downstream component.",
+          "phases": "Implementation"
+        },
+        {
+          "description": "Inputs should be decoded and canonicalized to the application's current internal representation before being validated (CWE-180). Make sure that the application does not decode the same input twice (CWE-174). Such errors could be used to bypass allowlist validation schemes by introducing dangerous inputs after they have been checked.",
+          "phases": "Implementation"
+        }
+      ],
+      "status": "Incomplete",
+      "structure": "Simple"
+    },
+    "CWE-1325": {
+      "abstraction": "Base",
+      "catalog_present": true,
+      "common_consequences": [
+        {
+          "impacts": "DoS: Resource Consumption (Memory)",
+          "note": "Not controlling memory allocation can result in a request for too much system memory, possibly leading to a crash of the application due to out-of-memory conditions, or the consumption of a large amount of memory on the system.",
+          "scopes": "Availability"
+        }
+      ],
+      "cwe_id": "CWE-1325",
+      "description": "The product manages a group of objects or resources and performs a separate memory allocation for each object, but it does not properly limit the total amount of memory that is consumed by all of the combined objects.",
+      "entry_type": "weakness",
+      "extended_description": "While the product might limit the amount of memory that is allocated in a single operation for a single object (such as a malloc of an array), if an attacker can cause multiple objects to be allocated in separate operations, then this might cause higher total memory consumption than the developer intended, leading to a denial of service.",
+      "likelihood_of_exploit": "",
+      "name": "Improperly Controlled Sequential Memory Allocation",
+      "potential_mitigations": [
+        {
+          "description": "Ensure multiple allocations of the same kind of object are properly tracked - possibly across multiple sessions, requests, or messages. Define an appropriate strategy for handling requests that exceed the limit, and consider supporting a configuration option so that the administrator can extend the amount of memory to be used if necessary.",
+          "phases": "Implementation"
+        },
+        {
+          "description": "Run the program using system-provided resource limits for memory. This might still cause the program to crash or exit, but the impact to the rest of the system will be minimized.",
+          "phases": "Operation"
+        }
+      ],
+      "status": "Incomplete",
+      "structure": "Simple"
+    },
+    "CWE-1333": {
+      "abstraction": "Base",
+      "catalog_present": true,
+      "common_consequences": [
+        {
+          "impacts": "DoS: Resource Consumption (CPU)",
+          "note": "Attackers can create crafted inputs that intentionally cause the regular expression to use excessive backtracking in a way that causes the CPU consumption to spike.",
+          "scopes": "Availability"
+        }
+      ],
+      "cwe_id": "CWE-1333",
+      "description": "The product uses a regular expression with a worst-case computational complexity that is inefficient and possibly exponential.",
+      "entry_type": "weakness",
+      "extended_description": "",
+      "likelihood_of_exploit": "High",
+      "name": "Inefficient Regular Expression Complexity",
+      "potential_mitigations": [
+        {
+          "description": "Use regular expressions that do not support backtracking, e.g. by removing nested quantifiers.",
+          "phases": "Architecture and Design"
+        },
+        {
+          "description": "Set backtracking limits in the configuration of the regular expression implementation, such as PHP's pcre.backtrack_limit. Also consider limits on execution time for the process.",
+          "phases": "System Configuration"
+        },
+        {
+          "description": "Do not use regular expressions with untrusted input. If regular expressions must be used, avoid using backtracking in the expression.",
+          "phases": "Implementation"
+        },
+        {
+          "description": "Limit the length of the input that the regular expression will process.",
+          "phases": "Implementation"
+        }
+      ],
+      "status": "Draft",
+      "structure": "Simple"
+    },
+    "CWE-164": {
+      "abstraction": "Variant",
+      "catalog_present": true,
+      "common_consequences": [
+        {
+          "impacts": "Unexpected State, Varies by Context",
+          "note": "As data is parsed, an injected element may cause the process to take unexpected actions.",
+          "scopes": "Integrity"
+        }
+      ],
+      "cwe_id": "CWE-164",
+      "description": "The product receives input from an upstream component, but it does not neutralize or incorrectly neutralizes internal special elements that could be interpreted in unexpected ways when they are sent to a downstream component.",
+      "entry_type": "weakness",
+      "extended_description": "",
+      "likelihood_of_exploit": "",
+      "name": "Improper Neutralization of Internal Special Elements",
+      "potential_mitigations": [
+        {
+          "description": "Developers should anticipate that internal special elements will be injected/removed/manipulated in the input vectors of their product. Use an appropriate combination of denylists and allowlists to ensure only valid, expected and appropriate input is processed by the system.",
+          "phases": ""
+        },
+        {
+          "description": "Assume all input is malicious. Use an \"accept known good\" input validation strategy, i.e., use a list of acceptable inputs that strictly conform to specifications. Reject any input that does not strictly conform to specifications, or transform it into something that does. When performing input validation, consider all potentially relevant properties, including length, type of input, the full range of acceptable values, missing or extra inputs, syntax, consistency across related fields, and conformance to business rules. As an example of business rule logic, \"boat\" may be syntactically valid because it only contains alphanumeric characters, but it is not valid if the input is only expected to contain colors such as \"red\" or \"blue.\" Do not rely exclusively on looking for malicious or malformed inputs. This is likely to miss at least one undesirable input, especially if the code's environment changes. This can give attackers enough room to bypass the intended validation. However, denylists can be useful for detecting potential attacks or determining which inputs are so malformed that they should be rejected outright.",
+          "phases": "Implementation"
+        },
+        {
+          "description": "While it is risky to use dynamically-generated query strings, code, or commands that mix control and data together, sometimes it may be unavoidable. Properly quote arguments and escape any special characters within those arguments. The most conservative approach is to escape or filter all characters that do not pass an extremely strict allowlist (such as everything that is not alphanumeric or white space). If some special characters are still needed, such as white space, wrap each argument in quotes after the escaping/filtering step. Be careful of argument injection (CWE-88).",
+          "phases": "Implementation"
+        },
+        {
+          "description": "Inputs should be decoded and canonicalized to the application's current internal representation before being validated (CWE-180). Make sure that the application does not decode the same input twice (CWE-174). Such errors could be used to bypass allowlist validation schemes by introducing dangerous inputs after they have been checked.",
+          "phases": "Implementation"
+        }
+      ],
+      "status": "Incomplete",
+      "structure": "Simple"
+    },
+    "CWE-178": {
+      "abstraction": "Base",
+      "catalog_present": true,
+      "common_consequences": [
+        {
+          "impacts": "Bypass Protection Mechanism",
+          "note": "Improperly handled case sensitive data can lead to several possible consequences, including: case-insensitive passwords reducing the size of the key space, making brute force attacks easier bypassing filters or access controls using alternate names multiple interpretation errors using alternate names.",
+          "scopes": "Access Control"
+        }
+      ],
+      "cwe_id": "CWE-178",
+      "description": "The product does not properly account for differences in case sensitivity when accessing or determining the properties of a resource, leading to inconsistent results.",
+      "entry_type": "weakness",
+      "extended_description": "",
+      "likelihood_of_exploit": "",
+      "name": "Improper Handling of Case Sensitivity",
+      "potential_mitigations": [
+        {
+          "description": "Avoid making decisions based on names of resources (e.g. files) if those resources can have alternate names.",
+          "phases": "Architecture and Design"
+        },
+        {
+          "description": "Assume all input is malicious. Use an \"accept known good\" input validation strategy, i.e., use a list of acceptable inputs that strictly conform to specifications. Reject any input that does not strictly conform to specifications, or transform it into something that does. When performing input validation, consider all potentially relevant properties, including length, type of input, the full range of acceptable values, missing or extra inputs, syntax, consistency across related fields, and conformance to business rules. As an example of business rule logic, \"boat\" may be syntactically valid because it only contains alphanumeric characters, but it is not valid if the input is only expected to contain colors such as \"red\" or \"blue.\" Do not rely exclusively on looking for malicious or malformed inputs. This is likely to miss at least one undesirable input, especially if the code's environment changes. This can give attackers enough room to bypass the intended validation. However, denylists can be useful for detecting potential attacks or determining which inputs are so malformed that they should be rejected outright.",
+          "phases": "Implementation"
+        },
+        {
+          "description": "Inputs should be decoded and canonicalized to the application's current internal representation before being validated (CWE-180). Make sure that the application does not decode the same input twice (CWE-174). Such errors could be used to bypass allowlist validation schemes by introducing dangerous inputs after they have been checked.",
+          "phases": "Implementation"
+        }
+      ],
+      "status": "Incomplete",
+      "structure": "Simple"
+    },
+    "CWE-190": {
+      "abstraction": "Base",
+      "catalog_present": true,
+      "common_consequences": [
+        {
+          "impacts": "DoS: Crash, Exit, or Restart, DoS: Resource Consumption (Memory), DoS: Instability",
+          "note": "This weakness can generally lead to undefined behavior and therefore crashes. When the calculated result is used for resource allocation, this weakness can cause too many (or too few) resources to be allocated, possibly enabling crashes if the product requests more resources than can be provided. If the calculated result involves time values, then the product might crash when it encounters a time that is less than the previously-calculated time.",
+          "scopes": "Availability"
+        },
+        {
+          "impacts": "Modify Memory",
+          "note": "If the value in question is important to data (as opposed to flow), simple data corruption has occurred. Also, if the overflow/wraparound results in other conditions such as buffer overflows, further memory corruption may occur.",
+          "scopes": "Integrity"
+        },
+        {
+          "impacts": "Execute Unauthorized Code or Commands, Bypass Protection Mechanism",
+          "note": "This weakness can sometimes trigger buffer overflows, which can be used to execute arbitrary code. This is usually outside the scope of the product's implicit security policy.",
+          "scopes": "Confidentiality, Availability, Access Control"
+        },
+        {
+          "impacts": "Alter Execution Logic, DoS: Crash, Exit, or Restart, DoS: Resource Consumption (CPU)",
+          "note": "If the overflow/wraparound occurs in a loop index variable, this could cause the loop to terminate at the wrong time - too early, too late, or not at all (i.e., infinite loops). With too many iterations, some loops could consume too many resources such as memory, file handles, etc., possibly leading to a crash or other DoS.",
+          "scopes": "Availability, Other"
+        },
+        {
+          "impacts": "Bypass Protection Mechanism",
+          "note": "If integer values are used in security-critical decisions, such as calculating quotas or allocation limits, integer overflows can be used to cause an incorrect security decision.",
+          "scopes": "Access Control"
+        },
+        {
+          "impacts": "Bypass Protection Mechanism, DoS: Crash, Exit, or Restart",
+          "note": "If integer values are used in time-based, security-critical decisions, such as calculating expiration times or determining whether an event occurs within a specific time or date range, to cause an incorrect security decision. The consequences could even include \"self-DoS\" if the overflow produces a time value that is not accounted for in protection mechanism logic [REF-1570].",
+          "scopes": "Access Control"
+        }
+      ],
+      "cwe_id": "CWE-190",
+      "description": "The product performs a calculation that can produce an integer overflow or wraparound when the logic assumes that the resulting value will always be larger than the original value. This occurs when an integer value is incremented to a value that is too large to store in the associated representation. When this occurs, the value may become a very small or negative number.",
+      "entry_type": "weakness",
+      "extended_description": "",
+      "likelihood_of_exploit": "Medium",
+      "name": "Integer Overflow or Wraparound",
+      "potential_mitigations": [
+        {
+          "description": "Ensure that all protocols are strictly defined, such that all out-of-bounds behavior can be identified simply, and require strict conformance to the protocol.",
+          "phases": "Requirements"
+        },
+        {
+          "description": "Use a language that does not allow this weakness to occur or provides constructs that make this weakness easier to avoid. If possible, choose a language or compiler that performs automatic bounds checking.",
+          "phases": "Requirements"
+        },
+        {
+          "description": "Use a vetted library or framework that does not allow this weakness to occur or provides constructs that make this weakness easier to avoid [REF-1482]. Use libraries or frameworks that make it easier to handle numbers without unexpected consequences. Examples include safe integer handling packages such as SafeInt (C++) or IntegerLib (C or C++). [REF-106]",
+          "phases": "Architecture and Design"
+        },
+        {
+          "description": "Perform input validation on any numeric input by ensuring that it is within the expected range. Enforce that the input meets both the minimum and maximum requirements for the expected range. Use unsigned integers where possible. This makes it easier to perform validation for integer overflows. When signed integers are required, ensure that the range check includes minimum values as well as maximum values.",
+          "phases": "Implementation"
+        },
+        {
+          "description": "Understand the programming language's underlying representation and how it interacts with numeric calculation (CWE-681). Pay close attention to byte size discrepancies, precision, signed/unsigned distinctions, truncation, conversion and casting between types, \"not-a-number\" calculations, and how the language handles numbers that are too large or too small for its underlying representation. [REF-7] Also be careful to account for 32-bit, 64-bit, and other potential differences that may affect the numeric representation.",
+          "phases": "Implementation"
+        },
+        {
+          "description": "For any security checks that are performed on the client side, ensure that these checks are duplicated on the server side, in order to avoid CWE-602. Attackers can bypass the client-side checks by modifying values after the checks have been performed, or by changing the client to remove the client-side checks entirely. Then, these modified values would be submitted to the server.",
+          "phases": "Architecture and Design"
+        },
+        {
+          "description": "Examine compiler warnings closely and eliminate problems with potential security implications, such as signed / unsigned mismatch in memory operations, or use of uninitialized variables. Even if the weakness is rarely exploitable, a single failure may lead to the compromise of the entire system.",
+          "phases": "Implementation"
+        }
+      ],
+      "status": "Stable",
+      "structure": "Simple"
+    },
+    "CWE-20": {
+      "abstraction": "Class",
+      "catalog_present": true,
+      "common_consequences": [
+        {
+          "impacts": "DoS: Crash, Exit, or Restart, DoS: Resource Consumption (CPU), DoS: Resource Consumption (Memory)",
+          "note": "An attacker could provide unexpected values and cause a program crash or arbitrary control of resource allocation, leading to excessive consumption of resources such as memory and CPU.",
+          "scopes": "Availability"
+        },
+        {
+          "impacts": "Read Memory, Read Files or Directories",
+          "note": "An attacker could read confidential data if they are able to control resource references.",
+          "scopes": "Confidentiality"
+        },
+        {
+          "impacts": "Modify Memory, Execute Unauthorized Code or Commands",
+          "note": "An attacker could use malicious input to modify data or possibly alter control flow in unexpected ways, including arbitrary command execution.",
+          "scopes": "Integrity, Confidentiality, Availability"
+        }
+      ],
+      "cwe_id": "CWE-20",
+      "description": "The product receives input or data, but it does not validate or incorrectly validates that the input has the properties that are required to process the data safely and correctly.",
+      "entry_type": "weakness",
+      "extended_description": "",
+      "likelihood_of_exploit": "High",
+      "name": "Improper Input Validation",
+      "potential_mitigations": [
+        {
+          "description": "Consider using language-theoretic security (LangSec) techniques that characterize inputs using a formal language and build \"recognizers\" for that language. This effectively requires parsing to be a distinct layer that effectively enforces a boundary between raw input and internal data representations, instead of allowing parser code to be scattered throughout the program, where it could be subject to errors or inconsistencies that create weaknesses. [REF-1109] [REF-1110] [REF-1111]",
+          "phases": "Architecture and Design"
+        },
+        {
+          "description": "Use an input validation framework such as Struts or the OWASP ESAPI Validation API. Note that using a framework does not automatically address all input validation problems; be mindful of weaknesses that could arise from misusing the framework itself (CWE-1173).",
+          "phases": "Architecture and Design"
+        },
+        {
+          "description": "Understand all the potential areas where untrusted inputs can enter the product, including but not limited to: parameters or arguments, cookies, anything read from the network, environment variables, reverse DNS lookups, query results, request headers, URL components, e-mail, files, filenames, databases, and any external systems that provide data to the application. Remember that such inputs may be obtained indirectly through API calls.",
+          "phases": "Architecture and Design, Implementation"
+        },
+        {
+          "description": "Assume all input is malicious. Use an \"accept known good\" input validation strategy, i.e., use a list of acceptable inputs that strictly conform to specifications. Reject any input that does not strictly conform to specifications, or transform it into something that does. When performing input validation, consider all potentially relevant properties, including length, type of input, the full range of acceptable values, missing or extra inputs, syntax, consistency across related fields, and conformance to business rules. As an example of business rule logic, \"boat\" may be syntactically valid because it only contains alphanumeric characters, but it is not valid if the input is only expected to contain colors such as \"red\" or \"blue.\" Do not rely exclusively on looking for malicious or malformed inputs. This is likely to miss at least one undesirable input, especially if the code's environment changes. This can give attackers enough room to bypass the intended validation. However, denylists can be useful for detecting potential attacks or determining which inputs are so malformed that they should be rejected outright.",
+          "phases": "Implementation"
+        },
+        {
+          "description": "For any security checks that are performed on the client side, ensure that these checks are duplicated on the server side, in order to avoid CWE-602. Attackers can bypass the client-side checks by modifying values after the checks have been performed, or by changing the client to remove the client-side checks entirely. Then, these modified values would be submitted to the server. Even though client-side checks provide minimal benefits with respect to server-side security, they are still useful. First, they can support intrusion detection. If the server receives input that should have been rejected by the client, then it may be an indication of an attack. Second, client-side error-checking can provide helpful feedback to the user about the expectations for valid input. Third, there may be a reduction in server-side processing time for accidental input errors, although this is typically a small savings.",
+          "phases": "Architecture and Design"
+        },
+        {
+          "description": "When your application combines data from multiple sources, perform the validation after the sources have been combined. The individual data elements may pass the validation step but violate the intended restrictions after they have been combined.",
+          "phases": "Implementation"
+        },
+        {
+          "description": "Be especially careful to validate all input when invoking code that crosses language boundaries, such as from an interpreted language to native code. This could create an unexpected interaction between the language boundaries. Ensure that you are not violating any of the expectations of the language with which you are interfacing. For example, even though Java may not be susceptible to buffer overflows, providing a large argument in a call to native code might trigger an overflow.",
+          "phases": "Implementation"
+        },
+        {
+          "description": "Directly convert your input type into the expected data type, such as using a conversion function that translates a string into a number. After converting to the expected data type, ensure that the input's values fall within the expected range of allowable values and that multi-field consistencies are maintained.",
+          "phases": "Implementation"
+        },
+        {
+          "description": "Inputs should be decoded and canonicalized to the application's current internal representation before being validated (CWE-180, CWE-181). Make sure that your application does not inadvertently decode the same input twice (CWE-174). Such errors could be used to bypass allowlist schemes by introducing dangerous inputs after they have been checked. Use libraries such as the OWASP ESAPI Canonicalization control. Consider performing repeated canonicalization until your input does not change any more. This will avoid double-decoding and similar scenarios, but it might inadvertently modify inputs that are allowed to contain properly-encoded dangerous content.",
+          "phases": "Implementation"
+        },
+        {
+          "description": "When exchanging data between components, ensure that both components are using the same character encoding. Ensure that the proper encoding is applied at each interface. Explicitly set the encoding you are using whenever the protocol allows you to do so.",
+          "phases": "Implementation"
+        }
+      ],
+      "status": "Stable",
+      "structure": "Simple"
+    },
+    "CWE-200": {
+      "abstraction": "Class",
+      "catalog_present": true,
+      "common_consequences": [
+        {
+          "impacts": "Read Application Data",
+          "note": "",
+          "scopes": "Confidentiality"
+        }
+      ],
+      "cwe_id": "CWE-200",
+      "description": "The product exposes sensitive information to an actor that is not explicitly authorized to have access to that information.",
+      "entry_type": "weakness",
+      "extended_description": "",
+      "likelihood_of_exploit": "High",
+      "name": "Exposure of Sensitive Information to an Unauthorized Actor",
+      "potential_mitigations": [
+        {
+          "description": "Compartmentalize the system to have \"safe\" areas where trust boundaries can be unambiguously drawn. Do not allow sensitive data to go outside of the trust boundary and always be careful when interfacing with a compartment outside of the safe area. Ensure that appropriate compartmentalization is built into the system design, and the compartmentalization allows for and reinforces privilege separation functionality. Architects and designers should rely on the principle of least privilege to decide the appropriate time to use privileges and the time to drop privileges.",
+          "phases": "Architecture and Design"
+        }
+      ],
+      "status": "Draft",
+      "structure": "Simple"
+    },
+    "CWE-22": {
+      "abstraction": "Base",
+      "catalog_present": true,
+      "common_consequences": [
+        {
+          "impacts": "Execute Unauthorized Code or Commands",
+          "note": "The attacker may be able to create or overwrite critical files that are used to execute code, such as programs or libraries.",
+          "scopes": "Integrity, Confidentiality, Availability"
+        },
+        {
+          "impacts": "Modify Files or Directories",
+          "note": "The attacker may be able to overwrite or create critical files, such as programs, libraries, or important data. If the targeted file is used for a security mechanism, then the attacker may be able to bypass that mechanism. For example, appending a new account at the end of a password file may allow an attacker to bypass authentication.",
+          "scopes": "Integrity"
+        },
+        {
+          "impacts": "Read Files or Directories",
+          "note": "The attacker may be able to read the contents of unexpected files and expose sensitive data. If the targeted file is used for a security mechanism, then the attacker may be able to bypass that mechanism. For example, by reading a password file, the attacker could conduct brute force password guessing attacks in order to break into an account on the system.",
+          "scopes": "Confidentiality"
+        },
+        {
+          "impacts": "DoS: Crash, Exit, or Restart",
+          "note": "The attacker may be able to overwrite, delete, or corrupt unexpected critical files such as programs, libraries, or important data. This may prevent the product from working at all and in the case of protection mechanisms such as authentication, it has the potential to lock out product users.",
+          "scopes": "Availability"
+        }
+      ],
+      "cwe_id": "CWE-22",
+      "description": "The product uses external input to construct a pathname that is intended to identify a file or directory that is located underneath a restricted parent directory, but the product does not properly neutralize special elements within the pathname that can cause the pathname to resolve to a location that is outside of the restricted directory.",
+      "entry_type": "weakness",
+      "extended_description": "Many file operations are intended to take place within a restricted directory. By using special elements such as \"..\" and \"/\" separators, attackers can escape outside of the restricted location to access files or directories that are elsewhere on the system. One of the most common special elements is the \"../\" sequence, which in most modern operating systems is interpreted as the parent directory of the current location. This is referred to as relative path traversal. Path traversal also covers the use of absolute pathnames such as \"/usr/local/bin\" to access unexpected files. This is referred to as absolute path traversal.",
+      "likelihood_of_exploit": "High",
+      "name": "Improper Limitation of a Pathname to a Restricted Directory",
+      "potential_mitigations": [
+        {
+          "description": "Assume all input is malicious. Use an \"accept known good\" input validation strategy, i.e., use a list of acceptable inputs that strictly conform to specifications. Reject any input that does not strictly conform to specifications, or transform it into something that does. When performing input validation, consider all potentially relevant properties, including length, type of input, the full range of acceptable values, missing or extra inputs, syntax, consistency across related fields, and conformance to business rules. As an example of business rule logic, \"boat\" may be syntactically valid because it only contains alphanumeric characters, but it is not valid if the input is only expected to contain colors such as \"red\" or \"blue.\" Do not rely exclusively on looking for malicious or malformed inputs. This is likely to miss at least one undesirable input, especially if the code's environment changes. This can give attackers enough room to bypass the intended validation. However, denylists can be useful for detecting potential attacks or determining which inputs are so malformed that they should be rejected outright. When validating filenames, use stringent allowlists that limit the character set to be used. If feasible, only allow a single \".\" character in the filename to avoid weaknesses such as CWE-23, and exclude directory separators such as \"/\" to avoid CWE-36. Use a list of allowable file extensions, which will help to avoid CWE-434. Do not rely exclusively on a filtering mechanism that removes potentially dangerous characters. This is equivalent to a denylist, which may be incomplete (CWE-184). For example, filtering \"/\" is insufficient protection if the filesystem also supports the use of \"\\\" as a directory separator. Another possible error could occur when the filtering is applied in a way that still produces dangerous data (CWE-182). For example, if \"../\" sequences are removed from the \".../...//\" string in a sequential fashion, two instances of \"../\" would be removed from the original string, but the remaining characters would still form the \"../\" string.",
+          "phases": "Implementation"
+        },
+        {
+          "description": "For any security checks that are performed on the client side, ensure that these checks are duplicated on the server side, in order to avoid CWE-602. Attackers can bypass the client-side checks by modifying values after the checks have been performed, or by changing the client to remove the client-side checks entirely. Then, these modified values would be submitted to the server.",
+          "phases": "Architecture and Design"
+        },
+        {
+          "description": "Inputs should be decoded and canonicalized to the application's current internal representation before being validated (CWE-180). Make sure that the application does not decode the same input twice (CWE-174). Such errors could be used to bypass allowlist validation schemes by introducing dangerous inputs after they have been checked. Use a built-in path canonicalization function (such as realpath() in C) that produces the canonical version of the pathname, which effectively removes \"..\" sequences and symbolic links (CWE-23, CWE-59). This includes: realpath() in C getCanonicalPath() in Java GetFullPath() in ASP.NET realpath() or abs_path() in Perl realpath() in PHP",
+          "phases": "Implementation"
+        },
+        {
+          "description": "Use a vetted library or framework that does not allow this weakness to occur or provides constructs that make this weakness easier to avoid [REF-1482].",
+          "phases": "Architecture and Design"
+        },
+        {
+          "description": "Use an application firewall that can detect attacks against this weakness. It can be beneficial in cases in which the code cannot be fixed (because it is controlled by a third party), as an emergency prevention measure while more comprehensive software assurance measures are applied, or to provide defense in depth [REF-1481].",
+          "phases": "Operation"
+        },
+        {
+          "description": "Run your code using the lowest privileges that are required to accomplish the necessary tasks [REF-76]. If possible, create isolated accounts with limited privileges that are only used for a single task. That way, a successful attack will not immediately give the attacker access to the rest of the software or its environment. For example, database applications rarely need to run as the database administrator, especially in day-to-day operations.",
+          "phases": "Architecture and Design, Operation"
+        },
+        {
+          "description": "When the set of acceptable objects, such as filenames or URLs, is limited or known, create a mapping from a set of fixed input values (such as numeric IDs) to the actual filenames or URLs, and reject all other inputs. For example, ID 1 could map to \"inbox.txt\" and ID 2 could map to \"profile.txt\". Features such as the ESAPI AccessReferenceMap [REF-185] provide this capability.",
+          "phases": "Architecture and Design"
+        },
+        {
+          "description": "Run the code in a \"jail\" or similar sandbox environment that enforces strict boundaries between the process and the operating system. This may effectively restrict which files can be accessed in a particular directory or which commands can be executed by the software. OS-level examples include the Unix chroot jail, AppArmor, and SELinux. In general, managed code may provide some protection. For example, java.io.FilePermission in the Java SecurityManager allows the software to specify restrictions on file operations. This may not be a feasible solution, and it only limits the impact to the operating system; the rest of the application may still be subject to compromise. Be careful to avoid CWE-243 and other weaknesses related to jails.",
+          "phases": "Architecture and Design, Operation"
+        },
+        {
+          "description": "Store library, include, and utility files outside of the web document root, if possible. Otherwise, store them in a separate directory and use the web server's access control capabilities to prevent attackers from directly requesting them. One common practice is to define a fixed constant in each calling program, then check for the existence of the constant in the library/include file; if the constant does not exist, then the file was directly requested, and it can exit immediately. This significantly reduces the chance of an attacker being able to bypass any protection mechanisms that are in the base program but not in the include files. It will also reduce the attack surface.",
+          "phases": "Architecture and Design, Operation"
+        },
+        {
+          "description": "Ensure that error messages only contain minimal details that are useful to the intended audience and no one else. The messages need to strike the balance between being too cryptic (which can confuse users) or being too detailed (which may reveal more than intended). The messages should not reveal the methods that were used to determine the error. Attackers can use detailed information to refine or optimize their original attack, thereby increasing their chances of success. If errors must be captured in some detail, record them in log messages, but consider what could occur if the log messages can be viewed by attackers. Highly sensitive information such as passwords should never be saved to log files. Avoid inconsistent messaging that might accidentally tip off an attacker about internal state, such as whether a user account exists or not. In the context of path traversal, error messages which disclose path information can help attackers craft the appropriate attack strings to move through the file system hierarchy.",
+          "phases": "Implementation"
+        },
+        {
+          "description": "When using PHP, configure the application so that it does not use register_globals. During implementation, develop the application so that it does not rely on this feature, but be wary of implementing a register_globals emulation that is subject to weaknesses such as CWE-95, CWE-621, and similar issues.",
+          "phases": "Operation, Implementation"
+        }
+      ],
+      "status": "Stable",
+      "structure": "Simple"
+    },
+    "CWE-23": {
+      "abstraction": "Base",
+      "catalog_present": true,
+      "common_consequences": [
+        {
+          "impacts": "Execute Unauthorized Code or Commands",
+          "note": "The attacker may be able to create or overwrite critical files that are used to execute code, such as programs or libraries.",
+          "scopes": "Integrity, Confidentiality, Availability"
+        },
+        {
+          "impacts": "Modify Files or Directories",
+          "note": "The attacker may be able to overwrite or create critical files, such as programs, libraries, or important data. If the targeted file is used for a security mechanism, then the attacker may be able to bypass that mechanism. For example, appending a new account at the end of a password file may allow an attacker to bypass authentication.",
+          "scopes": "Integrity"
+        },
+        {
+          "impacts": "Read Files or Directories",
+          "note": "The attacker may be able to read the contents of unexpected files and expose sensitive data by traversing the file system to access files or directories that are outside of the restricted directory. If the targeted file is used for a security mechanism, then the attacker may be able to bypass that mechanism. For example, by reading a password file, the attacker could conduct brute force password guessing attacks in order to break into an account on the system.",
+          "scopes": "Confidentiality"
+        },
+        {
+          "impacts": "DoS: Crash, Exit, or Restart",
+          "note": "The attacker may be able to overwrite, delete, or corrupt unexpected critical files such as programs, libraries, or important data. This may prevent the product from working at all and in the case of a protection mechanism such as authentication, it has the potential to lockout every user of the product.",
+          "scopes": "Availability"
+        }
+      ],
+      "cwe_id": "CWE-23",
+      "description": "The product uses external input to construct a pathname that should be within a restricted directory, but it does not properly neutralize sequences such as \"..\" that can resolve to a location that is outside of that directory.",
+      "entry_type": "weakness",
+      "extended_description": "",
+      "likelihood_of_exploit": "",
+      "name": "Relative Path Traversal",
+      "potential_mitigations": [
+        {
+          "description": "Assume all input is malicious. Use an \"accept known good\" input validation strategy, i.e., use a list of acceptable inputs that strictly conform to specifications. Reject any input that does not strictly conform to specifications, or transform it into something that does. When performing input validation, consider all potentially relevant properties, including length, type of input, the full range of acceptable values, missing or extra inputs, syntax, consistency across related fields, and conformance to business rules. As an example of business rule logic, \"boat\" may be syntactically valid because it only contains alphanumeric characters, but it is not valid if the input is only expected to contain colors such as \"red\" or \"blue.\" Do not rely exclusively on looking for malicious or malformed inputs. This is likely to miss at least one undesirable input, especially if the code's environment changes. This can give attackers enough room to bypass the intended validation. However, denylists can be useful for detecting potential attacks or determining which inputs are so malformed that they should be rejected outright. When validating filenames, use stringent allowlists that limit the character set to be used. If feasible, only allow a single \".\" character in the filename to avoid weaknesses such as CWE-23, and exclude directory separators such as \"/\" to avoid CWE-36. Use a list of allowable file extensions, which will help to avoid CWE-434. Do not rely exclusively on a filtering mechanism that removes potentially dangerous characters. This is equivalent to a denylist, which may be incomplete (CWE-184). For example, filtering \"/\" is insufficient protection if the filesystem also supports the use of \"\\\" as a directory separator. Another possible error could occur when the filtering is applied in a way that still produces dangerous data (CWE-182). For example, if \"../\" sequences are removed from the \".../...//\" string in a sequential fashion, two instances of \"../\" would be removed from the original string, but the remaining characters would still form the \"../\" string.",
+          "phases": "Implementation"
+        },
+        {
+          "description": "Inputs should be decoded and canonicalized to the application's current internal representation before being validated (CWE-180). Make sure that the application does not decode the same input twice (CWE-174). Such errors could be used to bypass allowlist validation schemes by introducing dangerous inputs after they have been checked. Use a built-in path canonicalization function (such as realpath() in C) that produces the canonical version of the pathname, which effectively removes \"..\" sequences and symbolic links (CWE-23, CWE-59). This includes: realpath() in C getCanonicalPath() in Java GetFullPath() in ASP.NET realpath() or abs_path() in Perl realpath() in PHP",
+          "phases": "Implementation"
+        },
+        {
+          "description": "Use an application firewall that can detect attacks against this weakness. It can be beneficial in cases in which the code cannot be fixed (because it is controlled by a third party), as an emergency prevention measure while more comprehensive software assurance measures are applied, or to provide defense in depth [REF-1481].",
+          "phases": "Operation"
+        }
+      ],
+      "status": "Draft",
+      "structure": "Simple"
+    },
+    "CWE-264": {
+      "abstraction": "",
+      "catalog_present": false,
+      "common_consequences": [],
+      "cwe_id": "CWE-264",
+      "description": "",
+      "entry_type": "dataset_fallback",
+      "extended_description": "",
+      "likelihood_of_exploit": "",
+      "name": "Permissions, Privileges, and Access Controls",
+      "potential_mitigations": [],
+      "status": "absent_from_current_mitre_weakness_catalog",
+      "structure": ""
+    },
+    "CWE-267": {
+      "abstraction": "Base",
+      "catalog_present": true,
+      "common_consequences": [
+        {
+          "impacts": "Gain Privileges or Assume Identity",
+          "note": "A user can access restricted functionality and/or sensitive information that may include administrative functionality and user accounts.",
+          "scopes": "Access Control"
+        }
+      ],
+      "cwe_id": "CWE-267",
+      "description": "A particular privilege, role, capability, or right can be used to perform unsafe actions that were not intended, even when it is assigned to the correct entity.",
+      "entry_type": "weakness",
+      "extended_description": "",
+      "likelihood_of_exploit": "",
+      "name": "Privilege Defined With Unsafe Actions",
+      "potential_mitigations": [
+        {
+          "description": "Very carefully manage the setting, management, and handling of privileges. Explicitly manage trust zones in the software.",
+          "phases": "Architecture and Design, Operation"
+        },
+        {
+          "description": "Run your code using the lowest privileges that are required to accomplish the necessary tasks [REF-76]. If possible, create isolated accounts with limited privileges that are only used for a single task. That way, a successful attack will not immediately give the attacker access to the rest of the software or its environment. For example, database applications rarely need to run as the database administrator, especially in day-to-day operations.",
+          "phases": "Architecture and Design, Operation"
+        }
+      ],
+      "status": "Incomplete",
+      "structure": "Simple"
+    },
+    "CWE-269": {
+      "abstraction": "Class",
+      "catalog_present": true,
+      "common_consequences": [
+        {
+          "impacts": "Gain Privileges or Assume Identity",
+          "note": "",
+          "scopes": "Access Control"
+        }
+      ],
+      "cwe_id": "CWE-269",
+      "description": "The product does not properly assign, modify, track, or check privileges for an actor, creating an unintended sphere of control for that actor.",
+      "entry_type": "weakness",
+      "extended_description": "",
+      "likelihood_of_exploit": "Medium",
+      "name": "Improper Privilege Management",
+      "potential_mitigations": [
+        {
+          "description": "Very carefully manage the setting, management, and handling of privileges. Explicitly manage trust zones in the software.",
+          "phases": "Architecture and Design, Operation"
+        },
+        {
+          "description": "Follow the principle of least privilege when assigning access rights to entities in a software system.",
+          "phases": "Architecture and Design"
+        },
+        {
+          "description": "Consider following the principle of separation of privilege. Require multiple conditions to be met before permitting access to a system resource.",
+          "phases": "Architecture and Design"
+        }
+      ],
+      "status": "Draft",
+      "structure": "Simple"
+    },
+    "CWE-276": {
+      "abstraction": "Base",
+      "catalog_present": true,
+      "common_consequences": [
+        {
+          "impacts": "Read Application Data, Modify Application Data",
+          "note": "",
+          "scopes": "Confidentiality, Integrity"
+        }
+      ],
+      "cwe_id": "CWE-276",
+      "description": "During installation, installed file permissions are set to allow anyone to modify those files.",
+      "entry_type": "weakness",
+      "extended_description": "",
+      "likelihood_of_exploit": "Medium",
+      "name": "Incorrect Default Permissions",
+      "potential_mitigations": [
+        {
+          "description": "The architecture needs to access and modification attributes for files to only those users who actually require those actions.",
+          "phases": "Architecture and Design, Operation"
+        },
+        {
+          "description": "Compartmentalize the system to have \"safe\" areas where trust boundaries can be unambiguously drawn. Do not allow sensitive data to go outside of the trust boundary and always be careful when interfacing with a compartment outside of the safe area. Ensure that appropriate compartmentalization is built into the system design, and the compartmentalization allows for and reinforces privilege separation functionality. Architects and designers should rely on the principle of least privilege to decide the appropriate time to use privileges and the time to drop privileges.",
+          "phases": "Architecture and Design"
+        }
+      ],
+      "status": "Draft",
+      "structure": "Simple"
+    },
+    "CWE-284": {
+      "abstraction": "Pillar",
+      "catalog_present": true,
+      "common_consequences": [
+        {
+          "impacts": "Varies by Context, Gain Privileges or Assume Identity",
+          "note": "When any mechanism is not applied or otherwise fails, attackers can compromise the security of the product by gaining privileges, reading sensitive information, executing commands, evading detection, etc.",
+          "scopes": "Other"
+        }
+      ],
+      "cwe_id": "CWE-284",
+      "description": "The product does not restrict or incorrectly restricts access to a resource from an unauthorized actor.",
+      "entry_type": "weakness",
+      "extended_description": "",
+      "likelihood_of_exploit": "",
+      "name": "Improper Access Control",
+      "potential_mitigations": [
+        {
+          "description": "Very carefully manage the setting, management, and handling of privileges. Explicitly manage trust zones in the software.",
+          "phases": "Architecture and Design, Operation"
+        },
+        {
+          "description": "Compartmentalize the system to have \"safe\" areas where trust boundaries can be unambiguously drawn. Do not allow sensitive data to go outside of the trust boundary and always be careful when interfacing with a compartment outside of the safe area. Ensure that appropriate compartmentalization is built into the system design, and the compartmentalization allows for and reinforces privilege separation functionality. Architects and designers should rely on the principle of least privilege to decide the appropriate time to use privileges and the time to drop privileges.",
+          "phases": "Architecture and Design"
+        }
+      ],
+      "status": "Incomplete",
+      "structure": "Simple"
+    },
+    "CWE-285": {
+      "abstraction": "Class",
+      "catalog_present": true,
+      "common_consequences": [
+        {
+          "impacts": "Read Application Data, Read Files or Directories",
+          "note": "An attacker could read sensitive data, either by reading the data directly from a data store that is not properly restricted, or by accessing insufficiently-protected, privileged functionality to read the data.",
+          "scopes": "Confidentiality"
+        },
+        {
+          "impacts": "Modify Application Data, Modify Files or Directories",
+          "note": "An attacker could modify sensitive data, either by writing the data directly to a data store that is not properly restricted, or by accessing insufficiently-protected, privileged functionality to write the data.",
+          "scopes": "Integrity"
+        },
+        {
+          "impacts": "Gain Privileges or Assume Identity, Execute Unauthorized Code or Commands",
+          "note": "When access control checks are not applied consistently - or not at all - an attacker could gain privileges and execute unauthorized code or commands by modifying or reading critical data directly, or by accessing insufficiently-protected, privileged functionality.",
+          "scopes": "Access Control"
+        }
+      ],
+      "cwe_id": "CWE-285",
+      "description": "The product does not perform or incorrectly performs an authorization check when an actor attempts to access a resource or perform an action.",
+      "entry_type": "weakness",
+      "extended_description": "",
+      "likelihood_of_exploit": "High",
+      "name": "Improper Authorization",
+      "potential_mitigations": [
+        {
+          "description": "Divide the product into anonymous, normal, privileged, and administrative areas. Reduce the attack surface by carefully mapping roles with data and functionality. Use role-based access control (RBAC) to enforce the roles at the appropriate boundaries. Note that this approach may not protect against horizontal authorization, i.e., it will not protect a user from attacking others with the same role.",
+          "phases": "Architecture and Design"
+        },
+        {
+          "description": "Ensure that you perform access control checks related to your business logic. These checks may be different than the access control checks that you apply to more generic resources such as files, connections, processes, memory, and database records. For example, a database may restrict access for medical records to a specific database user, but each record might only be intended to be accessible to the patient and the patient's doctor.",
+          "phases": "Architecture and Design"
+        },
+        {
+          "description": "Use a vetted library or framework that does not allow this weakness to occur or provides constructs that make this weakness easier to avoid. For example, consider using authorization frameworks such as the JAAS Authorization Framework [REF-233] and the OWASP ESAPI Access Control feature [REF-45].",
+          "phases": "Architecture and Design"
+        },
+        {
+          "description": "For web applications, make sure that the access control mechanism is enforced correctly at the server side on every page. Users should not be able to access any unauthorized functionality or information by simply requesting direct access to that page. One way to do this is to ensure that all pages containing sensitive information are not cached, and that all such pages restrict access to requests that are accompanied by an active and authenticated session token associated with a user who has the required permissions to access that page.",
+          "phases": "Architecture and Design"
+        },
+        {
+          "description": "Use the access control capabilities of your operating system and server environment and define your access control lists accordingly. Use a \"default deny\" policy when defining these ACLs.",
+          "phases": "System Configuration, Installation"
+        }
+      ],
+      "status": "Draft",
+      "structure": "Simple"
+    },
+    "CWE-287": {
+      "abstraction": "Class",
+      "catalog_present": true,
+      "common_consequences": [
+        {
+          "impacts": "Read Application Data, Gain Privileges or Assume Identity, Execute Unauthorized Code or Commands",
+          "note": "This weakness can lead to the exposure of resources or functionality to unintended actors, possibly providing attackers with sensitive information or even execute arbitrary code.",
+          "scopes": "Integrity, Confidentiality, Availability, Access Control"
+        }
+      ],
+      "cwe_id": "CWE-287",
+      "description": "When an actor claims to have a given identity, the product does not prove or insufficiently proves that the claim is correct.",
+      "entry_type": "weakness",
+      "extended_description": "",
+      "likelihood_of_exploit": "High",
+      "name": "Improper Authentication",
+      "potential_mitigations": [
+        {
+          "description": "Use an authentication framework or library such as the OWASP ESAPI Authentication feature.",
+          "phases": "Architecture and Design"
+        }
+      ],
+      "status": "Draft",
+      "structure": "Simple"
+    },
+    "CWE-288": {
+      "abstraction": "Base",
+      "catalog_present": true,
+      "common_consequences": [
+        {
+          "impacts": "Bypass Protection Mechanism",
+          "note": "",
+          "scopes": "Access Control"
+        }
+      ],
+      "cwe_id": "CWE-288",
+      "description": "The product requires authentication, but the product has an alternate path or channel that does not require authentication.",
+      "entry_type": "weakness",
+      "extended_description": "",
+      "likelihood_of_exploit": "",
+      "name": "Authentication Bypass Using an Alternate Path or Channel",
+      "potential_mitigations": [
+        {
+          "description": "Funnel all access through a single choke point to simplify how users can access a resource. For every access, perform a check to determine if the user has permissions to access the resource.",
+          "phases": "Architecture and Design"
+        }
+      ],
+      "status": "Incomplete",
+      "structure": "Simple"
+    },
+    "CWE-290": {
+      "abstraction": "Base",
+      "catalog_present": true,
+      "common_consequences": [
+        {
+          "impacts": "Bypass Protection Mechanism, Gain Privileges or Assume Identity",
+          "note": "This weakness can allow an attacker to access resources which are not otherwise accessible without proper authentication.",
+          "scopes": "Access Control"
+        }
+      ],
+      "cwe_id": "CWE-290",
+      "description": "This attack-focused weakness is caused by incorrectly implemented authentication schemes that are subject to spoofing attacks.",
+      "entry_type": "weakness",
+      "extended_description": "",
+      "likelihood_of_exploit": "",
+      "name": "Authentication Bypass by Spoofing",
+      "potential_mitigations": [],
+      "status": "Incomplete",
+      "structure": "Simple"
+    },
+    "CWE-295": {
+      "abstraction": "Base",
+      "catalog_present": true,
+      "common_consequences": [
+        {
+          "impacts": "Bypass Protection Mechanism, Gain Privileges or Assume Identity",
+          "note": "When a certificate is invalid or malicious, it might allow an attacker to spoof a trusted entity by interfering in the communication path between the host and client. The product might connect to a malicious host while believing it is a trusted host, or the product might be deceived into accepting spoofed data that appears to originate from a trusted host.",
+          "scopes": "Integrity, Authentication"
+        }
+      ],
+      "cwe_id": "CWE-295",
+      "description": "The product does not validate, or incorrectly validates, a certificate.",
+      "entry_type": "weakness",
+      "extended_description": "",
+      "likelihood_of_exploit": "",
+      "name": "Improper Certificate Validation",
+      "potential_mitigations": [
+        {
+          "description": "Certificates should be carefully managed and checked to assure that data are encrypted with the intended owner's public key.",
+          "phases": "Architecture and Design, Implementation"
+        },
+        {
+          "description": "If certificate pinning is being used, ensure that all relevant properties of the certificate are fully validated before the certificate is pinned, including the hostname.",
+          "phases": "Implementation"
+        }
+      ],
+      "status": "Draft",
+      "structure": "Simple"
+    },
+    "CWE-297": {
+      "abstraction": "Variant",
+      "catalog_present": true,
+      "common_consequences": [
+        {
+          "impacts": "Gain Privileges or Assume Identity",
+          "note": "The data read from the system vouched for by the certificate may not be from the expected system.",
+          "scopes": "Access Control"
+        },
+        {
+          "impacts": "Other",
+          "note": "Trust afforded to the system in question - based on the malicious certificate - may allow for spoofing or redirection attacks.",
+          "scopes": "Authentication, Other"
+        },
+        {
+          "impacts": "Gain Privileges or Assume Identity, Other",
+          "note": "If the certificate's host-specific data is not properly checked - such as the Common Name (CN) in the Subject or the Subject Alternative Name (SAN) extension of an X.509 certificate - it may be possible for a redirection or spoofing attack to allow a malicious host with a valid certificate to provide data, impersonating a trusted host.",
+          "scopes": "Access Control, Other"
+        }
+      ],
+      "cwe_id": "CWE-297",
+      "description": "The product communicates with a host that provides a certificate, but the product does not properly ensure that the certificate is actually associated with that host.",
+      "entry_type": "weakness",
+      "extended_description": "",
+      "likelihood_of_exploit": "High",
+      "name": "Improper Validation of Certificate with Host Mismatch",
+      "potential_mitigations": [
+        {
+          "description": "In order to ensure data integrity, the certificate must be valid, and it must pertain to the site that is being accessed.Fully check the hostname of the certificate and provide the user with adequate information about the nature of the problem and how to proceed.",
+          "phases": "Architecture and Design"
+        },
+        {
+          "description": "If certificate pinning is being used, ensure that all relevant properties of the certificate are fully validated before the certificate is pinned, including the hostname.",
+          "phases": "Implementation"
+        },
+        {
+          "description": "Be careful of other weaknesses in the code that checks the hostname, since it is still possible to incorrectly check the hostname. For example, attackers could create a certificate with a name that begins with a trusted name followed by a NUL byte, which could cause some string-based comparisons to only examine the portion that contains the trusted name.",
+          "phases": "Implementation"
+        }
+      ],
+      "status": "Incomplete",
+      "structure": "Simple"
+    },
+    "CWE-312": {
+      "abstraction": "Base",
+      "catalog_present": true,
+      "common_consequences": [
+        {
+          "impacts": "Read Application Data",
+          "note": "An attacker with access to the system could read sensitive information stored in cleartext (i.e., unencrypted). Even if the information is encoded in a way that is not human-readable, certain techniques could determine which encoding is being used, then decode the information.",
+          "scopes": "Confidentiality"
+        }
+      ],
+      "cwe_id": "CWE-312",
+      "description": "The product stores sensitive information in cleartext within a resource that might be accessible to another control sphere.",
+      "entry_type": "weakness",
+      "extended_description": "",
+      "likelihood_of_exploit": "",
+      "name": "Cleartext Storage of Sensitive Information",
+      "potential_mitigations": [
+        {
+          "description": "When storing data in the cloud (e.g., S3 buckets, Azure blobs, Google Cloud Storage, etc.), use the provider's controls to encrypt the data at rest. [REF-1297] [REF-1299] [REF-1301]",
+          "phases": "Implementation, System Configuration, Operation"
+        },
+        {
+          "description": "In some systems/environments such as cloud, the use of \"double encryption\" (at both the software and hardware layer) might be required, and the developer might be solely responsible for both layers, instead of shared responsibility with the administrator of the broader system/environment.",
+          "phases": "Implementation, System Configuration, Operation"
+        }
+      ],
+      "status": "Draft",
+      "structure": "Simple"
+    },
+    "CWE-327": {
+      "abstraction": "Class",
+      "catalog_present": true,
+      "common_consequences": [
+        {
+          "impacts": "Read Application Data",
+          "note": "The confidentiality of sensitive data may be compromised by the use of a broken or risky cryptographic algorithm.",
+          "scopes": "Confidentiality"
+        },
+        {
+          "impacts": "Modify Application Data",
+          "note": "The integrity of sensitive data may be compromised by the use of a broken or risky cryptographic algorithm.",
+          "scopes": "Integrity"
+        },
+        {
+          "impacts": "Hide Activities",
+          "note": "If the cryptographic algorithm is used to ensure the identity of the source of the data (such as digital signatures), then a broken algorithm will compromise this scheme and the source of the data cannot be proven.",
+          "scopes": "Accountability, Non-Repudiation"
+        }
+      ],
+      "cwe_id": "CWE-327",
+      "description": "The product uses a broken or risky cryptographic algorithm or protocol.",
+      "entry_type": "weakness",
+      "extended_description": "Cryptographic algorithms are the methods by which data is scrambled to prevent observation or influence by unauthorized actors. Insecure cryptography can be exploited to expose sensitive information, modify data in unexpected ways, spoof identities of other users or devices, or other impacts. It is very difficult to produce a secure algorithm, and even high-profile algorithms by accomplished cryptographic experts have been broken. Well-known techniques exist to break or weaken various kinds of cryptography. Accordingly, there are a small number of well-understood and heavily studied algorithms that should be used by most products. Using a non-standard or known-insecure algorithm is dangerous because a determined adversary may be able to break the algorithm and compromise whatever data has been protected. Since the state of cryptography advances so rapidly, it is common for an algorithm to be considered \"unsafe\" even if it was once thought to be strong. This can happen when new attacks are discovered, or if computing power increases so much that the cryptographic algorithm no longer provides the amount of protection that was originally thought. For a number of reasons, this weakness is even more challenging to manage with hardware deployment of cryptographic algorithms as opposed to software implementation. First, if a flaw is discovered with hardware-implemented cryptography, the flaw cannot be fixed in most cases without a recall of the product, because hardware is not easily replaceable like software. Second, because the hardware product is expected to work for years, the adversary's computing power will only increase over time.",
+      "likelihood_of_exploit": "High",
+      "name": "Use of a Broken or Risky Cryptographic Algorithm",
+      "potential_mitigations": [
+        {
+          "description": "When there is a need to store or transmit sensitive data, use strong, up-to-date cryptographic algorithms to encrypt that data. Select a well-vetted algorithm that is currently considered to be strong by experts in the field, and use well-tested implementations. As with all cryptographic mechanisms, the source code should be available for analysis. For example, US government systems require FIPS 140-2 certification [REF-1192]. Do not develop custom or private cryptographic algorithms. They will likely be exposed to attacks that are well-understood by cryptographers. Reverse engineering techniques are mature. If the algorithm can be compromised if attackers find out how it works, then it is especially weak. Periodically ensure that the cryptography has not become obsolete. Some older algorithms, once thought to require a billion years of computing time, can now be broken in days or hours. This includes MD4, MD5, SHA1, DES, and other algorithms that were once regarded as strong. [REF-267]",
+          "phases": "Architecture and Design"
+        },
+        {
+          "description": "Ensure that the design allows one cryptographic algorithm to be replaced with another in the next generation or version. Where possible, use wrappers to make the interfaces uniform. This will make it easier to upgrade to stronger algorithms. With hardware, design the product at the Intellectual Property (IP) level so that one cryptographic algorithm can be replaced with another in the next generation of the hardware product.",
+          "phases": "Architecture and Design"
+        },
+        {
+          "description": "Carefully manage and protect cryptographic keys (see CWE-320). If the keys can be guessed or stolen, then the strength of the cryptography itself is irrelevant.",
+          "phases": "Architecture and Design"
+        },
+        {
+          "description": "Use a vetted library or framework that does not allow this weakness to occur or provides constructs that make this weakness easier to avoid [REF-1482]. Industry-standard implementations will save development time and may be more likely to avoid errors that can occur during implementation of cryptographic algorithms. Consider the ESAPI Encryption feature.",
+          "phases": "Architecture and Design"
+        },
+        {
+          "description": "When using industry-approved techniques, use them correctly. Don't cut corners by skipping resource-intensive steps (CWE-325). These steps are often essential for preventing common attacks.",
+          "phases": "Implementation, Architecture and Design"
+        }
+      ],
+      "status": "Draft",
+      "structure": "Simple"
+    },
+    "CWE-346": {
+      "abstraction": "Class",
+      "catalog_present": true,
+      "common_consequences": [
+        {
+          "impacts": "Gain Privileges or Assume Identity, Varies by Context",
+          "note": "An attacker can access any functionality that is inadvertently accessible to the source.",
+          "scopes": "Access Control, Other"
+        }
+      ],
+      "cwe_id": "CWE-346",
+      "description": "The product does not properly verify that the source of data or communication is valid.",
+      "entry_type": "weakness",
+      "extended_description": "",
+      "likelihood_of_exploit": "",
+      "name": "Origin Validation Error",
+      "potential_mitigations": [],
+      "status": "Draft",
+      "structure": "Simple"
+    },
+    "CWE-352": {
+      "abstraction": "Compound",
+      "catalog_present": true,
+      "common_consequences": [
+        {
+          "impacts": "Gain Privileges or Assume Identity, Bypass Protection Mechanism, Read Application Data, Modify Application Data, DoS: Crash, Exit, or Restart",
+          "note": "The consequences will vary depending on the nature of the functionality that is vulnerable to CSRF. An attacker could trick a client into making an unintentional request to the web server via a URL, image load, XmlHttpRequest, etc., which would then be treated as an authentic request from the client - effectively performing any operations as the victim, leading to an exposure of data, unintended code execution, etc. If the victim is an administrator or privileged user, the consequences may include obtaining complete control over the web application - deleting or stealing data, uninstalling the product, or using it to launch other attacks against all of the product's users. Because the attacker has the identity of the victim, the scope of CSRF is limited only by the victim's privileges.",
+          "scopes": "Confidentiality, Integrity, Availability, Non-Repudiation, Access Control"
+        }
+      ],
+      "cwe_id": "CWE-352",
+      "description": "The web application does not, or cannot, sufficiently verify whether a request was intentionally provided by the user who sent the request, which could have originated from an unauthorized actor.",
+      "entry_type": "weakness",
+      "extended_description": "",
+      "likelihood_of_exploit": "Medium",
+      "name": "Cross-Site Request Forgery",
+      "potential_mitigations": [
+        {
+          "description": "Use a vetted library or framework that does not allow this weakness to occur or provides constructs that make this weakness easier to avoid [REF-1482]. For example, use anti-CSRF packages such as the OWASP CSRFGuard. [REF-330] Another example is the ESAPI Session Management control, which includes a component for CSRF. [REF-45]",
+          "phases": "Architecture and Design"
+        },
+        {
+          "description": "Ensure that the application is free of cross-site scripting issues (CWE-79), because most CSRF defenses can be bypassed using attacker-controlled script.",
+          "phases": "Implementation"
+        },
+        {
+          "description": "Generate a unique nonce for each form, place the nonce into the form, and verify the nonce upon receipt of the form. Be sure that the nonce is not predictable (CWE-330). [REF-332]",
+          "phases": "Architecture and Design"
+        },
+        {
+          "description": "Identify especially dangerous operations. When the user performs a dangerous operation, send a separate confirmation request to ensure that the user intended to perform that operation.",
+          "phases": "Architecture and Design"
+        },
+        {
+          "description": "Use the \"double-submitted cookie\" method as described by Felten and Zeller: When a user visits a site, the site should generate a pseudorandom value and set it as a cookie on the user's machine. The site should require every form submission to include this value as a form value and also as a cookie value. When a POST request is sent to the site, the request should only be considered valid if the form value and the cookie value are the same. Because of the same-origin policy, an attacker cannot read or modify the value stored in the cookie. To successfully submit a form on behalf of the user, the attacker would have to correctly guess the pseudorandom value. If the pseudorandom value is cryptographically strong, this will be prohibitively difficult. This technique requires Javascript, so it may not work for browsers that have Javascript disabled. [REF-331]",
+          "phases": "Architecture and Design"
+        },
+        {
+          "description": "Do not use the GET method for any request that triggers a state change.",
+          "phases": "Architecture and Design"
+        },
+        {
+          "description": "Check the HTTP Referer header to see if the request originated from an expected page. This could break legitimate functionality, because users or proxies may have disabled sending the Referer for privacy reasons.",
+          "phases": "Implementation"
+        }
+      ],
+      "status": "Stable",
+      "structure": "Composite"
+    },
+    "CWE-400": {
+      "abstraction": "Class",
+      "catalog_present": true,
+      "common_consequences": [
+        {
+          "impacts": "DoS: Crash, Exit, or Restart, DoS: Resource Consumption (CPU), DoS: Resource Consumption (Memory), DoS: Resource Consumption (Other)",
+          "note": "If an attacker can trigger the allocation of the limited resources, but the number or size of the resources is not controlled, then the most common result is denial of service. This would prevent valid users from accessing the product, and it could potentially have an impact on the surrounding environment, i.e., the product may slow down, crash due to unhandled errors, or lock out legitimate users. For example, a memory exhaustion attack against an application could slow down the application as well as its host operating system.",
+          "scopes": "Availability"
+        },
+        {
+          "impacts": "Bypass Protection Mechanism, Other",
+          "note": "In some cases it may be possible to force the product to \"fail open\" in the event of resource exhaustion. The state of the product -- and possibly the security functionality - may then be compromised.",
+          "scopes": "Access Control, Other"
+        }
+      ],
+      "cwe_id": "CWE-400",
+      "description": "The product does not properly control the allocation and maintenance of a limited resource.",
+      "entry_type": "weakness",
+      "extended_description": "",
+      "likelihood_of_exploit": "High",
+      "name": "Uncontrolled Resource Consumption",
+      "potential_mitigations": [
+        {
+          "description": "Design throttling mechanisms into the system architecture. The best protection is to limit the amount of resources that an unauthorized user can cause to be expended. A strong authentication and access control model will help prevent such attacks from occurring in the first place. The login application should be protected against DoS attacks as much as possible. Limiting the database access, perhaps by caching result sets, can help minimize the resources expended. To further limit the potential for a DoS attack, consider tracking the rate of requests received from users and blocking requests that exceed a defined rate threshold.",
+          "phases": "Architecture and Design"
+        },
+        {
+          "description": "Mitigation of resource exhaustion attacks requires that the target system either: recognizes the attack and denies that user further access for a given amount of time, or uniformly throttles all requests in order to make it more difficult to consume resources more quickly than they can again be freed. The first of these solutions is an issue in itself though, since it may allow attackers to prevent the use of the system by a particular valid user. If the attacker impersonates the valid user, they may be able to prevent the user from accessing the server in question. The second solution is simply difficult to effectively institute -- and even when properly done, it does not provide a full solution. It simply makes the attack require more resources on the part of the attacker.",
+          "phases": "Architecture and Design"
+        },
+        {
+          "description": "Ensure that protocols have specific limits of scale placed on them.",
+          "phases": "Architecture and Design"
+        },
+        {
+          "description": "Ensure that all failures in resource allocation place the system into a safe posture.",
+          "phases": "Implementation"
+        }
+      ],
+      "status": "Draft",
+      "structure": "Simple"
+    },
+    "CWE-407": {
+      "abstraction": "Class",
+      "catalog_present": true,
+      "common_consequences": [
+        {
+          "impacts": "DoS: Resource Consumption (CPU), DoS: Resource Consumption (Memory), DoS: Resource Consumption (Other)",
+          "note": "The typical consequence is CPU consumption, but memory consumption and consumption of other resources can also occur.",
+          "scopes": "Availability"
+        }
+      ],
+      "cwe_id": "CWE-407",
+      "description": "An algorithm in a product has an inefficient worst-case computational complexity that may be detrimental to system performance and can be triggered by an attacker, typically using crafted manipulations that ensure that the worst case is being reached.",
+      "entry_type": "weakness",
+      "extended_description": "",
+      "likelihood_of_exploit": "Low",
+      "name": "Inefficient Algorithmic Complexity",
+      "potential_mitigations": [],
+      "status": "Incomplete",
+      "structure": "Simple"
+    },
+    "CWE-426": {
+      "abstraction": "Base",
+      "catalog_present": true,
+      "common_consequences": [
+        {
+          "impacts": "Gain Privileges or Assume Identity, Execute Unauthorized Code or Commands",
+          "note": "There is the potential for arbitrary code execution with privileges of the vulnerable program. If the product uses a search path to locate critical resources such as programs or libraries, then an attacker could modify that search path to point to a malicious program/library, which the targeted product would then execute.",
+          "scopes": "Integrity, Confidentiality, Availability, Access Control"
+        },
+        {
+          "impacts": "DoS: Crash, Exit, or Restart",
+          "note": "The program could be redirected to the wrong files, potentially triggering a crash or hang when the targeted file is too large or does not have the expected format.",
+          "scopes": "Availability"
+        },
+        {
+          "impacts": "Read Files or Directories",
+          "note": "The program could access unauthorized data and send the output of unauthorized files to the attacker.",
+          "scopes": "Confidentiality"
+        },
+        {
+          "impacts": "Varies by Context",
+          "note": "The problem extends to any type of critical resource that the product trusts. For example, the attacker could modify configuration in unexpected ways.",
+          "scopes": "Other"
+        }
+      ],
+      "cwe_id": "CWE-426",
+      "description": "The product searches for critical resources using an externally-supplied search path that can point to resources that are not under the product's direct control.",
+      "entry_type": "weakness",
+      "extended_description": "Some of the most common variants of untrusted search path are: In various UNIX and Linux-based systems, the PATH environment variable may be consulted to locate executable programs, and LD_PRELOAD may be used to locate a separate library. Programming languages may have their own paths for locating code, e.g. PERL5LIB in Perl. In various Microsoft-based systems, the PATH environment variable is consulted to locate a DLL, if the DLL is not found in other paths that appear earlier in the search order.",
+      "likelihood_of_exploit": "High",
+      "name": "Untrusted Search Path",
+      "potential_mitigations": [
+        {
+          "description": "Hard-code the search path to a set of known-safe values (such as system directories), or only allow them to be specified by the administrator in a configuration file. Do not allow these settings to be modified by an external party. Be careful to avoid related weaknesses such as CWE-426 and CWE-428.",
+          "phases": "Architecture and Design, Implementation"
+        },
+        {
+          "description": "When invoking other programs, specify those programs using fully-qualified pathnames. While this is an effective approach, code that uses fully-qualified pathnames might not be portable to other systems that do not use the same pathnames. The portability can be improved by locating the full-qualified paths in a centralized, easily-modifiable location within the source code, and having the code refer to these paths.",
+          "phases": "Implementation"
+        },
+        {
+          "description": "Remove or restrict all environment settings before invoking other programs. This includes the PATH environment variable, LD_LIBRARY_PATH, and other settings that identify the location of code libraries, and any application-specific search paths.",
+          "phases": "Implementation"
+        },
+        {
+          "description": "Check your search path before use and remove any elements that are likely to be unsafe, such as the current working directory or a temporary files directory.",
+          "phases": "Implementation"
+        },
+        {
+          "description": "Use other functions that require explicit paths. Making use of any of the other readily available functions that require explicit paths is a safe way to avoid this problem. For example, system() in C does not require a full path since the shell can take care of it, while execl() and execv() require a full path.",
+          "phases": "Implementation"
+        }
+      ],
+      "status": "Stable",
+      "structure": "Simple"
+    },
+    "CWE-44": {
+      "abstraction": "Variant",
+      "catalog_present": true,
+      "common_consequences": [
+        {
+          "impacts": "Read Files or Directories, Modify Files or Directories",
+          "note": "",
+          "scopes": "Confidentiality, Integrity"
+        }
+      ],
+      "cwe_id": "CWE-44",
+      "description": "The product accepts path input in the form of internal dot ('file.ordir') without appropriate validation, which can lead to ambiguous path resolution and allow an attacker to traverse the file system to unintended locations or access arbitrary files.",
+      "entry_type": "weakness",
+      "extended_description": "",
+      "likelihood_of_exploit": "",
+      "name": "Path Equivalence: 'file.name' (Internal Dot)",
+      "potential_mitigations": [],
+      "status": "Incomplete",
+      "structure": "Simple"
+    },
+    "CWE-502": {
+      "abstraction": "Base",
+      "catalog_present": true,
+      "common_consequences": [
+        {
+          "impacts": "Modify Application Data, Unexpected State",
+          "note": "Attackers can modify unexpected objects or data that was assumed to be safe from modification. Deserialized data or code could be modified without using the provided accessor functions, or unexpected functions could be invoked.",
+          "scopes": "Integrity"
+        },
+        {
+          "impacts": "DoS: Resource Consumption (CPU)",
+          "note": "If a function is making an assumption on when to terminate, based on a sentry in a string, it could easily never terminate.",
+          "scopes": "Availability"
+        },
+        {
+          "impacts": "Varies by Context",
+          "note": "The consequences can vary widely, because it depends on which objects or methods are being deserialized, and how they are used. Making an assumption that the code in the deserialized object is valid is dangerous and can enable exploitation. One example is attackers using gadget chains to perform unauthorized actions, such as generating a shell.",
+          "scopes": "Other"
+        }
+      ],
+      "cwe_id": "CWE-502",
+      "description": "The product deserializes untrusted data without sufficiently ensuring that the resulting data will be valid.",
+      "entry_type": "weakness",
+      "extended_description": "",
+      "likelihood_of_exploit": "Medium",
+      "name": "Deserialization of Untrusted Data",
+      "potential_mitigations": [
+        {
+          "description": "If available, use the signing/sealing features of the programming language to assure that deserialized data has not been tainted. For example, a hash-based message authentication code (HMAC) could be used to ensure that data has not been modified.",
+          "phases": "Architecture and Design, Implementation"
+        },
+        {
+          "description": "When deserializing data, populate a new object rather than just deserializing. The result is that the data flows through safe input validation and that the functions are safe.",
+          "phases": "Implementation"
+        },
+        {
+          "description": "Explicitly define a final object() to prevent deserialization.",
+          "phases": "Implementation"
+        },
+        {
+          "description": "Make fields transient to protect them from deserialization. An attempt to serialize and then deserialize a class containing transient fields will result in NULLs where the transient data should be. This is an excellent way to prevent time, environment-based, or sensitive variables from being carried over and used improperly.",
+          "phases": "Architecture and Design, Implementation"
+        },
+        {
+          "description": "Avoid having unnecessary types or gadgets (a sequence of instances and method invocations that can self-execute during the deserialization process, often found in libraries) available that can be leveraged for malicious ends. This limits the potential for unintended or unauthorized types and gadgets to be leveraged by the attacker. Add only acceptable classes to an allowlist. Note: new gadgets are constantly being discovered, so this alone is not a sufficient mitigation.",
+          "phases": "Implementation"
+        },
+        {
+          "description": "Employ cryptography of the data or code for protection. However, it's important to note that it would still be client-side security. This is risky because if the client is compromised then the security implemented on the client (the cryptography) can be bypassed.",
+          "phases": "Architecture and Design, Implementation"
+        },
+        {
+          "description": "Use an application firewall that can detect attacks against this weakness. It can be beneficial in cases in which the code cannot be fixed (because it is controlled by a third party), as an emergency prevention measure while more comprehensive software assurance measures are applied, or to provide defense in depth [REF-1481].",
+          "phases": "Operation"
+        }
+      ],
+      "status": "Draft",
+      "structure": "Simple"
+    },
+    "CWE-522": {
+      "abstraction": "Class",
+      "catalog_present": true,
+      "common_consequences": [
+        {
+          "impacts": "Gain Privileges or Assume Identity",
+          "note": "An attacker could gain access to user accounts and access sensitive data used by the user accounts.",
+          "scopes": "Access Control"
+        }
+      ],
+      "cwe_id": "CWE-522",
+      "description": "The product transmits or stores authentication credentials, but it uses an insecure method that is susceptible to unauthorized interception and/or retrieval.",
+      "entry_type": "weakness",
+      "extended_description": "",
+      "likelihood_of_exploit": "",
+      "name": "Insufficiently Protected Credentials",
+      "potential_mitigations": [
+        {
+          "description": "Use an appropriate security mechanism to protect the credentials.",
+          "phases": "Architecture and Design"
+        },
+        {
+          "description": "Make appropriate use of cryptography to protect the credentials.",
+          "phases": "Architecture and Design"
+        },
+        {
+          "description": "Use industry standards to protect the credentials (e.g. LDAP, keystore, etc.).",
+          "phases": "Implementation"
+        }
+      ],
+      "status": "Incomplete",
+      "structure": "Simple"
+    },
+    "CWE-532": {
+      "abstraction": "Base",
+      "catalog_present": true,
+      "common_consequences": [
+        {
+          "impacts": "Read Application Data",
+          "note": "Logging sensitive user data, full path names, or system information often provides attackers with an additional, less-protected path to acquiring the information.",
+          "scopes": "Confidentiality"
+        }
+      ],
+      "cwe_id": "CWE-532",
+      "description": "The product writes sensitive information to a log file.",
+      "entry_type": "weakness",
+      "extended_description": "",
+      "likelihood_of_exploit": "Medium",
+      "name": "Insertion of Sensitive Information into Log File",
+      "potential_mitigations": [
+        {
+          "description": "Consider seriously the sensitivity of the information written into log files. Do not write secrets into the log files.",
+          "phases": "Architecture and Design, Implementation"
+        },
+        {
+          "description": "Remove debug log files before deploying the application into production.",
+          "phases": "Distribution"
+        },
+        {
+          "description": "Protect log files against unauthorized read/write.",
+          "phases": "Operation"
+        },
+        {
+          "description": "Adjust configurations appropriately when software is transitioned from a debug state to production.",
+          "phases": "Implementation"
+        }
+      ],
+      "status": "Incomplete",
+      "structure": "Simple"
+    },
+    "CWE-59": {
+      "abstraction": "Base",
+      "catalog_present": true,
+      "common_consequences": [
+        {
+          "impacts": "Read Files or Directories, Modify Files or Directories, Bypass Protection Mechanism",
+          "note": "An attacker may be able to traverse the file system to unintended locations and read or overwrite the contents of unexpected files. If the files are used for a security mechanism then an attacker may be able to bypass the mechanism.",
+          "scopes": "Confidentiality, Integrity, Access Control"
+        },
+        {
+          "impacts": "Execute Unauthorized Code or Commands",
+          "note": "Windows simple shortcuts, sometimes referred to as soft links, can be exploited remotely since a \".LNK\" file can be uploaded like a normal file. This can enable remote execution.",
+          "scopes": "Other"
+        }
+      ],
+      "cwe_id": "CWE-59",
+      "description": "The product attempts to access a file based on the filename, but it does not properly prevent that filename from identifying a link or shortcut that resolves to an unintended resource.",
+      "entry_type": "weakness",
+      "extended_description": "",
+      "likelihood_of_exploit": "Medium",
+      "name": "Improper Link Resolution Before File Access",
+      "potential_mitigations": [
+        {
+          "description": "Follow the principle of least privilege when assigning access rights to entities in a software system. Denying access to a file can prevent an attacker from replacing that file with a link to a sensitive file. Ensure good compartmentalization in the system to provide protected areas that can be trusted.",
+          "phases": "Architecture and Design"
+        }
+      ],
+      "status": "Draft",
+      "structure": "Simple"
+    },
+    "CWE-611": {
+      "abstraction": "Base",
+      "catalog_present": true,
+      "common_consequences": [
+        {
+          "impacts": "Read Application Data, Read Files or Directories",
+          "note": "If the attacker is able to include a crafted DTD and a default entity resolver is enabled, the attacker may be able to access arbitrary files on the system. By submitting an XML file that defines an external entity with a file:// URI, an attacker can cause the processing application to read the contents of a local file. For example, a URI such as \"file:///c:/winnt/win.ini\" designates (in Windows) the file C:\\Winnt\\win.ini, or file:///etc/passwd designates the password file in Unix-based systems. Once the content of the URI is read, it is fed back into the application that is processing the XML. This application may echo back the data (e.g., in an error message), thereby exposing the file contents.",
+          "scopes": "Confidentiality"
+        },
+        {
+          "impacts": "Bypass Protection Mechanism",
+          "note": "An attacker may supply a crafted DTD using URIs with schemes such as http://, forcing the application to make outgoing HTTP requests to servers that the attacker cannot reach directly, which can be used to bypass firewall restrictions; hide the source of attacks such as port scanning; or otherwise leverage the server's trust relationship with other entities.",
+          "scopes": "Integrity"
+        },
+        {
+          "impacts": "DoS: Resource Consumption (CPU), DoS: Resource Consumption (Memory)",
+          "note": "The product could consume excessive CPU cycles or memory using a URI that points to a large file, or a device that always returns data such as /dev/random. Alternately, the URI could reference a file that contains many nested or recursive entity references to further slow down parsing.",
+          "scopes": "Availability"
+        }
+      ],
+      "cwe_id": "CWE-611",
+      "description": "The product processes an XML document that can contain XML entities with URIs that resolve to documents outside of the intended sphere of control, causing the product to embed incorrect documents into its output.",
+      "entry_type": "weakness",
+      "extended_description": "",
+      "likelihood_of_exploit": "",
+      "name": "Improper Restriction of XML External Entity Reference",
+      "potential_mitigations": [
+        {
+          "description": "Many XML parsers and validators can be configured to disable external entity expansion.",
+          "phases": "Implementation, System Configuration"
+        }
+      ],
+      "status": "Draft",
+      "structure": "Simple"
+    },
+    "CWE-668": {
+      "abstraction": "Class",
+      "catalog_present": true,
+      "common_consequences": [
+        {
+          "impacts": "Read Application Data",
+          "note": "An adversary that gains access to a resource exposed to a wrong sphere could potentially retrieve private data from that resource, thus breaking the intended confidentiality of that data.",
+          "scopes": "Confidentiality"
+        },
+        {
+          "impacts": "Modify Application Data",
+          "note": "An adversary that gains access to a resource exposed to a wrong sphere could potentially modify data held within that resource, thus breaking the intended integrity of that data and causing the system relying on that resource to make unintended decisions.",
+          "scopes": "Integrity"
+        },
+        {
+          "impacts": "Varies by Context",
+          "note": "The consequences may vary widely depending on how the product uses the affected resource.",
+          "scopes": "Other"
+        }
+      ],
+      "cwe_id": "CWE-668",
+      "description": "The product exposes a resource to the wrong control sphere, providing unintended actors with inappropriate access to the resource.",
+      "entry_type": "weakness",
+      "extended_description": "Resources such as files and directories may be inadvertently exposed through mechanisms such as insecure permissions, or when a program accidentally operates on the wrong object. For example, a program may intend that private files can only be provided to a specific user. This effectively defines a control sphere that is intended to prevent attackers from accessing these private files. If the file permissions are insecure, then parties other than the user will be able to access those files. A separate control sphere might effectively require that the user can only access the private files, but not any other files on the system. If the program does not ensure that the user is only requesting private files, then the user might be able to access other files on the system. In either case, the end result is that a resource has been exposed to the wrong party.",
+      "likelihood_of_exploit": "",
+      "name": "Exposure of Resource to Wrong Sphere",
+      "potential_mitigations": [],
+      "status": "Draft",
+      "structure": "Simple"
+    },
+    "CWE-770": {
+      "abstraction": "Base",
+      "catalog_present": true,
+      "common_consequences": [
+        {
+          "impacts": "DoS: Resource Consumption (CPU), DoS: Resource Consumption (Memory), DoS: Resource Consumption (Other)",
+          "note": "When allocating resources without limits, an attacker could prevent other systems, applications, or processes from accessing the same type of resource. It can be easy for an attacker to consume many resources by rapidly making many requests or causing larger resources to be used than is needed.",
+          "scopes": "Availability"
+        }
+      ],
+      "cwe_id": "CWE-770",
+      "description": "The product allocates a reusable resource or group of resources on behalf of an actor without imposing any intended restrictions on the size or number of resources that can be allocated.",
+      "entry_type": "weakness",
+      "extended_description": "",
+      "likelihood_of_exploit": "High",
+      "name": "Allocation of Resources Without Limits or Throttling",
+      "potential_mitigations": [
+        {
+          "description": "Clearly specify the minimum and maximum expectations for capabilities, and dictate which behaviors are acceptable when resource allocation reaches limits.",
+          "phases": "Requirements"
+        },
+        {
+          "description": "Limit the amount of resources that are accessible to unprivileged users. Set per-user limits for resources. Allow the system administrator to define these limits. Be careful to avoid CWE-410.",
+          "phases": "Architecture and Design"
+        },
+        {
+          "description": "Design throttling mechanisms into the system architecture. The best protection is to limit the amount of resources that an unauthorized user can cause to be expended. A strong authentication and access control model will help prevent such attacks from occurring in the first place, and it will help the administrator to identify who is committing the abuse. The login application should be protected against DoS attacks as much as possible. Limiting the database access, perhaps by caching result sets, can help minimize the resources expended. To further limit the potential for a DoS attack, consider tracking the rate of requests received from users and blocking requests that exceed a defined rate threshold.",
+          "phases": "Architecture and Design"
+        },
+        {
+          "description": "Assume all input is malicious. Use an \"accept known good\" input validation strategy, i.e., use a list of acceptable inputs that strictly conform to specifications. Reject any input that does not strictly conform to specifications, or transform it into something that does. When performing input validation, consider all potentially relevant properties, including length, type of input, the full range of acceptable values, missing or extra inputs, syntax, consistency across related fields, and conformance to business rules. As an example of business rule logic, \"boat\" may be syntactically valid because it only contains alphanumeric characters, but it is not valid if the input is only expected to contain colors such as \"red\" or \"blue.\" Do not rely exclusively on looking for malicious or malformed inputs. This is likely to miss at least one undesirable input, especially if the code's environment changes. This can give attackers enough room to bypass the intended validation. However, denylists can be useful for detecting potential attacks or determining which inputs are so malformed that they should be rejected outright.",
+          "phases": "Implementation"
+        },
+        {
+          "description": "For any security checks that are performed on the client side, ensure that these checks are duplicated on the server side, in order to avoid CWE-602. Attackers can bypass the client-side checks by modifying values after the checks have been performed, or by changing the client to remove the client-side checks entirely. Then, these modified values would be submitted to the server.",
+          "phases": "Architecture and Design"
+        },
+        {
+          "description": "Mitigation of resource exhaustion attacks requires that the target system either: recognizes the attack and denies that user further access for a given amount of time, typically by using increasing time delays uniformly throttles all requests in order to make it more difficult to consume resources more quickly than they can again be freed. The first of these solutions is an issue in itself though, since it may allow attackers to prevent the use of the system by a particular valid user. If the attacker impersonates the valid user, they may be able to prevent the user from accessing the server in question. The second solution can be difficult to effectively institute -- and even when properly done, it does not provide a full solution. It simply requires more resources on the part of the attacker.",
+          "phases": "Architecture and Design"
+        },
+        {
+          "description": "Ensure that protocols have specific limits of scale placed on them.",
+          "phases": "Architecture and Design"
+        },
+        {
+          "description": "If the program must fail, ensure that it fails gracefully (fails closed). There may be a temptation to simply let the program fail poorly in cases such as low memory conditions, but an attacker may be able to assert control before the software has fully exited. Alternately, an uncontrolled failure could cause cascading problems with other downstream components; for example, the program could send a signal to a downstream process so the process immediately knows that a problem has occurred and has a better chance of recovery. Ensure that all failures in resource allocation place the system into a safe posture.",
+          "phases": "Architecture and Design, Implementation"
+        },
+        {
+          "description": "Use quotas or other resource-limiting settings provided by the operating system or environment. For example, when managing system resources in POSIX, setrlimit() can be used to set limits for certain types of resources, and getrlimit() can determine how many resources are available. However, these functions are not available on all operating systems. When the current levels get close to the maximum that is defined for the application (see CWE-770), then limit the allocation of further resources to privileged users; alternately, begin releasing resources for less-privileged users. While this mitigation may protect the system from attack, it will not necessarily stop attackers from adversely impacting other users. Ensure that the application performs the appropriate error checks and error handling in case resources become unavailable (CWE-703).",
+          "phases": "Operation, Architecture and Design"
+        }
+      ],
+      "status": "Incomplete",
+      "structure": "Simple"
+    },
+    "CWE-78": {
+      "abstraction": "Base",
+      "catalog_present": true,
+      "common_consequences": [
+        {
+          "impacts": "Execute Unauthorized Code or Commands, DoS: Crash, Exit, or Restart, Read Files or Directories, Modify Files or Directories, Read Application Data, Modify Application Data, Hide Activities",
+          "note": "Attackers could execute unauthorized operating system commands, which could then be used to disable the product, or read and modify data for which the attacker does not have permissions to access directly. Since the targeted application is directly executing the commands instead of the attacker, any malicious activities may appear to come from the application or the application's owner.",
+          "scopes": "Confidentiality, Integrity, Availability, Non-Repudiation"
+        }
+      ],
+      "cwe_id": "CWE-78",
+      "description": "The product constructs all or part of an OS command using externally-influenced input from an upstream component, but it does not neutralize or incorrectly neutralizes special elements that could modify the intended OS command before it is sent to a downstream component.",
+      "entry_type": "weakness",
+      "extended_description": "",
+      "likelihood_of_exploit": "High",
+      "name": "Improper Neutralization of Special Elements used in an OS Command",
+      "potential_mitigations": [
+        {
+          "description": "If at all possible, use library calls rather than external processes to recreate the desired functionality.",
+          "phases": "Architecture and Design"
+        },
+        {
+          "description": "Run the code in a \"jail\" or similar sandbox environment that enforces strict boundaries between the process and the operating system. This may effectively restrict which files can be accessed in a particular directory or which commands can be executed by the software. OS-level examples include the Unix chroot jail, AppArmor, and SELinux. In general, managed code may provide some protection. For example, java.io.FilePermission in the Java SecurityManager allows the software to specify restrictions on file operations. This may not be a feasible solution, and it only limits the impact to the operating system; the rest of the application may still be subject to compromise. Be careful to avoid CWE-243 and other weaknesses related to jails.",
+          "phases": "Architecture and Design, Operation"
+        },
+        {
+          "description": "For any data that will be used to generate a command to be executed, keep as much of that data out of external control as possible. For example, in web applications, this may require storing the data locally in the session's state instead of sending it out to the client in a hidden form field.",
+          "phases": "Architecture and Design"
+        },
+        {
+          "description": "For any security checks that are performed on the client side, ensure that these checks are duplicated on the server side, in order to avoid CWE-602. Attackers can bypass the client-side checks by modifying values after the checks have been performed, or by changing the client to remove the client-side checks entirely. Then, these modified values would be submitted to the server.",
+          "phases": "Architecture and Design"
+        },
+        {
+          "description": "Use a vetted library or framework that does not allow this weakness to occur or provides constructs that make this weakness easier to avoid. For example, consider using the ESAPI Encoding control [REF-45] or a similar tool, library, or framework. These will help the programmer encode outputs in a manner less prone to error.",
+          "phases": "Architecture and Design"
+        },
+        {
+          "description": "While it is risky to use dynamically-generated query strings, code, or commands that mix control and data together, sometimes it may be unavoidable. Properly quote arguments and escape any special characters within those arguments. The most conservative approach is to escape or filter all characters that do not pass an extremely strict allowlist (such as everything that is not alphanumeric or white space). If some special characters are still needed, such as white space, wrap each argument in quotes after the escaping/filtering step. Be careful of argument injection (CWE-88).",
+          "phases": "Implementation"
+        },
+        {
+          "description": "If the program to be executed allows arguments to be specified within an input file or from standard input, then consider using that mode to pass arguments instead of the command line.",
+          "phases": "Implementation"
+        },
+        {
+          "description": "If available, use structured mechanisms that automatically enforce the separation between data and code. These mechanisms may be able to provide the relevant quoting, encoding, and validation automatically, instead of relying on the developer to provide this capability at every point where output is generated. Some languages offer multiple functions that can be used to invoke commands. Where possible, identify any function that invokes a command shell using a single string, and replace it with a function that requires individual arguments. These functions typically perform appropriate quoting and filtering of arguments. For example, in C, the system() function accepts a string that contains the entire command to be executed, whereas execl(), execve(), and others require an array of strings, one for each argument. In Windows, CreateProcess() only accepts one command at a time. In Perl, if system() is provided with an array of arguments, then it will quote each of the arguments.",
+          "phases": "Architecture and Design"
+        },
+        {
+          "description": "Assume all input is malicious. Use an \"accept known good\" input validation strategy, i.e., use a list of acceptable inputs that strictly conform to specifications. Reject any input that does not strictly conform to specifications, or transform it into something that does. When performing input validation, consider all potentially relevant properties, including length, type of input, the full range of acceptable values, missing or extra inputs, syntax, consistency across related fields, and conformance to business rules. As an example of business rule logic, \"boat\" may be syntactically valid because it only contains alphanumeric characters, but it is not valid if the input is only expected to contain colors such as \"red\" or \"blue.\" Do not rely exclusively on looking for malicious or malformed inputs. This is likely to miss at least one undesirable input, especially if the code's environment changes. This can give attackers enough room to bypass the intended validation. However, denylists can be useful for detecting potential attacks or determining which inputs are so malformed that they should be rejected outright. When constructing OS command strings, use stringent allowlists that limit the character set based on the expected value of the parameter in the request. This will indirectly limit the scope of an attack, but this technique is less important than proper output encoding and escaping. Note that proper output encoding, escaping, and quoting is the most effective solution for preventing OS command injection, although input validation may provide some defense-in-depth. This is because it effectively limits what will appear in output. Input validation will not always prevent OS command injection, especially if you are required to support free-form text fields that could contain arbitrary characters. For example, when invoking a mail program, you might need to allow the subject field to contain otherwise-dangerous inputs like \";\" and \">\" characters, which would need to be escaped or otherwise handled. In this case, stripping the character might reduce the risk of OS command injection, but it would produce incorrect behavior because the subject field would not be recorded as the user intended. This might seem to be a minor inconvenience, but it could be more important when the program relies on well-structured subject lines in order to pass messages to other components. Even if you make a mistake in your validation (such as forgetting one out of 100 input fields), appropriate encoding is still likely to protect you from injection-based attacks. As long as it is not done in isolation, input validation is still a useful technique, since it may significantly reduce your attack surface, allow you to detect some attacks, and provide other security benefits that proper encoding does not address.",
+          "phases": "Implementation"
+        },
+        {
+          "description": "When the set of acceptable objects, such as filenames or URLs, is limited or known, create a mapping from a set of fixed input values (such as numeric IDs) to the actual filenames or URLs, and reject all other inputs.",
+          "phases": "Architecture and Design"
+        },
+        {
+          "description": "Run the code in an environment that performs automatic taint propagation and prevents any command execution that uses tainted variables, such as Perl's \"-T\" switch. This will force the program to perform validation steps that remove the taint, although you must be careful to correctly validate your inputs so that you do not accidentally mark dangerous inputs as untainted (see CWE-183 and CWE-184).",
+          "phases": "Operation"
+        },
+        {
+          "description": "Run the code in an environment that performs automatic taint propagation and prevents any command execution that uses tainted variables, such as Perl's \"-T\" switch. This will force the program to perform validation steps that remove the taint, although you must be careful to correctly validate your inputs so that you do not accidentally mark dangerous inputs as untainted (see CWE-183 and CWE-184).",
+          "phases": "Operation"
+        },
+        {
+          "description": "Ensure that error messages only contain minimal details that are useful to the intended audience and no one else. The messages need to strike the balance between being too cryptic (which can confuse users) or being too detailed (which may reveal more than intended). The messages should not reveal the methods that were used to determine the error. Attackers can use detailed information to refine or optimize their original attack, thereby increasing their chances of success. If errors must be captured in some detail, record them in log messages, but consider what could occur if the log messages can be viewed by attackers. Highly sensitive information such as passwords should never be saved to log files. Avoid inconsistent messaging that might accidentally tip off an attacker about internal state, such as whether a user account exists or not. In the context of OS Command Injection, error information passed back to the user might reveal whether an OS command is being executed and possibly which command is being used.",
+          "phases": "Implementation"
+        },
+        {
+          "description": "Use runtime policy enforcement to create an allowlist of allowable commands, then prevent use of any command that does not appear in the allowlist. Technologies such as AppArmor are available to do this.",
+          "phases": "Operation"
+        },
+        {
+          "description": "Use an application firewall that can detect attacks against this weakness. It can be beneficial in cases in which the code cannot be fixed (because it is controlled by a third party), as an emergency prevention measure while more comprehensive software assurance measures are applied, or to provide defense in depth [REF-1481].",
+          "phases": "Operation"
+        },
+        {
+          "description": "Run your code using the lowest privileges that are required to accomplish the necessary tasks [REF-76]. If possible, create isolated accounts with limited privileges that are only used for a single task. That way, a successful attack will not immediately give the attacker access to the rest of the software or its environment. For example, database applications rarely need to run as the database administrator, especially in day-to-day operations.",
+          "phases": "Architecture and Design, Operation"
+        },
+        {
+          "description": "When using PHP, configure the application so that it does not use register_globals. During implementation, develop the application so that it does not rely on this feature, but be wary of implementing a register_globals emulation that is subject to weaknesses such as CWE-95, CWE-621, and similar issues.",
+          "phases": "Operation, Implementation"
+        }
+      ],
+      "status": "Stable",
+      "structure": "Simple"
+    },
+    "CWE-79": {
+      "abstraction": "Base",
+      "catalog_present": true,
+      "common_consequences": [
+        {
+          "impacts": "Bypass Protection Mechanism, Read Application Data",
+          "note": "The most common attack performed with cross-site scripting involves the disclosure of private information stored in user cookies, such as session information. Typically, a malicious user will craft a client-side script, which -- when parsed by a web browser -- performs some activity on behalf of the victim to an attacker-controlled system (such as sending all site cookies to a given E-mail address). This could be especially dangerous to the site if the victim has administrator privileges to manage that site. This script will be loaded and run by each user visiting the web site. Since the site requesting to run the script has access to the cookies in question, the malicious script does also.",
+          "scopes": "Access Control, Confidentiality"
+        },
+        {
+          "impacts": "Execute Unauthorized Code or Commands",
+          "note": "In some circumstances it may be possible to run arbitrary code on a victim's computer when cross-site scripting is combined with other flaws, for example, \"drive-by hacking.\"",
+          "scopes": "Integrity, Confidentiality, Availability"
+        },
+        {
+          "impacts": "Execute Unauthorized Code or Commands, Bypass Protection Mechanism, Read Application Data",
+          "note": "The consequence of an XSS attack is the same regardless of whether it is stored or reflected. The difference is in how the payload arrives at the server. XSS can cause a variety of problems for the end user that range in severity from an annoyance to complete account compromise. Some cross-site scripting vulnerabilities can be exploited to manipulate or steal cookies, create requests that can be mistaken for those of a valid user, compromise confidential information, or execute malicious code on the end user systems for a variety of nefarious purposes. Other damaging attacks include the disclosure of end user files, installation of Trojan horse programs, redirecting the user to some other page or site, running \"Active X\" controls (under Microsoft Internet Explorer) from sites that a user perceives as trustworthy, and modifying presentation of content.",
+          "scopes": "Confidentiality, Integrity, Availability, Access Control"
+        }
+      ],
+      "cwe_id": "CWE-79",
+      "description": "The product does not neutralize or incorrectly neutralizes user-controllable input before it is placed in output that is used as a web page that is served to other users.",
+      "entry_type": "weakness",
+      "extended_description": "",
+      "likelihood_of_exploit": "High",
+      "name": "Improper Neutralization of Input During Web Page Generation",
+      "potential_mitigations": [
+        {
+          "description": "Use a vetted library or framework that does not allow this weakness to occur or provides constructs that make this weakness easier to avoid [REF-1482]. Examples of libraries and frameworks that make it easier to generate properly encoded output include Microsoft's Anti-XSS library, the OWASP ESAPI Encoding module, and Apache Wicket.",
+          "phases": "Architecture and Design"
+        },
+        {
+          "description": "Understand the context in which your data will be used and the encoding that will be expected. This is especially important when transmitting data between different components, or when generating outputs that can contain multiple encodings at the same time, such as web pages or multi-part mail messages. Study all expected communication protocols and data representations to determine the required encoding strategies. For any data that will be output to another web page, especially any data that was received from external inputs, use the appropriate encoding on all non-alphanumeric characters. Parts of the same output document may require different encodings, which will vary depending on whether the output is in the: HTML body Element attributes (such as src=\"XYZ\") URIs JavaScript sections Cascading Style Sheets and style property etc. Note that HTML Entity Encoding is only appropriate for the HTML body. Consult the XSS Prevention Cheat Sheet [REF-724] for more details on the types of encoding and escaping that are needed.",
+          "phases": "Implementation, Architecture and Design"
+        },
+        {
+          "description": "Understand all the potential areas where untrusted inputs can enter your software: parameters or arguments, cookies, anything read from the network, environment variables, reverse DNS lookups, query results, request headers, URL components, e-mail, files, filenames, databases, and any external systems that provide data to the application. Remember that such inputs may be obtained indirectly through API calls.",
+          "phases": "Architecture and Design, Implementation"
+        },
+        {
+          "description": "For any security checks that are performed on the client side, ensure that these checks are duplicated on the server side, in order to avoid CWE-602. Attackers can bypass the client-side checks by modifying values after the checks have been performed, or by changing the client to remove the client-side checks entirely. Then, these modified values would be submitted to the server.",
+          "phases": "Architecture and Design"
+        },
+        {
+          "description": "If available, use structured mechanisms that automatically enforce the separation between data and code. These mechanisms may be able to provide the relevant quoting, encoding, and validation automatically, instead of relying on the developer to provide this capability at every point where output is generated.",
+          "phases": "Architecture and Design"
+        },
+        {
+          "description": "Use and specify an output encoding that can be handled by the downstream component that is reading the output. Common encodings include ISO-8859-1, UTF-7, and UTF-8. When an encoding is not specified, a downstream component may choose a different encoding, either by assuming a default encoding or automatically inferring which encoding is being used, which can be erroneous. When the encodings are inconsistent, the downstream component might treat some character or byte sequences as special, even if they are not special in the original encoding. Attackers might then be able to exploit this discrepancy and conduct injection attacks; they even might be able to bypass protection mechanisms that assume the original encoding is also being used by the downstream component. The problem of inconsistent output encodings often arises in web pages. If an encoding is not specified in an HTTP header, web browsers often guess about which encoding is being used. This can open up the browser to subtle XSS attacks.",
+          "phases": "Implementation"
+        },
+        {
+          "description": "With Struts, write all data from form beans with the bean's filter attribute set to true.",
+          "phases": "Implementation"
+        },
+        {
+          "description": "To help mitigate XSS attacks against the user's session cookie, set the session cookie to be HttpOnly. In browsers that support the HttpOnly feature (such as more recent versions of Internet Explorer and Firefox), this attribute can prevent the user's session cookie from being accessible to malicious client-side scripts that use document.cookie. This is not a complete solution, since HttpOnly is not supported by all browsers. More importantly, XmlHttpRequest and other powerful browser technologies provide read access to HTTP headers, including the Set-Cookie header in which the HttpOnly flag is set.",
+          "phases": "Implementation"
+        },
+        {
+          "description": "Assume all input is malicious. Use an \"accept known good\" input validation strategy, i.e., use a list of acceptable inputs that strictly conform to specifications. Reject any input that does not strictly conform to specifications, or transform it into something that does. When performing input validation, consider all potentially relevant properties, including length, type of input, the full range of acceptable values, missing or extra inputs, syntax, consistency across related fields, and conformance to business rules. As an example of business rule logic, \"boat\" may be syntactically valid because it only contains alphanumeric characters, but it is not valid if the input is only expected to contain colors such as \"red\" or \"blue.\" Do not rely exclusively on looking for malicious or malformed inputs. This is likely to miss at least one undesirable input, especially if the code's environment changes. This can give attackers enough room to bypass the intended validation. However, denylists can be useful for detecting potential attacks or determining which inputs are so malformed that they should be rejected outright. When dynamically constructing web pages, use stringent allowlists that limit the character set based on the expected value of the parameter in the request. All input should be validated and cleansed, not just parameters that the user is supposed to specify, but all data in the request, including hidden fields, cookies, headers, the URL itself, and so forth. A common mistake that leads to continuing XSS vulnerabilities is to validate only fields that are expected to be redisplayed by the site. It is common to see data from the request that is reflected by the application server or the application that the development team did not anticipate. Also, a field that is not currently reflected may be used by a future developer. Therefore, validating ALL parts of the HTTP request is recommended. Note that proper output encoding, escaping, and quoting is the most effective solution for preventing XSS, although input validation may provide some defense-in-depth. This is because it effectively limits what will appear in output. Input validation will not always prevent XSS, especially if you are required to support free-form text fields that could contain arbitrary characters. For example, in a chat application, the heart emoticon (\"<3\") would likely pass the validation step, since it is commonly used. However, it cannot be directly inserted into the web page because it contains the \"<\" character, which would need to be escaped or otherwise handled. In this case, stripping the \"<\" might reduce the risk of XSS, but it would produce incorrect behavior because the emoticon would not be recorded. This might seem to be a minor inconvenience, but it would be more important in a mathematical forum that wants to represent inequalities. Even if you make a mistake in your validation (such as forgetting one out of 100 input fields), appropriate encoding is still likely to protect you from injection-based attacks. As long as it is not done in isolation, input validation is still a useful technique, since it may significantly reduce your attack surface, allow you to detect some attacks, and provide other security benefits that proper encoding does not address. Ensure that you perform input validation at well-defined interfaces within the application. This will help protect the application even if a component is reused or moved elsewhere.",
+          "phases": "Implementation"
+        },
+        {
+          "description": "When the set of acceptable objects, such as filenames or URLs, is limited or known, create a mapping from a set of fixed input values (such as numeric IDs) to the actual filenames or URLs, and reject all other inputs.",
+          "phases": "Architecture and Design"
+        },
+        {
+          "description": "Use an application firewall that can detect attacks against this weakness. It can be beneficial in cases in which the code cannot be fixed (because it is controlled by a third party), as an emergency prevention measure while more comprehensive software assurance measures are applied, or to provide defense in depth [REF-1481].",
+          "phases": "Operation"
+        },
+        {
+          "description": "When using PHP, configure the application so that it does not use register_globals. During implementation, develop the application so that it does not rely on this feature, but be wary of implementing a register_globals emulation that is subject to weaknesses such as CWE-95, CWE-621, and similar issues.",
+          "phases": "Operation, Implementation"
+        }
+      ],
+      "status": "Stable",
+      "structure": "Simple"
+    },
+    "CWE-83": {
+      "abstraction": "Variant",
+      "catalog_present": true,
+      "common_consequences": [
+        {
+          "impacts": "Read Application Data, Execute Unauthorized Code or Commands",
+          "note": "",
+          "scopes": "Confidentiality, Integrity, Availability"
+        }
+      ],
+      "cwe_id": "CWE-83",
+      "description": "The product does not neutralize or incorrectly neutralizes \"javascript:\" or other URIs from dangerous attributes within tags, such as onmouseover, onload, onerror, or style.",
+      "entry_type": "weakness",
+      "extended_description": "",
+      "likelihood_of_exploit": "",
+      "name": "Improper Neutralization of Script in Attributes in a Web Page",
+      "potential_mitigations": [
+        {
+          "description": "Carefully check each input parameter against a rigorous positive specification (allowlist) defining the specific characters and format allowed. All input should be neutralized, not just parameters that the user is supposed to specify, but all data in the request, including tag attributes, hidden fields, cookies, headers, the URL itself, and so forth. A common mistake that leads to continuing XSS vulnerabilities is to validate only fields that are expected to be redisplayed by the site. We often encounter data from the request that is reflected by the application server or the application that the development team did not anticipate. Also, a field that is not currently reflected may be used by a future developer. Therefore, validating ALL parts of the HTTP request is recommended.",
+          "phases": "Implementation"
+        },
+        {
+          "description": "Use and specify an output encoding that can be handled by the downstream component that is reading the output. Common encodings include ISO-8859-1, UTF-7, and UTF-8. When an encoding is not specified, a downstream component may choose a different encoding, either by assuming a default encoding or automatically inferring which encoding is being used, which can be erroneous. When the encodings are inconsistent, the downstream component might treat some character or byte sequences as special, even if they are not special in the original encoding. Attackers might then be able to exploit this discrepancy and conduct injection attacks; they even might be able to bypass protection mechanisms that assume the original encoding is also being used by the downstream component. The problem of inconsistent output encodings often arises in web pages. If an encoding is not specified in an HTTP header, web browsers often guess about which encoding is being used. This can open up the browser to subtle XSS attacks.",
+          "phases": "Implementation"
+        },
+        {
+          "description": "With Struts, write all data from form beans with the bean's filter attribute set to true.",
+          "phases": "Implementation"
+        },
+        {
+          "description": "To help mitigate XSS attacks against the user's session cookie, set the session cookie to be HttpOnly. In browsers that support the HttpOnly feature (such as more recent versions of Internet Explorer and Firefox), this attribute can prevent the user's session cookie from being accessible to malicious client-side scripts that use document.cookie. This is not a complete solution, since HttpOnly is not supported by all browsers. More importantly, XmlHttpRequest and other powerful browser technologies provide read access to HTTP headers, including the Set-Cookie header in which the HttpOnly flag is set.",
+          "phases": "Implementation"
+        }
+      ],
+      "status": "Draft",
+      "structure": "Simple"
+    },
+    "CWE-835": {
+      "abstraction": "Base",
+      "catalog_present": true,
+      "common_consequences": [
+        {
+          "impacts": "DoS: Resource Consumption (CPU), DoS: Resource Consumption (Memory), DoS: Amplification",
+          "note": "An infinite loop will cause unexpected consumption of resources, such as CPU cycles or memory. The software's operation may slow down, or cause a long time to respond.",
+          "scopes": "Availability"
+        }
+      ],
+      "cwe_id": "CWE-835",
+      "description": "The product contains an iteration or loop with an exit condition that cannot be reached, i.e., an infinite loop.",
+      "entry_type": "weakness",
+      "extended_description": "",
+      "likelihood_of_exploit": "",
+      "name": "Loop with Unreachable Exit Condition",
+      "potential_mitigations": [],
+      "status": "Incomplete",
+      "structure": "Simple"
+    },
+    "CWE-862": {
+      "abstraction": "Class",
+      "catalog_present": true,
+      "common_consequences": [
+        {
+          "impacts": "Read Application Data, Read Files or Directories",
+          "note": "An attacker could read sensitive data, either by reading the data directly from a data store that is not restricted, or by accessing insufficiently-protected, privileged functionality to read the data.",
+          "scopes": "Confidentiality"
+        },
+        {
+          "impacts": "Modify Application Data, Modify Files or Directories",
+          "note": "An attacker could modify sensitive data, either by writing the data directly to a data store that is not restricted, or by accessing insufficiently-protected, privileged functionality to write the data.",
+          "scopes": "Integrity"
+        },
+        {
+          "impacts": "Gain Privileges or Assume Identity, Bypass Protection Mechanism",
+          "note": "An attacker could gain privileges by modifying or reading critical data directly, or by accessing privileged functionality.",
+          "scopes": "Access Control"
+        },
+        {
+          "impacts": "DoS: Crash, Exit, or Restart, DoS: Resource Consumption (CPU), DoS: Resource Consumption (Memory), DoS: Resource Consumption (Other)",
+          "note": "An attacker could gain unauthorized access to resources on the system and excessively consume those resources, leading to a denial of service.",
+          "scopes": "Availability"
+        }
+      ],
+      "cwe_id": "CWE-862",
+      "description": "The product does not perform an authorization check when an actor attempts to access a resource or perform an action.",
+      "entry_type": "weakness",
+      "extended_description": "",
+      "likelihood_of_exploit": "High",
+      "name": "Missing Authorization",
+      "potential_mitigations": [
+        {
+          "description": "Divide the product into anonymous, normal, privileged, and administrative areas. Reduce the attack surface by carefully mapping roles with data and functionality. Use role-based access control (RBAC) [REF-229] to enforce the roles at the appropriate boundaries. Note that this approach may not protect against horizontal authorization, i.e., it will not protect a user from attacking others with the same role.",
+          "phases": "Architecture and Design"
+        },
+        {
+          "description": "Ensure that access control checks are performed related to the business logic. These checks may be different than the access control checks that are applied to more generic resources such as files, connections, processes, memory, and database records. For example, a database may restrict access for medical records to a specific database user, but each record might only be intended to be accessible to the patient and the patient's doctor [REF-7].",
+          "phases": "Architecture and Design"
+        },
+        {
+          "description": "Use a vetted library or framework that does not allow this weakness to occur or provides constructs that make this weakness easier to avoid. For example, consider using authorization frameworks such as the JAAS Authorization Framework [REF-233] and the OWASP ESAPI Access Control feature [REF-45].",
+          "phases": "Architecture and Design"
+        },
+        {
+          "description": "For web applications, make sure that the access control mechanism is enforced correctly at the server side on every page. Users should not be able to access any unauthorized functionality or information by simply requesting direct access to that page. One way to do this is to ensure that all pages containing sensitive information are not cached, and that all such pages restrict access to requests that are accompanied by an active and authenticated session token associated with a user who has the required permissions to access that page.",
+          "phases": "Architecture and Design"
+        },
+        {
+          "description": "Use the access control capabilities of your operating system and server environment and define your access control lists accordingly. Use a \"default deny\" policy when defining these ACLs.",
+          "phases": "System Configuration, Installation"
+        }
+      ],
+      "status": "Incomplete",
+      "structure": "Simple"
+    },
+    "CWE-863": {
+      "abstraction": "Class",
+      "catalog_present": true,
+      "common_consequences": [
+        {
+          "impacts": "Read Application Data, Read Files or Directories",
+          "note": "An attacker could bypass intended access restrictions to read sensitive data, either by reading the data directly from a data store that is not correctly restricted, or by accessing insufficiently-protected, privileged functionality to read the data.",
+          "scopes": "Confidentiality"
+        },
+        {
+          "impacts": "Modify Application Data, Modify Files or Directories",
+          "note": "An attacker could bypass intended access restrictions to modify sensitive data, either by writing the data directly to a data store that is not correctly restricted, or by accessing insufficiently-protected, privileged functionality to write the data.",
+          "scopes": "Integrity"
+        },
+        {
+          "impacts": "Gain Privileges or Assume Identity, Bypass Protection Mechanism",
+          "note": "An attacker could bypass intended access restrictions to gain privileges by modifying or reading critical data directly, or by accessing privileged functionality.",
+          "scopes": "Access Control"
+        },
+        {
+          "impacts": "Execute Unauthorized Code or Commands",
+          "note": "An attacker could use elevated privileges to execute unauthorized commands or code.",
+          "scopes": "Confidentiality, Integrity, Availability"
+        },
+        {
+          "impacts": "DoS: Crash, Exit, or Restart, DoS: Resource Consumption (CPU), DoS: Resource Consumption (Memory), DoS: Resource Consumption (Other)",
+          "note": "An attacker could gain unauthorized access to resources on the system and excessively consume those resources, leading to a denial of service.",
+          "scopes": "Availability"
+        }
+      ],
+      "cwe_id": "CWE-863",
+      "description": "The product performs an authorization check when an actor attempts to access a resource or perform an action, but it does not correctly perform the check.",
+      "entry_type": "weakness",
+      "extended_description": "",
+      "likelihood_of_exploit": "High",
+      "name": "Incorrect Authorization",
+      "potential_mitigations": [
+        {
+          "description": "Divide the product into anonymous, normal, privileged, and administrative areas. Reduce the attack surface by carefully mapping roles with data and functionality. Use role-based access control (RBAC) [REF-229] to enforce the roles at the appropriate boundaries. Note that this approach may not protect against horizontal authorization, i.e., it will not protect a user from attacking others with the same role.",
+          "phases": "Architecture and Design"
+        },
+        {
+          "description": "Ensure that access control checks are performed related to the business logic. These checks may be different than the access control checks that are applied to more generic resources such as files, connections, processes, memory, and database records. For example, a database may restrict access for medical records to a specific database user, but each record might only be intended to be accessible to the patient and the patient's doctor [REF-7].",
+          "phases": "Architecture and Design"
+        },
+        {
+          "description": "Use a vetted library or framework that does not allow this weakness to occur or provides constructs that make this weakness easier to avoid. For example, consider using authorization frameworks such as the JAAS Authorization Framework [REF-233] and the OWASP ESAPI Access Control feature [REF-45].",
+          "phases": "Architecture and Design"
+        },
+        {
+          "description": "For web applications, make sure that the access control mechanism is enforced correctly at the server side on every page. Users should not be able to access any unauthorized functionality or information by simply requesting direct access to that page. One way to do this is to ensure that all pages containing sensitive information are not cached, and that all such pages restrict access to requests that are accompanied by an active and authenticated session token associated with a user who has the required permissions to access that page.",
+          "phases": "Architecture and Design"
+        },
+        {
+          "description": "Use the access control capabilities of your operating system and server environment and define your access control lists accordingly. Use a \"default deny\" policy when defining these ACLs.",
+          "phases": "System Configuration, Installation"
+        }
+      ],
+      "status": "Incomplete",
+      "structure": "Simple"
+    },
+    "CWE-89": {
+      "abstraction": "Base",
+      "catalog_present": true,
+      "common_consequences": [
+        {
+          "impacts": "Execute Unauthorized Code or Commands",
+          "note": "Adversaries could execute system commands, typically by changing the SQL statement to redirect output to a file that can then be executed.",
+          "scopes": "Confidentiality, Integrity, Availability"
+        },
+        {
+          "impacts": "Read Application Data",
+          "note": "Since SQL databases generally hold sensitive data, loss of confidentiality is a frequent problem with SQL injection vulnerabilities.",
+          "scopes": "Confidentiality"
+        },
+        {
+          "impacts": "Gain Privileges or Assume Identity, Bypass Protection Mechanism",
+          "note": "If poor SQL commands are used to check user names and passwords or perform other kinds of authentication, it may be possible to connect to the product as another user with no previous knowledge of the password.",
+          "scopes": "Authentication"
+        },
+        {
+          "impacts": "Bypass Protection Mechanism",
+          "note": "If authorization information is held in a SQL database, it may be possible to change this information through the successful exploitation of a SQL injection vulnerability.",
+          "scopes": "Access Control"
+        },
+        {
+          "impacts": "Modify Application Data",
+          "note": "Just as it may be possible to read sensitive information, it is also possible to modify or even delete this information with a SQL injection attack.",
+          "scopes": "Integrity"
+        }
+      ],
+      "cwe_id": "CWE-89",
+      "description": "The product constructs all or part of an SQL command using externally-influenced input from an upstream component, but it does not neutralize or incorrectly neutralizes special elements that could modify the intended SQL command when it is sent to a downstream component. Without sufficient removal or quoting of SQL syntax in user-controllable inputs, the generated SQL query can cause those inputs to be interpreted as SQL instead of ordinary user data.",
+      "entry_type": "weakness",
+      "extended_description": "",
+      "likelihood_of_exploit": "High",
+      "name": "Improper Neutralization of Special Elements used in an SQL Command",
+      "potential_mitigations": [
+        {
+          "description": "Use a vetted library or framework that does not allow this weakness to occur or provides constructs that make this weakness easier to avoid [REF-1482]. For example, consider using persistence layers such as Hibernate or Enterprise Java Beans, which can provide significant protection against SQL injection if used properly.",
+          "phases": "Architecture and Design"
+        },
+        {
+          "description": "If available, use structured mechanisms that automatically enforce the separation between data and code. These mechanisms may be able to provide the relevant quoting, encoding, and validation automatically, instead of relying on the developer to provide this capability at every point where output is generated. Process SQL queries using prepared statements, parameterized queries, or stored procedures. These features should accept parameters or variables and support strong typing. Do not dynamically construct and execute query strings within these features using \"exec\" or similar functionality, since this may re-introduce the possibility of SQL injection. [REF-867]",
+          "phases": "Architecture and Design"
+        },
+        {
+          "description": "Run your code using the lowest privileges that are required to accomplish the necessary tasks [REF-76]. If possible, create isolated accounts with limited privileges that are only used for a single task. That way, a successful attack will not immediately give the attacker access to the rest of the software or its environment. For example, database applications rarely need to run as the database administrator, especially in day-to-day operations. Specifically, follow the principle of least privilege when creating user accounts to a SQL database. The database users should only have the minimum privileges necessary to use their account. If the requirements of the system indicate that a user can read and modify their own data, then limit their privileges so they cannot read/write others' data. Use the strictest permissions possible on all database objects, such as execute-only for stored procedures.",
+          "phases": "Architecture and Design, Operation"
+        },
+        {
+          "description": "For any security checks that are performed on the client side, ensure that these checks are duplicated on the server side, in order to avoid CWE-602. Attackers can bypass the client-side checks by modifying values after the checks have been performed, or by changing the client to remove the client-side checks entirely. Then, these modified values would be submitted to the server.",
+          "phases": "Architecture and Design"
+        },
+        {
+          "description": "While it is risky to use dynamically-generated query strings, code, or commands that mix control and data together, sometimes it may be unavoidable. Properly quote arguments and escape any special characters within those arguments. The most conservative approach is to escape or filter all characters that do not pass an extremely strict allowlist (such as everything that is not alphanumeric or white space). If some special characters are still needed, such as white space, wrap each argument in quotes after the escaping/filtering step. Be careful of argument injection (CWE-88). Instead of building a new implementation, such features may be available in the database or programming language. For example, the Oracle DBMS_ASSERT package can check or enforce that parameters have certain properties that make them less vulnerable to SQL injection. For MySQL, the mysql_real_escape_string() API function is available in both C and PHP.",
+          "phases": "Implementation"
+        },
+        {
+          "description": "Assume all input is malicious. Use an \"accept known good\" input validation strategy, i.e., use a list of acceptable inputs that strictly conform to specifications. Reject any input that does not strictly conform to specifications, or transform it into something that does. When performing input validation, consider all potentially relevant properties, including length, type of input, the full range of acceptable values, missing or extra inputs, syntax, consistency across related fields, and conformance to business rules. As an example of business rule logic, \"boat\" may be syntactically valid because it only contains alphanumeric characters, but it is not valid if the input is only expected to contain colors such as \"red\" or \"blue.\" Do not rely exclusively on looking for malicious or malformed inputs. This is likely to miss at least one undesirable input, especially if the code's environment changes. This can give attackers enough room to bypass the intended validation. However, denylists can be useful for detecting potential attacks or determining which inputs are so malformed that they should be rejected outright. When constructing SQL query strings, use stringent allowlists that limit the character set based on the expected value of the parameter in the request. This will indirectly limit the scope of an attack, but this technique is less important than proper output encoding and escaping. Note that proper output encoding, escaping, and quoting is the most effective solution for preventing SQL injection, although input validation may provide some defense-in-depth. This is because it effectively limits what will appear in output. Input validation will not always prevent SQL injection, especially if you are required to support free-form text fields that could contain arbitrary characters. For example, the name \"O'Reilly\" would likely pass the validation step, since it is a common last name in the English language. However, it cannot be directly inserted into the database because it contains the \"'\" apostrophe character, which would need to be escaped or otherwise handled. In this case, stripping the apostrophe might reduce the risk of SQL injection, but it would produce incorrect behavior because the wrong name would be recorded. When feasible, it may be safest to disallow meta-characters entirely, instead of escaping them. This will provide some defense in depth. After the data is entered into the database, later processes may neglect to escape meta-characters before use, and you may not have control over those processes.",
+          "phases": "Implementation"
+        },
+        {
+          "description": "When the set of acceptable objects, such as filenames or URLs, is limited or known, create a mapping from a set of fixed input values (such as numeric IDs) to the actual filenames or URLs, and reject all other inputs.",
+          "phases": "Architecture and Design"
+        },
+        {
+          "description": "Ensure that error messages only contain minimal details that are useful to the intended audience and no one else. The messages need to strike the balance between being too cryptic (which can confuse users) or being too detailed (which may reveal more than intended). The messages should not reveal the methods that were used to determine the error. Attackers can use detailed information to refine or optimize their original attack, thereby increasing their chances of success. If errors must be captured in some detail, record them in log messages, but consider what could occur if the log messages can be viewed by attackers. Highly sensitive information such as passwords should never be saved to log files. Avoid inconsistent messaging that might accidentally tip off an attacker about internal state, such as whether a user account exists or not. In the context of SQL Injection, error messages revealing the structure of a SQL query can help attackers tailor successful attack strings.",
+          "phases": "Implementation"
+        },
+        {
+          "description": "Use an application firewall that can detect attacks against this weakness. It can be beneficial in cases in which the code cannot be fixed (because it is controlled by a third party), as an emergency prevention measure while more comprehensive software assurance measures are applied, or to provide defense in depth [REF-1481.",
+          "phases": "Operation"
+        },
+        {
+          "description": "When using PHP, configure the application so that it does not use register_globals. During implementation, develop the application so that it does not rely on this feature, but be wary of implementing a register_globals emulation that is subject to weaknesses such as CWE-95, CWE-621, and similar issues.",
+          "phases": "Operation, Implementation"
+        }
+      ],
+      "status": "Stable",
+      "structure": "Simple"
+    },
+    "CWE-913": {
+      "abstraction": "Class",
+      "catalog_present": true,
+      "common_consequences": [
+        {
+          "impacts": "Execute Unauthorized Code or Commands",
+          "note": "",
+          "scopes": "Integrity"
+        },
+        {
+          "impacts": "Varies by Context, Alter Execution Logic",
+          "note": "",
+          "scopes": "Other, Integrity"
+        }
+      ],
+      "cwe_id": "CWE-913",
+      "description": "The product does not properly restrict reading from or writing to dynamically-managed code resources such as variables, objects, classes, attributes, functions, or executable instructions or statements.",
+      "entry_type": "weakness",
+      "extended_description": "",
+      "likelihood_of_exploit": "",
+      "name": "Improper Control of Dynamically-Managed Code Resources",
+      "potential_mitigations": [
+        {
+          "description": "For any externally-influenced input, check the input against an allowlist of acceptable values.",
+          "phases": "Implementation"
+        },
+        {
+          "description": "Refactor the code so that it does not need to be dynamically managed.",
+          "phases": "Implementation, Architecture and Design"
+        }
+      ],
+      "status": "Incomplete",
+      "structure": "Simple"
+    },
+    "CWE-918": {
+      "abstraction": "Base",
+      "catalog_present": true,
+      "common_consequences": [
+        {
+          "impacts": "Read Application Data",
+          "note": "",
+          "scopes": "Confidentiality"
+        },
+        {
+          "impacts": "Execute Unauthorized Code or Commands",
+          "note": "",
+          "scopes": "Integrity"
+        },
+        {
+          "impacts": "Bypass Protection Mechanism",
+          "note": "By providing URLs to unexpected hosts or ports, attackers can make it appear that the server is sending the request, possibly bypassing access controls such as firewalls that prevent the attackers from accessing the URLs directly. The server can be used as a proxy to conduct port scanning of hosts in internal networks, use other URLs such as that can access documents on the system (using file://), or use other protocols such as gopher:// or tftp://, which may provide greater control over the contents of requests.",
+          "scopes": "Access Control"
+        }
+      ],
+      "cwe_id": "CWE-918",
+      "description": "The web server receives a URL or similar request from an upstream component and retrieves the contents of this URL, but it does not sufficiently ensure that the request is being sent to the expected destination.",
+      "entry_type": "weakness",
+      "extended_description": "",
+      "likelihood_of_exploit": "",
+      "name": "Server-Side Request Forgery",
+      "potential_mitigations": [
+        {
+          "description": "If there is a known list of applications, IP, hostname, and/or domains to which the product is allowed to communicate, then use allowlists to ensure that outgoing requests are restricted to these known entities. The allowlists could be in the application code or possibly enforced by firewalls or network segmentation [REF-1511].",
+          "phases": "Implementation, Operation"
+        },
+        {
+          "description": "If the product is expected to be able to connect to arbitrary IP addresses or domains, consider using a denylist that includes private network addresses, internal domain names, etc. The denylist could be in the application code or possibly enforced by firewalls or network segmentation [REF-1511].",
+          "phases": "Implementation, Operation"
+        },
+        {
+          "description": "Assume all input is malicious. Use an \"accept known good\" input validation strategy, i.e., use a list of acceptable inputs that strictly conform to specifications. Reject any input that does not strictly conform to specifications, or transform it into something that does. When performing input validation, consider all potentially relevant properties, including length, type of input, the full range of acceptable values, missing or extra inputs, syntax, consistency across related fields, and conformance to business rules. As an example of business rule logic, \"boat\" may be syntactically valid because it only contains alphanumeric characters, but it is not valid if the input is only expected to contain colors such as \"red\" or \"blue.\" Do not rely exclusively on looking for malicious or malformed inputs. This is likely to miss at least one undesirable input, especially if the code's environment changes. This can give attackers enough room to bypass the intended validation. However, denylists can be useful for detecting potential attacks or determining which inputs are so malformed that they should be rejected outright. When constructing outgoing requests from input strings, use stringent allowlists that limit the character set based on the expected value of the parameter in the request. This will indirectly limit the scope of an attack, but this technique is less important than proper output encoding and escaping.",
+          "phases": "Implementation"
+        }
+      ],
+      "status": "Incomplete",
+      "structure": "Simple"
+    },
+    "CWE-94": {
+      "abstraction": "Base",
+      "catalog_present": true,
+      "common_consequences": [
+        {
+          "impacts": "Bypass Protection Mechanism",
+          "note": "In some cases, injectable code controls authentication; this may lead to a remote vulnerability.",
+          "scopes": "Access Control"
+        },
+        {
+          "impacts": "Gain Privileges or Assume Identity",
+          "note": "Injected code can access resources that the attacker is directly prevented from accessing.",
+          "scopes": "Access Control"
+        },
+        {
+          "impacts": "Execute Unauthorized Code or Commands",
+          "note": "When a product allows a user's input to contain code syntax, it might be possible for an attacker to craft the code in such a way that it will alter the intended control flow of the product. As a result, code injection can often result in the execution of arbitrary code. Code injection attacks can also lead to loss of data integrity in nearly all cases, since the control-plane data injected is always incidental to data recall or writing.",
+          "scopes": "Integrity, Confidentiality, Availability"
+        },
+        {
+          "impacts": "Hide Activities",
+          "note": "Often the actions performed by injected control code are unlogged.",
+          "scopes": "Non-Repudiation"
+        }
+      ],
+      "cwe_id": "CWE-94",
+      "description": "The product constructs all or part of a code segment using externally-influenced input from an upstream component, but it does not neutralize or incorrectly neutralizes special elements that could modify the syntax or behavior of the intended code segment.",
+      "entry_type": "weakness",
+      "extended_description": "",
+      "likelihood_of_exploit": "Medium",
+      "name": "Improper Control of Generation of Code",
+      "potential_mitigations": [
+        {
+          "description": "Refactor your program so that you do not have to dynamically generate code.",
+          "phases": "Architecture and Design"
+        },
+        {
+          "description": "Run your code in a \"jail\" or similar sandbox environment that enforces strict boundaries between the process and the operating system. This may effectively restrict which code can be executed by your product. Examples include the Unix chroot jail and AppArmor. In general, managed code may provide some protection. This may not be a feasible solution, and it only limits the impact to the operating system; the rest of your application may still be subject to compromise. Be careful to avoid CWE-243 and other weaknesses related to jails.",
+          "phases": "Architecture and Design"
+        },
+        {
+          "description": "Assume all input is malicious. Use an \"accept known good\" input validation strategy, i.e., use a list of acceptable inputs that strictly conform to specifications. Reject any input that does not strictly conform to specifications, or transform it into something that does. When performing input validation, consider all potentially relevant properties, including length, type of input, the full range of acceptable values, missing or extra inputs, syntax, consistency across related fields, and conformance to business rules. As an example of business rule logic, \"boat\" may be syntactically valid because it only contains alphanumeric characters, but it is not valid if the input is only expected to contain colors such as \"red\" or \"blue.\" Do not rely exclusively on looking for malicious or malformed inputs. This is likely to miss at least one undesirable input, especially if the code's environment changes. This can give attackers enough room to bypass the intended validation. However, denylists can be useful for detecting potential attacks or determining which inputs are so malformed that they should be rejected outright. To reduce the likelihood of code injection, use stringent allowlists that limit which constructs are allowed. If you are dynamically constructing code that invokes a function, then verifying that the input is alphanumeric might be insufficient. An attacker might still be able to reference a dangerous function that you did not intend to allow, such as system(), exec(), or exit().",
+          "phases": "Implementation"
+        },
+        {
+          "description": "Use dynamic tools and techniques that interact with the product using large test suites with many diverse inputs, such as fuzz testing (fuzzing), robustness testing, and fault injection. The product's operation may slow down, but it should not become unstable, crash, or generate incorrect results.",
+          "phases": "Testing"
+        },
+        {
+          "description": "Run the code in an environment that performs automatic taint propagation and prevents any command execution that uses tainted variables, such as Perl's \"-T\" switch. This will force the program to perform validation steps that remove the taint, although you must be careful to correctly validate your inputs so that you do not accidentally mark dangerous inputs as untainted (see CWE-183 and CWE-184).",
+          "phases": "Operation"
+        },
+        {
+          "description": "Run the code in an environment that performs automatic taint propagation and prevents any command execution that uses tainted variables, such as Perl's \"-T\" switch. This will force the program to perform validation steps that remove the taint, although you must be careful to correctly validate your inputs so that you do not accidentally mark dangerous inputs as untainted (see CWE-183 and CWE-184).",
+          "phases": "Operation"
+        },
+        {
+          "description": "For Python programs, it is frequently encouraged to use the ast.literal_eval() function instead of eval, since it is intentionally designed to avoid executing code. However, an adversary could still cause excessive memory or stack consumption via deeply nested structures [REF-1372], so the python documentation discourages use of ast.literal_eval() on untrusted data [REF-1373].",
+          "phases": "Implementation"
+        }
+      ],
+      "status": "Draft",
+      "structure": "Simple"
+    }
+  }
+}

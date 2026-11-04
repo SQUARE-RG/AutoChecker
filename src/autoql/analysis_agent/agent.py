@@ -18,6 +18,7 @@ from .prompts import explorer_system_prompt, spec_composer_prompt, spec_repair_p
 from .schemas import AnalysisBrief
 from .validator import (SpecValidationError, enriched_brief, finalize,
                         validate_brief)
+from .vulnerability_metadata import prompt_section
 
 
 class ReadOnlySourceBackend(FilesystemBackend):
@@ -78,8 +79,9 @@ class AnalysisPolicy(AgentMiddleware):
 
 
 class AnalysisAgent:
-    def __init__(self, task, registry, llm, limits):
+    def __init__(self, task, registry, llm, limits, vulnerability_metadata=None):
         self.task, self.registry, self.llm, self.limits = task, registry, llm, limits
+        self.vulnerability_metadata = vulnerability_metadata
         self.messages = []
         messages_path = Path(task.output_dir) / 'analysis_messages.json'
         if messages_path.exists():
@@ -114,12 +116,17 @@ class AnalysisAgent:
                 if hasattr(structured, 'model_dump') else structured)
 
     def _initial_request(self, additional_request):
-        request = (
+        sections = []
+        metadata = prompt_section(getattr(self, 'vulnerability_metadata', None))
+        if metadata:
+            sections.append(metadata)
+        sections.append(
             '## Commit message:\n' +
             json.dumps(self.task.fix_commit_message, ensure_ascii=False) +
             '\n\nPatch: /input/patch.diff\nBuggy source: /buggy\nFixed source: /fixed\n\n'
             'Analyze the patch and return vulnerability_summary with exact evidence locations. '
             'Use the displayed source line numbers for start_line and end_line.')
+        request = '\n\n'.join(sections)
         if additional_request:
             request += '\n\nAdditional validation request:\n' + additional_request
         return request

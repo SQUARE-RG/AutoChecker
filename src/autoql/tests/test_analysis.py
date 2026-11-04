@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 import subprocess
 import tempfile
@@ -12,6 +13,9 @@ from autoql.analysis_agent.prompts import explorer_system_prompt
 from autoql.analysis_agent.schemas import AnalysisBrief
 from autoql.analysis_agent.validator import (SpecValidationError, finalize,
                                               validate_brief)
+from autoql.analysis_agent.vulnerability_metadata import (
+    VulnerabilityMetadataError, canonical_cwe_id,
+    load_vulnerability_metadata, prompt_section)
 from autoql.llm import TrackedChatModel
 from langchain_core.messages import AIMessage, HumanMessage
 
@@ -114,6 +118,87 @@ class AnalysisTests(unittest.TestCase):
         request = agent._initial_request('')
         self.assertIn('update \\"quoted\\" version', request)
         self.assertNotIn('fix_commit_message.txt', request)
+
+    def test_cve_metadata_is_loaded_exactly_and_rendered_dynamically(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            dataset = Path(tmp)
+            (dataset / 'project_info.csv').write_text(
+                'cve_id,cwe_id,cwe_name,advisory_id\n'
+                'CVE-2022-25842,CWE-022,Path Traversal,GHSA-test\n')
+            (dataset / 'cve_info.json').write_text(json.dumps({
+                '_meta': {'schema_version': 1, 'generated_at': 'cve-time'},
+                'items': {'CVE-2022-25842': {
+                    'description': 'Archive entries can escape the extraction directory.',
+                    'published_date': '2022-01-01',
+                    'modified_date': '2022-02-01',
+                    'nvd_cwe_ids': ['CWE-22'],
+                }},
+            }))
+            (dataset / 'cwe_info.json').write_text(json.dumps({
+                '_meta': {'schema_version': 1, 'generated_at': 'cwe-time',
+                          'catalog_version': '5.0'},
+                'items': {'CWE-22': {
+                    'name': 'Improper Limitation of a Pathname',
+                    'description': 'A pathname can resolve outside a restricted directory.',
+                    'extended_description': 'Dot-dot segments can escape the parent.',
+                    'catalog_present': True,
+                }},
+            }))
+            task = SimpleNamespace(input_kind='cve', cve_id='CVE-2022-25842',
+                                   dataset_dir=str(dataset),
+                                   fix_commit_message='remove unsafe unzip')
+            metadata = load_vulnerability_metadata(task)
+            self.assertEqual(metadata['cwe_id'], 'CWE-22')
+            self.assertEqual(canonical_cwe_id('cwe-0022'), 'CWE-22')
+
+            agent = AnalysisAgent.__new__(AnalysisAgent)
+            agent.task = task
+            agent.vulnerability_metadata = metadata
+            request = agent._initial_request('')
+            self.assertIn('## Vulnerability metadata', request)
+            self.assertIn('Archive entries can escape', request)
+            self.assertIn('A pathname can resolve outside', request)
+            self.assertIn(
+                'CWE-22 — Improper Limitation of a Pathname', request)
+            self.assertNotIn('GHSA-test', request)
+            self.assertNotIn('Dot-dot segments', request)
+            self.assertLess(request.index('## Vulnerability metadata'),
+                            request.index('## Commit message'))
+
+            task.input_kind = 'commit'
+            self.assertIsNone(load_vulnerability_metadata(task))
+            self.assertEqual(prompt_section(None), '')
+
+    def test_cve_metadata_is_optional_when_cache_entries_are_missing(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            dataset = Path(tmp)
+            (dataset / 'project_info.csv').write_text(
+                'cve_id,cwe_id,cwe_name\nCVE-2022-25842,CWE-022,Path Traversal\n')
+            (dataset / 'cve_info.json').write_text(json.dumps({
+                '_meta': {'schema_version': 1}, 'items': {},
+            }))
+            (dataset / 'cwe_info.json').write_text(json.dumps({
+                '_meta': {'schema_version': 1}, 'items': {'CWE-22': {}},
+            }))
+            task = SimpleNamespace(input_kind='cve', cve_id='CVE-2022-25842',
+                                   dataset_dir=str(dataset))
+            self.assertIsNone(load_vulnerability_metadata(task))
+
+            (dataset / 'cwe_info.json').write_text(json.dumps({
+                '_meta': {'schema_version': 1},
+                'items': {'CWE-22': {
+                    'name': 'Path Traversal',
+                    'description': 'A path can escape its restricted directory.',
+                }},
+            }))
+            metadata = load_vulnerability_metadata(task)
+            self.assertEqual(metadata['cve_description'], '')
+            rendered = prompt_section(metadata)
+            self.assertNotIn('CVE description:', rendered)
+            self.assertIn('CWE description:', rendered)
+
+            with self.assertRaises(VulnerabilityMetadataError):
+                canonical_cwe_id('not-a-cwe')
 
 
 if __name__ == '__main__':

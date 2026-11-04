@@ -55,6 +55,8 @@ def main():
             if args.cve and manifest['cve_id'].upper() != args.cve.upper():
                 raise ValueError('Resume CVE does not match manifest')
             task = PatchTask(**{k: v for k, v in manifest.items() if k in PatchTask.__dataclass_fields__})
+            if args.cve:
+                task.input_kind = 'cve'
             limits = Limits(**json.loads((output / 'limits.json').read_text()))
             if (output / 'run_control.json').exists():
                 deadline = json.loads((output / 'run_control.json').read_text())['deadline']
@@ -75,8 +77,17 @@ def main():
         from autoql.llm import StreamingLLM
         from autoql.analysis_agent.agent import AnalysisAgent
         from autoql.analysis_agent.evidence_registry import EvidenceRegistry
+        from autoql.analysis_agent.vulnerability_metadata import load_vulnerability_metadata
+        context_path = output / 'analysis_context.json'
+        if args.resume and context_path.exists():
+            vulnerability_metadata = json.loads(context_path.read_text())
+        else:
+            vulnerability_metadata = load_vulnerability_metadata(task)
+            if vulnerability_metadata is not None:
+                write_json(context_path, vulnerability_metadata)
         llm = StreamingLLM(args.root, output, limits, deadline)
-        analysis = AnalysisAgent(task, EvidenceRegistry(task), llm, limits)
+        analysis = AnalysisAgent(
+            task, EvidenceRegistry(task), llm, limits, vulnerability_metadata)
         spec_path = output / 'vuln_spec.json'
         if args.resume and spec_path.exists():
             spec = json.loads(spec_path.read_text())

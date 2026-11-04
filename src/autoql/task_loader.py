@@ -29,8 +29,9 @@ class PatchTask:
     fixed_db_path: str
     output_dir: str
     workspace: str
-    cve_id: str  # evaluator only; never rendered into agent prompts
+    cve_id: str
     dataset_dir: str
+    input_kind: str = 'commit'
 
 
 def git(repo: Path, *args: str) -> str:
@@ -144,6 +145,6 @@ def load_task(commit: str | None, root: Path, output: Path,
     (workspace / 'work').mkdir(parents=True)
     task = PatchTask('patch-' + fixed[:12], 'java', str(repo), buggy, fixed, message,
                      str(diff_path), str(dbs[0]), str(dbs[1]), str(output), str(workspace),
-                     row['cve_id'], str(dataset))
+                     row['cve_id'], str(dataset), 'cve' if cve is not None else 'commit')
     write_json(output / 'manifest.json', {**asdict(task), 'diff_sha256': hashlib.sha256(diff.encode()).hexdigest()})
     return task

@@ -110,11 +110,8 @@ python src/main.py \
 - 如果后续为 AutoChecker 增加 PPCallbacks、CFG 或数据流生成能力，应重新评估相应分组，而不是直接移动文件或复制规则。
 - 四个能力文件必须互斥，且合计数量必须等于 `gjb8114_clang_tidy_supported_rules.json` 的规则数。
 
-
-
-
-python src/main.py \
-  --platform clang-tidy \
-  --rules experiment/gjb8114-all/clang_tidy_ast_supported_rules.json \
-  --resume \
+python src/main.py 
+  --platform clang-tidy 
+  --rules experiment/gjb8114-all/clang_tidy_ast_supported_rules.json 
+  --resume 
   2>&1 | tee result_input_processing/gjb8114-2013/phase4.log

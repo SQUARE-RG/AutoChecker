@@ -155,6 +155,7 @@ class InputTemplateTests(unittest.TestCase):
             task = load_task(None, root, root / 'run', dataset,
                              cve='CVE-2022-25842')
             self.assertEqual(task.fix_commit, fixed)
+            self.assertEqual(task.input_kind, 'cve')
             self.assertFalse(Path(task.buggy_db_path).exists())
             self.assertFalse(Path(task.fixed_db_path).exists())
             self.assertFalse((root / 'run' / 'vuln_spec.json').exists())

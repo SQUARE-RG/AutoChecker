@@ -1,0 +1,2195 @@
+{
+  "_meta": {
+    "generated_at": "2026-11-03T17:41:50.110803Z",
+    "item_count": 216,
+    "schema_version": 1,
+    "source": "NVD CVE API 2.0",
+    "source_url": "https://services.nvd.nist.gov/rest/json/cves/2.0"
+  },
+  "items": {
+    "CVE-2011-2732": {
+      "cve_id": "CVE-2011-2732",
+      "description": "CRLF injection vulnerability in the logout functionality in VMware SpringSource Spring Security before 2.0.7 and 3.0.x before 3.0.6 allows remote attackers to inject arbitrary HTTP headers and conduct HTTP response splitting attacks via the spring-security-redirect parameter.",
+      "modified_date": "2026-06-16T23:31:53.547",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2011-2732",
+      "nvd_cwe_ids": [
+        "CWE-94"
+      ],
+      "published_date": "2012-12-05T17:55:01.537"
+    },
+    "CVE-2011-4367": {
+      "cve_id": "CVE-2011-4367",
+      "description": "Multiple directory traversal vulnerabilities in MyFaces JavaServer Faces (JSF) in Apache MyFaces Core 2.0.x before 2.0.12 and 2.1.x before 2.1.6 allow remote attackers to read arbitrary files via a .. (dot dot) in the (1) ln parameter to faces/javax.faces.resource/web.xml or (2) the PATH_INFO to faces/javax.faces.resource/.",
+      "modified_date": "2026-06-16T23:34:51.120",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2011-4367",
+      "nvd_cwe_ids": [
+        "CWE-22"
+      ],
+      "published_date": "2014-06-19T14:55:06.693"
+    },
+    "CVE-2013-7285": {
+      "cve_id": "CVE-2013-7285",
+      "description": "Xstream API versions up to 1.4.6 and version 1.4.10, if the security framework has not been initialized, may allow a remote attacker to run arbitrary shell commands by manipulating the processed input stream when unmarshaling XML or any supported format. e.g. JSON.",
+      "modified_date": "2026-10-08T21:17:03.243",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2013-7285",
+      "nvd_cwe_ids": [
+        "CWE-78"
+      ],
+      "published_date": "2019-05-15T17:29:00.297"
+    },
+    "CVE-2014-3576": {
+      "cve_id": "CVE-2014-3576",
+      "description": "The processControlCommand function in broker/TransportConnection.java in Apache ActiveMQ before 5.11.0 allows remote attackers to cause a denial of service (shutdown) via a shutdown command.",
+      "modified_date": "2026-06-17T00:08:32.650",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2014-3576",
+      "nvd_cwe_ids": [
+        "CWE-264"
+      ],
+      "published_date": "2015-08-14T18:59:00.097"
+    },
+    "CVE-2014-3656": {
+      "cve_id": "CVE-2014-3656",
+      "description": "JBoss KeyCloak: XSS in login-status-iframe.html",
+      "modified_date": "2026-06-17T00:08:41.900",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2014-3656",
+      "nvd_cwe_ids": [
+        "CWE-79"
+      ],
+      "published_date": "2019-12-10T14:15:11.250"
+    },
+    "CVE-2014-7816": {
+      "cve_id": "CVE-2014-7816",
+      "description": "Directory traversal vulnerability in JBoss Undertow 1.0.x before 1.0.17, 1.1.x before 1.1.0.CR5, and 1.2.x before 1.2.0.Beta3, when running on Windows, allows remote attackers to read arbitrary files via a .. (dot dot) in a resource URI.",
+      "modified_date": "2026-06-17T00:15:44.737",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2014-7816",
+      "nvd_cwe_ids": [
+        "CWE-22"
+      ],
+      "published_date": "2014-12-01T15:59:06.610"
+    },
+    "CVE-2016-10006": {
+      "cve_id": "CVE-2016-10006",
+      "description": "In OWASP AntiSamy before 1.5.5, by submitting a specially crafted input (a tag that supports style with active content), you could bypass the library protections and supply executable code. The impact is XSS.",
+      "modified_date": "2026-06-17T00:38:53.040",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2016-10006",
+      "nvd_cwe_ids": [
+        "CWE-79"
+      ],
+      "published_date": "2016-12-24T18:59:00.130"
+    },
+    "CVE-2016-10726": {
+      "cve_id": "CVE-2016-10726",
+      "description": "The XMLUI feature in DSpace before 3.6, 4.x before 4.5, and 5.x before 5.5 allows directory traversal via the themes/ path in an attack with two or more arbitrary characters and a colon before a pathname, as demonstrated by a themes/Reference/aa:etc/passwd URI.",
+      "modified_date": "2026-06-17T00:40:14.457",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2016-10726",
+      "nvd_cwe_ids": [
+        "CWE-22"
+      ],
+      "published_date": "2018-07-10T11:29:00.223"
+    },
+    "CVE-2016-5394": {
+      "cve_id": "CVE-2016-5394",
+      "description": "In the XSS Protection API module before 1.0.12 in Apache Sling, the encoding done by the XSSAPI.encodeForJSString() method is not restrictive enough and for some input patterns allows script tags to pass through unencoded, leading to potential XSS vulnerabilities.",
+      "modified_date": "2026-06-17T00:49:19.870",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2016-5394",
+      "nvd_cwe_ids": [
+        "CWE-79"
+      ],
+      "published_date": "2017-07-19T15:29:00.180"
+    },
+    "CVE-2016-6812": {
+      "cve_id": "CVE-2016-6812",
+      "description": "The HTTP transport module in Apache CXF prior to 3.0.12 and 3.1.x prior to 3.1.9 uses FormattedServiceListWriter to provide an HTML page which lists the names and absolute URL addresses of the available service endpoints. The module calculates the base URL using the current HttpServletRequest. The calculated base URL is used by FormattedServiceListWriter to build the service endpoint absolute URLs. If the unexpected matrix parameters have been injected into the request URL then these matrix parameters will find their way back to the client in the services list page which represents an XSS risk to the client.",
+      "modified_date": "2026-06-17T00:51:49.047",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2016-6812",
+      "nvd_cwe_ids": [
+        "CWE-79"
+      ],
+      "published_date": "2017-08-10T16:29:00.657"
+    },
+    "CVE-2016-9177": {
+      "cve_id": "CVE-2016-9177",
+      "description": "Directory traversal vulnerability in Spark 2.5 allows remote attackers to read arbitrary files via a .. (dot dot) in the URI.",
+      "modified_date": "2026-06-17T00:55:37.800",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2016-9177",
+      "nvd_cwe_ids": [
+        "CWE-22"
+      ],
+      "published_date": "2016-11-04T10:59:00.177"
+    },
+    "CVE-2017-1000487": {
+      "cve_id": "CVE-2017-1000487",
+      "description": "Plexus-utils before 3.0.16 is vulnerable to command injection because it does not correctly process the contents of double quoted strings.",
+      "modified_date": "2026-06-17T00:59:15.600",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2017-1000487",
+      "nvd_cwe_ids": [
+        "CWE-78"
+      ],
+      "published_date": "2018-01-03T20:29:00.703"
+    },
+    "CVE-2017-14735": {
+      "cve_id": "CVE-2017-14735",
+      "description": "OWASP AntiSamy before 1.5.7 allows XSS via HTML5 entities, as demonstrated by use of &colon; to construct a javascript: URL.",
+      "modified_date": "2026-06-17T01:06:42.020",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2017-14735",
+      "nvd_cwe_ids": [
+        "CWE-79"
+      ],
+      "published_date": "2017-09-25T21:29:01.147"
+    },
+    "CVE-2018-1000129": {
+      "cve_id": "CVE-2018-1000129",
+      "description": "An XSS vulnerability exists in the Jolokia agent version 1.3.7 in the HTTP servlet that allows an attacker to execute malicious javascript in the victim's browser.",
+      "modified_date": "2026-06-17T01:32:29.423",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2018-1000129",
+      "nvd_cwe_ids": [
+        "CWE-79"
+      ],
+      "published_date": "2018-03-14T13:29:00.237"
+    },
+    "CVE-2018-1000850": {
+      "cve_id": "CVE-2018-1000850",
+      "description": "Square Retrofit version versions from (including) 2.0 and 2.5.0 (excluding) contains a Directory Traversal vulnerability in RequestBuilder class, method addPathParameter that can result in By manipulating the URL an attacker could add or delete resources otherwise unavailable to her.. This attack appear to be exploitable via An attacker should have access to an encoded path parameter on POST, PUT or DELETE request.. This vulnerability appears to have been fixed in 2.5.0 and later.",
+      "modified_date": "2026-06-17T01:33:10.547",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2018-1000850",
+      "nvd_cwe_ids": [
+        "CWE-22"
+      ],
+      "published_date": "2018-12-20T15:29:02.423"
+    },
+    "CVE-2018-1002200": {
+      "cve_id": "CVE-2018-1002200",
+      "description": "plexus-archiver before 3.6.0 is vulnerable to directory traversal, allowing attackers to write to arbitrary files via a ../ (dot dot slash) in an archive entry that is mishandled during extraction. This vulnerability is also known as 'Zip-Slip'.",
+      "modified_date": "2026-06-17T01:33:21.030",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2018-1002200",
+      "nvd_cwe_ids": [
+        "CWE-22"
+      ],
+      "published_date": "2018-07-25T17:29:00.237"
+    },
+    "CVE-2018-1002201": {
+      "cve_id": "CVE-2018-1002201",
+      "description": "zt-zip before 1.13 is vulnerable to directory traversal, allowing attackers to write to arbitrary files via a ../ (dot dot slash) in a Zip archive entry that is mishandled during extraction. This vulnerability is also known as 'Zip-Slip'.",
+      "modified_date": "2026-06-17T01:33:21.180",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2018-1002201",
+      "nvd_cwe_ids": [
+        "CWE-22"
+      ],
+      "published_date": "2018-07-25T17:29:00.500"
+    },
+    "CVE-2018-1002202": {
+      "cve_id": "CVE-2018-1002202",
+      "description": "zip4j before 1.3.3 is vulnerable to directory traversal, allowing attackers to write to arbitrary files via a ../ (dot dot slash) in a Zip archive entry that is mishandled during extraction. This vulnerability is also known as 'Zip-Slip'.",
+      "modified_date": "2026-06-17T01:33:21.310",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2018-1002202",
+      "nvd_cwe_ids": [
+        "CWE-22"
+      ],
+      "published_date": "2018-07-25T17:29:00.797"
+    },
+    "CVE-2018-1047": {
+      "cve_id": "CVE-2018-1047",
+      "description": "A flaw was found in Wildfly 9.x. A path traversal vulnerability through the org.wildfly.extension.undertow.deployment.ServletResourceManager.getResource method could lead to information disclosure of arbitrary local files.",
+      "modified_date": "2026-06-17T01:50:21.677",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2018-1047",
+      "nvd_cwe_ids": [
+        "CWE-20",
+        "CWE-22"
+      ],
+      "published_date": "2018-01-24T23:29:00.527"
+    },
+    "CVE-2018-11762": {
+      "cve_id": "CVE-2018-11762",
+      "description": "In Apache Tika 0.9 to 1.18, in a rare edge case where a user does not specify an extract directory on the commandline (--extract-dir=) and the input file has an embedded file with an absolute path, such as \"C:/evil.bat\", tika-app would overwrite that file.",
+      "modified_date": "2026-06-17T01:36:32.037",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2018-11762",
+      "nvd_cwe_ids": [
+        "CWE-22"
+      ],
+      "published_date": "2018-09-19T14:29:00.397"
+    },
+    "CVE-2018-12036": {
+      "cve_id": "CVE-2018-12036",
+      "description": "OWASP Dependency-Check before 3.2.0 allows attackers to write to arbitrary files via a crafted archive that holds directory traversal filenames.",
+      "modified_date": "2026-06-17T01:37:02.603",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2018-12036",
+      "nvd_cwe_ids": [
+        "CWE-123",
+        "CWE-22"
+      ],
+      "published_date": "2018-06-07T18:29:00.207"
+    },
+    "CVE-2018-12542": {
+      "cve_id": "CVE-2018-12542",
+      "description": "In version from 3.0.0 to 3.5.3 of Eclipse Vert.x, the StaticHandler uses external input to construct a pathname that should be within a restricted directory, but it does not properly neutralize '\\' (forward slashes) sequences that can resolve to a location that is outside of that directory when running on Windows Operating Systems.",
+      "modified_date": "2026-06-17T01:37:56.650",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2018-12542",
+      "nvd_cwe_ids": [
+        "CWE-22"
+      ],
+      "published_date": "2018-10-10T20:29:00.553"
+    },
+    "CVE-2018-1260": {
+      "cve_id": "CVE-2018-1260",
+      "description": "Spring Security OAuth, versions 2.3 prior to 2.3.3, 2.2 prior to 2.2.2, 2.1 prior to 2.1.2, 2.0 prior to 2.0.15 and older unsupported versions contains a remote code execution vulnerability. A malicious user or attacker can craft an authorization request to the authorization endpoint that can lead to remote code execution when the resource owner is forwarded to the approval endpoint.",
+      "modified_date": "2026-06-17T01:50:50.423",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2018-1260",
+      "nvd_cwe_ids": [
+        "CWE-94"
+      ],
+      "published_date": "2018-05-11T20:29:00.353"
+    },
+    "CVE-2018-17297": {
+      "cve_id": "CVE-2018-17297",
+      "description": "The unzip function in ZipUtil.java in Hutool before 4.1.12 allows remote attackers to overwrite arbitrary files via directory traversal sequences in a filename within a ZIP archive.",
+      "modified_date": "2026-06-17T01:45:37.913",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2018-17297",
+      "nvd_cwe_ids": [
+        "CWE-22"
+      ],
+      "published_date": "2018-09-21T07:29:00.787"
+    },
+    "CVE-2018-8041": {
+      "cve_id": "CVE-2018-8041",
+      "description": "Apache Camel's Mail 2.20.0 through 2.20.3, 2.21.0 through 2.21.1 and 2.22.0 is vulnerable to path traversal.",
+      "modified_date": "2026-06-17T02:04:09.737",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2018-8041",
+      "nvd_cwe_ids": [
+        "CWE-22"
+      ],
+      "published_date": "2018-09-17T14:29:00.920"
+    },
+    "CVE-2018-9159": {
+      "cve_id": "CVE-2018-9159",
+      "description": "In Spark before 2.7.2, a remote attacker can read unintended static files via various representations of absolute or relative pathnames, as demonstrated by file: URLs and directory traversal sequences. NOTE: this product is unrelated to Ignite Realtime Spark.",
+      "modified_date": "2026-06-17T02:06:10.843",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2018-9159",
+      "nvd_cwe_ids": [
+        "CWE-22"
+      ],
+      "published_date": "2018-03-31T21:29:00.373"
+    },
+    "CVE-2019-0194": {
+      "cve_id": "CVE-2019-0194",
+      "description": "Apache Camel's File is vulnerable to directory traversal. Camel 2.21.0 to 2.21.3, 2.22.0 to 2.22.2, 2.23.0 and the unsupported Camel 2.x (2.19 and earlier) versions may be also affected.",
+      "modified_date": "2026-06-17T02:07:55.793",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2019-0194",
+      "nvd_cwe_ids": [
+        "CWE-22"
+      ],
+      "published_date": "2019-04-30T22:29:00.607"
+    },
+    "CVE-2019-0207": {
+      "cve_id": "CVE-2019-0207",
+      "description": "Tapestry processes assets `/assets/ctx` using classes chain `StaticFilesFilter -> AssetDispatcher -> ContextResource`, which doesn't filter the character `\\`, so attacker can perform a path traversal attack to read any files on Windows platform.",
+      "modified_date": "2026-06-17T02:07:58.360",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2019-0207",
+      "nvd_cwe_ids": [
+        "CWE-22"
+      ],
+      "published_date": "2019-09-16T17:15:13.183"
+    },
+    "CVE-2019-0222": {
+      "cve_id": "CVE-2019-0222",
+      "description": "In Apache ActiveMQ 5.0.0 - 5.15.8, unmarshalling corrupt MQTT frame can lead to broker Out of Memory exception making it unresponsive.",
+      "modified_date": "2026-06-17T02:08:01.337",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2019-0222",
+      "nvd_cwe_ids": [],
+      "published_date": "2019-03-28T22:29:00.433"
+    },
+    "CVE-2019-0225": {
+      "cve_id": "CVE-2019-0225",
+      "description": "A specially crafted url could be used to access files under the ROOT directory of the application on Apache JSPWiki 2.9.0 to 2.11.0.M2, which could be used by an attacker to obtain registered users' details.",
+      "modified_date": "2026-06-17T02:08:01.920",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2019-0225",
+      "nvd_cwe_ids": [
+        "CWE-22"
+      ],
+      "published_date": "2019-03-28T22:29:00.683"
+    },
+    "CVE-2019-10076": {
+      "cve_id": "CVE-2019-10076",
+      "description": "A carefully crafted malicious attachment could trigger an XSS vulnerability on Apache JSPWiki 2.9.0 to 2.11.0.M3, which could lead to session hijacking.",
+      "modified_date": "2026-06-17T02:10:10.077",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2019-10076",
+      "nvd_cwe_ids": [
+        "CWE-79"
+      ],
+      "published_date": "2019-05-20T21:29:00.753"
+    },
+    "CVE-2019-10077": {
+      "cve_id": "CVE-2019-10077",
+      "description": "A carefully crafted InterWiki link could trigger an XSS vulnerability on Apache JSPWiki 2.9.0 to 2.11.0.M3, which could lead to session hijacking.",
+      "modified_date": "2026-06-17T02:10:10.200",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2019-10077",
+      "nvd_cwe_ids": [
+        "CWE-79"
+      ],
+      "published_date": "2019-05-20T21:29:00.817"
+    },
+    "CVE-2019-10078": {
+      "cve_id": "CVE-2019-10078",
+      "description": "A carefully crafted plugin link invocation could trigger an XSS vulnerability on Apache JSPWiki 2.9.0 to 2.11.0.M3, which could lead to session hijacking. Initial reporting indicated ReferredPagesPlugin, but further analysis showed that multiple plugins were vulnerable.",
+      "modified_date": "2026-06-17T02:10:10.317",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2019-10078",
+      "nvd_cwe_ids": [
+        "CWE-79"
+      ],
+      "published_date": "2019-05-20T21:29:00.877"
+    },
+    "CVE-2019-10089": {
+      "cve_id": "CVE-2019-10089",
+      "description": "On Apache JSPWiki, up to version 2.11.0.M4, a carefully crafted plugin link invocation could trigger an XSS vulnerability on Apache JSPWiki, related to the WYSIWYG editor, which could allow the attacker to execute javascript in the victim's browser and get some sensitive information about the victim.",
+      "modified_date": "2026-06-17T02:10:12.487",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2019-10089",
+      "nvd_cwe_ids": [
+        "CWE-79"
+      ],
+      "published_date": "2019-09-23T15:15:10.420"
+    },
+    "CVE-2019-10219": {
+      "cve_id": "CVE-2019-10219",
+      "description": "A vulnerability was found in Hibernate-Validator. The SafeHtml validator annotation fails to properly sanitize payloads consisting of potentially malicious code in HTML comments and instructions. This vulnerability can result in an XSS attack.",
+      "modified_date": "2026-10-08T22:16:49.207",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2019-10219",
+      "nvd_cwe_ids": [
+        "CWE-79"
+      ],
+      "published_date": "2019-11-08T15:15:11.157"
+    },
+    "CVE-2019-10392": {
+      "cve_id": "CVE-2019-10392",
+      "description": "Jenkins Git Client Plugin 2.8.4 and earlier and 3.0.0-rc did not properly restrict values passed as URL argument to an invocation of 'git ls-remote', resulting in OS command injection.",
+      "modified_date": "2026-06-17T02:10:51.027",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2019-10392",
+      "nvd_cwe_ids": [
+        "CWE-78"
+      ],
+      "published_date": "2019-09-12T14:15:11.257"
+    },
+    "CVE-2019-17572": {
+      "cve_id": "CVE-2019-17572",
+      "description": "In Apache RocketMQ 4.2.0 to 4.6.0, when the automatic topic creation in the broker is turned on by default, an evil topic like “../../../../topic2020” is sent from rocketmq-client to the broker, a topic folder will be created in the parent directory in brokers, which leads to a directory traversal vulnerability. Users of the affected versions should apply one of the following: Upgrade to Apache RocketMQ 4.6.1 or later.",
+      "modified_date": "2026-06-17T02:24:12.187",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2019-17572",
+      "nvd_cwe_ids": [
+        "CWE-22"
+      ],
+      "published_date": "2020-05-14T17:15:11.977"
+    },
+    "CVE-2019-17573": {
+      "cve_id": "CVE-2019-17573",
+      "description": "By default, Apache CXF creates a /services page containing a listing of the available endpoint names and addresses. This webpage is vulnerable to a reflected Cross-Site Scripting (XSS) attack, which allows a malicious actor to inject javascript into the web page. Please note that the attack exploits a feature which is not typically not present in modern browsers, who remove dot segments before sending the request. However, Mobile applications may be vulnerable.",
+      "modified_date": "2026-06-17T02:24:12.303",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2019-17573",
+      "nvd_cwe_ids": [
+        "CWE-79"
+      ],
+      "published_date": "2020-01-16T18:15:11.587"
+    },
+    "CVE-2019-17640": {
+      "cve_id": "CVE-2019-17640",
+      "description": "In Eclipse Vert.x 3.4.x up to 3.9.4, 4.0.0.milestone1, 4.0.0.milestone2, 4.0.0.milestone3, 4.0.0.milestone4, 4.0.0.milestone5, 4.0.0.Beta1, 4.0.0.Beta2, and 4.0.0.Beta3, StaticHandler doesn't correctly processes back slashes on Windows Operating systems, allowing, escape the webroot folder to the current working directory.",
+      "modified_date": "2026-06-17T02:24:19.793",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2019-17640",
+      "nvd_cwe_ids": [
+        "CWE-22",
+        "CWE-23"
+      ],
+      "published_date": "2020-10-15T21:15:11.427"
+    },
+    "CVE-2020-11998": {
+      "cve_id": "CVE-2020-11998",
+      "description": "A regression has been introduced in the commit preventing JMX re-bind. By passing an empty environment map to RMIConnectorServer, instead of the map that contains the authentication credentials, it leaves ActiveMQ open to the following attack: https://docs.oracle.com/javase/8/docs/technotes/guides/management/agent.html \"A remote client could create a javax.management.loading.MLet MBean and use it to create new MBeans from arbitrary URLs, at least if there is no security manager. In other words, a rogue remote client could make your Java application execute arbitrary code.\" Mitigation: Upgrade to Apache ActiveMQ 5.15.13",
+      "modified_date": "2026-06-17T02:51:13.523",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2020-11998",
+      "nvd_cwe_ids": [],
+      "published_date": "2020-09-10T19:15:13.083"
+    },
+    "CVE-2020-13973": {
+      "cve_id": "CVE-2020-13973",
+      "description": "OWASP json-sanitizer before 1.2.1 allows XSS. An attacker who controls a substring of the input JSON, and controls another substring adjacent to a SCRIPT element in which the output is embedded as JavaScript, may be able to confuse the HTML parser as to where the SCRIPT element ends, and cause non-script content to be interpreted as JavaScript.",
+      "modified_date": "2026-06-17T02:54:02.260",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2020-13973",
+      "nvd_cwe_ids": [
+        "CWE-79"
+      ],
+      "published_date": "2020-06-09T04:15:10.983"
+    },
+    "CVE-2020-15231": {
+      "cve_id": "CVE-2020-15231",
+      "description": "In mapfish-print before version 3.24, a user can use the JSONP support to do a Cross-site scripting.",
+      "modified_date": "2026-06-17T02:56:19.260",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2020-15231",
+      "nvd_cwe_ids": [
+        "CWE-79"
+      ],
+      "published_date": "2020-10-02T20:15:12.567"
+    },
+    "CVE-2020-17519": {
+      "cve_id": "CVE-2020-17519",
+      "description": "A change introduced in Apache Flink 1.11.0 (and released in 1.11.1 and 1.11.2 as well) allows attackers to read any file on the local filesystem of the JobManager through the REST interface of the JobManager process. Access is restricted to files accessible by the JobManager process. All users should upgrade to Flink 1.11.3 or 1.12.0 if their Flink instance(s) are exposed. The issue was fixed in commit b561010b0ee741543c3953306037f00d7a9f0801 from apache/flink:master.",
+      "modified_date": "2026-06-17T02:59:04.010",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2020-17519",
+      "nvd_cwe_ids": [
+        "CWE-552"
+      ],
+      "published_date": "2021-01-05T12:15:12.680"
+    },
+    "CVE-2020-17530": {
+      "cve_id": "CVE-2020-17530",
+      "description": "Forced OGNL evaluation, when evaluated on raw user input in tag attributes, may lead to remote code execution. Affected software : Apache Struts 2.0.0 - Struts 2.5.25.",
+      "modified_date": "2026-06-17T02:59:05.640",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2020-17530",
+      "nvd_cwe_ids": [
+        "CWE-917"
+      ],
+      "published_date": "2020-12-11T02:15:10.883"
+    },
+    "CVE-2020-2261": {
+      "cve_id": "CVE-2020-2261",
+      "description": "Jenkins Perfecto Plugin 1.17 and earlier executes a command on the Jenkins controller, allowing attackers with Job/Configure permission to run arbitrary commands on the Jenkins controller",
+      "modified_date": "2026-06-17T03:12:05.717",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2020-2261",
+      "nvd_cwe_ids": [
+        "CWE-78"
+      ],
+      "published_date": "2020-09-16T14:15:13.640"
+    },
+    "CVE-2020-26217": {
+      "cve_id": "CVE-2020-26217",
+      "description": "XStream before version 1.4.14 is vulnerable to Remote Code Execution.The vulnerability may allow a remote attacker to run arbitrary shell commands only by manipulating the processed input stream. Only users who rely on blocklists are affected. Anyone using XStream's Security Framework allowlist is not affected. The linked advisory provides code workarounds for users who cannot upgrade. The issue is fixed in version 1.4.14.",
+      "modified_date": "2026-10-07T19:17:17.070",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2020-26217",
+      "nvd_cwe_ids": [
+        "CWE-78"
+      ],
+      "published_date": "2020-11-16T21:15:12.893"
+    },
+    "CVE-2020-27219": {
+      "cve_id": "CVE-2020-27219",
+      "description": "In all version of Eclipse Hawkbit prior to 0.3.0M7, the HTTP 404 (Not Found) JSON response body returned by the REST API may contain unsafe characters within the path attribute. Sending a POST request to a non existing resource will return the full path from the given URL unescaped to the client.",
+      "modified_date": "2026-06-17T03:08:59.233",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2020-27219",
+      "nvd_cwe_ids": [
+        "CWE-79"
+      ],
+      "published_date": "2021-01-14T23:15:12.977"
+    },
+    "CVE-2020-29204": {
+      "cve_id": "CVE-2020-29204",
+      "description": "XXL-JOB 2.2.0 allows Stored XSS (in Add User) to bypass the 20-character limit via xxl-job-admin/src/main/java/com/xxl/job/admin/controller/UserController.java.",
+      "modified_date": "2026-06-17T03:11:07.977",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2020-29204",
+      "nvd_cwe_ids": [
+        "CWE-79"
+      ],
+      "published_date": "2020-12-27T06:15:12.387"
+    },
+    "CVE-2020-35460": {
+      "cve_id": "CVE-2020-35460",
+      "description": "common/InputStreamHelper.java in Packwood MPXJ before 8.3.5 allows directory traversal in the zip stream handler flow, leading to the writing of files to arbitrary locations.",
+      "modified_date": "2026-06-17T03:13:44.937",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2020-35460",
+      "nvd_cwe_ids": [
+        "CWE-22"
+      ],
+      "published_date": "2020-12-14T23:15:12.267"
+    },
+    "CVE-2020-5405": {
+      "cve_id": "CVE-2020-5405",
+      "description": "Spring Cloud Config, versions 2.2.x prior to 2.2.2, versions 2.1.x prior to 2.1.7, and older unsupported versions allow applications to serve arbitrary configuration files through the spring-cloud-config-server module. A malicious user, or attacker, can send a request using a specially crafted URL that can lead a directory traversal attack.",
+      "modified_date": "2026-06-17T03:21:25.987",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2020-5405",
+      "nvd_cwe_ids": [
+        "CWE-22",
+        "CWE-23"
+      ],
+      "published_date": "2020-03-05T19:15:11.700"
+    },
+    "CVE-2020-5410": {
+      "cve_id": "CVE-2020-5410",
+      "description": "Spring Cloud Config, versions 2.2.x prior to 2.2.3, versions 2.1.x prior to 2.1.9, and older unsupported versions allow applications to serve arbitrary configuration files through the spring-cloud-config-server module. A malicious user, or attacker, can send a request using a specially crafted URL that can lead to a directory traversal attack.",
+      "modified_date": "2026-06-17T03:21:26.550",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2020-5410",
+      "nvd_cwe_ids": [
+        "CWE-22",
+        "CWE-23"
+      ],
+      "published_date": "2020-06-02T17:15:11.690"
+    },
+    "CVE-2020-8570": {
+      "cve_id": "CVE-2020-8570",
+      "description": "Kubernetes Java client libraries in version 10.0.0 and versions prior to 9.0.1 allow writes to paths outside of the current directory when copying multiple files from a remote pod which sends a maliciously crafted archive. This can potentially overwrite any files on the system of the process executing the client code.",
+      "modified_date": "2026-06-17T03:26:34.343",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2020-8570",
+      "nvd_cwe_ids": [
+        "CWE-22",
+        "CWE-23"
+      ],
+      "published_date": "2021-01-21T17:15:14.327"
+    },
+    "CVE-2021-21345": {
+      "cve_id": "CVE-2021-21345",
+      "description": "XStream is a Java library to serialize objects to XML and back again. In XStream before version 1.4.16, there is a vulnerability which may allow a remote attacker who has sufficient rights to execute commands of the host only by manipulating the processed input stream. No user is affected, who followed the recommendation to setup XStream's security framework with a whitelist limited to the minimal required types. If you rely on XStream's default blacklist of the Security Framework, you will have to use at least version 1.4.16.",
+      "modified_date": "2026-10-07T19:17:23.537",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2021-21345",
+      "nvd_cwe_ids": [
+        "CWE-502",
+        "CWE-78",
+        "CWE-94"
+      ],
+      "published_date": "2021-03-23T00:15:12.787"
+    },
+    "CVE-2021-29425": {
+      "cve_id": "CVE-2021-29425",
+      "description": "In Apache Commons IO before 2.7, When invoking the method FileNameUtils.normalize with an improper input string, like \"//../foo\", or \"\\\\..\\foo\", the result would be the same value, thus possibly providing access to files in the parent directory, but not further above (thus \"limited\" path traversal), if the calling code would use the result to construct a path value.",
+      "modified_date": "2026-10-07T19:17:25.603",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2021-29425",
+      "nvd_cwe_ids": [
+        "CWE-20",
+        "CWE-22"
+      ],
+      "published_date": "2021-04-13T07:15:12.327"
+    },
+    "CVE-2021-30180": {
+      "cve_id": "CVE-2021-30180",
+      "description": "Apache Dubbo prior to 2.7.9 support Tag routing which will enable a customer to route the request to the right server. These rules are used by the customers when making a request in order to find the right endpoint. When parsing these YAML rules, Dubbo customers may enable calling arbitrary constructors.",
+      "modified_date": "2026-06-17T03:49:49.483",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2021-30180",
+      "nvd_cwe_ids": [
+        "CWE-444"
+      ],
+      "published_date": "2021-06-01T14:15:09.937"
+    },
+    "CVE-2021-30181": {
+      "cve_id": "CVE-2021-30181",
+      "description": "Apache Dubbo prior to 2.6.9 and 2.7.9 supports Script routing which will enable a customer to route the request to the right server. These rules are used by the customers when making a request in order to find the right endpoint. When parsing these rules, Dubbo customers use ScriptEngine and run the rule provided by the script which by default may enable executing arbitrary code.",
+      "modified_date": "2026-06-17T03:49:49.587",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2021-30181",
+      "nvd_cwe_ids": [],
+      "published_date": "2021-06-01T14:15:09.967"
+    },
+    "CVE-2021-41269": {
+      "cve_id": "CVE-2021-41269",
+      "description": "cron-utils is a Java library to define, parse, validate, migrate crons as well as get human readable descriptions for them. In affected versions A template Injection was identified in cron-utils enabling attackers to inject arbitrary Java EL expressions, leading to unauthenticated Remote Code Execution (RCE) vulnerability. Versions up to 9.1.2 are susceptible to this vulnerability. Please note, that only projects using the @Cron annotation to validate untrusted Cron expressions are affected. The issue was patched and a new version was released. Please upgrade to version 9.1.6. There are no known workarounds known.",
+      "modified_date": "2026-06-17T04:08:12.490",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2021-41269",
+      "nvd_cwe_ids": [
+        "CWE-94"
+      ],
+      "published_date": "2021-11-15T21:15:07.393"
+    },
+    "CVE-2021-4178": {
+      "cve_id": "CVE-2021-4178",
+      "description": "A arbitrary code execution flaw was found in the Fabric 8 Kubernetes client affecting versions 5.0.0-beta-1 and above. Due to an improperly configured YAML parsing, this will allow a local and privileged attacker to supply malicious YAML.",
+      "modified_date": "2026-06-17T04:19:09.863",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2021-4178",
+      "nvd_cwe_ids": [
+        "CWE-502"
+      ],
+      "published_date": "2022-08-24T16:15:09.770"
+    },
+    "CVE-2021-44667": {
+      "cve_id": "CVE-2021-44667",
+      "description": "A Cross Site Scripting (XSS) vulnerability exists in Nacos 2.0.3 in auth/users via the (1) pageSize and (2) pageNo parameters.",
+      "modified_date": "2026-06-17T04:12:39.810",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2021-44667",
+      "nvd_cwe_ids": [
+        "CWE-79"
+      ],
+      "published_date": "2022-03-11T19:15:09.023"
+    },
+    "CVE-2022-1274": {
+      "cve_id": "CVE-2022-1274",
+      "description": "A flaw was found in Keycloak in the execute-actions-email endpoint. This issue allows arbitrary HTML to be injected into emails sent to Keycloak users and can be misused to perform phishing or other attacks against users.",
+      "modified_date": "2026-06-17T04:22:07.933",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2022-1274",
+      "nvd_cwe_ids": [
+        "CWE-79",
+        "CWE-80"
+      ],
+      "published_date": "2023-03-29T21:15:07.853"
+    },
+    "CVE-2022-20617": {
+      "cve_id": "CVE-2022-20617",
+      "description": "Jenkins Docker Commons Plugin 1.17 and earlier does not sanitize the name of an image or a tag, resulting in an OS command execution vulnerability exploitable by attackers with Item/Configure permission or able to control the contents of a previously configured job's SCM repository.",
+      "modified_date": "2026-06-17T04:24:41.960",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2022-20617",
+      "nvd_cwe_ids": [
+        "CWE-78"
+      ],
+      "published_date": "2022-01-12T20:15:08.907"
+    },
+    "CVE-2022-22931": {
+      "cve_id": "CVE-2022-22931",
+      "description": "Fix of CVE-2021-40525 do not prepend delimiters upon valid directory validations. Affected implementations include: - maildir mailbox store - Sieve file repository This enables a user to access other users data stores (limited to user names being prefixed by the value of the username being used).",
+      "modified_date": "2026-06-17T04:29:11.940",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2022-22931",
+      "nvd_cwe_ids": [
+        "CWE-22"
+      ],
+      "published_date": "2022-02-07T19:15:08.300"
+    },
+    "CVE-2022-22932": {
+      "cve_id": "CVE-2022-22932",
+      "description": "Apache Karaf obr:* commands and run goal on the karaf-maven-plugin have partial path traversal which allows to break out of expected folder. The risk is low as obr:* commands are not very used and the entry is set by user. This has been fixed in revision: https://gitbox.apache.org/repos/asf?p=karaf.git;h=36a2bc4 https://gitbox.apache.org/repos/asf?p=karaf.git;h=52b70cf Mitigation: Apache Karaf users should upgrade to 4.2.15 or 4.3.6 or later as soon as possible, or use correct path. JIRA Tickets: https://issues.apache.org/jira/browse/KARAF-7326",
+      "modified_date": "2026-06-17T04:29:12.040",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2022-22932",
+      "nvd_cwe_ids": [
+        "CWE-22"
+      ],
+      "published_date": "2022-01-26T11:15:09.583"
+    },
+    "CVE-2022-22947": {
+      "cve_id": "CVE-2022-22947",
+      "description": "In spring cloud gateway versions prior to 3.1.1+ and 3.0.7+ , applications are vulnerable to a code injection attack when the Gateway Actuator endpoint is enabled, exposed and unsecured. A remote attacker could make a maliciously crafted request that could allow arbitrary remote execution on the remote host.",
+      "modified_date": "2026-06-17T04:29:13.420",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2022-22947",
+      "nvd_cwe_ids": [
+        "CWE-917",
+        "CWE-94"
+      ],
+      "published_date": "2022-03-03T22:15:08.673"
+    },
+    "CVE-2022-22965": {
+      "cve_id": "CVE-2022-22965",
+      "description": "A Spring MVC or Spring WebFlux application running on JDK 9+ may be vulnerable to remote code execution (RCE) via data binding. The specific exploit requires the application to run on Tomcat as a WAR deployment. If the application is deployed as a Spring Boot executable jar, i.e. the default, it is not vulnerable to the exploit. However, the nature of the vulnerability is more general, and there may be other ways to exploit it.",
+      "modified_date": "2026-06-17T04:29:15.610",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2022-22965",
+      "nvd_cwe_ids": [
+        "CWE-94"
+      ],
+      "published_date": "2022-04-01T23:15:13.870"
+    },
+    "CVE-2022-23082": {
+      "cve_id": "CVE-2022-23082",
+      "description": "In CureKit versions v1.0.1 through v1.1.3 are vulnerable to path traversal as the function isFileOutsideDir fails to sanitize the user input which may lead to path traversal.",
+      "modified_date": "2026-06-17T04:29:28.213",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2022-23082",
+      "nvd_cwe_ids": [
+        "CWE-22"
+      ],
+      "published_date": "2022-05-31T15:15:07.887"
+    },
+    "CVE-2022-23457": {
+      "cve_id": "CVE-2022-23457",
+      "description": "ESAPI (The OWASP Enterprise Security API) is a free, open source, web application security control library. Prior to version 2.3.0.0, the default implementation of `Validator.getValidDirectoryPath(String, String, File, boolean)` may incorrectly treat the tested input string as a child of the specified parent directory. This potentially could allow control-flow bypass checks to be defeated if an attack can specify the entire string representing the 'input' path. This vulnerability is patched in release 2.3.0.0 of ESAPI. As a workaround, it is possible to write one's own implementation of the Validator interface. However, maintainers do not recommend this.",
+      "modified_date": "2026-06-17T04:30:09.737",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2022-23457",
+      "nvd_cwe_ids": [
+        "CWE-22"
+      ],
+      "published_date": "2022-04-25T20:15:41.870"
+    },
+    "CVE-2022-24891": {
+      "cve_id": "CVE-2022-24891",
+      "description": "ESAPI (The OWASP Enterprise Security API) is a free, open source, web application security control library. Prior to version 2.3.0.0, there is a potential for a cross-site scripting vulnerability in ESAPI caused by a incorrect regular expression for \"onsiteURL\" in the **antisamy-esapi.xml** configuration file that can cause \"javascript:\" URLs to fail to be correctly sanitized. This issue is patched in ESAPI 2.3.0.0. As a workaround, manually edit the **antisamy-esapi.xml** configuration files to change the \"onsiteURL\" regular expression. More information about remediation of the vulnerability, including the workaround, is available in the maintainers' release notes and security bulletin.",
+      "modified_date": "2026-06-17T04:32:44.617",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2022-24891",
+      "nvd_cwe_ids": [
+        "CWE-79"
+      ],
+      "published_date": "2022-04-27T21:15:08.523"
+    },
+    "CVE-2022-24897": {
+      "cve_id": "CVE-2022-24897",
+      "description": "APIs to evaluate content with Velocity is a package for APIs to evaluate content with Velocity. Starting with version 2.3 and prior to 12.6.7, 12.10.3, and 13.0, the velocity scripts are not properly sandboxed against using the Java File API to perform read or write operations on the filesystem. Writing an attacking script in Velocity requires the Script rights in XWiki so not all users can use it, and it also requires finding an XWiki API which returns a File. The problem has been patched in versions 12.6.7, 12.10.3, and 13.0. There is no easy workaround for fixing this vulnerability other than upgrading and being careful when giving Script rights.",
+      "modified_date": "2026-06-17T04:32:45.360",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2022-24897",
+      "nvd_cwe_ids": [
+        "CWE-22"
+      ],
+      "published_date": "2022-05-02T22:15:09.767"
+    },
+    "CVE-2022-25173": {
+      "cve_id": "CVE-2022-25173",
+      "description": "Jenkins Pipeline: Groovy Plugin 2648.va9433432b33c and earlier uses the same checkout directories for distinct SCMs when reading the script file (typically Jenkinsfile) for Pipelines, allowing attackers with Item/Configure permission to invoke arbitrary OS commands on the controller through crafted SCM contents.",
+      "modified_date": "2026-06-17T04:33:08.970",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2022-25173",
+      "nvd_cwe_ids": [
+        "CWE-78"
+      ],
+      "published_date": "2022-02-15T17:15:08.477"
+    },
+    "CVE-2022-25174": {
+      "cve_id": "CVE-2022-25174",
+      "description": "Jenkins Pipeline: Shared Groovy Libraries Plugin 552.vd9cc05b8a2e1 and earlier uses the same checkout directories for distinct SCMs for Pipeline libraries, allowing attackers with Item/Configure permission to invoke arbitrary OS commands on the controller through crafted SCM contents.",
+      "modified_date": "2026-06-17T04:33:09.067",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2022-25174",
+      "nvd_cwe_ids": [
+        "CWE-78"
+      ],
+      "published_date": "2022-02-15T17:15:08.560"
+    },
+    "CVE-2022-25175": {
+      "cve_id": "CVE-2022-25175",
+      "description": "Jenkins Pipeline: Multibranch Plugin 706.vd43c65dec013 and earlier uses the same checkout directories for distinct SCMs for the readTrusted step, allowing attackers with Item/Configure permission to invoke arbitrary OS commands on the controller through crafted SCM contents.",
+      "modified_date": "2026-06-17T04:33:09.160",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2022-25175",
+      "nvd_cwe_ids": [
+        "CWE-78"
+      ],
+      "published_date": "2022-02-15T17:15:08.627"
+    },
+    "CVE-2022-25842": {
+      "cve_id": "CVE-2022-25842",
+      "description": "All versions of package com.alibaba.oneagent:one-java-agent-plugin are vulnerable to Arbitrary File Write via Archive Extraction (Zip Slip) using a specially crafted archive that holds directory traversal filenames (e.g. ../../evil.exe). The attacker can overwrite executable files and either invoke them remotely or wait for the system or user to call them, thus achieving remote command execution on the victim’s machine.",
+      "modified_date": "2026-06-17T04:34:22.557",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2022-25842",
+      "nvd_cwe_ids": [
+        "CWE-22"
+      ],
+      "published_date": "2022-05-01T16:15:08.710"
+    },
+    "CVE-2022-26049": {
+      "cve_id": "CVE-2022-26049",
+      "description": "This affects the package com.diffplug.gradle:goomph before 3.37.2. It allows a malicious zip file to potentially break out of the expected destination directory, writing contents into arbitrary locations on the file system. Overwriting certain files/directories could allow an attacker to achieve remote code execution on a target system by exploiting this vulnerability. **Note:** This could have allowed a malicious zip file to extract itself into an arbitrary directory. The only file that Goomph extracts is the p2 bootstrapper and eclipse metadata files hosted at eclipse.org, which are not malicious, so the only way this vulnerability could have affected you is if you had set a custom bootstrap zip, and that zip was malicious.",
+      "modified_date": "2026-06-17T04:34:36.637",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2022-26049",
+      "nvd_cwe_ids": [
+        "CWE-22"
+      ],
+      "published_date": "2022-09-11T14:15:08.887"
+    },
+    "CVE-2022-26884": {
+      "cve_id": "CVE-2022-26884",
+      "description": "Users can read any files by log server, Apache DolphinScheduler users should upgrade to version 2.0.6 or higher.",
+      "modified_date": "2026-06-17T04:36:03.417",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2022-26884",
+      "nvd_cwe_ids": [
+        "CWE-22"
+      ],
+      "published_date": "2022-10-28T08:15:08.927"
+    },
+    "CVE-2022-2712": {
+      "cve_id": "CVE-2022-2712",
+      "description": "In Eclipse GlassFish versions 5.1.0 to 6.2.5, there is a vulnerability in relative path traversal because it does not filter request path starting with './'. Successful exploitation could allow an remote unauthenticated attacker to access critical data, such as configuration files and deployed application source code. This is fixed in GlassFish 7.0.0.",
+      "modified_date": "2026-07-22T15:16:49.977",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2022-2712",
+      "nvd_cwe_ids": [
+        "CWE-22"
+      ],
+      "published_date": "2023-01-27T10:15:09.033"
+    },
+    "CVE-2022-28367": {
+      "cve_id": "CVE-2022-28367",
+      "description": "OWASP AntiSamy before 1.6.6 allows XSS via HTML tag smuggling on STYLE content with crafted input. The output serializer does not properly encode the supposed Cascading Style Sheets (CSS) content.",
+      "modified_date": "2026-06-17T04:38:26.397",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2022-28367",
+      "nvd_cwe_ids": [
+        "CWE-79"
+      ],
+      "published_date": "2022-04-21T23:15:10.427"
+    },
+    "CVE-2022-29577": {
+      "cve_id": "CVE-2022-29577",
+      "description": "OWASP AntiSamy before 1.6.7 allows XSS via HTML tag smuggling on STYLE content with crafted input. The output serializer does not properly encode the supposed Cascading Style Sheets (CSS) content. NOTE: this issue exists because of an incomplete fix for CVE-2022-28367.",
+      "modified_date": "2026-10-08T22:17:20.680",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2022-29577",
+      "nvd_cwe_ids": [
+        "CWE-79"
+      ],
+      "published_date": "2022-04-21T23:15:10.467"
+    },
+    "CVE-2022-31159": {
+      "cve_id": "CVE-2022-31159",
+      "description": "The AWS SDK for Java enables Java developers to work with Amazon Web Services. A partial-path traversal issue exists within the `downloadDirectory` method in the AWS S3 TransferManager component of the AWS SDK for Java v1 prior to version 1.12.261. Applications using the SDK control the `destinationDirectory` argument, but S3 object keys are determined by the application that uploaded the objects. The `downloadDirectory` method allows the caller to pass a filesystem object in the object key but contained an issue in the validation logic for the key name. A knowledgeable actor could bypass the validation logic by including a UNIX double-dot in the bucket key. Under certain conditions, this could permit them to retrieve a directory from their S3 bucket that is one level up in the filesystem from their working directory. This issue’s scope is limited to directories whose name prefix matches the destinationDirectory. E.g. for destination directory`/tmp/foo`, the actor can cause a download to `/tmp/foo-bar`, but not `/tmp/bar`. If `com.amazonaws.services.s3.transfer.TransferManager::downloadDirectory` is used to download an untrusted buckets contents, the contents of that bucket can be written outside of the intended destination directory. Version 1.12.261 contains a patch for this issue. As a workaround, when calling `com.amazonaws.services.s3.transfer.TransferManager::downloadDirectory`, pass a `KeyFilter` that forbids `S3ObjectSummary` objects that `getKey` method return a string containing the substring `..` .",
+      "modified_date": "2026-06-17T04:44:55.713",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2022-31159",
+      "nvd_cwe_ids": [
+        "CWE-22"
+      ],
+      "published_date": "2022-07-15T18:15:09.037"
+    },
+    "CVE-2022-31192": {
+      "cve_id": "CVE-2022-31192",
+      "description": "DSpace open source software is a repository application which provides durable access to digital resources. dspace-jspui is a UI component for DSpace. The JSPUI \"Request a Copy\" feature does not properly escape values submitted and stored from the \"Request a Copy\" form. This means that item requests could be vulnerable to XSS attacks. This vulnerability only impacts the JSPUI. Users are advised to upgrade. There are no known workarounds for this vulnerability.",
+      "modified_date": "2026-06-17T04:45:00.067",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2022-31192",
+      "nvd_cwe_ids": [
+        "CWE-79"
+      ],
+      "published_date": "2022-08-01T21:15:13.347"
+    },
+    "CVE-2022-31194": {
+      "cve_id": "CVE-2022-31194",
+      "description": "DSpace open source software is a repository application which provides durable access to digital resources. dspace-jspui is a UI component for DSpace. The JSPUI resumable upload implementations in SubmissionController and FileUploadRequest are vulnerable to multiple path traversal attacks, allowing an attacker to create files/directories anywhere on the server writable by the Tomcat/DSpace user, by modifying some request parameters during submission. This path traversal can only be executed by a user with special privileges (submitter rights). This vulnerability only impacts the JSPUI. Users are advised to upgrade. There are no known workarounds. However, this vulnerability cannot be exploited by an anonymous user or a basic user. The user must first have submitter privileges to at least one Collection and be able to determine how to modify the request parameters to exploit the vulnerability.",
+      "modified_date": "2026-06-17T04:45:00.327",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2022-31194",
+      "nvd_cwe_ids": [
+        "CWE-22"
+      ],
+      "published_date": "2022-08-01T21:15:13.490"
+    },
+    "CVE-2022-31195": {
+      "cve_id": "CVE-2022-31195",
+      "description": "DSpace open source software is a repository application which provides durable access to digital resources. In affected versions the ItemImportServiceImpl is vulnerable to a path traversal vulnerability. This means a malicious SAF (simple archive format) package could cause a file/directory to be created anywhere the Tomcat/DSpace user can write to on the server. However, this path traversal vulnerability is only possible by a user with special privileges (either Administrators or someone with command-line access to the server). This vulnerability impacts the XMLUI, JSPUI and command-line. Users are advised to upgrade. As a basic workaround, users may block all access to the following URL paths: If you are using the XMLUI, block all access to /admin/batchimport path (this is the URL of the Admin Batch Import tool). Keep in mind, if your site uses the path \"/xmlui\", then you'd need to block access to /xmlui/admin/batchimport. If you are using the JSPUI, block all access to /dspace-admin/batchimport path (this is the URL of the Admin Batch Import tool). Keep in mind, if your site uses the path \"/jspui\", then you'd need to block access to /jspui/dspace-admin/batchimport. Keep in mind, only an Administrative user or a user with command-line access to the server is able to import/upload SAF packages. Therefore, assuming those users do not blindly upload untrusted SAF packages, then it is unlikely your site could be impacted by this vulnerability.",
+      "modified_date": "2026-06-17T04:45:00.470",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2022-31195",
+      "nvd_cwe_ids": [
+        "CWE-22"
+      ],
+      "published_date": "2022-08-01T21:15:13.557"
+    },
+    "CVE-2022-32287": {
+      "cve_id": "CVE-2022-32287",
+      "description": "A relative path traversal vulnerability in a FileUtil class used by the PEAR management component of Apache UIMA allows an attacker to create files outside the designated target directory using carefully crafted ZIP entry names. This issue affects Apache UIMA Apache UIMA version 3.3.0 and prior versions. Note that PEAR files should never be installed into an UIMA installation from untrusted sources because PEAR archives are executable plugins that will be able to perform any actions with the same privileges as the host Java Virtual Machine.",
+      "modified_date": "2026-06-17T04:47:04.090",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2022-32287",
+      "nvd_cwe_ids": [
+        "CWE-22"
+      ],
+      "published_date": "2022-11-03T12:15:09.743"
+    },
+    "CVE-2022-33140": {
+      "cve_id": "CVE-2022-33140",
+      "description": "The optional ShellUserGroupProvider in Apache NiFi 1.10.0 to 1.16.2 and Apache NiFi Registry 0.6.0 to 1.16.2 does not neutralize arguments for group resolution commands, allowing injection of operating system commands on Linux and macOS platforms. The ShellUserGroupProvider is not included in the default configuration. Command injection requires ShellUserGroupProvider to be one of the enabled User Group Providers in the Authorizers configuration. Command injection also requires an authenticated user with elevated privileges. Apache NiFi requires an authenticated user with authorization to modify access policies in order to execute the command. Apache NiFi Registry requires an authenticated user with authorization to read user groups in order to execute the command. The resolution removes command formatting based on user-provided arguments.",
+      "modified_date": "2026-06-17T04:48:29.590",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2022-33140",
+      "nvd_cwe_ids": [
+        "CWE-78"
+      ],
+      "published_date": "2022-06-15T15:15:08.050"
+    },
+    "CVE-2022-34662": {
+      "cve_id": "CVE-2022-34662",
+      "description": "When users add resources to the resource center with a relation path will cause path traversal issues and only for logged-in users. You could upgrade to version 3.0.0 or higher",
+      "modified_date": "2026-06-17T04:50:40.133",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2022-34662",
+      "nvd_cwe_ids": [
+        "CWE-22"
+      ],
+      "published_date": "2022-11-01T16:15:13.447"
+    },
+    "CVE-2022-36007": {
+      "cve_id": "CVE-2022-36007",
+      "description": "Venice is a Clojure inspired sandboxed Lisp dialect with excellent Java interoperability. A partial path traversal issue exists within the functions `load-file` and `load-resource`. These functions can be limited to load files from a list of load paths. Assuming Venice has been configured with the load paths: `[ \"/Users/foo/resources\" ]` When passing **relative** paths to these two vulnerable functions everything is fine: `(load-resource \"test.png\")` => loads the file \"/Users/foo/resources/test.png\" `(load-resource \"../resources-alt/test.png\")` => rejected, outside the load path When passing **absolute** paths to these two vulnerable functions Venice may return files outside the configured load paths: `(load-resource \"/Users/foo/resources/test.png\")` => loads the file \"/Users/foo/resources/test.png\" `(load-resource \"/Users/foo/resources-alt/test.png\")` => loads the file \"/Users/foo/resources-alt/test.png\" !!! The latter call suffers from the _Partial Path Traversal_ vulnerability. This issue’s scope is limited to absolute paths whose name prefix matches a load path. E.g. for a load-path `\"/Users/foo/resources\"`, the actor can cause loading a resource also from `\"/Users/foo/resources-alt\"`, but not from `\"/Users/foo/images\"`. Versions of Venice before and including v1.10.17 are affected by this issue. Upgrade to Venice >= 1.10.18, if you are on a version < 1.10.18. There are currently no known workarounds.",
+      "modified_date": "2026-06-17T04:52:43.633",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2022-36007",
+      "nvd_cwe_ids": [
+        "CWE-22"
+      ],
+      "published_date": "2022-08-15T11:21:40.967"
+    },
+    "CVE-2022-37422": {
+      "cve_id": "CVE-2022-37422",
+      "description": "Payara through 5.2022.2 allows directory traversal without authentication. This affects Payara Server, Payara Micro, and Payara Server Embedded.",
+      "modified_date": "2026-06-17T04:55:04.317",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2022-37422",
+      "nvd_cwe_ids": [
+        "CWE-22"
+      ],
+      "published_date": "2022-08-18T19:15:14.663"
+    },
+    "CVE-2022-3782": {
+      "cve_id": "CVE-2022-3782",
+      "description": "keycloak: path traversal via double URL encoding. A flaw was found in Keycloak, where it does not properly validate URLs included in a redirect. An attacker can use this flaw to construct a malicious request to bypass validation and access other URLs and potentially sensitive information within the domain or possibly conduct further attacks. This flaw affects any client that utilizes a wildcard in the Valid Redirect URIs field.",
+      "modified_date": "2026-06-17T05:00:17.670",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2022-3782",
+      "nvd_cwe_ids": [
+        "CWE-22"
+      ],
+      "published_date": "2023-01-13T06:15:11.187"
+    },
+    "CVE-2022-4065": {
+      "cve_id": "CVE-2022-4065",
+      "description": "A vulnerability was found in cbeust testng 7.5.0/7.6.0/7.6.1/7.7.0. It has been declared as critical. Affected by this vulnerability is the function testngXmlExistsInJar of the file testng-core/src/main/java/org/testng/JarFileUtils.java of the component XML File Parser. The manipulation leads to path traversal. The attack can be launched remotely. Upgrading to version 7.5.1 and 7.7.1 is able to address this issue. The patch is named 9150736cd2c123a6a3b60e6193630859f9f0422b. It is recommended to upgrade the affected component. The associated identifier of this vulnerability is VDB-214027.",
+      "modified_date": "2026-06-17T05:19:53.443",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2022-4065",
+      "nvd_cwe_ids": [
+        "CWE-22"
+      ],
+      "published_date": "2022-11-19T19:15:10.433"
+    },
+    "CVE-2022-4137": {
+      "cve_id": "CVE-2022-4137",
+      "description": "A reflected cross-site scripting (XSS) vulnerability was found in the 'oob' OAuth endpoint due to incorrect null-byte handling. This issue allows a malicious link to insert an arbitrary URI into a Keycloak error page. This flaw requires a user or administrator to interact with a link in order to be vulnerable. This may compromise user details, allowing it to be changed or collected by an attacker.",
+      "modified_date": "2026-06-17T05:20:03.403",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2022-4137",
+      "nvd_cwe_ids": [
+        "CWE-79",
+        "CWE-81"
+      ],
+      "published_date": "2023-09-25T20:15:09.897"
+    },
+    "CVE-2022-4244": {
+      "cve_id": "CVE-2022-4244",
+      "description": "A flaw was found in codeplex-codehaus. A directory traversal attack (also known as path traversal) aims to access files and directories stored outside the intended folder. By manipulating files with \"dot-dot-slash (../)\" sequences and their variations or by using absolute file paths, it may be possible to access arbitrary files and directories stored on the file system, including application source code, configuration, and other critical system files.",
+      "modified_date": "2026-06-17T05:20:21.450",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2022-4244",
+      "nvd_cwe_ids": [
+        "CWE-22"
+      ],
+      "published_date": "2023-09-25T20:15:10.220"
+    },
+    "CVE-2022-42889": {
+      "cve_id": "CVE-2022-42889",
+      "description": "Apache Commons Text performs variable interpolation, allowing properties to be dynamically evaluated and expanded. The standard format for interpolation is \"${prefix:name}\", where \"prefix\" is used to locate an instance of org.apache.commons.text.lookup.StringLookup that performs the interpolation. Starting with version 1.5 and continuing through 1.9, the set of default Lookup instances included interpolators that could result in arbitrary code execution or contact with remote servers. These lookups are: - \"script\" - execute expressions using the JVM script execution engine (javax.script) - \"dns\" - resolve dns records - \"url\" - load values from urls, including from remote servers Applications using the interpolation defaults in the affected versions may be vulnerable to remote code execution or unintentional contact with remote servers if untrusted configuration values are used. Users are recommended to upgrade to Apache Commons Text 1.10.0, which disables the problematic interpolators by default.",
+      "modified_date": "2026-06-17T05:05:31.850",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2022-42889",
+      "nvd_cwe_ids": [
+        "CWE-94"
+      ],
+      "published_date": "2022-10-13T13:15:10.113"
+    },
+    "CVE-2022-4361": {
+      "cve_id": "CVE-2022-4361",
+      "description": "Keycloak, an open-source identity and access management solution, has a cross-site scripting (XSS) vulnerability in the SAML or OIDC providers. The vulnerability can allow an attacker to execute malicious scripts by setting the AssertionConsumerServiceURL value or the redirect_uri.",
+      "modified_date": "2026-06-17T05:20:41.540",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2022-4361",
+      "nvd_cwe_ids": [
+        "CWE-79",
+        "CWE-81"
+      ],
+      "published_date": "2023-07-07T20:15:09.813"
+    },
+    "CVE-2022-44262": {
+      "cve_id": "CVE-2022-44262",
+      "description": "ff4j 1.8.1 is vulnerable to Remote Code Execution (RCE).",
+      "modified_date": "2026-06-17T05:08:01.927",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2022-44262",
+      "nvd_cwe_ids": [
+        "CWE-94"
+      ],
+      "published_date": "2022-12-01T05:15:11.973"
+    },
+    "CVE-2022-45206": {
+      "cve_id": "CVE-2022-45206",
+      "description": "Jeecg-boot v3.4.3 was discovered to contain a SQL injection vulnerability via the component /sys/duplicate/check.",
+      "modified_date": "2026-07-09T01:17:59.150",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2022-45206",
+      "nvd_cwe_ids": [
+        "CWE-89"
+      ],
+      "published_date": "2022-11-25T17:15:11.060"
+    },
+    "CVE-2022-46166": {
+      "cve_id": "CVE-2022-46166",
+      "description": "Spring boot admins is an open source administrative user interface for management of spring boot applications. All users who run Spring Boot Admin Server, having enabled Notifiers (e.g. Teams-Notifier) and write access to environment variables via UI are affected. Users are advised to upgrade to the most recent releases of Spring Boot Admin 2.6.10 and 2.7.8 to resolve this issue. Users unable to upgrade may disable any notifier or disable write access (POST request) on `/env` actuator endpoint.",
+      "modified_date": "2026-06-17T05:11:20.743",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2022-46166",
+      "nvd_cwe_ids": [
+        "CWE-94"
+      ],
+      "published_date": "2022-12-09T21:15:14.843"
+    },
+    "CVE-2022-46907": {
+      "cve_id": "CVE-2022-46907",
+      "description": "A carefully crafted request on several JSPWiki plugins could trigger an XSS vulnerability on Apache JSPWiki, which could allow the attacker to execute javascript in the victim's browser and get some sensitive information about the victim.  Apache JSPWiki users should upgrade to 2.12.0 or later.",
+      "modified_date": "2026-06-17T05:12:40.613",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2022-46907",
+      "nvd_cwe_ids": [
+        "CWE-79"
+      ],
+      "published_date": "2023-05-25T07:15:08.620"
+    },
+    "CVE-2022-4963": {
+      "cve_id": "CVE-2022-4963",
+      "description": "A vulnerability was found in Folio Spring Module Core up to 1.1.5. It has been rated as critical. Affected by this issue is the function dropSchema of the file tenant/src/main/java/org/folio/spring/tenant/hibernate/HibernateSchemaService.java of the component Schema Name Handler. The manipulation leads to sql injection. Upgrading to version 2.0.0 is able to address this issue. The name of the patch is d374a5f77e6b58e36f0e0e4419be18b95edcd7ff. It is recommended to upgrade the affected component. The identifier of this vulnerability is VDB-257516.",
+      "modified_date": "2026-06-17T05:22:25.790",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2022-4963",
+      "nvd_cwe_ids": [
+        "CWE-89"
+      ],
+      "published_date": "2024-03-21T02:44:57.060"
+    },
+    "CVE-2023-24057": {
+      "cve_id": "CVE-2023-24057",
+      "description": "HL7 (Health Level 7) FHIR Core Libraries before 5.6.92 allow attackers to extract files into arbitrary directories via directory traversal from a crafted ZIP or TGZ archive (for a prepackaged terminology cache, NPM package, or comparison archive).",
+      "modified_date": "2026-06-17T05:38:34.507",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2023-24057",
+      "nvd_cwe_ids": [
+        "CWE-22"
+      ],
+      "published_date": "2023-01-26T21:18:15.960"
+    },
+    "CVE-2023-24422": {
+      "cve_id": "CVE-2023-24422",
+      "description": "A sandbox bypass vulnerability involving map constructors in Jenkins Script Security Plugin 1228.vd93135a_2fb_25 and earlier allows attackers with permission to define and run sandboxed scripts, including Pipelines, to bypass the sandbox protection and execute arbitrary code in the context of the Jenkins controller JVM.",
+      "modified_date": "2026-06-17T05:39:11.777",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2023-24422",
+      "nvd_cwe_ids": [
+        "CWE-78"
+      ],
+      "published_date": "2023-01-26T21:18:16.633"
+    },
+    "CVE-2023-28465": {
+      "cve_id": "CVE-2023-28465",
+      "description": "The package-decompression feature in HL7 (Health Level 7) FHIR Core Libraries before 5.6.106 allows attackers to copy arbitrary files to certain directories via directory traversal, if an allowed directory name is a substring of the directory name chosen by the attacker. NOTE: this issue exists because of an incomplete fix for CVE-2023-24057.",
+      "modified_date": "2026-06-17T05:47:47.967",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2023-28465",
+      "nvd_cwe_ids": [
+        "CWE-22"
+      ],
+      "published_date": "2023-12-12T17:15:07.770"
+    },
+    "CVE-2023-29201": {
+      "cve_id": "CVE-2023-29201",
+      "description": "XWiki Commons are technical libraries common to several other top level XWiki projects. The \"restricted\" mode of the HTML cleaner in XWiki, introduced in version 4.2-milestone-1, only escaped `<script>` and `<style>`-tags but neither attributes that can be used to inject scripts nor other dangerous HTML tags like `<iframe>`. As a consequence, any code relying on this \"restricted\" mode for security is vulnerable to JavaScript injection (\"cross-site scripting\"/XSS). When a privileged user with programming rights visits such a comment in XWiki, the malicious JavaScript code is executed in the context of the user session. This allows server-side code execution with programming rights, impacting the confidentiality, integrity and availability of the XWiki instance. This problem has been patched in XWiki 14.6 RC1 with the introduction of a filter with allowed HTML elements and attributes that is enabled in restricted mode. There are no known workarounds apart from upgrading to a version including the fix.",
+      "modified_date": "2026-06-17T05:49:35.957",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2023-29201",
+      "nvd_cwe_ids": [
+        "CWE-79"
+      ],
+      "published_date": "2023-04-15T15:15:08.273"
+    },
+    "CVE-2023-29528": {
+      "cve_id": "CVE-2023-29528",
+      "description": "XWiki Commons are technical libraries common to several other top level XWiki projects. The \"restricted\" mode of the HTML cleaner in XWiki, introduced in version 4.2-milestone-1 and massively improved in version 14.6-rc-1, allowed the injection of arbitrary HTML code and thus cross-site scripting via invalid HTML comments. As a consequence, any code relying on this \"restricted\" mode for security is vulnerable to JavaScript injection (\"cross-site scripting\"/XSS). When a privileged user with programming rights visits such a comment in XWiki, the malicious JavaScript code is executed in the context of the user session. This allows server-side code execution with programming rights, impacting the confidentiality, integrity and availability of the XWiki instance. This problem has been patched in XWiki 14.10, HTML comments are now removed in restricted mode and a check has been introduced that ensures that comments don't start with `>`. There are no known workarounds apart from upgrading to a version including the fix.",
+      "modified_date": "2026-06-17T05:50:28.250",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2023-29528",
+      "nvd_cwe_ids": [
+        "CWE-79"
+      ],
+      "published_date": "2023-04-20T18:15:07.307"
+    },
+    "CVE-2023-31126": {
+      "cve_id": "CVE-2023-31126",
+      "description": "`org.xwiki.commons:xwiki-commons-xml` is an XML library used by the open-source wiki platform XWiki. The HTML sanitizer, introduced in version 14.6-rc-1, allows the injection of arbitrary HTML code and thus cross-site scripting via invalid data attributes. This vulnerability does not affect restricted cleaning in HTMLCleaner as there attributes are cleaned and thus characters like `/` and `>` are removed in all attribute names. This problem has been patched in XWiki 14.10.4 and 15.0 RC1 by making sure that data attributes only contain allowed characters. There are no known workarounds apart from upgrading to a version including the fix.",
+      "modified_date": "2026-06-17T05:56:19.473",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2023-31126",
+      "nvd_cwe_ids": [
+        "CWE-79",
+        "CWE-86"
+      ],
+      "published_date": "2023-05-09T13:15:18.427"
+    },
+    "CVE-2023-32070": {
+      "cve_id": "CVE-2023-32070",
+      "description": "XWiki Platform is a generic wiki platform. Prior to version 14.6-rc-1, HTML rendering didn't check for dangerous attributes/attribute values. This allowed cross-site scripting (XSS) attacks via attributes and link URLs, e.g., supported in XWiki syntax. This has been patched in XWiki 14.6-rc-1. There are no known workarounds apart from upgrading to a fixed version.",
+      "modified_date": "2026-10-28T19:10:00.193",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2023-32070",
+      "nvd_cwe_ids": [
+        "CWE-79",
+        "CWE-83"
+      ],
+      "published_date": "2023-05-10T18:15:10.003"
+    },
+    "CVE-2023-32697": {
+      "cve_id": "CVE-2023-32697",
+      "description": "SQLite JDBC is a library for accessing and creating SQLite database files in Java. Sqlite-jdbc addresses a remote code execution vulnerability via JDBC URL. This issue impacting versions 3.6.14.1 through 3.41.2.1 and has been fixed in version 3.41.2.2.",
+      "modified_date": "2026-06-17T05:59:24.877",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2023-32697",
+      "nvd_cwe_ids": [
+        "CWE-94"
+      ],
+      "published_date": "2023-05-23T23:15:09.337"
+    },
+    "CVE-2023-33246": {
+      "cve_id": "CVE-2023-33246",
+      "description": "For RocketMQ versions 5.1.0 and below, under certain conditions, there is a risk of remote command execution. \n\nSeveral components of RocketMQ, including NameServer, Broker, and Controller, are leaked on the extranet and lack permission verification, an attacker can exploit this vulnerability by using the update configuration function to execute commands as the system users that RocketMQ is running as. Additionally, an attacker can achieve the same effect by forging the RocketMQ protocol content. \n\nTo prevent these attacks, users are recommended to upgrade to version 5.1.1 or above for using RocketMQ 5.x or 4.9.6 or above for using RocketMQ 4.x .",
+      "modified_date": "2026-06-17T06:01:24.160",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2023-33246",
+      "nvd_cwe_ids": [
+        "CWE-94"
+      ],
+      "published_date": "2023-05-24T15:15:09.553"
+    },
+    "CVE-2023-33962": {
+      "cve_id": "CVE-2023-33962",
+      "description": "JStachio is a  type-safe Java Mustache templating engine. Prior to version 1.0.1, JStachio fails to escape single quotes `'` in HTML, allowing an attacker to inject malicious code. This vulnerability can be exploited by an attacker to execute arbitrary JavaScript code in the context of other users visiting pages that use this template engine. This can lead to various consequences, including session hijacking, defacement of web pages, theft of sensitive information, or even the propagation of malware.\n\nVersion 1.0.1 contains a patch for this issue. To mitigate this vulnerability, the template engine should properly escape special characters, including single quotes. Common practice is to escape `'` as `&#39`. As a workaround, users can avoid this issue by using only double quotes `\"` for HTML attributes.",
+      "modified_date": "2026-06-17T06:02:36.583",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2023-33962",
+      "nvd_cwe_ids": [
+        "CWE-79"
+      ],
+      "published_date": "2023-05-30T22:15:10.933"
+    },
+    "CVE-2023-34468": {
+      "cve_id": "CVE-2023-34468",
+      "description": "The DBCPConnectionPool and HikariCPConnectionPool Controller Services in Apache NiFi 0.0.2 through 1.21.0 allow an authenticated and authorized user to configure a Database URL with the H2 driver that enables custom code execution.\n\nThe resolution validates the Database URL and rejects H2 JDBC locations.\n\nYou are recommended to upgrade to version 1.22.0 or later which fixes this issue.",
+      "modified_date": "2026-06-17T06:03:42.910",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2023-34468",
+      "nvd_cwe_ids": [
+        "CWE-94"
+      ],
+      "published_date": "2023-06-12T16:15:10.130"
+    },
+    "CVE-2023-34478": {
+      "cve_id": "CVE-2023-34478",
+      "description": "Apache Shiro, before 1.12.0 or 2.0.0-alpha-3, may be susceptible to a path traversal attack that results in an authentication bypass when used together with APIs or other web frameworks that route requests based on non-normalized requests.\n\nMitigation: Update to Apache Shiro 1.12.0+ or 2.0.0-alpha-3+",
+      "modified_date": "2026-06-17T06:03:44.157",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2023-34478",
+      "nvd_cwe_ids": [
+        "CWE-22"
+      ],
+      "published_date": "2023-07-24T19:15:10.630"
+    },
+    "CVE-2023-35887": {
+      "cve_id": "CVE-2023-35887",
+      "description": "Exposure of Sensitive Information to an Unauthorized Actor vulnerability in Apache Software Foundation Apache MINA.\n\nIn SFTP servers implemented using Apache MINA SSHD that use a RootedFileSystem, logged users may be able to discover \"exists/does not exist\" information about items outside the rooted tree via paths including parent navigation (\"..\") beyond the root, or involving symlinks.\n\nThis issue affects Apache MINA: from 1.0 before 2.10. Users are recommended to upgrade to 2.10",
+      "modified_date": "2026-06-17T06:05:24.763",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2023-35887",
+      "nvd_cwe_ids": [
+        "CWE-22"
+      ],
+      "published_date": "2023-07-10T16:15:53.050"
+    },
+    "CVE-2023-36471": {
+      "cve_id": "CVE-2023-36471",
+      "description": "Xwiki commons is the common modules used by other XWiki top level projects. The HTML sanitizer that is included in XWiki since version 14.6RC1 allowed form and input HTML tags. In the context of XWiki, this allows an attacker without script right to either create forms that can be used for phishing attacks or also in the context of a sheet, the attacker could add an input like `{{html}}<input type=\"hidden\" name=\"content\" value=\"{{groovy}}println(&quot;Hello from Groovy!&quot;)\" />{{/html}}` that would allow remote code execution when it is submitted by an admin (the sheet is rendered as part of the edit form). The attacker would need to ensure that the edit form looks plausible, though, which can be non-trivial as without script right the attacker cannot display the regular content of the document. This has been patched in XWiki 14.10.6 and 15.2RC1 by removing the central form-related tags from the list of allowed tags. Users are advised to upgrade. As a workaround an admin can manually disallow the tags by adding `form, input, select, textarea, button` to the configuration option `xml.htmlElementSanitizer.forbidTags` in the `xwiki.properties` configuration file.",
+      "modified_date": "2026-06-17T06:06:20.117",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2023-36471",
+      "nvd_cwe_ids": [
+        "CWE-74",
+        "CWE-79"
+      ],
+      "published_date": "2023-06-29T20:15:10.003"
+    },
+    "CVE-2023-36542": {
+      "cve_id": "CVE-2023-36542",
+      "description": "Apache NiFi 0.0.2 through 1.22.0 include Processors and Controller Services that support HTTP URL references for retrieving drivers, which allows an authenticated and authorized user to configure a location that enables custom code execution. The resolution introduces a new Required Permission for referencing remote resources, restricting configuration of these components to privileged users. The permission prevents unprivileged users from configuring Processors and Controller Services annotated with the new Reference Remote Resources restriction. Upgrading to Apache NiFi 1.23.0 is the recommended mitigation.",
+      "modified_date": "2026-06-17T06:06:30.147",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2023-36542",
+      "nvd_cwe_ids": [
+        "CWE-94"
+      ],
+      "published_date": "2023-07-29T08:15:48.833"
+    },
+    "CVE-2023-37460": {
+      "cve_id": "CVE-2023-37460",
+      "description": "Plexis Archiver is a collection of Plexus components to create archives or extract archives to a directory with a unified `Archiver`/`UnArchiver` API. Prior to version 4.8.0, using AbstractUnArchiver for extracting an archive might lead to an arbitrary file creation and possibly remote code execution. When extracting an archive with an entry that already exists in the destination directory as a symbolic link whose target does not exist - the `resolveFile()` function will return the symlink's source instead of its target, which will pass the verification that ensures the file will not be extracted outside of the destination directory. Later `Files.newOutputStream()`, that follows symlinks by default,  will actually write the entry's content to the symlink's target. Whoever uses plexus archiver to extract an untrusted archive is vulnerable to an arbitrary file creation and possibly remote code execution. Version 4.8.0 contains a patch for this issue.",
+      "modified_date": "2026-06-17T06:08:15.757",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2023-37460",
+      "nvd_cwe_ids": [
+        "CWE-22",
+        "CWE-61"
+      ],
+      "published_date": "2023-07-25T20:15:13.703"
+    },
+    "CVE-2023-37582": {
+      "cve_id": "CVE-2023-37582",
+      "description": "The RocketMQ NameServer component still has a remote command execution vulnerability as the CVE-2023-33246 issue was not completely fixed in version 5.1.1. \n\nWhen NameServer address are leaked on the extranet and lack permission verification, an attacker can exploit this vulnerability by using the update configuration function on the NameServer component to execute commands as the system users that RocketMQ is running as. \n\nIt is recommended for users to upgrade their NameServer version to 5.1.2 or above for RocketMQ 5.x or 4.9.7 or above for RocketMQ 4.x to prevent these attacks.",
+      "modified_date": "2026-06-17T06:08:30.507",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2023-37582",
+      "nvd_cwe_ids": [
+        "CWE-94"
+      ],
+      "published_date": "2023-07-12T10:15:11.197"
+    },
+    "CVE-2023-37908": {
+      "cve_id": "CVE-2023-37908",
+      "description": "XWiki Rendering is a generic Rendering system that converts textual input in a given syntax into another syntax. The cleaning of attributes during XHTML rendering, introduced in version 14.6-rc-1, allowed the injection of arbitrary HTML code and thus cross-site scripting via invalid attribute names. This can be exploited, e.g., via the link syntax in any content that supports XWiki syntax like comments in XWiki. When a user moves the mouse over a malicious link, the malicious JavaScript code is executed in the context of the user session. When this user is a privileged user who has programming rights, this allows server-side code execution with programming rights, impacting the confidentiality, integrity and availability of the XWiki instance. While this attribute was correctly recognized as not allowed, the attribute was still printed with a prefix `data-xwiki-translated-attribute-` without further cleaning or validation. This problem has been patched in XWiki 14.10.4 and 15.0 RC1 by removing characters not allowed in data attributes and then validating the cleaned attribute again. There are no known workarounds apart from upgrading to a version including the fix.",
+      "modified_date": "2026-06-17T06:08:52.760",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2023-37908",
+      "nvd_cwe_ids": [
+        "CWE-79",
+        "CWE-83"
+      ],
+      "published_date": "2023-10-25T18:17:28.333"
+    },
+    "CVE-2023-41044": {
+      "cve_id": "CVE-2023-41044",
+      "description": "Graylog is a free and open log management platform. A partial path traversal vulnerability exists in Graylog's `Support Bundle` feature. The vulnerability is caused by incorrect user input validation in an HTTP API resource. Graylog's Support Bundle feature allows an attacker with valid Admin role credentials to download or delete files in sibling directories of the support bundle directory. The default `data_dir` in operating system packages (DEB, RPM) is set to `/var/lib/graylog-server`. The data directory for the Support Bundle feature is always `<data_dir>/support-bundle`. Due to the partial path traversal vulnerability, an attacker with valid Admin role credentials can read or delete files in directories that start with a `/var/lib/graylog-server/support-bundle` directory name. The vulnerability would allow the download or deletion of files in the following example directories: `/var/lib/graylog-server/support-bundle-test` and `/var/lib/graylog-server/support-bundlesdirectory`. For the Graylog Docker images, the `data_dir` is set to `/usr/share/graylog/data` by default. This vulnerability is fixed in Graylog version 5.1.3 and later. Users are advised to upgrade. Users unable to upgrade should block all HTTP requests to the following HTTP API endpoints by using a reverse proxy server in front of Graylog. `GET /api/system/debug/support/bundle/download/{filename}` and `DELETE /api/system/debug/support/bundle/{filename}`.",
+      "modified_date": "2026-06-17T06:20:15.837",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2023-41044",
+      "nvd_cwe_ids": [
+        "CWE-22"
+      ],
+      "published_date": "2023-08-31T18:15:09.187"
+    },
+    "CVE-2023-45277": {
+      "cve_id": "CVE-2023-45277",
+      "description": "Yamcs 5.8.6 is vulnerable to directory traversal (issue 1 of 2). The vulnerability is in the storage functionality of the API and allows one to escape the base directory of the buckets, freely navigate system directories, and read arbitrary files.",
+      "modified_date": "2026-06-17T06:28:34.027",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2023-45277",
+      "nvd_cwe_ids": [
+        "CWE-22"
+      ],
+      "published_date": "2023-10-19T17:15:10.150"
+    },
+    "CVE-2023-45278": {
+      "cve_id": "CVE-2023-45278",
+      "description": "Directory Traversal vulnerability in the storage functionality of the API in Yamcs 5.8.6 allows attackers to delete arbitrary files via crafted HTTP DELETE request.",
+      "modified_date": "2026-06-17T06:28:34.157",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2023-45278",
+      "nvd_cwe_ids": [
+        "CWE-22"
+      ],
+      "published_date": "2023-10-19T17:15:10.200"
+    },
+    "CVE-2023-46749": {
+      "cve_id": "CVE-2023-46749",
+      "description": "Apache Shiro before 1.13.0 or 2.0.0-alpha-4, may be susceptible to a path traversal attack that results in an authentication bypass when used together with path rewriting \n\nMitigation: Update to Apache Shiro 1.13.0+ or 2.0.0-alpha-4+, or ensure `blockSemicolon` is enabled (this is the default).",
+      "modified_date": "2026-06-17T06:31:32.990",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2023-46749",
+      "nvd_cwe_ids": [
+        "CWE-22"
+      ],
+      "published_date": "2024-01-15T10:15:26.380"
+    },
+    "CVE-2023-49109": {
+      "cve_id": "CVE-2023-49109",
+      "description": "Exposure of Remote Code Execution in Apache Dolphinscheduler.\n\nThis issue affects Apache DolphinScheduler: before 3.2.1. \n\nWe recommend users to upgrade Apache DolphinScheduler to version 3.2.1, which fixes the issue.",
+      "modified_date": "2026-06-17T06:35:23.407",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2023-49109",
+      "nvd_cwe_ids": [
+        "CWE-94"
+      ],
+      "published_date": "2024-02-20T10:15:07.927"
+    },
+    "CVE-2023-51441": {
+      "cve_id": "CVE-2023-51441",
+      "description": "** UNSUPPORTED WHEN ASSIGNED ** Improper Input Validation vulnerability in Apache Axis allowed users with access to the admin service to perform possible SSRF\nThis issue affects Apache Axis: through 1.3.\n\nAs Axis 1 has been EOL we recommend you migrate to a different SOAP engine, such as Apache Axis 2/Java. Alternatively you could use a build of Axis with the patch from  https://github.com/apache/axis-axis1-java/commit/685c309febc64aa393b2d64a05f90e7eb9f73e06  applied. The Apache Axis project does not expect to create an Axis 1.x release \nfixing this problem, though contributors that would like to work towards\n this are welcome.",
+      "modified_date": "2026-06-17T06:40:57.880",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2023-51441",
+      "nvd_cwe_ids": [
+        "CWE-918"
+      ],
+      "published_date": "2024-01-06T12:15:42.997"
+    },
+    "CVE-2023-51770": {
+      "cve_id": "CVE-2023-51770",
+      "description": "Arbitrary File Read Vulnerability in Apache Dolphinscheduler.\n\nThis issue affects Apache DolphinScheduler: before 3.2.1. \n\nWe recommend users to upgrade Apache DolphinScheduler to version 3.2.1, which fixes the issue.",
+      "modified_date": "2026-06-17T06:41:37.473",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2023-51770",
+      "nvd_cwe_ids": [
+        "CWE-94"
+      ],
+      "published_date": "2024-02-20T10:15:08.243"
+    },
+    "CVE-2023-51982": {
+      "cve_id": "CVE-2023-51982",
+      "description": "CrateDB 5.5.1 is contains an authentication bypass vulnerability in the Admin UI component. After configuring password authentication and_ Local_ In the case of an address, identity authentication can be bypassed by setting the X-Real IP request header to a specific value and accessing the Admin UI directly using the default user identity.(https://github.com/crate/crate/issues/15231)",
+      "modified_date": "2026-06-17T06:41:55.380",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2023-51982",
+      "nvd_cwe_ids": [
+        "CWE-287"
+      ],
+      "published_date": "2024-01-30T01:15:59.013"
+    },
+    "CVE-2024-23673": {
+      "cve_id": "CVE-2024-23673",
+      "description": "Malicious code execution via path traversal in Apache Software Foundation Apache Sling Servlets Resolver.This issue affects all version of Apache Sling Servlets Resolver before 2.11.0. However, whether a system is vulnerable to this attack depends on the exact configuration of the system.\nIf the system is vulnerable, a user with write access to the repository might be able to trick the Sling Servlet Resolver to load a previously uploaded script. \n\nUsers are recommended to upgrade to version 2.11.0, which fixes this issue. It is recommended to upgrade, regardless of whether your system configuration currently allows this attack or not.",
+      "modified_date": "2026-06-17T07:13:21.547",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2024-23673",
+      "nvd_cwe_ids": [
+        "CWE-22"
+      ],
+      "published_date": "2024-02-06T10:15:08.833"
+    },
+    "CVE-2024-48944": {
+      "cve_id": "CVE-2024-48944",
+      "description": "Server-Side Request Forgery (SSRF) vulnerability in Apache Kylin. Through a kylin server, an attacker may forge a request to invoke \"/kylin/api/xxx/diag\" api on another internal host and possibly get leaked information. There are two preconditions: 1) The attacker has got admin access to a kylin server; 2) Another internal host has the \"/kylin/api/xxx/diag\" api\n\nendpoint open for service.\n\n\nThis issue affects Apache Kylin: from 5.0.0 \nthrough \n\n5.0.1.\n\nUsers are recommended to upgrade to version 5.0.2, which fixes the issue.",
+      "modified_date": "2026-06-17T07:59:05.867",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2024-48944",
+      "nvd_cwe_ids": [
+        "CWE-918"
+      ],
+      "published_date": "2025-03-27T15:15:53.573"
+    },
+    "CVE-2025-0604": {
+      "cve_id": "CVE-2025-0604",
+      "description": "A flaw was found in Keycloak. When an Active Directory user resets their password, the system updates it without performing an LDAP bind to validate the new credentials against AD. This vulnerability allows users whose AD accounts are expired or disabled to regain access in Keycloak, bypassing AD restrictions. The issue enables authentication bypass and could allow unauthorized access under certain conditions.",
+      "modified_date": "2026-09-21T06:16:59.613",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-0604",
+      "nvd_cwe_ids": [
+        "CWE-287"
+      ],
+      "published_date": "2025-01-22T15:15:14.827"
+    },
+    "CVE-2025-0851": {
+      "cve_id": "CVE-2025-0851",
+      "description": "A path traversal issue in ZipUtils.unzip and TarUtils.untar in Deep Java Library (DJL) on all platforms allows a bad actor to write files to arbitrary locations.",
+      "modified_date": "2026-06-17T08:27:15.617",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-0851",
+      "nvd_cwe_ids": [
+        "CWE-36",
+        "CWE-73"
+      ],
+      "published_date": "2025-01-29T22:15:30.463"
+    },
+    "CVE-2025-1391": {
+      "cve_id": "CVE-2025-1391",
+      "description": "A flaw was found in the Keycloak organization feature, which allows the incorrect assignment of an organization to a user if their username or email matches the organization’s domain pattern. This issue occurs at the mapper level, leading to misrepresentation in tokens. If an application relies on these claims for authorization, it may incorrectly assume a user belongs to an organization they are not a member of, potentially granting unauthorized access or privileges.",
+      "modified_date": "2026-09-21T06:17:00.010",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-1391",
+      "nvd_cwe_ids": [
+        "CWE-284"
+      ],
+      "published_date": "2025-02-17T14:15:08.413"
+    },
+    "CVE-2025-1584": {
+      "cve_id": "CVE-2025-1584",
+      "description": "A vulnerability classified as problematic was found in opensolon Solon up to 3.0.8. This vulnerability affects unknown code of the file solon-projects/solon-web/solon-web-staticfiles/src/main/java/org/noear/solon/web/staticfiles/StaticMappings.java. The manipulation leads to path traversal: '../filedir'. The attack can be initiated remotely. The exploit has been disclosed to the public and may be used. Upgrading to version 3.0.9 is able to address this issue. The name of the patch is f46e47fd1f8455b9467d7ead3cdb0509115b2ef1. It is recommended to upgrade the affected component.",
+      "modified_date": "2026-06-17T08:39:24.730",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-1584",
+      "nvd_cwe_ids": [
+        "CWE-23",
+        "CWE-24"
+      ],
+      "published_date": "2025-02-23T13:15:09.253"
+    },
+    "CVE-2025-1948": {
+      "cve_id": "CVE-2025-1948",
+      "description": "In Eclipse Jetty versions 12.0.0 to 12.0.16 included, an HTTP/2 client can specify a very large value for the HTTP/2 settings parameter SETTINGS_MAX_HEADER_LIST_SIZE.\nThe Jetty HTTP/2 server does not perform validation on this setting, and tries to allocate a ByteBuffer of the specified capacity to encode HTTP responses, likely resulting in OutOfMemoryError being thrown, or even the JVM process exiting.",
+      "modified_date": "2026-06-17T08:40:24.420",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-1948",
+      "nvd_cwe_ids": [
+        "CWE-400"
+      ],
+      "published_date": "2025-05-08T18:15:41.990"
+    },
+    "CVE-2025-22223": {
+      "cve_id": "CVE-2025-22223",
+      "description": "Spring Security 6.4.0 - 6.4.3 may not correctly locate method security annotations on parameterized types or methods. This may cause an authorization bypass. \n\nYou are not affected if you are not using @EnableMethodSecurity, or\nyou do not have method security annotations on parameterized types or methods, or all method security annotations are attached to target methods",
+      "modified_date": "2026-06-17T08:45:42.900",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-22223",
+      "nvd_cwe_ids": [
+        "CWE-290"
+      ],
+      "published_date": "2025-03-24T18:15:22.673"
+    },
+    "CVE-2025-22227": {
+      "cve_id": "CVE-2025-22227",
+      "description": "In some specific scenarios with chained redirects, Reactor Netty HTTP client leaks credentials. In order for this to happen, the HTTP client must have been explicitly configured to follow redirects.",
+      "modified_date": "2026-06-17T08:45:45.027",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-22227",
+      "nvd_cwe_ids": [
+        "CWE-200"
+      ],
+      "published_date": "2025-07-16T10:15:27.787"
+    },
+    "CVE-2025-22228": {
+      "cve_id": "CVE-2025-22228",
+      "description": "BCryptPasswordEncoder.matches(CharSequence,String) will incorrectly return true for passwords larger than 72 characters as long as the first 72 characters are the same.",
+      "modified_date": "2026-06-17T08:45:45.500",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-22228",
+      "nvd_cwe_ids": [
+        "CWE-287"
+      ],
+      "published_date": "2025-03-20T06:15:23.087"
+    },
+    "CVE-2025-22233": {
+      "cve_id": "CVE-2025-22233",
+      "description": "CVE-2024-38820 ensured Locale-independent, lowercase conversion for both the configured disallowedFields patterns and for request parameter names. However, there are still cases where it is possible to bypass the disallowedFields checks.\n\nAffected Spring Products and Versions\n\nSpring Framework:\n  *  6.2.0 - 6.2.6\n\n  *  6.1.0 - 6.1.19\n\n  *  6.0.0 - 6.0.27\n\n  *  5.3.0 - 5.3.42\n  *  Older, unsupported versions are also affected\n\n\n\nMitigation\n\nUsers of affected versions should upgrade to the corresponding fixed version.\n\nAffected version(s)Fix Version Availability 6.2.x\n 6.2.7\nOSS6.1.x\n 6.1.20\nOSS6.0.x\n 6.0.28\n Commercial https://enterprise.spring.io/ 5.3.x\n 5.3.43\n Commercial https://enterprise.spring.io/ \nNo further mitigation steps are necessary.\n\n\nGenerally, we recommend using a dedicated model object with properties only for data binding, or using constructor binding since constructor arguments explicitly declare what to bind together with turning off setter binding through the declarativeBinding flag. See the Model Design section in the reference documentation.\n\nFor setting binding, prefer the use of allowedFields (an explicit list) over disallowedFields.\n\nCredit\n\nThis issue was responsibly reported by the TERASOLUNA Framework Development Team from NTT DATA Group Corporation.",
+      "modified_date": "2026-06-17T08:45:47.490",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-22233",
+      "nvd_cwe_ids": [
+        "CWE-20"
+      ],
+      "published_date": "2025-05-16T20:15:22.143"
+    },
+    "CVE-2025-2240": {
+      "cve_id": "CVE-2025-2240",
+      "description": "A flaw was found in Smallrye, where smallrye-fault-tolerance is vulnerable to an out-of-memory (OOM) issue. This vulnerability is externally triggered when calling the metrics URI. Every call creates a new object within meterMap and may lead to a denial of service (DoS) issue.",
+      "modified_date": "2026-10-20T05:16:53.510",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-2240",
+      "nvd_cwe_ids": [
+        "CWE-1325"
+      ],
+      "published_date": "2025-03-12T15:15:42.273"
+    },
+    "CVE-2025-23015": {
+      "cve_id": "CVE-2025-23015",
+      "description": "Privilege Defined With Unsafe Actions vulnerability in Apache Cassandra. An user with MODIFY permission ON ALL KEYSPACES can escalate privileges to superuser within a targeted Cassandra cluster via unsafe actions to a system resource. Operators granting data MODIFY permission on all keyspaces on affected versions should review data access rules for potential breaches.\n\nThis issue affects Apache Cassandra through 3.0.30, 3.11.17, 4.0.15, 4.1.7, 5.0.2.\n\nUsers are recommended to upgrade to versions 3.0.31, 3.11.18, 4.0.16, 4.1.8, 5.0.3, which fixes the issue.",
+      "modified_date": "2026-06-17T08:51:26.447",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-23015",
+      "nvd_cwe_ids": [
+        "CWE-267"
+      ],
+      "published_date": "2025-02-04T10:15:09.097"
+    },
+    "CVE-2025-23026": {
+      "cve_id": "CVE-2025-23026",
+      "description": "jte (Java Template Engine) is a secure and lightweight template engine for Java and Kotlin. In affected versions Jte HTML templates with `script` tags or script attributes that include a Javascript template string (backticks) are subject to XSS. The `javaScriptBlock` and `javaScriptAttribute` methods in the `Escape` class do not escape backticks, which are used for Javascript template strings. Dollar signs in template strings should also be escaped as well to prevent undesired interpolation. HTML templates rendered by Jte's `OwaspHtmlTemplateOutput` in versions less than or equal to `3.1.15` with `script` tags or script attributes that contain Javascript template strings (backticks) are vulnerable. Users are advised to upgrade to version 3.1.16 or later to resolve this issue. There are no known workarounds for this vulnerability.",
+      "modified_date": "2026-06-17T08:51:31.540",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-23026",
+      "nvd_cwe_ids": [
+        "CWE-150",
+        "CWE-79"
+      ],
+      "published_date": "2025-01-13T20:15:30.003"
+    },
+    "CVE-2025-23184": {
+      "cve_id": "CVE-2025-23184",
+      "description": "A potential denial of service vulnerability is present in versions of Apache CXF before 3.5.10, 3.6.5 and 4.0.6. In some edge cases, the CachedOutputStream instances may not be closed and, if backed by temporary files, may fill up the file system (it applies to servers and clients).",
+      "modified_date": "2026-06-17T08:52:27.207",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-23184",
+      "nvd_cwe_ids": [
+        "CWE-400"
+      ],
+      "published_date": "2025-01-21T10:15:08.110"
+    },
+    "CVE-2025-23367": {
+      "cve_id": "CVE-2025-23367",
+      "description": "A flaw was found in the Wildfly Server Role Based Access Control (RBAC) provider. When authorization to control management operations is secured using the Role Based Access Control provider, a user without the required privileges can suspend or resume the server. A user with a Monitor or Auditor role is supposed to have only read access permissions and should not be able to suspend the server. \nThe vulnerability is caused by the Suspend and Resume handlers not performing authorization checks to validate whether the current user has the required permissions to proceed with the action.",
+      "modified_date": "2026-09-18T00:16:51.783",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-23367",
+      "nvd_cwe_ids": [
+        "CWE-284"
+      ],
+      "published_date": "2025-01-30T15:15:18.610"
+    },
+    "CVE-2025-24399": {
+      "cve_id": "CVE-2025-24399",
+      "description": "Jenkins OpenId Connect Authentication Plugin 4.452.v2849b_d3945fa_ and earlier, except 4.438.440.v3f5f201de5dc, treats usernames as case-insensitive, allowing attackers on Jenkins instances configured with a case-sensitive OpenID Connect provider to log in as any user by providing a username that differs only in letter case, potentially gaining administrator access to Jenkins.",
+      "modified_date": "2026-06-17T08:58:57.763",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-24399",
+      "nvd_cwe_ids": [
+        "CWE-276"
+      ],
+      "published_date": "2025-01-22T17:15:13.853"
+    },
+    "CVE-2025-24789": {
+      "cve_id": "CVE-2025-24789",
+      "description": "Snowflake JDBC provides a JDBC type 4 driver that supports core functionality, allowing Java program to connect to Snowflake. Snowflake discovered and remediated a vulnerability in the Snowflake JDBC Driver. When the EXTERNALBROWSER authentication method is used on Windows, an attacker with write access to a directory in the %PATH% can escalate their privileges to the user that runs the vulnerable JDBC Driver version. This vulnerability affects versions 3.2.3 through 3.21.0 on Windows. Snowflake fixed the issue in version 3.22.0.",
+      "modified_date": "2026-06-17T08:59:36.757",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-24789",
+      "nvd_cwe_ids": [
+        "CWE-426"
+      ],
+      "published_date": "2025-01-29T18:15:47.030"
+    },
+    "CVE-2025-24790": {
+      "cve_id": "CVE-2025-24790",
+      "description": "Snowflake JDBC provides a JDBC type 4 driver that supports core functionality, allowing Java program to connect to Snowflake. Snowflake discovered and remediated a vulnerability in the Snowflake JDBC Driver. On Linux systems, when temporary credential caching is enabled, the Snowflake JDBC Driver will cache temporary credentials locally in a world-readable file. This vulnerability affects versions 3.6.8 through 3.21.0. Snowflake fixed the issue in version 3.22.0.",
+      "modified_date": "2026-06-17T08:59:36.863",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-24790",
+      "nvd_cwe_ids": [
+        "CWE-276"
+      ],
+      "published_date": "2025-01-29T18:15:47.207"
+    },
+    "CVE-2025-24813": {
+      "cve_id": "CVE-2025-24813",
+      "description": "Path Equivalence: 'file.Name' (Internal Dot) leading to Remote Code Execution and/or Information disclosure and/or malicious content added to uploaded files via write enabled Default Servlet in Apache Tomcat.\n\nThis issue affects Apache Tomcat: from 11.0.0-M1 through 11.0.2, from 10.1.0-M1 through 10.1.34, from 9.0.0.M1 through 9.0.98.\nThe following versions were EOL at the time the CVE was created but are \nknown to be affected: 8.5.0 though 8.5.100. Other, older, EOL versions \nmay also be affected.\n\n\nIf all of the following were true, a malicious user was able to view       security sensitive files and/or inject content into those files:\n- writes enabled for the default servlet (disabled by default)\n- support for partial PUT (enabled by default)\n- a target URL for security sensitive uploads that was a sub-directory of a target URL for public uploads\n- attacker knowledge of the names of security sensitive files being uploaded\n- the security sensitive files also being uploaded via partial PUT\n\nIf all of the following were true, a malicious user was able to       perform remote code execution:\n- writes enabled for the default servlet (disabled by default)\n- support for partial PUT (enabled by default)\n- application was using Tomcat's file based session persistence with the default storage location\n- application included a library that may be leveraged in a deserialization attack\n\nUsers are recommended to upgrade to version 11.0.3, 10.1.35 or 9.0.99, which fixes the issue.",
+      "modified_date": "2026-06-17T08:59:39.593",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-24813",
+      "nvd_cwe_ids": [
+        "CWE-44",
+        "CWE-502",
+        "CWE-706"
+      ],
+      "published_date": "2025-03-10T17:15:35.067"
+    },
+    "CVE-2025-24814": {
+      "cve_id": "CVE-2025-24814",
+      "description": "Core creation allows users to replace \"trusted\" configset files with arbitrary configuration\n\nSolr instances that (1) use the \"FileSystemConfigSetService\" component (the default in \"standalone\" or \"user-managed\" mode), and (2) are running without authentication and authorization are vulnerable to a sort of privilege escalation wherein individual \"trusted\" configset files can be ignored in favor of potentially-untrusted replacements available elsewhere on the filesystem.  These replacement config files are treated as \"trusted\" and can use \"<lib>\" tags to add to Solr's classpath, which an attacker might use to load malicious code as a searchComponent or other plugin.\n\nThis issue affects all Apache Solr versions up through Solr 9.7.  Users can protect against the vulnerability by enabling authentication and authorization on their Solr clusters or switching to SolrCloud (and away from \"FileSystemConfigSetService\").  Users are also recommended to upgrade to Solr 9.8.0, which mitigates this issue by disabling use of \"<lib>\" tags by default.",
+      "modified_date": "2026-06-17T08:59:39.810",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-24814",
+      "nvd_cwe_ids": [
+        "CWE-250"
+      ],
+      "published_date": "2025-01-27T09:15:14.947"
+    },
+    "CVE-2025-24961": {
+      "cve_id": "CVE-2025-24961",
+      "description": "org.gaul S3Proxy implements the S3 API and proxies requests. Users of the filesystem and filesystem-nio2 storage backends could unintentionally expose local files to users. This issue has been addressed in version 2.6.0. Users are advised to upgrade. There are no known workarounds for this vulnerability.",
+      "modified_date": "2026-06-17T08:59:53.220",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-24961",
+      "nvd_cwe_ids": [
+        "CWE-22"
+      ],
+      "published_date": "2025-02-03T21:15:16.170"
+    },
+    "CVE-2025-24970": {
+      "cve_id": "CVE-2025-24970",
+      "description": "Netty, an asynchronous, event-driven network application framework, has a vulnerability starting in version 4.1.91.Final and prior to version 4.1.118.Final. When a special crafted packet is received via SslHandler it doesn't correctly handle validation of such a packet in all cases which can lead to a native crash. Version 4.1.118.Final contains a patch. As workaround its possible to either disable the usage of the native SSLEngine or change the code manually.",
+      "modified_date": "2026-06-17T08:59:54.227",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-24970",
+      "nvd_cwe_ids": [
+        "CWE-20"
+      ],
+      "published_date": "2025-02-10T22:15:38.057"
+    },
+    "CVE-2025-25193": {
+      "cve_id": "CVE-2025-25193",
+      "description": "Netty, an asynchronous, event-driven network application framework, has a vulnerability in versions up to and including 4.1.118.Final. An unsafe reading of environment file could potentially cause a denial of service in Netty. When loaded on an Windows application, Netty attempts to load a file that does not exist. If an attacker creates such a large file, the Netty application crash. A similar issue was previously reported as CVE-2024-47535. This issue was fixed, but the fix was incomplete in that null-bytes were not counted against the input limit. Commit d1fbda62d3a47835d3fb35db8bd42ecc205a5386 contains an updated fix.",
+      "modified_date": "2026-06-17T09:00:27.567",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-25193",
+      "nvd_cwe_ids": [
+        "CWE-400"
+      ],
+      "published_date": "2025-02-10T22:15:38.450"
+    },
+    "CVE-2025-25247": {
+      "cve_id": "CVE-2025-25247",
+      "description": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in Apache Felix Webconsole.\n\nThis issue affects Apache Felix Webconsole 4.x up to 4.9.8 and 5.x up to 5.0.8.\n\nUsers are recommended to upgrade to version 4.9.10 or 5.0.10 or higher, which fixes the issue.",
+      "modified_date": "2026-06-17T09:00:33.310",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-25247",
+      "nvd_cwe_ids": [
+        "CWE-79"
+      ],
+      "published_date": "2025-02-10T12:15:29.557"
+    },
+    "CVE-2025-26074": {
+      "cve_id": "CVE-2025-26074",
+      "description": "Orkes Conductor v3.21.11 allows remote attackers to execute arbitrary OS commands through unrestricted access to Java classes.",
+      "modified_date": "2026-06-17T09:01:27.623",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-26074",
+      "nvd_cwe_ids": [
+        "CWE-78"
+      ],
+      "published_date": "2025-06-30T17:15:31.987"
+    },
+    "CVE-2025-26511": {
+      "cve_id": "CVE-2025-26511",
+      "description": "Systems running the Instaclustr \nfork of Stratio's Cassandra-Lucene-Index plugin versions 4.0-rc1-1.0.0 \nthrough 4.0.16-1.0.0 and 4.1.2-1.0.0 through 4.1.8-1.0.0, installed into\n Apache Cassandra version 4.x, are susceptible to a vulnerability which \nwhen successfully exploited could allow authenticated Cassandra users to\n remotely bypass RBAC and escalate their privileges.",
+      "modified_date": "2026-06-17T09:01:56.487",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-26511",
+      "nvd_cwe_ids": [
+        "CWE-863"
+      ],
+      "published_date": "2025-02-13T16:16:50.270"
+    },
+    "CVE-2025-26795": {
+      "cve_id": "CVE-2025-26795",
+      "description": "Exposure of Sensitive Information to an Unauthorized Actor, Insertion of Sensitive Information into Log File vulnerability in Apache IoTDB JDBC driver.\n\nThis issue affects iotdb-jdbc: from 0.10.0 through 1.3.3, from 2.0.1-beta before 2.0.2.\n\nUsers are recommended to upgrade to version 2.0.2 and 1.3.4, which fix the issue.",
+      "modified_date": "2026-06-17T09:02:27.023",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-26795",
+      "nvd_cwe_ids": [
+        "CWE-200",
+        "CWE-532"
+      ],
+      "published_date": "2025-05-14T11:16:26.487"
+    },
+    "CVE-2025-26864": {
+      "cve_id": "CVE-2025-26864",
+      "description": "Exposure of Sensitive Information to an Unauthorized Actor, Insertion of Sensitive Information into Log File vulnerability in the OpenIdAuthorizer of Apache IoTDB.\n\nThis issue affects Apache IoTDB: from 0.10.0 through 1.3.3, from 2.0.1-beta before 2.0.2.\n\nUsers are recommended to upgrade to version 1.3.4 and 2.0.2, which fix the issue.",
+      "modified_date": "2026-06-17T09:02:30.593",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-26864",
+      "nvd_cwe_ids": [
+        "CWE-200",
+        "CWE-532"
+      ],
+      "published_date": "2025-05-14T11:16:28.437"
+    },
+    "CVE-2025-27017": {
+      "cve_id": "CVE-2025-27017",
+      "description": "Apache NiFi 1.13.0 through 2.2.0 includes the username and password used to authenticate with MongoDB in the NiFi provenance events that MongoDB components generate during processing. An authorized user with read access to the provenance events of those processors may see the credentials information. Upgrading to Apache NiFi 2.3.0 is the recommended mitigation, which removes the credentials from provenance event records.",
+      "modified_date": "2026-06-17T09:02:46.027",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-27017",
+      "nvd_cwe_ids": [
+        "CWE-538"
+      ],
+      "published_date": "2025-03-12T17:15:50.327"
+    },
+    "CVE-2025-27136": {
+      "cve_id": "CVE-2025-27136",
+      "description": "LocalS3 is an Amazon S3 mock service for testing and local development. Prior to version 1.21, the LocalS3 service's bucket creation endpoint is vulnerable to XML External Entity (XXE) injection. When processing the CreateBucketConfiguration XML document during bucket creation, the service's XML parser is configured to resolve external entities. This allows an attacker to declare an external entity that references an internal URL, which the server will then attempt to fetch when parsing the XML. The vulnerability specifically occurs in the location constraint processing, where the XML parser resolves external entities without proper validation or restrictions. When the external entity is resolved, the server makes an HTTP request to the specified URL and includes the response content in the parsed XML document. This vulnerability can be exploited to perform server-side request forgery (SSRF) attacks, allowing an attacker to make requests to internal services or resources that should not be accessible from external networks. The server will include the responses from these internal requests in the resulting bucket configuration, effectively leaking sensitive information. The attacker only needs to be able to send HTTP requests to the LocalS3 service to exploit this vulnerability.",
+      "modified_date": "2026-06-17T09:03:04.770",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-27136",
+      "nvd_cwe_ids": [
+        "CWE-611"
+      ],
+      "published_date": "2025-03-10T19:15:40.770"
+    },
+    "CVE-2025-27427": {
+      "cve_id": "CVE-2025-27427",
+      "description": "A vulnerability exists in Apache ActiveMQ Artemis whereby a user with the createDurableQueue or createNonDurableQueue permission on an address can augment the routing-type supported by that address even if said user doesn't have the createAddress permission for that particular address. When combined with the send permission and automatic queue creation a user could successfully send a message with a routing-type not supported by the address when that message should actually be rejected on the basis that the user doesn't have permission to change the routing-type of the address.\n\nThis issue affects Apache ActiveMQ Artemis from 2.0.0 through 2.39.0.\n\nUsers are recommended to upgrade to version 2.40.0 which fixes the issue.",
+      "modified_date": "2026-06-17T09:03:34.233",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-27427",
+      "nvd_cwe_ids": [
+        "CWE-863"
+      ],
+      "published_date": "2025-04-01T08:15:13.860"
+    },
+    "CVE-2025-27496": {
+      "cve_id": "CVE-2025-27496",
+      "description": "Snowflake, a platform for using artificial intelligence in the context of cloud computing, has a vulnerability in the Snowflake JDBC driver (\"Driver\") in versions 3.0.13 through 3.23.0 of the driver. When the logging level was set to DEBUG, the Driver would log locally the client-side encryption master key of the target stage during the execution of GET/PUT commands. This key by itself does not grant access to any sensitive data without additional access authorizations,  and is not logged server-side by Snowflake. Snowflake fixed the issue in version 3.23.1.",
+      "modified_date": "2026-06-17T09:03:42.710",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-27496",
+      "nvd_cwe_ids": [
+        "CWE-532"
+      ],
+      "published_date": "2025-03-13T19:15:52.050"
+    },
+    "CVE-2025-27497": {
+      "cve_id": "CVE-2025-27497",
+      "description": "OpenDJ is an LDAPv3 compliant directory service. OpenDJ prior to 4.9.3 contains a denial-of-service (DoS) vulnerability that causes the server to become unresponsive to all LDAP requests without crashing or restarting. This issue occurs when an alias loop exists in the LDAP database. If an ldapsearch request is executed with alias dereferencing set to \"always\" on this alias entry, the server stops responding to all future requests. Fortunately, the server can be restarted without data corruption. This vulnerability is fixed in 4.9.3.",
+      "modified_date": "2026-06-17T09:03:42.817",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-27497",
+      "nvd_cwe_ids": [
+        "CWE-835"
+      ],
+      "published_date": "2025-03-05T16:15:40.587"
+    },
+    "CVE-2025-27505": {
+      "cve_id": "CVE-2025-27505",
+      "description": "GeoServer is an open source server that allows users to share and edit geospatial data. It is possible to bypass the default REST API security and access the index page. The REST API security handles rest and its subpaths but not rest with an extension (e.g., rest.html). The REST API index can disclose whether certain extensions are installed. This vulnerability is fixed in 2.26.3 and 2.25.6. As a workaround, in ${GEOSERVER_DATA_DIR}/security/config.xml, change the paths for the rest filter to /rest.*,/rest/** and change the paths for the gwc filter to /gwc/rest.*,/gwc/rest/** and restart GeoServer.",
+      "modified_date": "2026-06-17T09:03:43.363",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-27505",
+      "nvd_cwe_ids": [
+        "CWE-862"
+      ],
+      "published_date": "2025-06-10T15:15:23.903"
+    },
+    "CVE-2025-27508": {
+      "cve_id": "CVE-2025-27508",
+      "description": "Emissary is a P2P based data-driven workflow engine. The ChecksumCalculator class within allows for hashing and checksum generation, but it includes or defaults to algorithms that are no longer recommended for secure cryptographic use cases (e.g., SHA-1, CRC32, and SSDEEP). These algorithms, while possibly valid for certain non-security-critical tasks, can expose users to security risks if used in scenarios where strong cryptographic guarantees are required. This issue is fixed in 8.24.0.",
+      "modified_date": "2026-06-17T09:03:43.690",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-27508",
+      "nvd_cwe_ids": [
+        "CWE-327"
+      ],
+      "published_date": "2025-03-05T22:15:35.867"
+    },
+    "CVE-2025-27522": {
+      "cve_id": "CVE-2025-27522",
+      "description": "Deserialization of Untrusted Data vulnerability in Apache InLong.\n\nThis issue affects Apache InLong: from 1.13.0 through 2.1.0. This vulnerability is a secondary mining bypass for CVE-2024-26579. Users are advised to upgrade to Apache InLong's 2.2.0 or cherry-pick [1] to solve it.\n\n[1] \n\n https://github.com/apache/inlong/pull/11732",
+      "modified_date": "2026-06-17T09:03:45.203",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-27522",
+      "nvd_cwe_ids": [
+        "CWE-502"
+      ],
+      "published_date": "2025-05-28T08:15:21.540"
+    },
+    "CVE-2025-27526": {
+      "cve_id": "CVE-2025-27526",
+      "description": "Deserialization of Untrusted Data vulnerability in Apache InLong.\n\nThis issue affects Apache InLong: from 1.13.0 through 2.1.0. This vulnerability which can lead to JDBC Vulnerability URLEncdoe and backspace bypass. Users are advised to upgrade to Apache InLong's 2.2.0 or cherry-pick [1] to solve it.\n\n[1]  https://github.com/apache/inlong/pull/11747",
+      "modified_date": "2026-06-17T09:03:45.643",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-27526",
+      "nvd_cwe_ids": [
+        "CWE-502"
+      ],
+      "published_date": "2025-05-28T08:15:21.690"
+    },
+    "CVE-2025-27528": {
+      "cve_id": "CVE-2025-27528",
+      "description": "Deserialization of Untrusted Data vulnerability in Apache InLong.\n\nThis issue affects Apache InLong: from 1.13.0 through 2.1.0. \n\nThis\nvulnerability allows attackers to bypass the security mechanisms of InLong\nJDBC and leads to arbitrary file reading. Users are advised to upgrade to Apache InLong's 2.2.0 or cherry-pick [1] to solve it.\n\n[1]  https://github.com/apache/inlong/pull/11747",
+      "modified_date": "2026-06-17T09:03:45.790",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-27528",
+      "nvd_cwe_ids": [
+        "CWE-502"
+      ],
+      "published_date": "2025-05-28T08:15:21.830"
+    },
+    "CVE-2025-27531": {
+      "cve_id": "CVE-2025-27531",
+      "description": "Deserialization of Untrusted Data vulnerability in Apache InLong. \n\nThis issue affects Apache InLong: from 1.13.0 before 2.1.0, \n\nthis issue would allow an authenticated attacker to read arbitrary files by double writing the param.\n\n\n\n\n\nUsers are recommended to upgrade to version 2.1.0, which fixes the issue.",
+      "modified_date": "2026-06-17T09:03:45.933",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-27531",
+      "nvd_cwe_ids": [
+        "CWE-502"
+      ],
+      "published_date": "2025-06-06T15:15:23.883"
+    },
+    "CVE-2025-27818": {
+      "cve_id": "CVE-2025-27818",
+      "description": "A possible security vulnerability has been identified in Apache Kafka.\nThis requires access to a alterConfig to the cluster resource, or Kafka Connect worker, and the ability to create/modify connectors on it with an arbitrary Kafka client SASL JAAS config\nand a SASL-based security protocol, which has been possible on Kafka clusters since Apache Kafka 2.0.0 (Kafka Connect 2.3.0).\nWhen configuring the broker via config file or AlterConfig command, or connector via the Kafka Kafka Connect REST API, an authenticated operator can set the `sasl.jaas.config`\nproperty for any of the connector's Kafka clients to \"com.sun.security.auth.module.LdapLoginModule\", which can be done via the\n`producer.override.sasl.jaas.config`, `consumer.override.sasl.jaas.config`, or `admin.override.sasl.jaas.config` properties.\nThis will allow the server to connect to the attacker's LDAP server\nand deserialize the LDAP response, which the attacker can use to execute java deserialization gadget chains on the Kafka connect server.\nAttacker can cause unrestricted deserialization of untrusted data (or) RCE vulnerability when there are gadgets in the classpath.\n\nSince Apache Kafka 3.0.0, users are allowed to specify these properties in connector configurations for Kafka Connect clusters running with out-of-the-box\nconfigurations. Before Apache Kafka 3.0.0, users may not specify these properties unless the Kafka Connect cluster has been reconfigured with a connector\nclient override policy that permits them.\n\nSince Apache Kafka 3.9.1/4.0.0, we have added a system property (\"-Dorg.apache.kafka.disallowed.login.modules\") to disable the problematic login modules usage\nin SASL JAAS configuration. Also by default \"com.sun.security.auth.module.JndiLoginModule,com.sun.security.auth.module.LdapLoginModule\" are disabled in Apache Kafka Connect 3.9.1/4.0.0. \n\nWe advise the Kafka users to validate connector configurations and only allow trusted LDAP configurations. Also examine connector dependencies for \nvulnerable versions and either upgrade their connectors, upgrading that specific dependency, or removing the connectors as options for remediation. Finally,\nin addition to leveraging the \"org.apache.kafka.disallowed.login.modules\" system property, Kafka Connect users can also implement their own connector\nclient config override policy, which can be used to control which Kafka client properties can be overridden directly in a connector config and which cannot.",
+      "modified_date": "2026-06-17T09:04:16.457",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-27818",
+      "nvd_cwe_ids": [
+        "CWE-502"
+      ],
+      "published_date": "2025-06-10T08:15:22.533"
+    },
+    "CVE-2025-27820": {
+      "cve_id": "CVE-2025-27820",
+      "description": "A bug in PSL validation logic in Apache HttpClient 5.4.x disables domain checks, affecting cookie management and host name verification. Discovered by the Apache HttpClient team. Fixed in the 5.4.3 release",
+      "modified_date": "2026-06-17T09:04:16.777",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-27820",
+      "nvd_cwe_ids": [
+        "CWE-295"
+      ],
+      "published_date": "2025-04-24T12:15:16.723"
+    },
+    "CVE-2025-27888": {
+      "cve_id": "CVE-2025-27888",
+      "description": "Severity: medium (5.8) / important\n\nServer-Side Request Forgery (SSRF), Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting'), URL Redirection to Untrusted Site ('Open Redirect') vulnerability in Apache Druid.\n\nThis issue affects all previous Druid versions.\n\n\nWhen using the Druid management proxy, a request that has a specially crafted URL could be used to redirect the request to an arbitrary server instead. This has the potential for XSS or XSRF. The user is required to be authenticated for this exploit. The management proxy is enabled in Druid's out-of-box configuration. It may be disabled to mitigate this vulnerability. If the management proxy is disabled, some web console features will not work properly, but core functionality is unaffected.\n\n\nUsers are recommended to upgrade to Druid 31.0.2 or Druid 32.0.1, which fixes the issue.",
+      "modified_date": "2026-06-17T09:04:20.633",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-27888",
+      "nvd_cwe_ids": [
+        "CWE-601",
+        "CWE-79",
+        "CWE-918"
+      ],
+      "published_date": "2025-03-20T12:15:14.563"
+    },
+    "CVE-2025-2901": {
+      "cve_id": "CVE-2025-2901",
+      "description": "Rejected reason: This vulnerability is redundant to CVE-2025-23366 and CVE-2024-10234.",
+      "modified_date": "2025-06-20T12:15:21.010",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-2901",
+      "nvd_cwe_ids": [],
+      "published_date": "2025-03-28T14:15:22.020"
+    },
+    "CVE-2025-29908": {
+      "cve_id": "CVE-2025-29908",
+      "description": "Netty QUIC codec is a QUIC codec for netty which makes use of quiche. An issue was discovered in the codec. A hash collision vulnerability (in the hash map used to manage connections) allows remote attackers to cause a considerable CPU load on the server (a Hash DoS attack) by initiating connections with colliding Source Connection IDs (SCIDs). This vulnerability is fixed in 0.0.71.Final.",
+      "modified_date": "2026-06-17T09:05:51.863",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-29908",
+      "nvd_cwe_ids": [
+        "CWE-407"
+      ],
+      "published_date": "2025-03-31T19:15:40.367"
+    },
+    "CVE-2025-30067": {
+      "cve_id": "CVE-2025-30067",
+      "description": "Improper Control of Generation of Code ('Code Injection') vulnerability in Apache Kylin. \nIf an attacker gets access to Kylin's system or project admin permission, the JDBC connection configuration maybe altered to execute arbitrary code from the remote. You are fine as long as the Kylin's system and project admin access is well protected.\n\nThis issue affects Apache Kylin: from 4.0.0 through 5.0.1.\n\nUsers are recommended to upgrade to version 5.0.2 or above, which fixes the issue.",
+      "modified_date": "2026-06-17T09:08:07.027",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-30067",
+      "nvd_cwe_ids": [
+        "CWE-94"
+      ],
+      "published_date": "2025-03-27T15:16:02.033"
+    },
+    "CVE-2025-30145": {
+      "cve_id": "CVE-2025-30145",
+      "description": "GeoServer is an open source server that allows users to share and edit geospatial data. Malicious Jiffle scripts can be executed by GeoServer, either as a rendering transformation in WMS dynamic styles or as a WPS process, that can enter an infinite loop to trigger denial of service. This vulnerability is fixed in 2.27.0, 2.26.3, and 2.25.7. This vulnerability can be mitigated by disabling WMS dynamic styling and  the Jiffle process.",
+      "modified_date": "2026-06-17T09:08:14.830",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-30145",
+      "nvd_cwe_ids": [
+        "CWE-835"
+      ],
+      "published_date": "2025-06-10T15:15:24.070"
+    },
+    "CVE-2025-30177": {
+      "cve_id": "CVE-2025-30177",
+      "description": "Bypass/Injection vulnerability in Apache Camel in Camel-Undertow component under particular conditions.\n\nThis issue affects Apache Camel: from 4.10.0 before 4.10.3, from 4.8.0 before 4.8.6.\n\nUsers are recommended to upgrade to version 4.10.3 for 4.10.x LTS and 4.8.6 for 4.8.x LTS.\n\nCamel undertow component is vulnerable to Camel message header injection, in particular the custom header filter strategy used by the component only filter the \"out\" direction, while it doesn't filter the \"in\" direction.\n\n\nThis allows an attacker to include Camel specific headers that for some Camel components can alter the behaviour such as the camel-bean component, or the camel-exec component.",
+      "modified_date": "2026-06-17T09:08:18.247",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-30177",
+      "nvd_cwe_ids": [
+        "CWE-164"
+      ],
+      "published_date": "2025-04-01T12:15:15.747"
+    },
+    "CVE-2025-30197": {
+      "cve_id": "CVE-2025-30197",
+      "description": "Jenkins Zoho QEngine Plugin 1.0.29.vfa_cc23396502 and earlier does not mask the QEngine API Key form field, increasing the potential for attackers to observe and capture it.",
+      "modified_date": "2026-06-17T09:08:20.193",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-30197",
+      "nvd_cwe_ids": [
+        "CWE-549"
+      ],
+      "published_date": "2025-03-19T16:15:34.060"
+    },
+    "CVE-2025-31720": {
+      "cve_id": "CVE-2025-31720",
+      "description": "A missing permission check in Jenkins 2.503 and earlier, LTS 2.492.2 and earlier allows attackers with Computer/Create permission but without Computer/Extended Read permission to copy an agent, gaining access to its configuration.",
+      "modified_date": "2026-06-17T09:10:49.800",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-31720",
+      "nvd_cwe_ids": [
+        "CWE-862"
+      ],
+      "published_date": "2025-04-02T15:15:59.420"
+    },
+    "CVE-2025-31721": {
+      "cve_id": "CVE-2025-31721",
+      "description": "A missing permission check in Jenkins 2.503 and earlier, LTS 2.492.2 and earlier allows attackers with Computer/Create permission but without Computer/Configure permission to copy an agent, gaining access to encrypted secrets in its configuration.",
+      "modified_date": "2026-06-17T09:10:49.937",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-31721",
+      "nvd_cwe_ids": [
+        "CWE-862"
+      ],
+      "published_date": "2025-04-02T15:15:59.547"
+    },
+    "CVE-2025-31722": {
+      "cve_id": "CVE-2025-31722",
+      "description": "In Jenkins Templating Engine Plugin 2.5.3 and earlier, libraries defined in folders are not subject to sandbox protection, allowing attackers with Item/Configure permission to execute arbitrary code in the context of the Jenkins controller JVM.",
+      "modified_date": "2026-06-17T09:10:50.070",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-31722",
+      "nvd_cwe_ids": [
+        "CWE-94"
+      ],
+      "published_date": "2025-04-02T15:15:59.680"
+    },
+    "CVE-2025-31723": {
+      "cve_id": "CVE-2025-31723",
+      "description": "A cross-site request forgery (CSRF) vulnerability in Jenkins Simple Queue Plugin 1.4.6 and earlier allows attackers to change and reset the build queue order.",
+      "modified_date": "2026-06-17T09:10:50.203",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-31723",
+      "nvd_cwe_ids": [
+        "CWE-352"
+      ],
+      "published_date": "2025-04-02T15:15:59.803"
+    },
+    "CVE-2025-32897": {
+      "cve_id": "CVE-2025-32897",
+      "description": "Deserialization of Untrusted Data vulnerability in Apache Seata (incubating).\n\nThis security vulnerability is the same as CVE-2024-47552, but the version range described in the CVE-2024-47552 definition is too narrow.\nThis issue affects Apache Seata (incubating): from 2.0.0 before 2.3.0.\n\nSeverity Justification:\nThe Apache Seata security team assesses the severity of this vulnerability as \"Low\" due to stringent real-world mitigating factors. First, the vulnerability is strictly isolated to the Raft cluster mode, an optional and non-default feature introduced in v2.0.0, while most users rely on the unaffected traditional architecture. Second, Seata is an internal middleware; communication between TC and RM/TM occurs entirely within trusted internal networks. An attacker would require prior, unauthorized access to the Intranet to exploit this, making external exploitation highly improbable.\nUsers are recommended to upgrade to version 2.3.0, which fixes the issue.",
+      "modified_date": "2026-06-17T09:12:46.183",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-32897",
+      "nvd_cwe_ids": [
+        "CWE-502"
+      ],
+      "published_date": "2025-06-28T19:15:21.917"
+    },
+    "CVE-2025-32959": {
+      "cve_id": "CVE-2025-32959",
+      "description": "CUBA Platform is a high level framework for enterprise applications development. Prior to version 7.2.23, the local file storage implementation does not restrict the size of uploaded files. An attacker could exploit this by uploading excessively large files, potentially causing the server to run out of space and return HTTP 500 error, resulting in a denial of service. This issue has been patched in version 7.2.23. A workaround is provided on the Jmix documentation website.",
+      "modified_date": "2026-06-17T09:12:51.990",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-32959",
+      "nvd_cwe_ids": [
+        "CWE-770"
+      ],
+      "published_date": "2025-04-22T18:16:00.233"
+    },
+    "CVE-2025-32960": {
+      "cve_id": "CVE-2025-32960",
+      "description": "The CUBA REST API add-on performs operations on data and entities. Prior to version 7.2.7, the input parameter, which consists of a file path and name, can be manipulated to return the Content-Type header with text/html if the name part ends with .html. This could allow malicious JavaScript code to be executed in the browser. For a successful attack, a malicious file needs to be uploaded beforehand. This issue has been patched in version 7.2.7. A workaround is provided on the Jmix documentation website.",
+      "modified_date": "2026-06-17T09:12:52.090",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-32960",
+      "nvd_cwe_ids": [
+        "CWE-79"
+      ],
+      "published_date": "2025-04-22T18:16:00.380"
+    },
+    "CVE-2025-32961": {
+      "cve_id": "CVE-2025-32961",
+      "description": "The Cuba JPA web API enables loading and saving any entities defined in the application data model by sending simple HTTP requests. Prior to version 1.1.1, the input parameter, which consists of a file path and name, can be manipulated to return the Content-Type header with text/html if the name part ends with .html. This could allow malicious JavaScript code to be executed in the browser. For a successful attack, a malicious file needs to be uploaded beforehand. This issue has been patched in version 1.1.1. A workaround is provided on the Jmix documentation website.",
+      "modified_date": "2026-06-17T09:12:52.187",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-32961",
+      "nvd_cwe_ids": [
+        "CWE-79"
+      ],
+      "published_date": "2025-04-22T18:16:00.557"
+    },
+    "CVE-2025-3501": {
+      "cve_id": "CVE-2025-3501",
+      "description": "A flaw was found in Keycloak. By setting a verification policy to 'ALL', the trust store certificate verification is skipped, which is unintended.",
+      "modified_date": "2026-09-21T06:17:00.330",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-3501",
+      "nvd_cwe_ids": [
+        "CWE-297"
+      ],
+      "published_date": "2025-04-29T21:15:51.523"
+    },
+    "CVE-2025-3910": {
+      "cve_id": "CVE-2025-3910",
+      "description": "A flaw was found in Keycloak. The org.keycloak.authorization package may be vulnerable to circumventing required actions, allowing users to circumvent requirements such as setting up two-factor authentication.",
+      "modified_date": "2026-09-21T06:17:00.497",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-3910",
+      "nvd_cwe_ids": [
+        "CWE-287"
+      ],
+      "published_date": "2025-04-29T21:15:51.707"
+    },
+    "CVE-2025-41234": {
+      "cve_id": "CVE-2025-41234",
+      "description": "Description\n\nIn Spring Framework, versions 6.0.x as of 6.0.5, versions 6.1.x and 6.2.x, an application is vulnerable to a reflected file download (RFD) attack when it sets a “Content-Disposition” header with a non-ASCII charset, where the filename attribute is derived from user-supplied input.\n\nSpecifically, an application is vulnerable when all the following are true:\n\n  *  The header is prepared with org.springframework.http.ContentDisposition.\n  *  The filename is set via ContentDisposition.Builder#filename(String, Charset).\n  *  The value for the filename is derived from user-supplied input.\n  *  The application does not sanitize the user-supplied input.\n  *  The downloaded content of the response is injected with malicious commands by the attacker (see RFD paper reference for details).\n\n\nAn application is not vulnerable if any of the following is true:\n\n  *  The application does not set a “Content-Disposition” response header.\n  *  The header is not prepared with org.springframework.http.ContentDisposition.\n  *  The filename is set via one of:  *  ContentDisposition.Builder#filename(String), or\n  *  ContentDisposition.Builder#filename(String, ASCII)\n\n\n\n  *  The filename is not derived from user-supplied input.\n  *  The filename is derived from user-supplied input but sanitized by the application.\n  *  The attacker cannot inject malicious content in the downloaded content of the response.\n\n\nAffected Spring Products and VersionsSpring Framework:\n\n  *  6.2.0 - 6.2.7\n  *  6.1.0 - 6.1.20\n  *  6.0.5 - 6.0.28\n  *  Older, unsupported versions are not affected\n\n\nMitigationUsers of affected versions should upgrade to the corresponding fixed version.\n\nAffected version(s)Fix versionAvailability6.2.x6.2.8OSS6.1.x6.1.21OSS6.0.x6.0.29 Commercial https://enterprise.spring.io/ No further mitigation steps are necessary.\n\n\nCWE-113 in `Content-Disposition` handling in VMware Spring Framework versions 6.0.5 to 6.2.7 allows remote attackers to launch Reflected File Download (RFD) attacks via unsanitized user input in `ContentDisposition.Builder#filename(String, Charset)` with non-ASCII charsets.",
+      "modified_date": "2026-06-17T09:22:38.830",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-41234",
+      "nvd_cwe_ids": [
+        "CWE-113"
+      ],
+      "published_date": "2025-06-12T22:15:21.090"
+    },
+    "CVE-2025-46096": {
+      "cve_id": "CVE-2025-46096",
+      "description": "Directory Traversal vulnerability in solon v.3.1.2 allows a remote attacker to conduct XSS attacks via the solon-faas-luffy component",
+      "modified_date": "2026-06-17T09:25:55.830",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-46096",
+      "nvd_cwe_ids": [
+        "CWE-22",
+        "CWE-79"
+      ],
+      "published_date": "2025-06-13T13:15:21.710"
+    },
+    "CVE-2025-4641": {
+      "cve_id": "CVE-2025-4641",
+      "description": "Improper Restriction of XML External Entity Reference vulnerability in bonigarcia webdrivermanager WebDriverManager on Windows, MacOS, Linux (XML parsing components modules) allows Data Serialization External Entities Blowup. This vulnerability is associated with program files src/main/java/io/github/bonigarcia/wdm/WebDriverManager.java.\n\nThis issue affects webdrivermanager: from 1.0.0 before 6.0.2.",
+      "modified_date": "2026-06-17T09:33:40.020",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-4641",
+      "nvd_cwe_ids": [
+        "CWE-611"
+      ],
+      "published_date": "2025-05-14T19:15:53.683"
+    },
+    "CVE-2025-46548": {
+      "cve_id": "CVE-2025-46548",
+      "description": "If you enable Basic Authentication in Pekko Management using the Java DSL, the authenticator may not be properly applied.\n\n\nUsers that rely on authentication instead of making sure the Management API ports are only available to trusted users are recommended to upgrade to version 1.1.1, which fixes this issue.\n\n\n\n\nAkka was affected by the same issue and has released the fix in version 1.6.1.",
+      "modified_date": "2026-06-17T09:26:36.550",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-46548",
+      "nvd_cwe_ids": [
+        "CWE-287"
+      ],
+      "published_date": "2025-06-03T15:15:59.110"
+    },
+    "CVE-2025-46558": {
+      "cve_id": "CVE-2025-46558",
+      "description": "XWiki Contrib's Syntax Markdown allows importing Markdown content into wiki pages and creating wiki content in Markdown. In versions starting from 8.2 to before 8.9, the Markdown syntax is vulnerable to cross-site scripting (XSS) through HTML. In particular, using Markdown syntax, it's possible for any user to embed Javascript code that will then be executed on the browser of any other user visiting either the document or the comment that contains it. In the instance that this code is executed by a user with admins or programming rights, this issue compromises the confidentiality, integrity and availability of the whole XWiki installation. This issue has been patched in version 8.9.",
+      "modified_date": "2026-06-17T09:26:37.613",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-46558",
+      "nvd_cwe_ids": [
+        "CWE-79"
+      ],
+      "published_date": "2025-04-30T19:15:55.930"
+    },
+    "CVE-2025-47293": {
+      "cve_id": "CVE-2025-47293",
+      "description": "PowSyBl (Power System Blocks) is a framework to build power system oriented software. Prior to version 6.7.2, in certain places, powsybl-core XML parsing is vulnerable to an XML external entity (XXE) attack and to a server-side request forgery (SSRF) attack. This allows an attacker to elevate their privileges to read files that they do not have permissions to, including sensitive files on the system. The vulnerable class is com.powsybl.commons.xml.XmlReader which is considered to be untrusted in use cases where untrusted users can submit their XML to the vulnerable methods. This can be a multi-tenant application that hosts many different users perhaps with different privilege levels. This issue has been patched in com.powsybl:powsybl-commons: 6.7.2.",
+      "modified_date": "2026-06-17T09:27:40.973",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-47293",
+      "nvd_cwe_ids": [
+        "CWE-611",
+        "CWE-918"
+      ],
+      "published_date": "2025-06-19T22:15:19.983"
+    },
+    "CVE-2025-47771": {
+      "cve_id": "CVE-2025-47771",
+      "description": "PowSyBl (Power System Blocks) is a framework to build power system oriented software. In versions 6.3.0 to 6.7.1, there is a deserialization issue in the read method of the SparseMatrix class that can lead to a wide range of privilege escalations depending on the circumstances. This method takes in an InputStream and returns a SparseMatrix object. This issue has been patched in com.powsybl:powsybl-math: 6.7.2. A workaround for this issue involves not using SparseMatrix deserialization (SparseMatrix.read(...) methods).",
+      "modified_date": "2026-06-17T09:28:39.817",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-47771",
+      "nvd_cwe_ids": [
+        "CWE-502"
+      ],
+      "published_date": "2025-06-20T00:15:29.730"
+    },
+    "CVE-2025-47885": {
+      "cve_id": "CVE-2025-47885",
+      "description": "Jenkins Health Advisor by CloudBees Plugin 374.v194b_d4f0c8c8 and earlier does not escape responses from the Jenkins Health Advisor server, resulting in a stored cross-site scripting (XSS) vulnerability exploitable by attackers able to control Jenkins Health Advisor server responses.",
+      "modified_date": "2026-06-17T09:28:47.740",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-47885",
+      "nvd_cwe_ids": [
+        "CWE-79"
+      ],
+      "published_date": "2025-05-14T21:15:59.483"
+    },
+    "CVE-2025-48058": {
+      "cve_id": "CVE-2025-48058",
+      "description": "PowSyBl (Power System Blocks) is a framework to build power system oriented software. Prior to version 6.7.2, there is a potential polynomial Regular Expression Denial of Service (ReDoS) vulnerability in the PowSyBl's DataSource mechanism. If successfully exploited, a malicious actor can cause significant CPU consumption due to regex backtracking — even with polynomial patterns. This issue has been patched in com.powsybl:powsybl-commons: 6.7.2.",
+      "modified_date": "2026-06-17T09:29:04.860",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-48058",
+      "nvd_cwe_ids": [
+        "CWE-1333"
+      ],
+      "published_date": "2025-06-20T01:15:38.530"
+    },
+    "CVE-2025-48059": {
+      "cve_id": "CVE-2025-48059",
+      "description": "PowSyBl (Power System Blocks) is a framework to build power system oriented software. In com.powsybl:powsybl-iidm-criteria versions 6.3.0 to before 6.7.2 and com.powsybl:powsybl-contingency-api versions 5.0.0 to before 6.3.0, there is a a potential polynomial Regular Expression Denial of Service (ReDoS) vulnerability in the RegexCriterion class. This class compiles and evaluates an unvalidated, user-supplied regular expression against the identifier of an Identifiable object via Pattern.compile(regex).matcher(id).find(). If successfully exploited, a malicious actor can cause significant CPU exhaustion through repeated or recursive filter(...) calls — especially if performed over large network models or filtering operations. This issue has been patched in com.powsybl:powsybl-iidm-criteria 6.7.2.",
+      "modified_date": "2026-06-17T09:29:04.967",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-48059",
+      "nvd_cwe_ids": [
+        "CWE-1333"
+      ],
+      "published_date": "2025-06-20T17:15:40.560"
+    },
+    "CVE-2025-48734": {
+      "cve_id": "CVE-2025-48734",
+      "description": "Improper Access Control vulnerability in Apache Commons.\n\n\n\nA special BeanIntrospector class was added in version 1.9.2. This can be used to stop attackers from using the declared class property of Java enum objects to get access to the classloader. However this protection was not enabled by default. PropertyUtilsBean (and consequently BeanUtilsBean) now disallows declared class level property access by default.\n\n\n\n\n\nReleases 1.11.0 and 2.0.0-M2 address a potential security issue when accessing enum properties in an uncontrolled way. If an application using Commons BeanUtils passes property paths from an external source directly to the getProperty() method of PropertyUtilsBean, an attacker can access the enum’s class loader via the “declaredClass” property available on all Java “enum” objects. Accessing the enum’s “declaredClass” allows remote attackers to access the ClassLoader and execute arbitrary code. The same issue exists with PropertyUtilsBean.getNestedProperty().\nStarting in versions 1.11.0 and 2.0.0-M2 a special BeanIntrospector suppresses the “declaredClass” property. Note that this new BeanIntrospector is enabled by default, but you can disable it to regain the old behavior; see section 2.5 of the user's guide and the unit tests.\n\nThis issue affects Apache Commons BeanUtils 1.x before 1.11.0, and 2.x before 2.0.0-M2.Users of the artifact commons-beanutils:commons-beanutils\n\n 1.x are recommended to upgrade to version 1.11.0, which fixes the issue.\n\n\nUsers of the artifact org.apache.commons:commons-beanutils2\n\n 2.x are recommended to upgrade to version 2.0.0-M2, which fixes the issue.",
+      "modified_date": "2026-06-17T09:30:14.797",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-48734",
+      "nvd_cwe_ids": [
+        "CWE-284"
+      ],
+      "published_date": "2025-05-28T14:15:34.070"
+    },
+    "CVE-2025-48795": {
+      "cve_id": "CVE-2025-48795",
+      "description": "Apache CXF stores large stream based messages as temporary files on the local filesystem. A bug was introduced which means that the entire temporary file is read into memory and then logged. An attacker might be able to exploit this to cause a denial of service attack by causing an out of memory exception. In addition, it is possible to configure CXF to encrypt temporary files to prevent sensitive credentials from being cached unencrypted on the local filesystem, however this bug means that the cached files are written out to logs unencrypted.\n\nUsers are recommended to upgrade to versions 3.5.11, 3.6.6, 4.0.7 or 4.1.1, which fixes this issue.",
+      "modified_date": "2026-06-17T09:30:18.430",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-48795",
+      "nvd_cwe_ids": [
+        "CWE-400"
+      ],
+      "published_date": "2025-07-15T15:15:24.697"
+    },
+    "CVE-2025-48881": {
+      "cve_id": "CVE-2025-48881",
+      "description": "Valtimo is a platform for Business Process Automation. In versions starting from 11.0.0.RELEASE to 11.3.3.RELEASE and 12.0.0.RELEASE to 12.12.0.RELEASE, all objects for which an object-management configuration exists can be listed, viewed, edited, created or deleted by unauthorised users. If object-urls are exposed via other channels, the contents of these objects can be viewed independent of object-management configurations. This issue has been patched in version 12.13.0.RELEASE.  A workaround for this issue involves overriding the endpoint security as defined in ObjectenApiHttpSecurityConfigurer and ObjectManagementHttpSecurityConfigurer. Depending on the implementation, this could result in loss of functionality.",
+      "modified_date": "2026-06-17T09:30:25.537",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-48881",
+      "nvd_cwe_ids": [
+        "CWE-863"
+      ],
+      "published_date": "2025-05-30T06:15:28.327"
+    },
+    "CVE-2025-48955": {
+      "cve_id": "CVE-2025-48955",
+      "description": "Para is a multitenant backend server/framework for object persistence and retrieval. A vulnerability that exists in versions prior to 1.50.8 exposes both access and secret keys in logs without redaction. These credentials are later reused in variable assignments for persistence but do not require logging for debugging or system health purposes. Version 1.50.8 fixes the issue.",
+      "modified_date": "2026-06-17T09:30:33.643",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-48955",
+      "nvd_cwe_ids": [
+        "CWE-532"
+      ],
+      "published_date": "2025-06-02T12:15:25.523"
+    },
+    "CVE-2025-48976": {
+      "cve_id": "CVE-2025-48976",
+      "description": "Allocation of resources for multipart headers with insufficient limits enabled a DoS vulnerability in Apache Commons FileUpload.\n\nThis issue affects Apache Commons FileUpload: from 1.0 before 1.6; from 2.0.0-M1 before 2.0.0-M4.\n\nUsers are recommended to upgrade to versions 1.6 or 2.0.0-M4, which fix the issue.",
+      "modified_date": "2026-06-17T09:30:35.803",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-48976",
+      "nvd_cwe_ids": [
+        "CWE-770"
+      ],
+      "published_date": "2025-06-16T15:15:24.460"
+    },
+    "CVE-2025-48988": {
+      "cve_id": "CVE-2025-48988",
+      "description": "Allocation of Resources Without Limits or Throttling vulnerability in Apache Tomcat.\n\nThis issue affects Apache Tomcat: from 11.0.0-M1 through 11.0.7, from 10.1.0-M1 through 10.1.41, from 9.0.0.M1 through 9.0.105.\nThe following versions were EOL at the time the CVE was created but are \nknown to be affected: 8.5.0 though 8.5.100. Other, older, EOL versions \nmay also be affected.\n\n\nUsers are recommended to upgrade to version 11.0.8, 10.1.42 or 9.0.106, which fix the issue.",
+      "modified_date": "2026-06-17T09:30:37.383",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-48988",
+      "nvd_cwe_ids": [
+        "CWE-770"
+      ],
+      "published_date": "2025-06-16T15:15:24.563"
+    },
+    "CVE-2025-49009": {
+      "cve_id": "CVE-2025-49009",
+      "description": "Para is a multitenant backend server/framework for object persistence and retrieval. A vulnerability that exists in versions prior to 1.50.8 in `FacebookAuthFilter.java` results in a full request URL being logged during a failed request to a Facebook user profile. The log includes the user's access token in plain text. Since WARN-level logs are often retained in production and accessible to operators or log aggregation systems, this poses a risk of token exposure. Version 1.50.8 fixes the issue.",
+      "modified_date": "2026-06-17T09:30:39.890",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-49009",
+      "nvd_cwe_ids": [
+        "CWE-532"
+      ],
+      "published_date": "2025-06-05T17:15:29.570"
+    },
+    "CVE-2025-49125": {
+      "cve_id": "CVE-2025-49125",
+      "description": "Authentication Bypass Using an Alternate Path or Channel vulnerability in Apache Tomcat.  When using PreResources or PostResources mounted other than at the root of the web application, it was possible to access those resources via an unexpected path. That path was likely not to be protected by the same security constraints as the expected path, allowing those security constraints to be bypassed.\n\nThis issue affects Apache Tomcat: from 11.0.0-M1 through 11.0.7, from 10.1.0-M1 through 10.1.41, from 9.0.0.M1 through 9.0.105.\nThe following versions were EOL at the time the CVE was created but are \nknown to be affected: 8.5.0 through 8.5.100. Other, older, EOL versions \nmay also be affected.\n\n\nUsers are recommended to upgrade to version 11.0.8, 10.1.42 or 9.0.106, which fix the issue.",
+      "modified_date": "2026-06-17T09:30:47.307",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-49125",
+      "nvd_cwe_ids": [
+        "CWE-288"
+      ],
+      "published_date": "2025-06-16T15:15:24.850"
+    },
+    "CVE-2025-49574": {
+      "cve_id": "CVE-2025-49574",
+      "description": "Quarkus is a Cloud Native, (Linux) Container First framework for writing Java applications. In versions prior to 3.24.1, 3.20.2, and 3.15.6, there is a potential data leak when duplicating a duplicated context. Quarkus extensively uses the Vert.x duplicated context to implement context propagation. With the new semantic data from one transaction can leak to the data from another transaction. From a Vert.x point of view, this new semantic clarifies the behavior. A significant amount of data is stored in the duplicated context, including request scope, security details, and metadata. Duplicating a duplicated context is rather rare and is only done in a few places. This issue has been patched in version 3.24.1, 3.20.2, and 3.15.6.",
+      "modified_date": "2026-06-17T09:31:30.923",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-49574",
+      "nvd_cwe_ids": [
+        "CWE-668"
+      ],
+      "published_date": "2025-06-23T20:15:28.170"
+    },
+    "CVE-2025-49656": {
+      "cve_id": "CVE-2025-49656",
+      "description": "Users with administrator access can create databases files outside the files area of the Fuseki server.\n\nThis issue affects Apache Jena version up to 5.4.0.\n\nUsers are recommended to upgrade to version 5.5.0, which fixes the issue.",
+      "modified_date": "2026-06-17T09:31:36.130",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-49656",
+      "nvd_cwe_ids": [
+        "CWE-22"
+      ],
+      "published_date": "2025-07-21T10:15:25.440"
+    },
+    "CVE-2025-52520": {
+      "cve_id": "CVE-2025-52520",
+      "description": "For some unlikely configurations of multipart upload, an Integer Overflow vulnerability in Apache Tomcat could lead to a DoS via bypassing of size limits.\n\nThis issue affects Apache Tomcat: from 11.0.0-M1 through 11.0.8, from 10.1.0-M1 through 10.1.42, from 9.0.0.M1 through 9.0.106.\nThe following versions were EOL at the time the CVE was created but are \nknown to be affected: 8.5.0 through 8.5.100. Other, older, EOL versions \nmay also be affected.\n\n\nUsers are recommended to upgrade to version 11.0.9, 10.1.43 or 9.0.107, which fix the issue.",
+      "modified_date": "2026-06-17T09:36:37.370",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-52520",
+      "nvd_cwe_ids": [
+        "CWE-190"
+      ],
+      "published_date": "2025-07-10T19:15:25.570"
+    },
+    "CVE-2025-52888": {
+      "cve_id": "CVE-2025-52888",
+      "description": "Allure 2 is the version 2.x branch of Allure Report, a multi-language test reporting tool. A critical XML External Entity (XXE) vulnerability exists in the xunit-xml-plugin used by Allure 2 prior to version 2.34.1. The plugin fails to securely configure the XML parser (`DocumentBuilderFactory`) and allows external entity expansion when processing test result .xml files. This allows attackers to read arbitrary files from the file system and potentially trigger server-side request forgery (SSRF). Version 2.34.1 contains a patch for the issue.",
+      "modified_date": "2026-06-17T09:37:13.210",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-52888",
+      "nvd_cwe_ids": [
+        "CWE-611"
+      ],
+      "published_date": "2025-06-24T20:15:26.700"
+    },
+    "CVE-2025-53003": {
+      "cve_id": "CVE-2025-53003",
+      "description": "The Janssen Project is an open-source identity and access management (IAM) platform. Prior to version 1.8.0, the Config API returns results without scope verification. This has a large internal surface attack area that exposes all sorts of information from the IDP including clients, users, scripts ..etc. This issue has been patched in version 1.8.0. A workaround for this vulnerability involves users forking and building the config api, patching it in their system following commit 92eea4d.",
+      "modified_date": "2026-06-17T09:37:27.433",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-53003",
+      "nvd_cwe_ids": [
+        "CWE-200",
+        "CWE-269",
+        "CWE-284"
+      ],
+      "published_date": "2025-07-01T02:15:22.413"
+    },
+    "CVE-2025-53103": {
+      "cve_id": "CVE-2025-53103",
+      "description": "JUnit is a testing framework for Java and the JVM. From version 5.12.0 to 5.13.1, JUnit's support for writing Open Test Reporting XML files can leak Git credentials. The impact depends on the level of the access token exposed through the OpenTestReportGeneratingListener. If these test reports are published or stored anywhere public, then there is the possibility that a rouge attacker can steal the token and perform elevated actions by impersonating the user or app. This issue as been patched in version 5.13.2.",
+      "modified_date": "2026-06-17T09:37:37.880",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-53103",
+      "nvd_cwe_ids": [
+        "CWE-312"
+      ],
+      "published_date": "2025-07-01T18:15:25.837"
+    },
+    "CVE-2025-53106": {
+      "cve_id": "CVE-2025-53106",
+      "description": "Graylog is a free and open log management platform. In versions 6.2.0 to before 6.2.4 and 6.3.0-alpha.1 to before 6.3.0-rc.2, Graylog users can gain elevated privileges by creating and using API tokens for the local Administrator or any other user for whom the malicious user knows the ID. For the attack to succeed, the attacker needs a user account in Graylog. They can then proceed to issue hand-crafted requests to the Graylog REST API and exploit a weak permission check for token creation. This issue has been patched in versions 6.2.4 and 6.3.0-rc.2. A workaround involves disabling the respective configuration found in System > Configuration > Users > \"Allow users to create personal access tokens\".",
+      "modified_date": "2026-06-17T09:37:38.193",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-53106",
+      "nvd_cwe_ids": [
+        "CWE-285"
+      ],
+      "published_date": "2025-07-02T14:15:26.273"
+    },
+    "CVE-2025-53506": {
+      "cve_id": "CVE-2025-53506",
+      "description": "Uncontrolled Resource Consumption vulnerability in Apache Tomcat if an HTTP/2 client did not acknowledge the initial settings frame that reduces the maximum permitted concurrent streams.\n\nThis issue affects Apache Tomcat: from 11.0.0-M1 through 11.0.8, from 10.1.0-M1 through 10.1.42, from 9.0.0.M1 through 9.0.106.\nThe following versions were EOL at the time the CVE was created but are \nknown to be affected: 8.5.0 through 8.5.100. Other EOL versions may also be affected.\n\n\nUsers are recommended to upgrade to version 11.0.9, 10.1.43 or 9.0.107, which fix the issue.",
+      "modified_date": "2026-06-17T09:38:20.783",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-53506",
+      "nvd_cwe_ids": [
+        "CWE-400"
+      ],
+      "published_date": "2025-07-10T20:15:26.970"
+    },
+    "CVE-2025-53621": {
+      "cve_id": "CVE-2025-53621",
+      "description": "DSpace open source software is a repository application which provides durable access to digital resources. Two related XML External Entity (XXE) injection possibilities impact all versions of DSpace prior to 7.6.4, 8.2, and 9.1. External entities are not disabled when parsing XML files during import of an archive (in Simple Archive Format), either from command-line (`./dspace import` command) or from the \"Batch Import (Zip)\" user interface feature. External entities are also not explicitly disabled when parsing XML responses from some upstream services (ArXiv, Crossref, OpenAIRE, Creative Commons) used in import from external sources via the user interface or REST API. An XXE injection in these files may result in a connection being made to an attacker's site or a local path readable by the Tomcat user, with content potentially being injected into a metadata field. In the latter case, this may result in sensitive content disclosure, including retrieving arbitrary files or configurations from the server where DSpace is running. The Simple Archive Format (SAF) importer / Batch Import (Zip) is only usable by site administrators (from user interface / REST API) or system administrators (from command-line). Therefore, to exploit this vulnerability, the malicious payload would have to be provided by an attacker and trusted by an administrator, who would trigger the import. The fix is included in DSpace 7.6.4, 8.2, and 9.1. Please upgrade to one of these versions. For those who cannot upgrade immediately, it is possible to manually patch the DSpace backend. One may also apply some best practices, though the protection provided is not as complete as upgrading. Administrators must carefully inspect any SAF archives (they did not construct themselves) before importing. As necessary, affected external services can be disabled to mitigate the ability for payloads to be delivered via external service APIs.",
+      "modified_date": "2026-06-17T09:38:35.270",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-53621",
+      "nvd_cwe_ids": [
+        "CWE-611"
+      ],
+      "published_date": "2025-07-15T15:15:25.517"
+    },
+    "CVE-2025-53622": {
+      "cve_id": "CVE-2025-53622",
+      "description": "DSpace open source software is a repository application which provides durable access to digital resources. Prior to versions 7.6.4, 8.2, and 9.1, a path traversal vulnerability is possible during the import of an archive (in Simple Archive Format), either from command-line (`./dspace import` command) or from the \"Batch Import (Zip)\" user interface feature. An attacker may craft a malicious Simple Archive Format (SAF) package where the `contents` file references any system files (using relative traversal sequences) which are readable by the Tomcat user.  If such a package is imported, this will result in sensitive content disclose, including retrieving arbitrary files or configurations from the server where DSpace is running. The Simple Archive Format (SAF) importer / Batch Import (Zip) is only usable by site administrators (from user interface / REST API) or system administrators (from command-line). Therefore, to exploit this vulnerability, the malicious payload would have to be provided by an attacker and trusted by an administrator (who would trigger the import). The fix is included in DSpace 7.6.4, 8.2 and 9.1. For those who cannot upgrade immediately, it is possible to manually patch the DSpace backend. (No changes are necessary to the frontend.)  A pull request exists which can be used to patch systems running DSpace 7.6.x, 8.x or 9.0. Although it is not possible to fully protect the system via workarounds, one may can apply a best practice. Administrators must carefully inspect any SAF archives (they did not construct themselves) before importing, paying close attention to the `contents` file to validate it does not reference files outside of the SAF archives.",
+      "modified_date": "2026-06-17T09:38:35.390",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-53622",
+      "nvd_cwe_ids": [
+        "CWE-22"
+      ],
+      "published_date": "2025-07-15T15:15:25.680"
+    },
+    "CVE-2025-53689": {
+      "cve_id": "CVE-2025-53689",
+      "description": "Blind XXE Vulnerabilities in jackrabbit-spi-commons and jackrabbit-core in Apache Jackrabbit < 2.23.2 due to usage of an unsecured document build to load privileges.\n\nUsers are recommended to upgrade to versions 2.20.17 (Java 8), 2.22.1 (Java 11) or 2.23.2 (Java 11, beta versions), which fix this issue. Earlier versions (up to 2.20.16) are not supported anymore, thus users should update to the respective supported version.",
+      "modified_date": "2026-06-17T09:38:42.977",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-53689",
+      "nvd_cwe_ids": [
+        "CWE-611"
+      ],
+      "published_date": "2025-07-14T10:15:28.587"
+    },
+    "CVE-2025-54380": {
+      "cve_id": "CVE-2025-54380",
+      "description": "Opencast is a free, open-source platform to support the management of educational audio and video content. Prior to version 17.6, Opencast would incorrectly send the hashed global system account credentials (ie: org.opencastproject.security.digest.user and org.opencastproject.security.digest.pass) when attempting to fetch mediapackage elements included in a mediapackage XML file. A previous CVE prevented many cases where the credentials were inappropriately sent, but not all. Anyone with ingest permissions could cause Opencast to send its hashed global system account credentials to a url of their choosing. This issue is fixed in Opencast 17.6.",
+      "modified_date": "2026-06-17T09:39:57.343",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-54380",
+      "nvd_cwe_ids": [
+        "CWE-200",
+        "CWE-522"
+      ],
+      "published_date": "2025-07-26T04:16:06.190"
+    },
+    "CVE-2025-6384": {
+      "cve_id": "CVE-2025-6384",
+      "description": "Improper Control of Dynamically-Managed Code Resources vulnerability in Crafter Studio of CrafterCMS allows authenticated developers to execute OS commands via Groovy Sandbox Bypass.\n\nBy inserting malicious Groovy elements, an attacker may bypass Sandbox restrictions and obtain RCE (Remote Code Execution).\n\nThis issue affects CrafterCMS: from 4.0.0 through 4.2.2.",
+      "modified_date": "2026-06-17T10:01:46.530",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-6384",
+      "nvd_cwe_ids": [
+        "CWE-913"
+      ],
+      "published_date": "2025-06-19T21:15:27.390"
+    },
+    "CVE-2025-7365": {
+      "cve_id": "CVE-2025-7365",
+      "description": "A flaw was found in Keycloak. When an authenticated attacker attempts to merge accounts with another existing account during an identity provider (IdP) login, the attacker will subsequently be prompted to \"review profile\" information. This vulnerability allows the attacker to modify their email address to match that of a victim's account, triggering a verification email sent to the victim's email address. The attacker's email address is not present in the verification email content, making it a potential phishing opportunity. If the victim clicks the verification link, the attacker can gain access to the victim's account.",
+      "modified_date": "2026-08-31T01:16:47.253",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-7365",
+      "nvd_cwe_ids": [
+        "CWE-346"
+      ],
+      "published_date": "2025-07-10T15:15:30.427"
+    },
+    "CVE-2025-7784": {
+      "cve_id": "CVE-2025-7784",
+      "description": "A flaw was found in the Keycloak identity and access management system when Fine-Grained Admin Permissions(FGAPv2) are enabled. An administrative user with the manage-users role can escalate their privileges to realm-admin due to improper privilege enforcement. This vulnerability allows unauthorized elevation of access rights, compromising the intended separation of administrative duties and posing a security risk to the realm.",
+      "modified_date": "2026-06-17T10:05:39.140",
+      "nist_url": "https://nvd.nist.gov/vuln/detail/CVE-2025-7784",
+      "nvd_cwe_ids": [
+        "CWE-269"
+      ],
+      "published_date": "2025-07-18T14:15:26.983"
+    }
+  }
+}
