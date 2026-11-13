@@ -155,6 +155,21 @@ class AnalysisTests(unittest.TestCase):
         self.assertIn('update \\"quoted\\" version', request)
         self.assertNotIn('fix_commit_message.txt', request)
 
+        current_spec = {
+            'vulnerability_summary': 'Unsafe path reaches a file operation.',
+            'evidence': [{
+                'id': 'E1', 'revision': 'buggy', 'file': 'A.java',
+                'start_line': 2, 'end_line': 3, 'code': 'sink(path);\n',
+            }],
+        }
+        refresh = agent._evidence_refresh_request(
+            current_spec, 'Add the caller that constructs path.', 2)
+        self.assertIn('Request number: 2', refresh)
+        self.assertIn('Add the caller that constructs path.', refresh)
+        self.assertIn('"vulnerability_summary"', refresh)
+        self.assertIn('sink(path)', refresh)
+        self.assertIn('complete updated AnalysisBrief', refresh)
+
     def test_cve_metadata_is_loaded_exactly_and_rendered_dynamically(self):
         with tempfile.TemporaryDirectory() as tmp:
             dataset = Path(tmp)

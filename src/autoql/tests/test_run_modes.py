@@ -113,12 +113,26 @@ class RunModeTests(unittest.TestCase):
                     'start_line': 1, 'end_line': 1, 'code': 'sink(input);\n',
                 }],
             }
+            updated_spec = {
+                'vulnerability_summary': spec['vulnerability_summary'],
+                'evidence': spec['evidence'] + [{
+                    'id': 'E2', 'revision': 'buggy', 'file': 'B.java',
+                    'start_line': 2, 'end_line': 2,
+                    'code': 'source(input);\n',
+                }],
+            }
 
             class FakeAnalysis:
                 def __init__(self, *args):
                     pass
                 def run(self, additional_request=''):
                     return spec
+                def refresh_evidence(self, current_spec, reason, request_index):
+                    self_test.assertEqual(current_spec, spec)
+                    self_test.assertEqual(reason, 'Add the buggy source caller.')
+                    self_test.assertEqual(request_index, 1)
+                    calls['refresh'] = calls.get('refresh', 0) + 1
+                    return updated_spec
 
             class FakeRetrieval:
                 def __init__(self, actual_output, limits):
@@ -127,12 +141,31 @@ class RunModeTests(unittest.TestCase):
             def run_query(actual_task, actual_spec, llm, retrieval,
                           codeql, evaluator, limits, initial):
                 calls['query'] += 1
-                self.assertEqual(actual_spec, spec)
                 self.assertIsInstance(retrieval, FakeRetrieval)
+                self.assertEqual(initial['candidate_count'], 0)
+                self.assertEqual(initial['attempt'], 0)
+                self.assertEqual(initial['generation_phase'], 'initial')
+                if calls['query'] == 1:
+                    self.assertEqual(actual_spec, spec)
+                    self.assertEqual(initial['evidence_request_count'], 0)
+                    return {
+                        **initial,
+                        'final_status': 'needs_evidence', 'route': 'finish',
+                        'feedback': 'Add the buggy source caller.',
+                        'evidence_request': {
+                            'status': 'needs_evidence',
+                            'reason': 'Add the buggy source caller.',
+                        },
+                    }
+                self.assertEqual(actual_spec, updated_spec)
+                self.assertEqual(initial['evidence_request_count'], 1)
                 return {
                     'final_status': 'query_verified', 'route': 'finish',
-                    'attempt': 1, 'final_query_path': str(output / 'final.ql'),
+                    'candidate_count': 1, 'attempt': 1,
+                    'final_query_path': str(output / 'final.ql'),
                 }
+
+            self_test = self
 
             argv = [
                 'autoql.run_patch', '--cve', 'CVE-2022-25842',
@@ -157,13 +190,20 @@ class RunModeTests(unittest.TestCase):
 
             self.assertEqual(calls['structure'], [
                 ('/db/buggy', 'buggy'), ('/db/fixed', 'fixed')])
-            self.assertEqual(calls['query'], 1)
+            self.assertEqual(calls['query'], 2)
+            self.assertEqual(calls['refresh'], 1)
             self.assertEqual(
                 json.loads((output / 'result.json').read_text())['final_status'],
                 'query_verified')
             self.assertEqual(
                 json.loads((output / 'run_control.json').read_text())['run_mode'],
                 'full')
+            self.assertEqual(
+                json.loads((output / 'vuln_spec.json').read_text()),
+                updated_spec)
+            request = json.loads(
+                (output / 'evidence_requests/1/request.json').read_text())
+            self.assertEqual(request['status'], 'completed')
 
 
 if __name__ == '__main__':

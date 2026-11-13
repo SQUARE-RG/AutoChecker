@@ -23,8 +23,8 @@ Requirements:
   the standard library; otherwise remove it.
 - Remove unused imports, optional classes, predicates, and branches.
 - Do not preserve any bracketed placeholder in the returned query.
-- If the evidence cannot support a source-to-sink model, return needs_evidence
-  instead of changing to another template or inventing predicates.
+- Do not change to another template or invent predicates unsupported by the
+  evidence.
 
 ```ql
 /**

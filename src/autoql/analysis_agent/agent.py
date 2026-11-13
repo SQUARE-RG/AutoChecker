@@ -151,9 +151,38 @@ class AnalysisAgent:
             request += '\n\nAdditional validation request:\n' + additional_request
         return request
 
-    @timed('analysis', 'stage')
-    def run(self, additional_request=''):
-        self.messages.append(HumanMessage(content=self._initial_request(additional_request)))
+    @staticmethod
+    def _evidence_refresh_request(current_spec, reason, request_index):
+        return (
+            '## Evidence refresh request\n\n'
+            'The Query Agent could not generate its first candidate query from '
+            'the current source evidence.\n\n'
+            f'Request number: {request_index}\n\n'
+            '### Current vulnerability specification\n\n```json\n' +
+            json.dumps(current_spec, ensure_ascii=False, indent=2) +
+            '\n```\n\n'
+            '### Missing evidence requested by the Query Agent\n\n' + reason +
+            '\n\n### Task\n\n'
+            'Inspect the buggy and fixed repositories only for the missing '
+            'source-level relationship described above. Treat the request '
+            'reason as a search objective, not as source-code evidence. '
+            'Confirm it against the repository. Return one complete updated '
+            'AnalysisBrief, not a patch or an evidence delta. Preserve valid '
+            'existing evidence when relevant, and add, replace, expand, or '
+            'remove evidence only when repository inspection supports it. The '
+            'updated evidence locations must differ meaningfully from the '
+            'current evidence and address the request.')
+
+    @staticmethod
+    def _location_set(spec):
+        return {
+            (entry['revision'], entry['file'], entry['start_line'],
+             entry['end_line'])
+            for entry in spec.get('evidence', [])
+        }
+
+    def _run_request(self, request, previous_spec=None, persist_latest=True):
+        self.messages.append(HumanMessage(content=request))
         brief = None
         for correction in range(self.limits.spec_repair_limit + 1):
             result = self.agent.invoke({'messages': self.messages}, {'recursion_limit': 256})
@@ -172,6 +201,16 @@ class AnalysisAgent:
                         + str(exc)) from exc
             try:
                 brief = validate_brief(structured, self.registry)
+                if (previous_spec is not None and
+                        self._location_set(brief.model_dump()) ==
+                        self._location_set(previous_spec)):
+                    raise SpecValidationError([{
+                        'path': 'evidence',
+                        'code': 'unchanged_evidence',
+                        'message': (
+                            'Evidence refresh must change at least one source '
+                            'location to address the Query Agent request.'),
+                    }])
                 break
             except SpecValidationError as exc:
                 if correction == self.limits.spec_repair_limit:
@@ -194,5 +233,17 @@ class AnalysisAgent:
         #   draft = self._compose(complete_brief)
         #   spec = finalize(draft, brief, self.registry)
         spec = finalize(brief, brief, self.registry)
-        write_json(Path(self.task.output_dir) / 'vuln_spec.json', spec)
+        if persist_latest:
+            write_json(Path(self.task.output_dir) / 'vuln_spec.json', spec)
         return spec
+
+    @timed('analysis', 'stage')
+    def run(self, additional_request=''):
+        return self._run_request(self._initial_request(additional_request))
+
+    @timed('analysis.refresh_evidence', 'stage')
+    def refresh_evidence(self, current_spec, reason, request_index):
+        request = self._evidence_refresh_request(
+            current_spec, reason, request_index)
+        return self._run_request(
+            request, previous_spec=current_spec, persist_latest=False)

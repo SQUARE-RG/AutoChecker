@@ -31,8 +31,9 @@ def _load_query_state(path: Path, deadline: float) -> dict | None:
     # without spending another model call or changing the saved deadline.
     if (state.get('final_status') == 'budget_exhausted' and
             state.get('route') == 'finish' and
-            state.get('feedback', '').startswith(
-                'Return exactly one complete query_code:')):
+            state.get('feedback', '').startswith((
+                'Return exactly one complete query_code:',
+                'Return exactly one complete ```query fenced block'))):
         from autoql.query_agent.nodes import extract_query
         try:
             extract_query(state['messages'][-1].content)
@@ -46,6 +47,24 @@ def _load_query_state(path: Path, deadline: float) -> dict | None:
             })
             state.update(route='extract', final_status='')
     return state
+
+
+def _fresh_initial_query_state(evidence_request_count: int) -> dict:
+    """Start initial generation without consuming a candidate iteration."""
+    return {
+        'candidate_count': 0,
+        'attempt': 0,
+        'compile_repairs': 0,
+        'semantic_repairs': 0,
+        'evidence_request_count': evidence_request_count,
+        'history': [],
+        'query_code': '',
+        'query_path': '',
+        'feedback': '',
+        'generation_phase': 'initial',
+        'final_status': '',
+        'route': 'prep',
+    }
 
 
 def main():
@@ -167,10 +186,77 @@ def main():
                 initial = (_load_query_state(output / 'query_state.json', deadline)
                            if args.resume else None)
                 refresh_path = output / 'evidence_refresh.json'
-                refresh_count = (json.loads(refresh_path.read_text())['count']
-                                 if refresh_path.exists() else 0)
-                for refresh in range(
-                        refresh_count, limits.evidence_refresh_limit + 1):
+                refresh_state = (json.loads(refresh_path.read_text())
+                                 if refresh_path.exists() else {})
+                refresh_count = refresh_state.get('count', 0)
+
+                def complete_refresh(before_spec, reason, request_index,
+                                     request_dir):
+                    request_record = {
+                        'request_index': request_index,
+                        'reason': reason,
+                        'status': 'analysis_running',
+                    }
+                    write_json(request_dir / 'request.json', request_record)
+                    write_json(refresh_path, {
+                        'count': request_index,
+                        'status': 'analysis_running',
+                        'request_dir': str(request_dir),
+                    })
+                    updated = analysis.refresh_evidence(
+                        before_spec, reason, request_index)
+                    write_json(request_dir / 'vuln_spec.after.json', updated)
+                    brief_path = output / 'analysis_brief.json'
+                    if brief_path.exists():
+                        write_json(
+                            request_dir / 'analysis_brief.json',
+                            json.loads(brief_path.read_text()))
+                    request_record.update(
+                        status='completed', evidence_changed=True)
+                    write_json(request_dir / 'request.json', request_record)
+                    write_json(refresh_path, {
+                        'count': request_index,
+                        'status': 'completed',
+                        'request_dir': str(request_dir),
+                    })
+                    # Commit the latest root spec last. On resume, the completed
+                    # versioned artifact is authoritative and repairs this copy.
+                    write_json(spec_path, updated)
+                    return updated
+
+                refresh_status = refresh_state.get('status')
+                request_dir_value = refresh_state.get('request_dir')
+                if (refresh_count and refresh_status == 'completed' and
+                        request_dir_value):
+                    completed_path = (Path(request_dir_value) /
+                                      'vuln_spec.after.json')
+                    if completed_path.exists():
+                        spec = _load_v2_spec(completed_path)
+                        write_json(spec_path, spec)
+                    if (initial is None or
+                            initial.get('evidence_request_count', 0) <
+                            refresh_count or
+                            initial.get('final_status') == 'needs_evidence'):
+                        initial = _fresh_initial_query_state(refresh_count)
+                elif (refresh_count and
+                      refresh_status in ('requested', 'analysis_running') and
+                      request_dir_value):
+                    pending_dir = Path(request_dir_value)
+                    request_record = json.loads(
+                        (pending_dir / 'request.json').read_text())
+                    before_spec = _load_v2_spec(
+                        pending_dir / 'vuln_spec.before.json')
+                    spec = complete_refresh(
+                        before_spec, request_record['reason'], refresh_count,
+                        pending_dir)
+                    initial = _fresh_initial_query_state(refresh_count)
+                elif initial is None:
+                    initial = _fresh_initial_query_state(refresh_count)
+                else:
+                    initial.setdefault(
+                        'evidence_request_count', refresh_count)
+
+                while True:
                     state = run_query(
                         task, spec, llm, retrieval, codeql, evaluator, limits,
                         initial)
@@ -178,22 +264,36 @@ def main():
                         key: value for key, value in state.items()
                         if key not in ('messages', 'query_code')
                     })
-                    if (state['final_status'] != 'needs_evidence' or
-                            refresh == limits.evidence_refresh_limit):
+                    if state['final_status'] != 'needs_evidence':
+                        final.pop('evidence_request', None)
                         break
-                    write_json(refresh_path, {'count': refresh + 1})
-                    spec = analysis.run(
-                        'Query generation needs additional source evidence: ' +
-                        state['feedback'] +
-                        '. Explore only what is missing, register it, and submit '
-                        'an updated AnalysisBrief.')
-                    initial = {
-                        **state,
-                        'final_status': '',
-                        'route': 'prep',
-                        'feedback': (
-                            'Evidence refreshed; generate a complete query.'),
-                    }
+                    if (state.get('candidate_count', 0) != 0 or
+                            state.get('generation_phase') != 'initial'):
+                        raise RuntimeError(
+                            'needs_evidence escaped a non-initial query stage')
+                    if refresh_count >= limits.evidence_refresh_limit:
+                        final.update(
+                            final_status='needs_review',
+                            reason='evidence_request_limit_reached')
+                        break
+                    refresh_count += 1
+                    request_dir = (
+                        output / 'evidence_requests' / str(refresh_count))
+                    reason = state['evidence_request']['reason']
+                    write_json(request_dir / 'vuln_spec.before.json', spec)
+                    write_json(request_dir / 'request.json', {
+                        'request_index': refresh_count,
+                        'reason': reason,
+                        'status': 'requested',
+                    })
+                    write_json(refresh_path, {
+                        'count': refresh_count,
+                        'status': 'requested',
+                        'request_dir': str(request_dir),
+                    })
+                    spec = complete_refresh(
+                        spec, reason, refresh_count, request_dir)
+                    initial = _fresh_initial_query_state(refresh_count)
     except UnsupportedInput as exc:
         final.update(final_status='unsupported_input', reason=str(exc))
     except BudgetExceeded as exc:

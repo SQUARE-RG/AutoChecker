@@ -1,11 +1,11 @@
-"""Run-scoped ChromaDB retrieval tools for Java CodeQL documentation.
+"""Run-scoped tools for CodeQL documentation and evidence AST inspection.
 
 This follows the retrieval protocol used by ``src/codeql_agent/tools.py``:
 
 * ``search_docs`` performs embedding retrieval across the language collections;
 * results retain Chroma chunk IDs so repeated documents can be suppressed;
-* prompts receive short query summaries instead of all previous documents; and
-* ``get_doc_detail`` retrieves the cached answer by the exact original query.
+* prompts receive ``query``/``answer`` history entries with short answers; and
+* ``get_doc_detail`` retrieves cached answers by exact original queries.
 
 Unlike the standalone CodeQL agent, AutoQL persists the context so a resumed
 run keeps the same retrieval history and document de-duplication state.
@@ -18,6 +18,7 @@ import re
 
 from langchain_core.tools import tool
 
+from autoql.evidence_ast import extract_evidence_ast
 from autoql.runtime import write_json
 
 
@@ -38,10 +39,7 @@ def _query_chroma(query: str, collection_names: list[str], top_k: int):
 
 def _make_summary(query: str, answer: str) -> str:
     clean = re.sub(r'\[doc [^\]]+\]', '', answer)
-    return json.dumps({
-        'query': query,
-        'summary': ' '.join(clean.split())[:120],
-    }, ensure_ascii=False, separators=(',', ':'))
+    return ' '.join(clean.split())[:120]
 
 
 class RetrievalContext:
@@ -66,8 +64,8 @@ class RetrievalContext:
                 isinstance(entry.get('doc_ids'), list) and
                 isinstance(entry.get('summary'), str)
             }
-            # Normalize old summary display formats while preserving answers and
-            # chunk IDs. The JSON-line form makes the exact detail key explicit.
+            # Normalize old summary formats while preserving answers and chunk
+            # IDs. Rendering adds explicit query/answer field labels.
             for query, entry in self.entries.items():
                 entry['summary'] = _make_summary(query, entry['answer'])
 
@@ -89,10 +87,13 @@ class RetrievalContext:
         return None
 
     def summaries(self, limit: int = 8) -> str:
-        selected = list(self.entries.values())[:limit]
+        selected = list(self.entries.items())[:limit]
         if not selected:
             return '(none; call search_docs when documentation is needed)'
-        return '\n'.join(entry['summary'] for entry in selected)
+        return '\n'.join(
+            f'query: {json.dumps(query, ensure_ascii=False)}\n'
+            f'answer: {entry["summary"]}'
+            for query, entry in selected)
 
     def search(self, queries):
         if isinstance(queries, str):
@@ -110,7 +111,8 @@ class RetrievalContext:
             if query in self.entries:
                 sections.append(
                     f'### Search: {query}\nAlready cached. Use '
-                    f'get_doc_detail(query="{query}") for the stored result.')
+                    f'get_doc_detail(queries=[{json.dumps(query)}]) for the '
+                    'stored result.')
                 continue
 
             pairs = _query_chroma(
@@ -128,7 +130,8 @@ class RetrievalContext:
             if not new_pairs:
                 previous = self.find_entry_with_ids(
                     [str(chunk_id) for chunk_id, _ in pairs])
-                detail = (f' Use get_doc_detail(query="{previous}") to read it.'
+                detail = (f' Use get_doc_detail(queries=['
+                          f'{json.dumps(previous)}]) to read it.'
                           if previous else '')
                 sections.append(
                     f'### Search: {query}\nAll matching chunks were already '
@@ -163,17 +166,91 @@ class RetrievalContext:
             return self.search(queries)
 
         @tool
-        def get_doc_detail(query: str) -> str:
-            """Return the full cached result for an exact earlier search query.
+        def get_doc_detail(queries: str | list[str]) -> str:
+            """Return full cached results for one or more earlier searches.
 
-            In RETRIEVAL HISTORY, copy the JSON ``query`` value exactly. Do not
-            pass the summary text and do not paraphrase or repeat search_docs.
-            Example: {"query": "TaintTracking Global ConfigSig"}.
+            Copy each ``query`` value from RETRIEVAL HISTORY exactly and pass
+            it in ``queries``. Do not pass the answer text or paraphrase the
+            query. Example: {"queries": ["asExpr", "localFlowStep"]}.
             """
-            entry = self.entries.get(query)
-            if entry is None:
-                return (f'Query "{query}" has not been searched. Call '
-                        f'search_docs(queries=["{query}"]) first.')
-            return entry['answer']
+            if isinstance(queries, str):
+                queries = [queries]
+            if not isinstance(queries, list) or not queries or not all(
+                    isinstance(query, str) and query for query in queries):
+                return ('queries must be a non-empty string or a list of '
+                        'non-empty strings.')
+            sections = []
+            for query in dict.fromkeys(queries):
+                entry = self.entries.get(query)
+                if entry is None:
+                    sections.append(
+                        f'### Detail: {query}\nQuery has not been searched. '
+                        f'Call search_docs(queries=[{json.dumps(query)}]) first.')
+                else:
+                    sections.append(f'### Detail: {query}\n{entry["answer"]}')
+            return '\n\n'.join(sections)
 
         return [search_docs, get_doc_detail]
+
+
+class EvidenceAstContext:
+    """Expose complete CodeQL PrintAst text for registered vuln_spec evidence."""
+
+    def __init__(self, task, spec, limits, extractor=None):
+        self.task = task
+        self.spec = spec
+        self.limits = limits
+        self.extractor = extractor or extract_evidence_ast
+        self.output = Path(task.output_dir)
+        self.evidence = {
+            entry['id']: entry
+            for entry in spec.get('evidence', [])
+            if isinstance(entry, dict) and isinstance(entry.get('id'), str)
+        }
+        self.cache: dict[str, str] = {}
+
+    def get(self, evidence_id: str) -> str:
+        if not isinstance(evidence_id, str) or evidence_id not in self.evidence:
+            available = ', '.join(sorted(self.evidence)) or '(none)'
+            return (
+                f'Unknown evidence_id {evidence_id!r}. '
+                f'Available evidence IDs: {available}.')
+        if evidence_id in self.cache:
+            return self.cache[evidence_id]
+
+        destination = self.output / 'evidence_ast' / f'{evidence_id}-full.txt'
+        try:
+            self.extractor(
+                self.output, evidence_id, destination,
+                timeout=self.limits.database_run_timeout_seconds,
+                output_format='text', detail='full')
+            text = destination.read_text(encoding='utf-8')
+        except (ValueError, RuntimeError, OSError) as exc:
+            return (
+                f'CodeQL AST unavailable for evidence {evidence_id}: '
+                f'{type(exc).__name__}: {exc}')
+        self.cache[evidence_id] = text
+        return text
+
+    def tools(self):
+        @tool
+        def get_evidence_ast(evidence_ids: str | list[str]) -> str:
+            """Return complete CodeQL Java PrintAst text for evidence items.
+
+            Pass one or more exact IDs from VULNERABILITY SPEC, for example
+            ``{"evidence_ids": ["E1", "E2"]}``. The tool automatically uses
+            the buggy or fixed CodeQL database declared by each evidence item.
+            Results are complete rather than relevance-pruned and may be large.
+            """
+            if isinstance(evidence_ids, str):
+                evidence_ids = [evidence_ids]
+            if not isinstance(evidence_ids, list) or not evidence_ids or not all(
+                    isinstance(evidence_id, str) and evidence_id
+                    for evidence_id in evidence_ids):
+                return ('evidence_ids must be a non-empty string or a list of '
+                        'non-empty strings.')
+            return '\n\n'.join(
+                f'### Evidence: {evidence_id}\n{self.get(evidence_id)}'
+                for evidence_id in dict.fromkeys(evidence_ids))
+
+        return [get_evidence_ast]

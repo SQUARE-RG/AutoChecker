@@ -15,16 +15,39 @@ class PolicyTests(unittest.TestCase):
             }],
         }
         retrieval_history = (
-            '{"query":"TaintTracking Global ConfigSig",'
-            '"summary":"global taint tracking"}')
-        messages = render(spec, '', '', [], retrieval_history)
+            'query: "TaintTracking Global ConfigSig"\n'
+            'answer: global taint tracking')
+        messages = render(spec, '', '', retrieval_history)
         self.assertIn('class Source extends DataFlow::Node', messages[0].content)
-        self.assertIn('TOOL WORKFLOW', messages[0].content)
-        self.assertIn('copy the exact query value', messages[0].content)
+        self.assertIn('# Tools Usage', messages[0].content)
+        self.assertIn('get_doc_detail({"queries":', messages[0].content)
+        self.assertIn('get_evidence_ast', messages[0].content)
+        self.assertIn('{"status":"needs_evidence"', messages[0].content)
         self.assertIn('Request data reaches a file operation.', messages[1].content)
         self.assertIn('unsafe(input);', messages[1].content)
         self.assertIn('RETRIEVAL HISTORY', messages[1].content)
+        self.assertIn('query and answer fields', messages[1].content)
+        self.assertNotIn('ATTEMPT HISTORY', messages[1].content)
         self.assertIn('TaintTracking Global ConfigSig', messages[1].content)
+        self.assertIn('QUERY GENERATION PHASE:\ninitial', messages[1].content)
+
+        repaired = render(
+            spec, 'current query', 'type error', retrieval_history,
+            'compile_repair')
+        self.assertIn('QUERY GENERATION PHASE:\ncompile_repair', repaired[1].content)
+        self.assertNotIn('PHASE INSTRUCTIONS', repaired[1].content)
+        self.assertNotIn('{"status":"needs_evidence"', repaired[0].content)
+        self.assertNotIn('[AST node type derived from evidence]', repaired[0].content)
+        self.assertIn('current query', repaired[1].content)
+        self.assertIn('COMPILER DIAGNOSTICS:\ntype error', repaired[1].content)
+        self.assertIn('type error', repaired[1].content)
+
+        semantic = render(
+            spec, 'current query', 'target verification failed',
+            retrieval_history, 'semantic_repair')
+        self.assertNotIn(
+            '{"status":"needs_evidence"', semantic[0].content)
+        self.assertNotIn('[AST node type derived from evidence]', semantic[0].content)
 
     def test_project_identity(self):
         spec = {'vulnerability_summary': 'Unsafe operation.',

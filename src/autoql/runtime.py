@@ -18,7 +18,7 @@ class Limits:
     analysis_max_model_calls: int = 30
     analysis_max_tool_calls: int = 60
     spec_repair_limit: int = 2
-    evidence_refresh_limit: int = 1
+    evidence_refresh_limit: int = 3
     query_model_calls_per_attempt: int = 8
     query_tool_calls_per_attempt: int = 8
     search_queries_per_call: int = 3
