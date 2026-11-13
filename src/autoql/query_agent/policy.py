@@ -17,8 +17,4 @@ def generation_issues(query, spec, task):
             packages.add(package_path.group(1).replace('/', '.'))
     if any('"' + p + '"' in code for p in packages):
         issues.append('Remove project-package/type anchors. Model the external API, data/control relationships, not the particular containing helper.')
-    # An empty guard model cannot justify introducing guessed safety exceptions.
-    model = spec['model']
-    if not model.get('barriers') and not model.get('excluded_patterns') and re.search(r'\b(?:isBarrier|safeException|excludedPair)\s*\(', code):
-        issues.append('No proven safe guard exists in the evidence/model. Remove guessed barrier/exclusion predicates and their uses.')
     return issues

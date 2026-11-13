@@ -8,6 +8,8 @@ from pathlib import Path, PurePosixPath
 import re
 import subprocess
 
+import yaml
+
 from .runtime import command, write_json, write_text
 from .timing import timed
 
@@ -109,6 +111,48 @@ def latest_fix_commit(repo: Path, commit_ids: list[str]) -> str:
             latest_timestamp = timestamp
             latest = commit_id
     return latest or commit_ids[-1]
+
+
+def validate_codeql_databases(task: PatchTask) -> list[dict]:
+    """Fail closed unless both finalized Java databases match task revisions.
+
+    Task loading deliberately does not call this function so analysis-only runs
+    remain independent from CodeQL databases. Full/preflight mode owns this
+    validation immediately before query infrastructure is initialized.
+    """
+    validated = []
+    for side, raw_path, expected_sha in (
+            ('buggy', task.buggy_db_path, task.buggy_commit),
+            ('fixed', task.fixed_db_path, task.fix_commit)):
+        path = Path(raw_path)
+        metadata_path = path / 'codeql-database.yml'
+        if not metadata_path.is_file():
+            raise ValueError(f'Missing {side} CodeQL database metadata: {metadata_path}')
+        try:
+            metadata = yaml.safe_load(metadata_path.read_text(encoding='utf-8'))
+        except (OSError, yaml.YAMLError) as exc:
+            raise ValueError(
+                f'Invalid {side} CodeQL database metadata: {metadata_path}') from exc
+        if not isinstance(metadata, dict):
+            raise ValueError(f'Invalid {side} CodeQL database metadata: {metadata_path}')
+        actual_sha = metadata.get('creationMetadata', {}).get('sha')
+        if actual_sha != expected_sha:
+            raise ValueError(
+                f'{side.capitalize()} CodeQL database revision mismatch: '
+                f'expected {expected_sha}, found {actual_sha!r}')
+        if metadata.get('finalised') is not True:
+            raise ValueError(f'{side.capitalize()} CodeQL database is not finalized: {path}')
+        if metadata.get('primaryLanguage') != 'java':
+            raise ValueError(
+                f'{side.capitalize()} CodeQL database is not Java: '
+                f'{metadata.get("primaryLanguage")!r}')
+        validated.append({
+            'side': side,
+            'path': str(path),
+            'revision': actual_sha,
+            'source_location_prefix': metadata.get('sourceLocationPrefix'),
+        })
+    return validated
 
 
 @timed('input.prepare', 'stage')

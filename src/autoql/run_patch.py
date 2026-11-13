@@ -10,8 +10,42 @@ import json
 import fcntl
 
 from autoql.runtime import Limits, BudgetExceeded, write_json
-from autoql.task_loader import load_task, PatchTask, UnsupportedInput
-from autoql.timing import TimingRecorder, CURRENT
+from autoql.task_loader import (PatchTask, UnsupportedInput, load_task,
+                                validate_codeql_databases)
+from autoql.timing import CURRENT, TimingRecorder, timing_span
+
+
+def _load_v2_spec(path: Path) -> dict:
+    from autoql.analysis_agent.schemas import VulnerabilitySpec
+    value = json.loads(path.read_text(encoding='utf-8'))
+    return VulnerabilitySpec.model_validate(value).model_dump()
+
+
+def _load_query_state(path: Path, deadline: float) -> dict | None:
+    if not path.is_file():
+        return None
+    from langchain_core.messages import messages_from_dict
+    state = json.loads(path.read_text(encoding='utf-8'))
+    state['messages'] = messages_from_dict(state.get('messages', []))
+    # A parser upgrade may be able to consume an already completed response
+    # without spending another model call or changing the saved deadline.
+    if (state.get('final_status') == 'budget_exhausted' and
+            state.get('route') == 'finish' and
+            state.get('feedback', '').startswith(
+                'Return exactly one complete query_code:')):
+        from autoql.query_agent.nodes import extract_query
+        try:
+            extract_query(state['messages'][-1].content)
+        except (ValueError, IndexError, TypeError):
+            pass
+        else:
+            write_json(path.parent / 'parser_recovery.json', {
+                'reason': 'Parser now accepts the saved complete query response',
+                'preserved_deadline': deadline,
+                'additional_model_calls': 0,
+            })
+            state.update(route='extract', final_status='')
+    return state
 
 
 def main():
@@ -24,14 +58,12 @@ def main():
     parser.add_argument('--dataset', type=Path)
     parser.add_argument('--limits', type=Path, help='JSON overrides for default budgets/timeouts')
     parser.add_argument('--run-mode', choices=('analysis', 'full'), default='analysis',
-                        help='Pipeline scope; full mode is reserved for the query pipeline')
+                        help='analysis stops after vuln_spec; full continues through query verification')
     parser.add_argument('--preflight-only', action='store_true',
-                        help=argparse.SUPPRESS)
+                        help='full mode only: validate databases, CodeQL and ground truth without LLM calls')
     parser.add_argument('--resume', action='store_true', help='Resume --output without resetting budgets/deadline')
     args = parser.parse_args()
-    if args.run_mode == 'full':
-        parser.error('--run-mode full is not implemented yet; use --run-mode analysis')
-    if args.preflight_only:
+    if args.preflight_only and args.run_mode != 'full':
         parser.error('--preflight-only belongs to full mode and is unavailable in analysis mode')
     input_label = args.commit[:12] if args.commit else args.cve.upper()
     output = args.output or args.root / 'autoql_runs' / (input_label + '-' + time.strftime('%Y%m%d-%H%M%S'))
@@ -59,11 +91,18 @@ def main():
                 task.input_kind = 'cve'
             limits = Limits(**json.loads((output / 'limits.json').read_text()))
             if (output / 'run_control.json').exists():
-                deadline = json.loads((output / 'run_control.json').read_text())['deadline']
+                control = json.loads((output / 'run_control.json').read_text())
+                deadline = control['deadline']
+                saved_mode = control.get('run_mode', 'full')
+                if saved_mode == 'full' and args.run_mode == 'analysis':
+                    raise ValueError('Cannot resume a full run in analysis-only mode')
             if (output / 'budget.json').exists():
                 deadline = json.loads((output / 'budget.json').read_text())['deadline']
             prior = json.loads((output / 'result.json').read_text()) if (output / 'result.json').exists() else {}
-            if prior.get('final_status') in ('query_verified', 'analysis_completed'):
+            completed = prior.get('final_status')
+            if (completed == 'query_verified' or
+                    args.run_mode == 'analysis' and completed == 'analysis_completed' or
+                    args.preflight_only and completed == 'preflight_passed'):
                 final = prior
                 return 0
         else:
@@ -74,28 +113,87 @@ def main():
         timing.attach(output, resume=args.resume)
         write_json(output / 'run_control.json', {'deadline': deadline, 'run_mode': args.run_mode})
         write_json(output / 'limits.json', asdict(limits))
-        from autoql.llm import StreamingLLM
-        from autoql.analysis_agent.agent import AnalysisAgent
-        from autoql.analysis_agent.evidence_registry import EvidenceRegistry
-        from autoql.analysis_agent.vulnerability_metadata import load_vulnerability_metadata
-        context_path = output / 'analysis_context.json'
-        if args.resume and context_path.exists():
-            vulnerability_metadata = json.loads(context_path.read_text())
+        codeql = None
+        evaluator = None
+        if args.run_mode == 'full':
+            from autoql.query_agent.codeql import CodeQL
+            from autoql.query_agent.evaluator import Evaluator
+            with timing_span('preflight', 'stage'):
+                databases = validate_codeql_databases(task)
+                codeql = CodeQL(output, limits, deadline)
+                buggy_methods = codeql.structure(task.buggy_db_path, 'buggy')
+                fixed_methods = codeql.structure(task.fixed_db_path, 'fixed')
+                evaluator = Evaluator(task, buggy_methods, fixed_methods)
+            write_json(output / 'preflight.json', {
+                'databases': databases,
+                'buggy_functions': len(buggy_methods),
+                'fixed_functions': len(fixed_methods),
+                'granularity': evaluator.granularity,
+                'fixed_mapping_unresolved': evaluator.mapping_unknown,
+                'deleted_targets': evaluator.deleted,
+                'java_pack': str(codeql.java_pack),
+            })
+
+        if args.preflight_only:
+            final['final_status'] = 'preflight_passed'
         else:
-            vulnerability_metadata = load_vulnerability_metadata(task)
-            if vulnerability_metadata is not None:
-                write_json(context_path, vulnerability_metadata)
-        llm = StreamingLLM(args.root, output, limits, deadline)
-        analysis = AnalysisAgent(
-            task, EvidenceRegistry(task), llm, limits, vulnerability_metadata)
-        spec_path = output / 'vuln_spec.json'
-        if args.resume and spec_path.exists():
-            spec = json.loads(spec_path.read_text())
-            if set(spec) != {'vulnerability_summary', 'evidence'}:
-                raise ValueError('Existing vuln_spec.json does not use the Analysis V2 format')
-        else:
-            spec = analysis.run()
-        final.update(final_status='analysis_completed', evidence_count=len(spec['evidence']))
+            from autoql.llm import StreamingLLM
+            from autoql.analysis_agent.agent import AnalysisAgent
+            from autoql.analysis_agent.evidence_registry import EvidenceRegistry
+            from autoql.analysis_agent.vulnerability_metadata import load_vulnerability_metadata
+            context_path = output / 'analysis_context.json'
+            if args.resume and context_path.exists():
+                vulnerability_metadata = json.loads(context_path.read_text())
+            else:
+                vulnerability_metadata = load_vulnerability_metadata(task)
+                if vulnerability_metadata is not None:
+                    write_json(context_path, vulnerability_metadata)
+            llm = StreamingLLM(args.root, output, limits, deadline)
+            analysis = AnalysisAgent(
+                task, EvidenceRegistry(task), llm, limits,
+                vulnerability_metadata)
+            spec_path = output / 'vuln_spec.json'
+            spec = (_load_v2_spec(spec_path)
+                    if args.resume and spec_path.exists() else analysis.run())
+
+            if args.run_mode == 'analysis':
+                final.update(
+                    final_status='analysis_completed',
+                    evidence_count=len(spec['evidence']))
+            else:
+                from autoql.query_agent.graph import run_query
+                from autoql.query_agent.tools import RetrievalContext
+                retrieval = RetrievalContext(output, limits)
+                initial = (_load_query_state(output / 'query_state.json', deadline)
+                           if args.resume else None)
+                refresh_path = output / 'evidence_refresh.json'
+                refresh_count = (json.loads(refresh_path.read_text())['count']
+                                 if refresh_path.exists() else 0)
+                for refresh in range(
+                        refresh_count, limits.evidence_refresh_limit + 1):
+                    state = run_query(
+                        task, spec, llm, retrieval, codeql, evaluator, limits,
+                        initial)
+                    final.update({
+                        key: value for key, value in state.items()
+                        if key not in ('messages', 'query_code')
+                    })
+                    if (state['final_status'] != 'needs_evidence' or
+                            refresh == limits.evidence_refresh_limit):
+                        break
+                    write_json(refresh_path, {'count': refresh + 1})
+                    spec = analysis.run(
+                        'Query generation needs additional source evidence: ' +
+                        state['feedback'] +
+                        '. Explore only what is missing, register it, and submit '
+                        'an updated AnalysisBrief.')
+                    initial = {
+                        **state,
+                        'final_status': '',
+                        'route': 'prep',
+                        'feedback': (
+                            'Evidence refreshed; generate a complete query.'),
+                    }
     except UnsupportedInput as exc:
         final.update(final_status='unsupported_input', reason=str(exc))
     except BudgetExceeded as exc:

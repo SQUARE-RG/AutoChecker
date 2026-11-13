@@ -8,8 +8,9 @@ import unittest
 from autoql.analysis_agent.evidence_registry import EvidenceRegistry
 from autoql.query_agent.evaluator import location_points, enclosing, normalize_uri, Evaluator
 from autoql.query_agent.graph import extract_query
-from autoql.task_loader import safe_relative, load_task, select_project, UnsupportedInput
-from autoql.prompt.codeql_template_prompt import supported_analysis_kinds, query_skeleton
+from autoql.task_loader import (UnsupportedInput, load_task, safe_relative,
+                                select_project, validate_codeql_databases)
+from autoql.prompt.codeql_template_prompt import query_skeleton
 
 
 class EvidenceTests(unittest.TestCase):
@@ -160,11 +161,41 @@ class InputTemplateTests(unittest.TestCase):
             self.assertFalse(Path(task.fixed_db_path).exists())
             self.assertFalse((root / 'run' / 'vuln_spec.json').exists())
 
+    def test_database_validation_is_deferred_and_revision_strict(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            buggy_sha = 'a' * 40
+            fixed_sha = 'b' * 40
+            paths = []
+            for name, sha in (('buggy', buggy_sha), ('fixed', fixed_sha)):
+                database = root / name
+                database.mkdir()
+                (database / 'codeql-database.yml').write_text(
+                    'finalised: true\n'
+                    'primaryLanguage: java\n'
+                    'sourceLocationPrefix: /repo\n'
+                    'creationMetadata:\n'
+                    f'  sha: {sha}\n')
+                paths.append(database)
+            task = SimpleNamespace(
+                buggy_db_path=str(paths[0]), fixed_db_path=str(paths[1]),
+                buggy_commit=buggy_sha, fix_commit=fixed_sha)
+            validated = validate_codeql_databases(task)
+            self.assertEqual(
+                [entry['revision'] for entry in validated],
+                [buggy_sha, fixed_sha])
+
+            task.fix_commit = 'c' * 40
+            with self.assertRaisesRegex(ValueError, 'revision mismatch'):
+                validate_codeql_databases(task)
+
     def test_templates(self):
-        for kind in supported_analysis_kinds():
-            self.assertIn('使用 CodeQL 语法建模', query_skeleton(kind))
-        with self.assertRaises(ValueError):
-            query_skeleton('hybrid')
+        skeleton = query_skeleton()
+        self.assertIn('class Source extends DataFlow::Node', skeleton)
+        self.assertIn('class Sink extends DataFlow::Node', skeleton)
+        self.assertIn('TaintTracking::Global<MyPathConfig>', skeleton)
+        with self.assertRaises(TypeError):
+            query_skeleton('structural_pattern')
 
     def test_query_format(self):
         query = '/** @kind problem */\nimport java\nfrom Method m where m.fromSource() select m, "Test"'
@@ -174,6 +205,9 @@ class InputTemplateTests(unittest.TestCase):
             extract_query('```ql\n' + query + '\n```\n```ql\n' + query + '\n```')
         with self.assertRaises(ValueError):
             extract_query('query_code: ```query {{model.sources}} ```')
+        with self.assertRaises(ValueError):
+            extract_query('```query\n/** @kind path-problem */\n' +
+                          'from Expr e where [Semantic source constraints] select e\n```')
 
     def test_path_input(self):
         for path in ['/etc/passwd', '../x', 'a/../../b', 'a\\b']:

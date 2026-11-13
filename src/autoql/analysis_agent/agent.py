@@ -9,14 +9,16 @@ from deepagents.backends.protocol import WriteResult, EditResult
 from langchain.agents import create_agent
 from langchain.agents.middleware import AgentMiddleware
 from langchain.agents.structured_output import ToolStrategy
-from langchain_core.messages import HumanMessage, ToolMessage, messages_to_dict, messages_from_dict
+from langchain_core.messages import (AIMessage, HumanMessage, ToolMessage,
+                                     messages_from_dict, messages_to_dict)
 
 from autoql.llm import TrackedChatModel
 from autoql.runtime import BudgetExceeded, remaining, write_json
 from autoql.timing import timed
 from .prompts import explorer_system_prompt, spec_composer_prompt, spec_repair_prompt
 from .schemas import AnalysisBrief
-from .validator import (SpecValidationError, enriched_brief, finalize,
+from .validator import (AnalysisBriefRecoveryError, SpecValidationError,
+                        enriched_brief, finalize, recover_analysis_brief_text,
                         validate_brief)
 from .vulnerability_metadata import prompt_section
 
@@ -102,6 +104,24 @@ class AnalysisAgent:
             value['current_output'] = current
         return json.dumps(value, ensure_ascii=False, indent=2)
 
+    @staticmethod
+    def _last_ai_text(messages):
+        for message in reversed(messages):
+            if not isinstance(message, AIMessage):
+                continue
+            content = message.content
+            if isinstance(content, str):
+                text = content
+            elif isinstance(content, list):
+                text = ''.join(
+                    item if isinstance(item, str) else str(item.get('text') or '')
+                    for item in content if isinstance(item, (str, dict)))
+            else:
+                text = str(content or '')
+            if text.strip():
+                return text
+        return ''
+
     def _compose(self, brief, current=None, issues=None):
         prompt = spec_repair_prompt(issues) if issues is not None else spec_composer_prompt()
         composer = create_agent(
@@ -142,7 +162,14 @@ class AnalysisAgent:
                        messages_to_dict(self.messages))
             structured = result.get('structured_response')
             if structured is None:
-                raise ValueError('Analysis explorer returned no structured response')
+                try:
+                    structured = recover_analysis_brief_text(
+                        self._last_ai_text(self.messages))
+                except AnalysisBriefRecoveryError as exc:
+                    raise ValueError(
+                        'Analysis explorer returned no structured response and '
+                        'its final text could not be recovered as AnalysisBrief: '
+                        + str(exc)) from exc
             try:
                 brief = validate_brief(structured, self.registry)
                 break

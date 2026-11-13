@@ -287,3 +287,5 @@ final_status = analysis_completed
 6. Analysis system prompt 不包含任何任务动态数据；
 7. Query 阶段暂不改动，Analysis V2 在输出 vuln spec 后停止。
 
+你是一个计算机领域的教授，研究范围包括软件工程，程序分析等等，擅长想idea，抽象问题。
+你看一下paper/Introduction.md里面的内容，我们想解决的问题是候选checker的语义错误定位，针对性引导agent修复checker，加快合成checker流程的收敛。现在我们得要想办法解决这样的问题，我们要用

@@ -12,6 +12,7 @@ from autoql.analysis_agent.evidence_registry import EvidenceRegistry
 from autoql.analysis_agent.prompts import explorer_system_prompt
 from autoql.analysis_agent.schemas import AnalysisBrief
 from autoql.analysis_agent.validator import (SpecValidationError, finalize,
+                                              recover_analysis_brief_text,
                                               validate_brief)
 from autoql.analysis_agent.vulnerability_metadata import (
     VulnerabilityMetadataError, canonical_cwe_id,
@@ -21,6 +22,41 @@ from langchain_core.messages import AIMessage, HumanMessage
 
 
 class AnalysisTests(unittest.TestCase):
+    def test_recover_analysis_brief_from_text_output_variants(self):
+        payload = {
+            'vulnerability_summary': 'Unsafe operation is reachable.',
+            'evidence': [{
+                'id': 'E1', 'revision': 'buggy', 'file': 'A.java',
+                'start_line': 2, 'end_line': 4,
+            }],
+        }
+        encoded = json.dumps(payload)
+        variants = [
+            encoded,
+            'Analysis complete.\n```json\n' + encoded + '\n```',
+            'Final result:\n<AnalysisBrief>\n' + encoded +
+            '\n</AnalysisBrief>',
+            'Evidence collected. Result follows: ' + encoded,
+        ]
+        for text in variants:
+            with self.subTest(text=text[:30]):
+                recovered = recover_analysis_brief_text(text)
+                value = (recovered.model_dump() if hasattr(recovered, 'model_dump')
+                         else recovered)
+                self.assertEqual(value, payload)
+
+    def test_recover_analysis_brief_handles_braces_inside_strings(self):
+        payload = {
+            'vulnerability_summary': 'Input {value} reaches "unsafe" code.',
+            'evidence': [{
+                'id': 'E1', 'revision': 'buggy', 'file': 'A.java',
+                'start_line': 1, 'end_line': 1,
+            }],
+        }
+        recovered = recover_analysis_brief_text(
+            'Result: ' + json.dumps(payload))
+        self.assertEqual(recovered, payload)
+
     def test_source_readonly_and_work_writable(self):
         with tempfile.TemporaryDirectory() as tmp:
             backend = ReadOnlySourceBackend(root_dir=tmp, virtual_mode=True)

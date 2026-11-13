@@ -1,102 +1,179 @@
-"""Stable retrieval cache over the installed official Java CodeQL library sources."""
+"""Run-scoped ChromaDB retrieval tools for Java CodeQL documentation.
+
+This follows the retrieval protocol used by ``src/codeql_agent/tools.py``:
+
+* ``search_docs`` performs embedding retrieval across the language collections;
+* results retain Chroma chunk IDs so repeated documents can be suppressed;
+* prompts receive short query summaries instead of all previous documents; and
+* ``get_doc_detail`` retrieves the cached answer by the exact original query.
+
+Unlike the standalone CodeQL agent, AutoQL persists the context so a resumed
+run keeps the same retrieval history and document de-duplication state.
+"""
+from __future__ import annotations
+
+import json
 from pathlib import Path
 import re
-import time
-import math
-import json
-from collections import Counter
 
 from langchain_core.tools import tool
+
 from autoql.runtime import write_json
 
 
-class RetrievalContext:
-    def __init__(self, roots, output, limits):
-        self.entries = {}
-        self.output, self.limits = Path(output), limits
-        cache = self.output / 'retrieval_cache.json'
-        if cache.exists():
-            self.entries = json.loads(cache.read_text())
-        # Keep full cached snippets retrievable, but send repeated documents only
-        # once during discovery, even when different terms return the same hit.
-        self.document_queries = {}
-        for query, answer in self.entries.items():
-            for label in re.findall(r'^\[([^\n]+)\]$', answer, re.MULTILINE):
-                if label != 'TRUNCATED':
-                    self.document_queries.setdefault(label, query)
-        self.documents = []
-        for root in roots:
-            root = Path(root)
-            for path in sorted(root.rglob('*')):
-                if path.suffix not in ('.qll', '.ql', '.md') or '.codeql' in path.parts:
-                    continue
-                text = path.read_text(errors='replace')
-                lines = text.splitlines(keepends=True)
-                for offset in range(0, len(lines), 70):
-                    content = ''.join(lines[offset:offset + 90])
-                    label = root.parent.name + '/' + str(path.relative_to(root)) + f':{offset + 1}'
-                    tokens = self.tokens(label + '\n' + content)
-                    self.documents.append((label, content, Counter(tokens)))
-        self.df = Counter()
-        for _, _, counts in self.documents:
-            self.df.update(counts.keys())
+JAVA_DOC_COLLECTIONS = (
+    'java_codeql_stdlib',
+    'java_codeql_language_guides',
+    'java_codeql_local_queries',
+    'codeql_ql_reference',
+)
 
-    @staticmethod
-    def tokens(text):
-        split = re.sub(r'([a-z])([A-Z])', r'\1 \2', text)
-        raw = re.findall(r'[a-zA-Z_][a-zA-Z_0-9]*', text.lower())
-        return raw + re.findall(r'[a-zA-Z_][a-zA-Z_0-9]*', split.lower())
+
+def _query_chroma(query: str, collection_names: list[str], top_k: int):
+    """Lazy import keeps module loading independent from the embedding stack."""
+    from retriever.retriever_codeql_uniform import query_chroma_docs_with_ids
+    return query_chroma_docs_with_ids(
+        [query], collection_names, top_k=top_k)
+
+
+def _make_summary(query: str, answer: str) -> str:
+    clean = re.sub(r'\[doc [^\]]+\]', '', answer)
+    return json.dumps({
+        'query': query,
+        'summary': ' '.join(clean.split())[:120],
+    }, ensure_ascii=False, separators=(',', ':'))
+
+
+class RetrievalContext:
+    """One AutoQL run's query-to-answer cache and Chroma chunk-ID history."""
+
+    def __init__(self, output, limits, collection_names=None):
+        self.output = Path(output)
+        self.limits = limits
+        self.collection_names = list(collection_names or JAVA_DOC_COLLECTIONS)
+        self.cache_path = self.output / 'retrieval_cache.json'
+        self.entries: dict[str, dict] = {}
+        if self.cache_path.is_file():
+            try:
+                cached = json.loads(self.cache_path.read_text(encoding='utf-8'))
+            except (OSError, json.JSONDecodeError):
+                cached = {}
+            # Ignore caches from the previous local-keyword implementation.
+            self.entries = {
+                query: entry for query, entry in cached.items()
+                if isinstance(query, str) and isinstance(entry, dict) and
+                isinstance(entry.get('answer'), str) and
+                isinstance(entry.get('doc_ids'), list) and
+                isinstance(entry.get('summary'), str)
+            }
+            # Normalize old summary display formats while preserving answers and
+            # chunk IDs. The JSON-line form makes the exact detail key explicit.
+            for query, entry in self.entries.items():
+                entry['summary'] = _make_summary(query, entry['answer'])
+
+    def _persist(self):
+        write_json(self.cache_path, self.entries)
+
+    def seen_doc_ids(self) -> set[str]:
+        return {
+            doc_id
+            for entry in self.entries.values()
+            for doc_id in entry['doc_ids']
+        }
+
+    def find_entry_with_ids(self, doc_ids) -> str | None:
+        wanted = set(doc_ids)
+        for query, entry in self.entries.items():
+            if wanted.intersection(entry['doc_ids']):
+                return query
+        return None
+
+    def summaries(self, limit: int = 8) -> str:
+        selected = list(self.entries.values())[:limit]
+        if not selected:
+            return '(none; call search_docs when documentation is needed)'
+        return '\n'.join(entry['summary'] for entry in selected)
 
     def search(self, queries):
         if isinstance(queries, str):
             queries = [queries]
-        if not isinstance(queries, list) or len(queries) > self.limits.search_queries_per_call:
-            return 'At most three search terms per call.'
-        sections = []
-        started = time.monotonic()
-        for query in queries:
-            if query in self.entries:
-                sections.append(f'{query}: cached; use get_doc_detail with this exact query.')
-                continue
-            terms = set(self.tokens(query))
-            scores = []
-            for label, content, counts in self.documents:
-                if time.monotonic() - started > self.limits.retrieval_timeout_seconds:
-                    return 'Retrieval timeout; previous cached entries remain available.'
-                score = sum(math.log(1 + len(self.documents) / (1 + self.df[t])) *
-                            min(counts[t], 3) for t in terms if counts[t])
-                if score:
-                    scores.append((score, label, content))
-            hits = sorted(scores, reverse=True)[:self.limits.retrieval_top_k]
-            answer = '\n\n'.join(f'[{label}]\n' + content[:self.limits.document_max_chars] +
-                ('\n[TRUNCATED]' if len(content) > self.limits.document_max_chars else '')
-                for _, label, content in hits) or 'No matching official library documentation.'
-            self.entries[query] = answer
-            visible = []
-            for _, label, content in hits:
-                previous = self.document_queries.get(label)
-                if previous is not None:
-                    visible.append(f'[{label}] Already returned for {previous!r}; '
-                                   'use get_doc_detail with that exact query.')
-                else:
-                    self.document_queries[label] = query
-                    visible.append(f'[{label}]\n' + content[:self.limits.document_max_chars] +
-                        ('\n[TRUNCATED]' if len(content) > self.limits.document_max_chars else ''))
-            sections.append(query + '\n' + ('\n\n'.join(visible) if hits else answer))
-        write_json(self.output / 'retrieval_cache.json', self.entries)
-        return '\n\n'.join(sections)
+        if not isinstance(queries, list) or not all(
+                isinstance(query, str) and query.strip() for query in queries):
+            return 'queries must be a non-empty string or a list of non-empty strings.'
+        if len(queries) > self.limits.search_queries_per_call:
+            return (f'At most {self.limits.search_queries_per_call} search terms '
+                    'may be submitted per call.')
 
-    def summaries(self):
-        return '\n'.join(q + ': ' + text[:160].replace('\n', ' ') for q, text in self.entries.items())
+        sections = []
+        for raw_query in queries:
+            query = raw_query.strip()
+            if query in self.entries:
+                sections.append(
+                    f'### Search: {query}\nAlready cached. Use '
+                    f'get_doc_detail(query="{query}") for the stored result.')
+                continue
+
+            pairs = _query_chroma(
+                query, self.collection_names, self.limits.retrieval_top_k)
+            if not pairs:
+                sections.append(
+                    f'### Search: {query}\nNo matching CodeQL documentation.')
+                continue
+
+            seen = self.seen_doc_ids()
+            new_pairs = [
+                (str(chunk_id), text) for chunk_id, text in pairs
+                if str(chunk_id) not in seen
+            ]
+            if not new_pairs:
+                previous = self.find_entry_with_ids(
+                    [str(chunk_id) for chunk_id, _ in pairs])
+                detail = (f' Use get_doc_detail(query="{previous}") to read it.'
+                          if previous else '')
+                sections.append(
+                    f'### Search: {query}\nAll matching chunks were already '
+                    f'retrieved by query "{previous}".{detail}')
+                continue
+
+            answer = '\n\n'.join(
+                f'[doc {chunk_id}]\n{text[:self.limits.document_max_chars]}'
+                for chunk_id, text in new_pairs)
+            self.entries[query] = {
+                'answer': answer,
+                'doc_ids': [chunk_id for chunk_id, _ in new_pairs],
+                'summary': _make_summary(query, answer),
+            }
+            sections.append(f'### Search: {query}\n{answer}')
+
+        self._persist()
+        return '\n\n'.join(sections) if sections else 'No search terms supplied.'
 
     def tools(self):
         @tool
         def search_docs(queries: str | list[str]) -> str:
-            """Search installed official Java CodeQL API sources/examples using up to 3 terms."""
+            """Search the Java CodeQL ChromaDB collections.
+
+            Pass up to the configured limit of concise English searches in one
+            call. Use it for Java CodeQL APIs/signatures, existing source/sink
+            models or official queries, and data-flow/query authoring guides.
+            Example: {"queries": ["TaintTracking Global ConfigSig",
+            "MethodCall getArgument"]}. Results are cached by the exact query;
+            repeated Chroma chunks are not sent twice.
+            """
             return self.search(queries)
 
         @tool
         def get_doc_detail(query: str) -> str:
-            """Retrieve a previous cached result by its exact original search query."""
-            return self.entries.get(query, 'Unknown search key. Call search_docs first.')
+            """Return the full cached result for an exact earlier search query.
+
+            In RETRIEVAL HISTORY, copy the JSON ``query`` value exactly. Do not
+            pass the summary text and do not paraphrase or repeat search_docs.
+            Example: {"query": "TaintTracking Global ConfigSig"}.
+            """
+            entry = self.entries.get(query)
+            if entry is None:
+                return (f'Query "{query}" has not been searched. Call '
+                        f'search_docs(queries=["{query}"]) first.')
+            return entry['answer']
+
         return [search_docs, get_doc_detail]

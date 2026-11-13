@@ -43,6 +43,15 @@ Every material claim in vulnerability_summary must be directly supported by the 
 
 Stop exploring once the evidence is sufficient to explain both why the buggy revision is vulnerable and how the fixed revision prevents the vulnerable behavior.
 
+### Step 4 - Submit the AnalysisBrief
+After the evidence is sufficient, stop repository exploration and call the `AnalysisBrief` tool exactly once.
+
+Provide these tool arguments:
+- `vulnerability_summary`: the vulnerability mechanism supported by the selected evidence;
+- `evidence`: the minimal validated buggy and fixed source ranges supporting the analysis.
+
+The tool call is the final action of this task.
+
 ## EVIDENCE 
 Each evidence item must contain:
 - `id`: `E1`, `E2`, ...
@@ -57,27 +66,8 @@ Select the minimum non-overlapping evidence, preferably the root-cause buggy blo
 - vulnerability_summary: A concise summary of the vulnerability mechanism, including the violated security invariant, how the buggy revision violates it, any evidenced trigger, the supported security consequence, and how the fix restores the invariant.
 - evidence: The minimal validated source ranges supporting the analysis.
 
-## OUTPUT FORMAT REQUIREMENTS
-
-{
-  "vulnerability_summary": "The buggy handler commits a privileged state transition when a request flag is present without verifying that the selected operation is the authorized operation. This can allow the required authorization step to be skipped.",
-  "evidence": [
-    {
-      "id": "E1",
-      "revision": "buggy",
-      "file": "src/Example.java",
-      "start_line": 40,
-      "end_line": 68
-    },
-    {
-      "id": "E2",
-      "revision": "fix",
-      "file": "src/Example.java",
-      "start_line": 40,
-      "end_line": 72
-    }
-  ]
-}
+## OUTPUT REQUIREMENTS
+When the analysis is complete, call the `AnalysisBrief` tool.
 '''
 
 

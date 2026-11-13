@@ -16,6 +16,10 @@ class SpecValidationError(ValueError):
         super().__init__('; '.join(f"{x['path']}: {x['message']}" for x in issues))
 
 
+class AnalysisBriefRecoveryError(ValueError):
+    """Raised when ordinary assistant text cannot be recovered unambiguously."""
+
+
 def issue(path, code, message, expected=None, actual=None):
     value = {'path': path, 'code': code, 'message': message}
     if expected is not None:
@@ -29,6 +33,93 @@ def parse_json(text):
     """Shared Query-Agent parser retained independently of the Analysis schema."""
     matches = re.findall(r'```json\s*([\s\S]*?)```', text)
     return json.loads(matches[-1] if matches else text.strip())
+
+
+def _balanced_json_objects(text):
+    """Yield top-level JSON-object substrings while respecting quoted braces."""
+    start = None
+    depth = 0
+    quoted = False
+    escaped = False
+    for index, char in enumerate(text):
+        if start is None:
+            if char == '{':
+                start = index
+                depth = 1
+                quoted = False
+                escaped = False
+            continue
+        if quoted:
+            if escaped:
+                escaped = False
+            elif char == '\\':
+                escaped = True
+            elif char == '"':
+                quoted = False
+            continue
+        if char == '"':
+            quoted = True
+        elif char == '{':
+            depth += 1
+        elif char == '}':
+            depth -= 1
+            if depth == 0:
+                yield text[start:index + 1]
+                start = None
+
+
+def recover_analysis_brief_text(text):
+    """Recover one AnalysisBrief candidate from a text-only model response.
+
+    Explicit wrappers are considered first, followed by balanced JSON objects.
+    Candidates are deduplicated after JSON decoding. If several candidates are
+    present, exactly one must satisfy the AnalysisBrief schema; otherwise the
+    response is ambiguous and is rejected.
+    """
+    if not isinstance(text, str) or not text.strip():
+        raise AnalysisBriefRecoveryError('final assistant message has no text')
+
+    candidates = [text.strip()]
+    candidates.extend(re.findall(
+        r'```(?:json)?\s*([\s\S]*?)```', text, flags=re.IGNORECASE))
+    candidates.extend(re.findall(
+        r'<AnalysisBrief\b[^>]*>\s*([\s\S]*?)\s*</AnalysisBrief>',
+        text, flags=re.IGNORECASE))
+    candidates.extend(_balanced_json_objects(text))
+
+    decoded = []
+    seen = set()
+    for candidate in candidates:
+        try:
+            value = json.loads(candidate.strip())
+        except (json.JSONDecodeError, TypeError):
+            continue
+        if not isinstance(value, dict):
+            continue
+        canonical = json.dumps(value, ensure_ascii=False, sort_keys=True,
+                               separators=(',', ':'))
+        if canonical not in seen:
+            seen.add(canonical)
+            decoded.append(value)
+
+    if not decoded:
+        raise AnalysisBriefRecoveryError(
+            'no complete JSON object found in final assistant message')
+    if len(decoded) == 1:
+        # Return the raw object so the normal validate_brief path can report
+        # schema and evidence-location issues through its existing repair loop.
+        return decoded[0]
+
+    valid = []
+    for value in decoded:
+        try:
+            valid.append(AnalysisBrief.model_validate(value))
+        except ValidationError:
+            pass
+    if len(valid) == 1:
+        return valid[0]
+    raise AnalysisBriefRecoveryError(
+        'multiple distinct JSON objects found in final assistant message')
 
 
 def _parse(value):

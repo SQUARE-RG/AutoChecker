@@ -23,7 +23,7 @@ class Limits:
     query_tool_calls_per_attempt: int = 8
     search_queries_per_call: int = 3
     retrieval_top_k: int = 2
-    document_max_chars: int = 6000
+    document_max_chars: int = 5120
     query_parse_retries: int = 1
     max_compile_repairs: int = 3
     max_semantic_repairs: int = 3

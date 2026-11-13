@@ -50,8 +50,8 @@ class GraphTests(unittest.TestCase):
                 'buggy': {'hit_function': False, 'num_results': 0},
                 'fixed': {'num_results': 0}}
             llm = FakeLLM([AIMessage(content=QUERY)] * 4)
-            state = run_query(task, {'analysis_kind': 'structural_pattern', 'evidence': [], 'model': {}},
-                llm, RetrievalContext([], root, Limits()), Compiler(),
+            state = run_query(task, {'vulnerability_summary': 'Unsafe operation.', 'evidence': []},
+                llm, RetrievalContext(root, Limits()), Compiler(),
                 SimpleNamespace(evaluate=lambda *args: evaluation, granularity='function'), Limits())
             self.assertEqual(state['final_status'], 'budget_exhausted')
             self.assertEqual(state['semantic_repairs'], 3)
@@ -73,8 +73,8 @@ class GraphTests(unittest.TestCase):
             def should_not_evaluate(*args):
                 self.fail('Execution failure must not be evaluated as zero findings')
             with self.assertRaisesRegex(RuntimeError, 'Database execution failed'):
-                run_query(task, {'analysis_kind': 'structural_pattern', 'evidence': [], 'model': {}},
-                    FakeLLM([AIMessage(content=QUERY)]), RetrievalContext([], root, Limits()),
+                run_query(task, {'vulnerability_summary': 'Unsafe operation.', 'evidence': []},
+                    FakeLLM([AIMessage(content=QUERY)]), RetrievalContext(root, Limits()),
                     Compiler(), SimpleNamespace(evaluate=should_not_evaluate), Limits())
             self.assertFalse((root / 'final.ql').exists())
 
@@ -93,8 +93,8 @@ class GraphTests(unittest.TestCase):
                     return {'runs': []}, {'returncode': 0}
             evaluator = SimpleNamespace(evaluate=lambda *args: {'verified': True})
             llm = FakeLLM([AIMessage(content=QUERY), AIMessage(content=QUERY)])
-            spec = {'analysis_kind': 'structural_pattern', 'evidence': [], 'model': {}}
-            result = run_query(task, spec, llm, RetrievalContext([], root, Limits()), Compiler(), evaluator, Limits())
+            spec = {'vulnerability_summary': 'Unsafe operation.', 'evidence': []}
+            result = run_query(task, spec, llm, RetrievalContext(root, Limits()), Compiler(), evaluator, Limits())
             self.assertEqual(result['final_status'], 'query_verified')
             self.assertEqual(result['compile_repairs'], 1)
             self.assertEqual(result['attempt'], 2)
@@ -107,8 +107,8 @@ class GraphTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             task = SimpleNamespace(output_dir=tmp)
             llm = FakeLLM([AIMessage(content='invalid'), AIMessage(content='invalid')])
-            result = run_query(task, {'analysis_kind': 'structural_pattern'}, llm,
-                RetrievalContext([], Path(tmp), Limits()), None, None, Limits())
+            result = run_query(task, {'vulnerability_summary': 'Unsafe operation.', 'evidence': []}, llm,
+                RetrievalContext(Path(tmp), Limits()), None, None, Limits())
             self.assertEqual(result['final_status'], 'budget_exhausted')
             self.assertEqual(llm.calls, 2)
 
