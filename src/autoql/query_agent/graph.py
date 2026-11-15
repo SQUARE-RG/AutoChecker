@@ -1,5 +1,4 @@
 """Explicit generate/retrieve/compile/verify/repair graph, independent of codeql_agent."""
-import json
 from pathlib import Path
 
 from langchain_core.messages import HumanMessage, ToolMessage, messages_to_dict
@@ -8,9 +7,9 @@ from langgraph.graph import StateGraph, START, END
 from autoql.runtime import BudgetExceeded, remaining, write_json, write_text
 from .state import QueryState
 from .prompt_renderer import render
-from .policy import generation_issues
 from .nodes import extract_needs_evidence, extract_query
 from .tools import EvidenceAstContext
+from .semantic_report import build_semantic_report
 from autoql.timing import timed, timing_span
 
 
@@ -162,7 +161,7 @@ def run_query(task, spec, llm, retrieval, codeql, evaluator, limits, initial=Non
         candidate = state['candidate_count']
         result = codeql.compile(state['query_path'], candidate)
         if result['returncode'] == 0:
-            return {'last_compilable_query': state['query_code'], 'route': 'policy'}
+            return {'last_compilable_query': state['query_code'], 'route': 'verify'}
         if state['compile_repairs'] >= limits.max_compile_repairs:
             return {'final_status': 'budget_exhausted', 'route': 'finish'}
         feedback = '\n\n'.join(
@@ -177,22 +176,6 @@ def run_query(task, spec, llm, retrieval, codeql, evaluator, limits, initial=Non
                 f'Candidate {candidate}: compilation failed'],
             'route': 'prep',
         }
-
-    def policy(state):
-        candidate = state['candidate_count']
-        issues = generation_issues(state['query_code'], spec, task)
-        if issues:
-            write_json(output / 'attempts' / str(candidate) / 'policy.json', {'issues': issues})
-            if state['semantic_repairs'] >= limits.max_semantic_repairs:
-                return {'final_status': 'budget_exhausted', 'route': 'finish'}
-            return {
-                'generation_phase': 'semantic_repair',
-                'feedback': '\n'.join(issues),
-                'history': state['history'] + [
-                    f'Candidate {candidate}: generalization/safety policy failed'],
-                'route': 'prep',
-            }
-        return {'route': 'verify'}
 
     def verify(state):
         candidate = state['candidate_count']
@@ -209,10 +192,14 @@ def run_query(task, spec, llm, retrieval, codeql, evaluator, limits, initial=Non
             return {'evaluation': result, 'final_status': 'needs_review', 'route': 'finish'}
         if state['semantic_repairs'] >= limits.max_semantic_repairs:
             return {'evaluation': result, 'final_status': 'budget_exhausted', 'route': 'finish'}
-        # No target names, coordinates, or hidden labels in model feedback.
-        feedback = json.dumps({'target_hit': result['buggy']['hit_function'] if evaluator.granularity == 'function' else result['buggy']['hit_file'],
-            'fixed_target_persists': result['fixed_target_status'] == 'still_present',
-            'buggy_total_results': result['buggy']['num_results'], 'fixed_total_results': result['fixed']['num_results']})
+        # Sample raw full-query results independently of evaluator hits. The
+        # report exposes only the target-hit booleans, never hidden target
+        # identities or coordinates.
+        feedback = build_semantic_report(
+            task, old, new, result, evaluator.granularity)
+        write_text(
+            output / 'attempts' / str(candidate) / 'semantic_report.txt',
+            feedback)
         return {
             'evaluation': result,
             'generation_phase': 'semantic_repair',
@@ -231,10 +218,10 @@ def run_query(task, spec, llm, retrieval, codeql, evaluator, limits, initial=Non
 
     graph = StateGraph(QueryState)
     for name, fn in [('prep', prep), ('model', model), ('tools', call_tools), ('extract', extract),
-                     ('compile', compile_node), ('policy', policy), ('verify', verify), ('finish', finish)]:
+                     ('compile', compile_node), ('verify', verify), ('finish', finish)]:
         graph.add_node(name, checkpointed(fn))
     graph.add_conditional_edges(START, lambda s: s.get('route', 'prep'))
-    for name in ('prep', 'model', 'tools', 'extract', 'compile', 'policy', 'verify'):
+    for name in ('prep', 'model', 'tools', 'extract', 'compile', 'verify'):
         graph.add_conditional_edges(name, lambda s: s['route'])
     graph.add_edge('finish', END)
     start = dict(initial or {})

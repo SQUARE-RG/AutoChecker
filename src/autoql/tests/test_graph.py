@@ -256,6 +256,10 @@ class GraphTests(unittest.TestCase):
             phases = [messages[1].content for messages in llm.seen]
             self.assertIn('QUERY GENERATION PHASE:\ninitial', phases[0])
             self.assertIn('QUERY GENERATION PHASE:\nsemantic_repair', phases[1])
+            self.assertIn('VERIFICATION FEEDBACK:\nFULL QUERY RESULTS', phases[1])
+            report = root / 'attempts/1/semantic_report.txt'
+            self.assertTrue(report.is_file())
+            self.assertIn('Buggy database:', report.read_text())
             self.assertIn('QUERY GENERATION PHASE:\ncompile_repair', phases[2])
 
 

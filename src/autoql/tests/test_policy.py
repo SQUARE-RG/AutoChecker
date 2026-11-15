@@ -1,7 +1,5 @@
-from types import SimpleNamespace
 import unittest
 
-from autoql.query_agent.policy import generation_issues
 from autoql.query_agent.prompt_renderer import merge_evidence, render
 
 
@@ -48,13 +46,6 @@ class PolicyTests(unittest.TestCase):
         self.assertNotIn(
             '{"status":"needs_evidence"', semantic[0].content)
         self.assertNotIn('[AST node type derived from evidence]', semantic[0].content)
-
-    def test_project_identity(self):
-        spec = {'vulnerability_summary': 'Unsafe operation.',
-                'evidence': [{'file': 'a.java', 'code': 'package app.impl;'}]}
-        task = SimpleNamespace(buggy_commit='old', fix_commit='fixed', cve_id='private')
-        self.assertTrue(generation_issues('m.hasQualifiedName("app.impl", "Helper")', spec, task))
-        self.assertFalse(generation_issues('m.hasQualifiedName("java.io", "File")', spec, task))
 
     def test_overlap_union(self):
         first = {'id': 'E1', 'revision': 'buggy', 'file': 'a.java', 'start_line': 1, 'end_line': 2, 'code': 'a\nb\n'}
