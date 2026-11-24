@@ -8,7 +8,7 @@
     "catalog_version": "5.0",
     "dataset": "/root/code_check/autoql_data/project_info.csv",
     "dataset_cwe_count": 46,
-    "generated_at": "2026-11-03T17:22:45.458495Z",
+    "generated_at": "2026-11-24T13:02:00.471593Z",
     "item_count": 46,
     "schema_version": 1,
     "source": "MITRE CWE",

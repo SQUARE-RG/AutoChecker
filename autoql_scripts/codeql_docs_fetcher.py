@@ -8,12 +8,12 @@ import requests
 import time
 import logging
 import chromadb
-from typing import List, Dict, Any, Set
+from typing import List, Dict, Any, Set, Union
 from pathlib import Path
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, NavigableString
 import re
 import hashlib
-from urllib.parse import urljoin, urlparse
+from urllib.parse import quote, urldefrag, unquote, urljoin, urlparse
 from datetime import datetime
 import concurrent.futures
 import threading
@@ -26,6 +26,10 @@ logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
+REPOSITORY_ROOT = Path(__file__).resolve().parent.parent
+STDLIB_DOC_ROOT = REPOSITORY_ROOT / "codeql-standard-libraries"
+STDLIB_BROWSER_BASE_URL = "http://127.0.0.1:3672/codeql-standard-libraries"
+
 JAVA_SECURITY_QLPACK_PATH="/opt/codeql-bundle-2.23.3/qlpacks/codeql/java-queries/1.8.2/Security/CWE"
 JAVA_LIBRARY_QLPACK_PATH="/opt/codeql-bundle-2.23.3/qlpacks/codeql/java-all/7.7.2/semmle/code/java"
 
@@ -89,8 +93,13 @@ class CodeQLDocsFetcher:
         # Documentation sources
         self.java_doc_sources = {
             'java_stdlib': {
-                'base_url': 'https://codeql.github.com/codeql-standard-libraries/java/index.html',
-                'collection': 'java_codeql_stdlib'
+                'local_path': str(STDLIB_DOC_ROOT / 'java'),
+                'browser_base_url': f'{STDLIB_BROWSER_BASE_URL}/java/',
+                'collection': 'java_codeql_stdlib',
+                'language': 'java',
+                'pack_name': 'codeql/java-all',
+                'pack_version': '7.7.2',
+                'cli_version': '2.23.3'
             },
             'language_guides': {
                 'urls': [
@@ -114,8 +123,13 @@ class CodeQLDocsFetcher:
         }
         self.cpp_doc_sources = {
             'cpp_stdlib': {
-                'base_url': 'https://codeql.github.com/codeql-standard-libraries/cpp/index.html',
-                'collection': 'cpp_codeql_stdlib'
+                'local_path': str(STDLIB_DOC_ROOT / 'cpp'),
+                'browser_base_url': f'{STDLIB_BROWSER_BASE_URL}/cpp/',
+                'collection': 'cpp_codeql_stdlib',
+                'language': 'cpp',
+                'pack_name': 'codeql/cpp-all',
+                'pack_version': '6.0.0',
+                'cli_version': '2.23.3'
             },
             'language_guides': {
                 'urls': [
@@ -146,8 +160,13 @@ class CodeQLDocsFetcher:
         }
         self.python_doc_sources = {
                     'python_stdlib': {
-                        'base_url': 'https://codeql.github.com/codeql-standard-libraries/python/index.html',
-                        'collection': 'python_codeql_stdlib'
+                        'local_path': str(STDLIB_DOC_ROOT / 'python'),
+                        'browser_base_url': f'{STDLIB_BROWSER_BASE_URL}/python/',
+                        'collection': 'python_codeql_stdlib',
+                        'language': 'python',
+                        'pack_name': 'codeql/python-all',
+                        'pack_version': '4.0.17',
+                        'cli_version': '2.23.3'
                     },
                     'language_guides': {
                         'urls': [
@@ -229,22 +248,37 @@ class CodeQLDocsFetcher:
 
         return collections
     
-    def fetch_page_content(self, url: str) -> Dict[str, Any]:
+    def fetch_page_content(self, page: Union[str, Dict[str, Any]]) -> Dict[str, Any]:
         """Fetch and process a single page with error handling."""
+        is_local = isinstance(page, dict)
+        if is_local:
+            local_path = Path(page['local_path'])
+            url = page['url']
+            visit_key = f"local:{local_path.resolve()}"
+        else:
+            local_path = None
+            url = page
+            visit_key = url
+
         # Check if already visited
         with self.visited_lock:
-            if url in self.visited_urls:
+            if visit_key in self.visited_urls:
                 return None
-            self.visited_urls.add(url)
+            self.visited_urls.add(visit_key)
         
-        session = self.get_session()
+        session = None
         try:
-            time.sleep(self.request_delay)  # Rate limiting
-            response = session.get(url, timeout=30)
-            response.raise_for_status()
+            if is_local:
+                page_content = local_path.read_bytes()
+            else:
+                session = self.get_session()
+                time.sleep(self.request_delay)  # Rate limiting for remote sources
+                response = session.get(url, timeout=30)
+                response.raise_for_status()
+                page_content = response.content
             
             # Process content
-            soup = BeautifulSoup(response.content, 'html.parser')
+            soup = BeautifulSoup(page_content, 'html.parser')
             
             # Extract title
             title = soup.find('h1')
@@ -255,7 +289,8 @@ class CodeQLDocsFetcher:
                 title_text = title_tag.get_text().strip() if title_tag else url.split('/')[-1]
             
             # Extract main content
-            content_div = (soup.find('main') or 
+            content_div = (soup.find('div', id='content') or
+                          soup.find('main') or
                           soup.find('div', class_='content') or 
                           soup.find('article') or
                           soup.find('div', class_='documentation'))
@@ -263,12 +298,17 @@ class CodeQLDocsFetcher:
             if content_div:
                 for elem in content_div.find_all(['nav', 'aside', 'footer', 'header', 'script', 'style']):
                     elem.decompose()
-                content_text = self._extract_structured_content(content_div)
+                if content_div.get('id') == 'content':
+                    content_text = self._extract_qldoc_content(content_div)
+                else:
+                    content_text = self._extract_structured_content(content_div)
             else:
                 content_text = soup.get_text()
             
             # Extract metadata and code examples
             metadata = self._extract_page_metadata(soup, url)
+            if is_local:
+                metadata.update(page['metadata'])
             code_examples = self._extract_code_examples(soup)
             
             # Update progress
@@ -283,6 +323,7 @@ class CodeQLDocsFetcher:
                 'content': content_text,
                 'metadata': metadata,
                 'code_examples': code_examples,
+                'id_source': page.get('id_source') if is_local else url,
                 'fetch_time': datetime.now().isoformat()
             }
             
@@ -292,7 +333,30 @@ class CodeQLDocsFetcher:
             logger.error(f"Error fetching {url}: {e}")
             return None
         finally:
-            self.return_session(session)
+            if session is not None:
+                self.return_session(session)
+
+    def _extract_qldoc_content(self, content_div) -> str:
+        """Extract QLDoc content once, without header/sidebar/footer noise.
+
+        QLDoc uses deeply nested div/span/table/dl elements. Iterating over
+        selected tags would either omit API table cells or duplicate nested
+        text, so consume each stripped text node exactly once while preserving
+        preformatted code blocks with their detected fence language.
+        """
+        content_parts = []
+        for node in content_div.descendants:
+            if getattr(node, 'name', None) == 'pre':
+                code_text = node.get_text().strip()
+                language = self._detect_code_block_language(node, code_text)
+                content_parts.append(f"```{language}\n{code_text}\n```")
+            elif isinstance(node, NavigableString):
+                if node.find_parent('pre') is not None:
+                    continue
+                text = str(node).strip()
+                if text:
+                    content_parts.append(text)
+        return '\n'.join(content_parts)
     
     def _extract_structured_content(self, content_div) -> str:
         """Extract structured content preserving formatting."""
@@ -304,7 +368,8 @@ class CodeQLDocsFetcher:
                 content_parts.append(f"\n{level} {element.get_text().strip()}\n")
             elif element.name == 'pre':
                 code_text = element.get_text().strip()
-                content_parts.append(f"\n```\n{code_text}\n```\n")
+                language = self._detect_code_block_language(element, code_text)
+                content_parts.append(f"\n```{language}\n{code_text}\n```\n")
             elif element.name == 'code':
                 content_parts.append(f"`{element.get_text().strip()}`")
             elif element.name in ['ul', 'ol']:
@@ -318,6 +383,70 @@ class CodeQLDocsFetcher:
                     content_parts.append(f"{text}\n")
         
         return '\n'.join(content_parts)
+
+    def _detect_code_block_language(self, block, code_text: str) -> str:
+        """Return a Markdown fence language, normalizing QL to ``query``."""
+        aliases = {
+            'codeql': 'query',
+            'ql': 'query',
+            'query': 'query',
+            'c++': 'cpp',
+            'cxx': 'cpp',
+            'py': 'python',
+            'sh': 'shell',
+        }
+        known_languages = {
+            'java', 'cpp', 'c', 'python', 'javascript', 'typescript',
+            'ruby', 'go', 'csharp', 'swift', 'rust', 'kotlin', 'scala',
+            'shell', 'bash', 'powershell', 'json', 'yaml', 'xml', 'sql',
+            'text',
+        }
+
+        class_tokens = []
+        nodes = [block]
+        code_child = block.find('code')
+        if code_child is not None:
+            nodes.append(code_child)
+        parent = block.parent
+        for _ in range(3):
+            if parent is None:
+                break
+            nodes.append(parent)
+            parent = parent.parent
+
+        for node in nodes:
+            class_tokens.extend(node.get('class', []))
+
+        for token in class_tokens:
+            candidate = token.lower()
+            for prefix in ('language-', 'lang-', 'highlight-'):
+                if candidate.startswith(prefix):
+                    candidate = candidate[len(prefix):]
+                    break
+            if candidate in aliases:
+                return aliases[candidate]
+            if candidate in known_languages:
+                return candidate
+
+        # Prefer strong CodeQL syntax before language keyword heuristics: QL
+        # libraries can legitimately mention Java types such as ``String``.
+        if (re.search(r'\b(?:from|where|select|predicate)\b', code_text) or
+                re.search(
+                    r'^\s*import\s+(?:java|cpp|python|semmle\.|codeql\.)',
+                    code_text, re.MULTILINE)):
+            return 'query'
+        if any(keyword in code_text for keyword in ['#include', 'std::', 'int main(']):
+            return 'cpp'
+        if (re.search(r'^\s*def\s+\w+\s*\(', code_text, re.MULTILINE) or
+                'if __name__ ==' in code_text):
+            return 'python'
+        if any(keyword in code_text for keyword in ['public class', 'private', 'void', 'String']):
+            return 'java'
+
+        # CodeQL documentation predominantly contains QL snippets. This also
+        # preserves the previous default, changing only its fence label from
+        # ``codeql`` to the query-agent convention ``query``.
+        return 'query'
     
     def _extract_page_metadata(self, soup, url: str) -> Dict[str, Any]:
         """Extract metadata from the page."""
@@ -353,16 +482,16 @@ class CodeQLDocsFetcher:
     def _extract_code_examples(self, soup) -> List[Dict[str, str]]:
         """Extract code examples from the page."""
         examples = []
-        code_blocks = soup.find_all(['pre', 'code'])
+        # Inline <code> is used extensively for API names and signatures in
+        # QLDoc. Only <pre> represents a standalone code example.
+        code_blocks = soup.find_all('pre')
         
         for i, block in enumerate(code_blocks):
             code_text = block.get_text().strip()
             if len(code_text) < 20:
                 continue
-            
-            language = "codeql"
-            if any(keyword in code_text for keyword in ['public class', 'private', 'void', 'String']):
-                language = "java"
+
+            language = self._detect_code_block_language(block, code_text)
             
             examples.append({
                 'code': code_text,
@@ -413,6 +542,66 @@ class CodeQLDocsFetcher:
             return [base_url]
         finally:
             self.return_session(session)
+
+    def get_all_local_stdlib_pages(self, source: Dict[str, Any]) -> List[Dict[str, Any]]:
+        """Read a generated QLDoc index and resolve its local HTML targets."""
+        root = Path(source['local_path']).resolve()
+        index_path = root / 'index.html'
+        if not index_path.is_file():
+            raise FileNotFoundError(f"Local CodeQL stdlib index does not exist: {index_path}")
+
+        logger.info(f"Collecting local stdlib links from: {index_path}")
+        soup = BeautifulSoup(index_path.read_bytes(), 'html.parser')
+        relative_paths = {'index.html'}
+
+        for link in soup.find_all('a', href=True):
+            href, _ = urldefrag(link['href'])
+            parsed = urlparse(href)
+            if parsed.scheme or parsed.netloc or not parsed.path.endswith('.html'):
+                continue
+            if parsed.path.startswith('/'):
+                continue
+
+            candidate = (root / unquote(parsed.path)).resolve()
+            try:
+                relative_path = candidate.relative_to(root).as_posix()
+            except ValueError:
+                logger.warning(f"Skipping stdlib link outside document root: {href}")
+                continue
+
+            if candidate.is_file():
+                relative_paths.add(relative_path)
+            else:
+                logger.warning(f"Skipping missing local stdlib page: {candidate}")
+
+        pages = []
+        for relative_path in sorted(relative_paths):
+            local_path = root / relative_path
+            url = urljoin(
+                source['browser_base_url'],
+                quote(relative_path, safe='/$@._~-')
+            )
+            pages.append({
+                'local_path': str(local_path),
+                'relative_path': relative_path,
+                'url': url,
+                'id_source': f"{source['language']}:{relative_path}",
+                'metadata': {
+                    'source': 'local_codeql_stdlib',
+                    'language': source['language'],
+                    'doc_type': f"{source['language']}_stdlib",
+                    'cli_version': source['cli_version'],
+                    'pack_name': source['pack_name'],
+                    'pack_version': source['pack_version'],
+                    'relative_path': relative_path,
+                    'url_path': f"/codeql-standard-libraries/{source['language']}/{relative_path}"
+                }
+            })
+
+        logger.info(
+            f"Found {len(pages)} local HTML pages for {source['pack_name']}@{source['pack_version']}"
+        )
+        return pages
     
     def load_local_codeql_queries(self, local_path: str) -> List[Dict[str, Any]]:
         logger.info(f"Loading local CodeQL queries from: {local_path}")
@@ -525,7 +714,7 @@ class CodeQLDocsFetcher:
                 except Exception as e:
                     logger.error(f"Error storing batch: {e}")
     
-    def process_url_batch(self, urls: List[str], collection_name: str, 
+    def process_url_batch(self, urls: List[Union[str, Dict[str, Any]]], collection_name: str,
                          collections: Dict[str, chromadb.Collection]) -> None:
         collection = collections[collection_name]
         
@@ -543,10 +732,15 @@ class CodeQLDocsFetcher:
                 try:
                     doc_data = future.result()
                     if doc_data:
-                        url_hash = hashlib.md5(url.encode()).hexdigest()[:12]
-                        doc_id = f"{collection_name}_{url_hash}"
+                        if isinstance(url, dict):
+                            stable_key = f"{collection_name}:{doc_data['id_source']}"
+                            stable_hash = hashlib.sha256(stable_key.encode()).hexdigest()[:20]
+                            doc_id = f"{collection_name}_{stable_hash}"
+                        else:
+                            url_hash = hashlib.md5(url.encode()).hexdigest()[:12]
+                            doc_id = f"{collection_name}_{url_hash}"
                         main_doc = {
-                            'text': f"# {doc_data['title']}\n\nURL: {doc_data['url']}\n\n{doc_data['content']}",
+                            'text': f"# {doc_data['title']}\n\n{doc_data['content']}",
                             'metadata': doc_data['metadata'],
                             'id': doc_id
                         }
@@ -595,7 +789,7 @@ class CodeQLDocsFetcher:
         # --- 2. Java documentation sources ---
         logger.info("Collecting Java Standard Library URLs...")
         java_stdlib_src = self.java_doc_sources['java_stdlib']
-        java_stdlib_links = self.get_all_links(java_stdlib_src['base_url'])
+        java_stdlib_links = self.get_all_local_stdlib_pages(java_stdlib_src)
         all_url_batches.append((java_stdlib_links, java_stdlib_src['collection']))
 
         logger.info("Collecting Java Language Guide URLs...")
@@ -605,7 +799,7 @@ class CodeQLDocsFetcher:
         # --- 3. C++ documentation sources ---
         logger.info("Collecting C++ Standard Library URLs...")
         cpp_stdlib_src = self.cpp_doc_sources['cpp_stdlib']
-        cpp_stdlib_links = self.get_all_links(cpp_stdlib_src['base_url'])
+        cpp_stdlib_links = self.get_all_local_stdlib_pages(cpp_stdlib_src)
         all_url_batches.append((cpp_stdlib_links, cpp_stdlib_src['collection']))
 
         logger.info("Collecting C++ Language Guide URLs...")
@@ -615,7 +809,7 @@ class CodeQLDocsFetcher:
         # --- 4. Python documentation sources ---
         logger.info("Collecting Python Standard Library URLs...")
         python_stdlib_src = self.python_doc_sources['python_stdlib']
-        python_stdlib_links = self.get_all_links(python_stdlib_src['base_url'])
+        python_stdlib_links = self.get_all_local_stdlib_pages(python_stdlib_src)
         all_url_batches.append((python_stdlib_links, python_stdlib_src['collection']))
 
         logger.info("Collecting Python Language Guide URLs...")
@@ -679,23 +873,13 @@ class CodeQLDocsFetcher:
         documents = []
         for query_file in all_local_queries:
             main_text = f"# {query_file['filename']}\n\n"
-            main_text += f"**Type**: {query_file['file_type']}\n"
-            main_text += f"**Path**: {query_file['relative_path']}\n"
-            main_text += f"**Category**: {query_file['metadata'].get('category', 'general')}\n\n"
-
-            if 'cwe_number' in query_file['metadata']:
-                main_text += f"**CWE**: CWE-{query_file['metadata']['cwe_number']}\n"
-            if 'name' in query_file['metadata']:
-                main_text += f"**Name**: {query_file['metadata']['name']}\n"
-            if 'description' in query_file['metadata']:
-                main_text += f"**Description**: {query_file['metadata']['description']}\n"
 
             if query_file['metadata'].get('category') == 'security':
                 doc_id = f"cwe_query_{query_file['relative_path'].replace('/', '_').replace('.', '_')}"
             else:
                 doc_id = f"local_query_{query_file['relative_path'].replace('/', '_').replace('.', '_')}"
 
-            main_text += f"\n```codeql\n{query_file['content']}\n```"
+            main_text += f"```query\n{query_file['content']}\n```"
 
             documents.append({
                 'text': main_text,

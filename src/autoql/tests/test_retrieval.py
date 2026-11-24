@@ -10,6 +10,25 @@ from autoql.runtime import Limits
 
 
 class RetrievalTests(unittest.TestCase):
+    def test_default_java_group_policy(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            expected = [
+                ('stdlib-1', 'stdlib one'),
+                ('stdlib-2', 'stdlib two'),
+                ('guide-1', 'guide one'),
+                ('local-1', 'local one'),
+            ]
+            with patch(
+                    'autoql.query_agent.tools._query_chroma_groups',
+                    return_value=expected) as backend:
+                context = RetrievalContext(Path(tmp) / 'run', Limits())
+                result = context.search('MethodCall getArgument')
+
+            backend.assert_called_once_with('MethodCall getArgument')
+            for chunk_id, text in expected:
+                self.assertIn(f'[doc {chunk_id}]', result)
+                self.assertIn(text, result)
+
     def test_dedup_cache_and_resume(self):
         with tempfile.TemporaryDirectory() as tmp:
             out = Path(tmp) / 'run'

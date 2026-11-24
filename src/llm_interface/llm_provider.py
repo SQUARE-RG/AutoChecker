@@ -68,6 +68,20 @@ def get_llm_client():
             max_retries=0,
         )
         return client
+    elif "claude" in model_name:
+        API_KEY = os.getenv("CLAUDE_API_KEY", "your_default_api_key_here")
+        BASE_URL = os.getenv("CLAUDE_BASE_URL", "https://api.claude.ai")
+        client = ChatOpenAI(
+            model=model_name,
+            api_key=API_KEY,
+            base_url=BASE_URL,
+            temperature=0.7,
+            timeout=settings["timeout_seconds"],
+            max_retries=0,
+        )
+        return client
+    else:
+        raise ValueError(f"Unsupported model: {model_name}")
 
 
 def llm_invoke(llm_provider, prompt: str, system_prompt: str = None):
@@ -249,8 +263,21 @@ DEEPSEEK_PRICE_PER_1M_TOKENS = {
         "input_cache_hit": 0.04,
         "input_cache_miss": 2.0,
         "output": 8.0, 
+    },
+    "deepseek-v4.1-flash-ark":{
+        "input_cache_hit": 0.04,
+        "input_cache_miss": 2.0,
+        "output": 8.0, 
+    },
+}
+CLAUDE_PRICE_PER_1M_TOKENS = {
+    "claude-fable-5": {
+        "input_cache_hit": 1.0,
+        "input_cache_miss": 10.0,
+        "output": 50.0,
     }
 }
+
 
 
 def calculate_deepseek_cost(cb, model_name=None):
@@ -307,6 +334,25 @@ def calculate_deepseek_cost(cb, model_name=None):
             total_cost = input_cost + output_cost
             pricing_source = "deepseek_table"
             currency = "CNY"
+    elif "claude" in model_name:
+        prices = CLAUDE_PRICE_PER_1M_TOKENS.get(model_name)
+        if prices is None:
+            logger.warning(f"claude 模型 {model_name} 不在自定义定价表中，cost 记为 0")
+            total_cost = 0.0
+            input_cost = 0.0
+            output_cost = 0.0
+            pricing_source = "none"
+            currency = "USD"
+        else:
+            uncached_prompt = max(prompt_tokens - cached_tokens, 0)
+            input_cost_cached = (cached_tokens / 1_000_000) * prices["input_cache_hit"]
+            input_cost_uncached = (uncached_prompt / 1_000_000) * prices["input_cache_miss"]
+            output_cost = (completion_tokens / 1_000_000) * prices["output"]
+            input_cost = input_cost_cached + input_cost_uncached
+            total_cost = input_cost + output_cost
+            pricing_source = "claude_table"
+            currency = "USD"
+
     else:
         # langchain 官方 callback 内置价格表（USD）；查不到时 cb.total_cost 为 0
         total_cost = getattr(cb, "total_cost", 0.0) or 0.0

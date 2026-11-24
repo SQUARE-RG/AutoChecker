@@ -28,34 +28,6 @@ def setup_logging():
 
     return logging.getLogger(__name__)
 
-def find_project_source_directory(cve_base_path):
-    cve_name = os.path.basename(cve_base_path)
-
-    # Look for project directories (not CVE-specific dirs or files)
-    for item in os.listdir(cve_base_path):
-        item_path = os.path.join(cve_base_path, item)
-
-        # Skip CVE-specific directories and files
-        if item.startswith(cve_name) or item.endswith('.diff'):
-            continue
-
-        # Look for directories that contain Java source
-        if os.path.isdir(item_path):
-            # Check if this directory contains pom.xml, build.gradle, or build.xml (indicating it's a project root)
-            if (os.path.exists(os.path.join(item_path, "pom.xml")) or
-                os.path.exists(os.path.join(item_path, "build.gradle")) or
-                os.path.exists(os.path.join(item_path, "build.gradle.kts")) or
-                os.path.exists(os.path.join(item_path, "build.xml"))):
-                return item_path
-
-            # Also check if it has Java source files
-            for root, dirs, files in os.walk(item_path):
-                if any(f.endswith('.java') for f in files):
-                    return item_path
-                break  
-
-    return None
-
 def checkout_commit(project_source, commit_hash):
     logger = logging.getLogger(__name__)
     try:
@@ -97,45 +69,46 @@ def checkout_commit(project_source, commit_hash):
         logger.error(msg)
         return False
 
-def create_codeql_database(cve_dir_path, version_type, cve_base_path, commit_hash=None):
-    """Create CodeQL database using build-mode=none (no build required)"""
+def create_codeql_database(database_path, source_path):
+    """Create a CodeQL database from an explicitly selected source repository."""
     logger = logging.getLogger(__name__)
 
-    db_java_path = os.path.join(cve_dir_path, "db-java")
+    database_path = os.path.abspath(database_path)
+    source_path = os.path.abspath(source_path)
+    db_java_path = os.path.join(database_path, "db-java")
+
     if os.path.exists(db_java_path):
         print(f"Database already exists at {db_java_path}")
         return True
 
-    database_path = os.path.abspath(cve_dir_path)
+    if not os.path.isdir(source_path):
+        message = f"Source repository does not exist: {source_path}"
+        print(message)
+        logger.error(message)
+        return False
 
-    project_source = find_project_source_directory(cve_base_path)
+    if os.path.normcase(source_path) == os.path.normcase(database_path):
+        message = f"Source root cannot be the database output directory: {source_path}"
+        print(message)
+        logger.error(message)
+        return False
 
-    if commit_hash and project_source:
-        if not checkout_commit(project_source, commit_hash):
-            print(f"Failed to checkout commit {commit_hash} - aborting database creation")
-            return False
+    has_java_source = False
+    for _, _, files in os.walk(source_path):
+        if any(file_name.endswith('.java') for file_name in files):
+            has_java_source = True
+            break
 
-    if project_source:
-        source_path = project_source
-        print(f"Found project source directory: {source_path}")
-    else:
-        source_candidates = [
-            os.path.join(cve_dir_path, "src"),
-            os.path.join(cve_dir_path, "src/main/java"),
-            cve_dir_path
-        ]
-
-        source_path = cve_dir_path 
-        for candidate in source_candidates:
-            if os.path.exists(candidate):
-                source_path = candidate
-                break
-        print(f"Using fallback source path: {source_path}")
+    if not has_java_source:
+        message = f"No Java source files found under source root: {source_path}"
+        print(message)
+        logger.error(message)
+        return False
 
     command = [
         "codeql", "database", "create",
         database_path,
-        "--source-root", source_path,
+        f"--source-root={source_path}",
         "--language", "java",
         "--build-mode=none",
         "--overwrite"
@@ -146,7 +119,7 @@ def create_codeql_database(cve_dir_path, version_type, cve_base_path, commit_has
         print(f"Using source path: {source_path}")
         print(f"Using build-mode=none (no build required)")
 
-        res = subprocess.run(command, capture_output=True, text=True, timeout=3600)  # 10 min timeout
+        res = subprocess.run(command, capture_output=True, text=True, timeout=6000)  # 10 min timeout
 
         if res.returncode == 0:
             print(f"Successfully created CodeQL database")
@@ -267,46 +240,48 @@ def process_cve_directory(cve_dir_path):
     vul_db_exists = os.path.exists(os.path.join(vul_db_path, "db-java"))
     fix_db_exists = os.path.exists(os.path.join(fix_db_path, "db-java"))
 
-    if vul_db_exists and fix_db_exists:
-        print(f"{cve_id} already has complete databases, skipping...")
-        return [f"{cve_id}-vul: Already exists", f"{cve_id}-fix: Already exists"]
-
     results = []
 
-    # Create vulnerable version database
-    if not vul_db_exists:
-        print(f"\nCreating vulnerable database for {cve_id}...")
-        print(f"Checking out buggy commit: {buggy_commit[:8]}")
-        if checkout_commit(repo_path, buggy_commit):
-            success = create_codeql_database(vul_db_path, "vul", cve_dir_path, None)
-            if success:
-                results.append(f"{cve_id}-vul: Success")
-            else:
-                results.append(f"{cve_id}-vul: Database creation failed")
-        else:
-            results.append(f"{cve_id}-vul: Checkout failed")
-    else:
-        print(f"Vulnerable database already exists for {cve_id}")
-        results.append(f"{cve_id}-vul: Already exists")
+    try:
+        if vul_db_exists and fix_db_exists:
+            print(f"{cve_id} already has complete databases, skipping...")
+            return [f"{cve_id}-vul: Already exists", f"{cve_id}-fix: Already exists"]
 
-    # Create fixed version database
-    if not fix_db_exists:
-        print(f"\nCreating fixed database for {cve_id}...")
-        print(f"Checking out fix commit: {fix_commit[:8]}")
-        if checkout_commit(repo_path, fix_commit):
-            success = create_codeql_database(fix_db_path, "fix", cve_dir_path, None)
-            if success:
-                results.append(f"{cve_id}-fix: Success")
+        # Create vulnerable version database
+        if not vul_db_exists:
+            print(f"\nCreating vulnerable database for {cve_id}...")
+            print(f"Checking out buggy commit: {buggy_commit[:8]}")
+            if checkout_commit(repo_path, buggy_commit):
+                success = create_codeql_database(vul_db_path, repo_path)
+                if success:
+                    results.append(f"{cve_id}-vul: Success")
+                else:
+                    results.append(f"{cve_id}-vul: Database creation failed")
             else:
-                results.append(f"{cve_id}-fix: Database creation failed")
+                results.append(f"{cve_id}-vul: Checkout failed")
         else:
-            results.append(f"{cve_id}-fix: Checkout failed")
-    else:
-        print(f"Fixed database already exists for {cve_id}")
-        results.append(f"{cve_id}-fix: Already exists")
+            print(f"Vulnerable database already exists for {cve_id}")
+            results.append(f"{cve_id}-vul: Already exists")
 
-    # Checkout back to buggy commit (leave repo in vulnerable state)
-    checkout_commit(repo_path, buggy_commit)
+        # Create fixed version database
+        if not fix_db_exists:
+            print(f"\nCreating fixed database for {cve_id}...")
+            print(f"Checking out fix commit: {fix_commit[:8]}")
+            if checkout_commit(repo_path, fix_commit):
+                success = create_codeql_database(fix_db_path, repo_path)
+                if success:
+                    results.append(f"{cve_id}-fix: Success")
+                else:
+                    results.append(f"{cve_id}-fix: Database creation failed")
+            else:
+                results.append(f"{cve_id}-fix: Checkout failed")
+        else:
+            print(f"Fixed database already exists for {cve_id}")
+            results.append(f"{cve_id}-fix: Already exists")
+    finally:
+        # Leave the repository in the vulnerable state even if database
+        # creation raises an exception or is interrupted.
+        checkout_commit(repo_path, buggy_commit)
 
     return results
 

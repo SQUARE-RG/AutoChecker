@@ -21,7 +21,7 @@ class Limits:
     evidence_refresh_limit: int = 3
     query_model_calls_per_attempt: int = 8
     query_tool_calls_per_attempt: int = 8
-    search_queries_per_call: int = 3
+    search_queries_per_call: int = 4
     retrieval_top_k: int = 2
     document_max_chars: int = 5120
     query_parse_retries: int = 1

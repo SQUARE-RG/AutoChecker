@@ -29,12 +29,28 @@ JAVA_DOC_COLLECTIONS = (
     'codeql_ql_reference',
 )
 
+JAVA_DOC_GROUPS = (
+    (('java_codeql_stdlib',), 2, 2),
+    (('java_codeql_language_guides', 'codeql_ql_reference'), 2, 1),
+    (('java_codeql_local_queries',), 3, 1),
+)
+
 
 def _query_chroma(query: str, collection_names: list[str], top_k: int):
     """Lazy import keeps module loading independent from the embedding stack."""
     from retriever.retriever_codeql_uniform import query_chroma_docs_with_ids
     return query_chroma_docs_with_ids(
         [query], collection_names, top_k=top_k)
+
+
+def _query_chroma_groups(query: str):
+    """Apply AutoQL's Java documentation diversity and size policy."""
+    from retriever.retriever_codeql_uniform import (
+        query_chroma_doc_groups_with_ids,
+    )
+    return query_chroma_doc_groups_with_ids(
+        [query], [(list(names), candidates, results)
+                  for names, candidates, results in JAVA_DOC_GROUPS])
 
 
 def _make_summary(query: str, answer: str) -> str:
@@ -48,6 +64,7 @@ class RetrievalContext:
     def __init__(self, output, limits, collection_names=None):
         self.output = Path(output)
         self.limits = limits
+        self.use_java_group_policy = collection_names is None
         self.collection_names = list(collection_names or JAVA_DOC_COLLECTIONS)
         self.cache_path = self.output / 'retrieval_cache.json'
         self.entries: dict[str, dict] = {}
@@ -115,8 +132,12 @@ class RetrievalContext:
                     'stored result.')
                 continue
 
-            pairs = _query_chroma(
-                query, self.collection_names, self.limits.retrieval_top_k)
+            if self.use_java_group_policy:
+                pairs = _query_chroma_groups(query)
+            else:
+                pairs = _query_chroma(
+                    query, self.collection_names,
+                    self.limits.retrieval_top_k)
             if not pairs:
                 sections.append(
                     f'### Search: {query}\nNo matching CodeQL documentation.')
@@ -159,6 +180,9 @@ class RetrievalContext:
             Pass up to the configured limit of concise English searches in one
             call. Use it for Java CodeQL APIs/signatures, existing source/sink
             models or official queries, and data-flow/query authoring guides.
+            Each query returns at most four diverse results: two standard
+            library documents, one language-guide/QL-reference document, and
+            one local-query example.
             Example: {"queries": ["TaintTracking Global ConfigSig",
             "MethodCall getArgument"]}. Results are cached by the exact query;
             repeated Chroma chunks are not sent twice.

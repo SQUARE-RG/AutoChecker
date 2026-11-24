@@ -131,6 +131,74 @@ def query_chroma_docs_with_ids(query_texts: List[str],
     return unique
 
 
+def query_chroma_doc_groups_with_ids(
+        query_texts: List[str],
+        groups: List[tuple[List[str], int, int]]) -> List[tuple]:
+    """Query collection groups and keep a bounded number per group.
+
+    Each group is ``(collection_names, candidates_per_collection,
+    results_per_group)``. Candidates from collections in the same group are
+    compared by Chroma distance before the group limit is applied. All
+    collections must therefore use embeddings and distance metrics that are
+    comparable.
+    """
+    if not groups or not query_texts:
+        return []
+
+    if len(query_texts) > 1:
+        query_embs = sequential_encode(
+            query_texts, _MODEL_PATH,
+            batch_size=min(len(query_texts), 128))
+    else:
+        query_embs = sequential_encode(
+            query_texts, _MODEL_PATH, batch_size=1)
+
+    client = get_chroma_client()
+    collection_names = list(dict.fromkeys(
+        name for names, _, _ in groups for name in names))
+    collections_cache = {}
+    for name in collection_names:
+        try:
+            collections_cache[name] = client.get_collection(name=name)
+        except Exception:
+            logger.debug(f"Collection '{name}' not found, skipping")
+
+    results: List[tuple] = []
+    seen = set()
+    for query_emb in query_embs:
+        embedding = query_emb.tolist()
+        for names, candidate_k, result_k in groups:
+            candidates = []
+            for name in names:
+                collection = collections_cache.get(name)
+                if collection is None:
+                    continue
+                try:
+                    response = collection.query(
+                        query_embeddings=[embedding],
+                        n_results=candidate_k,
+                        include=['documents', 'distances'])
+                    ids = response.get('ids', [[]])[0]
+                    docs = response.get('documents', [[]])[0]
+                    distances = response.get('distances', [[]])[0]
+                    candidates.extend(zip(distances, ids, docs))
+                except Exception:
+                    logger.debug(f"Query failed on '{name}', skipping")
+
+            candidates.sort(key=lambda item: item[0])
+            kept = 0
+            for _, chunk_id, document in candidates:
+                if chunk_id in seen:
+                    continue
+                seen.add(chunk_id)
+                results.append((chunk_id, document))
+                kept += 1
+                if kept >= result_k:
+                    break
+
+    return results
+
+
 # ── 对外接口（与现有函数签名兼容）──────────────────────────
 
 def get_related_api_uniform(logics: List[str], lang_config: LanguageConfig) -> List[str]:

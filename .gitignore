@@ -129,3 +129,4 @@ autoql_runs/
 reference/
 src/codeql_collect_uniform/chroma_db
 temp/
+codeql-standard-libraries/

@@ -94,6 +94,18 @@ class StreamingTests(unittest.TestCase):
         self.assertEqual(self.gateway.records[0]['timeout_kind'], 'ReadTimeout')
         self.assertGreater(self.gateway.records[1]['retry_wait_before_seconds'], 0)
 
+    def test_remote_protocol_error_discards_partial_and_retries(self):
+        self.gateway.model = FakeModel([
+            [AIMessageChunk(content='partial'),
+             httpx.RemoteProtocolError('peer closed connection')],
+            [AIMessageChunk(content='ok')]])
+        self.assertEqual(self.gateway.call([], [], 'query').content, 'ok')
+        self.assertEqual(len(self.gateway.records), 2)
+        self.assertEqual(self.gateway.records[0]['error_type'], 'RemoteProtocolError')
+        self.assertIsNone(self.gateway.records[0]['usage'])
+        self.assertEqual(self.gateway.records[1]['status'], 'success')
+        self.assertEqual(self.gateway.counts['query'], 1)
+
     def test_stream_usage_counted_once(self):
         self.gateway.model = FakeModel([[AIMessageChunk(content='hi'), AIMessageChunk(content='', usage_metadata={
             'input_tokens': 10, 'output_tokens': 2, 'total_tokens': 12,

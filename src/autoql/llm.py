@@ -28,6 +28,17 @@ class TransientLLMError(RuntimeError):
     pass
 
 
+# Transport failures that are safe to retry as a whole logical call. A dropped
+# stream, reset connection, or proxy error is not a query/model error and the
+# partial response is discarded before retrying.
+TRANSIENT_TRANSPORT_ERRORS = (
+    httpx.NetworkError,
+    httpx.RemoteProtocolError,
+    httpx.ProxyError,
+    httpx.TimeoutException,
+)
+
+
 class RequestDeadlineExceeded(TimeoutError):
     """A total request deadline is not blindly retried as a network failure."""
 
@@ -222,9 +233,10 @@ class StreamingLLM:
                 if isinstance(exc, (RequestDeadlineExceeded, BudgetExceeded)):
                     raise
                 code = getattr(exc, 'status_code', None)
-                if isinstance(exc, TransientLLMError) or isinstance(exc, TimeoutError) or code == 429 or (
-                    isinstance(code, int) and code >= 500
-                ) or any(s in type(exc).__name__.lower() for s in ('connection', 'timeout')):
+                if (isinstance(exc, (TransientLLMError, TimeoutError) + TRANSIENT_TRANSPORT_ERRORS)
+                        or code == 429
+                        or (isinstance(code, int) and code >= 500)
+                        or any(s in type(exc).__name__.lower() for s in ('connection', 'timeout'))):
                     raise TransientLLMError(type(exc).__name__) from exc
                 raise
             finally:

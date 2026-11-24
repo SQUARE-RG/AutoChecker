@@ -9,95 +9,62 @@ from ``vulnerability_summary`` and the program-materialized evidence.
 
 def query_skeleton() -> str:
     """Return the sole CodeQL query skeleton supplied to query synthesis."""
-    return r"""Use the skeleton below as the only starting point. Replace every
-bracketed placeholder with concrete CodeQL derived from the supplied
-vulnerability summary and source evidence. The skeleton is guidance, not a
-compilable query and not permission to invent a taint model.
+    return r"""Use the skeleton below as a general starting point.
 
-Requirements:
-- Identify the untrusted value as Source and the security-sensitive operand as
-  Sink using semantic API, type, argument, and data-flow constraints.
-- Add Sanitizer/isBarrier only when the evidence proves a guard that blocks the
-  same value; otherwise remove both definitions.
-- Add isAdditionalFlowStep only for an evidenced propagation step missing from
-  the standard library; otherwise remove it.
-- Remove unused imports, optional classes, predicates, and branches.
-- Do not preserve any bracketed placeholder in the returned query.
-- Do not change to another template or invent predicates unsupported by the
-  evidence.
+Choose the simplest CodeQL modeling strategy that matches the evidenced vulnerability mechanism. Use AST structure, API semantics, types, values, control flow, data flow, or taint tracking only when needed.
 
-```ql
+```query
 /**
- * @name [Vulnerability name derived from the analysis]
- * @description [Description derived from the vulnerability mechanism]
+ * @name [Name derived from the vulnerability mechanism]
+ * @description [Description of the detected vulnerable behavior]
  * @problem.severity error
- * @security-severity [Numeric security severity]
  * @precision high
  * @tags security
- * @kind path-problem
- * @id autoql/[stable-query-id]
+ * @kind [problem or path-problem]
+ * @id autoql/[query-id]
  */
+
 import java
-import semmle.code.java.dataflow.DataFlow
-import semmle.code.java.dataflow.TaintTracking
 
-class Source extends DataFlow::Node {
-  Source() {
-    exists([AST node type derived from evidence] sourceNode |
-      [Semantic source constraints] and
-      this.asExpr() = [Source expression mapping]
-    )
-  }
-}
+// Add only the CodeQL libraries required by the chosen analysis.
+// Examples:
+// import semmle.code.java.dataflow.DataFlow
+// import semmle.code.java.dataflow.TaintTracking
 
-class Sink extends DataFlow::Node {
-  Sink() {
-    exists([AST node type derived from evidence] sinkNode |
-      [Semantic sink constraints] and
-      this.asExpr() = [Sensitive operand mapping]
-    )
-  }
-}
 
-class Sanitizer extends DataFlow::Node {
-  Sanitizer() {
-    exists([AST node type for an evidenced sanitizer] sanitizerNode |
-      [Semantic sanitizer constraints] and
-      this.asExpr() = [Sanitized value mapping]
-    )
-  }
-}
+// Define the program elements and semantic relationships that
+// characterize the vulnerable behavior.
+//
+// These may model, for example:
+// - AST or API usage
+// - types, arguments, receivers, fields, annotations, or constants
+// - missing or incorrect conditions
+// - control-flow or state relationships
+// - data-flow or taint-flow sources, sinks, and propagation
+//
+// Add only what the vulnerability mechanism requires.
 
-module MyPathConfig implements DataFlow::ConfigSig {
-  predicate isSource(DataFlow::Node source) {
-    source instanceof Source
-  }
+[Relevant classes and predicates]
 
-  predicate isSink(DataFlow::Node sink) {
-    sink instanceof Sink
-  }
 
-  predicate isBarrier(DataFlow::Node sanitizer) {
-    sanitizer instanceof Sanitizer
-  }
+// Optional data-flow or taint-tracking configuration.
+// Include this section only when propagation between values is
+// essential to detecting the vulnerability.
 
-  predicate isAdditionalFlowStep(DataFlow::Node node1, DataFlow::Node node2) {
-    [Evidenced additional propagation step]
-  }
-}
+[Optional DataFlow/TaintTracking configuration]
 
-module MyPathFlow = TaintTracking::Global<MyPathConfig>;
-import MyPathFlow::PathGraph
+
+// Select the program element that represents the detected vulnerability.
 
 from
-  MyPathFlow::PathNode source,
-  MyPathFlow::PathNode sink
+  [Relevant query variables]
 where
-  MyPathFlow::flowPath(source, sink)
+  [Semantic conditions defining the vulnerable behavior]
 select
-  sink.getNode(),
-  source,
-  sink,
-  "[Alert message derived from the vulnerability]"
+  [Result entity and message, or path-problem result columns]
 ```
+
+For `@kind problem`, return the detected entity followed by its alert message.
+For `@kind path-problem`, use an appropriate path query configuration and return the required source, sink, and message columns.
+
 """
