@@ -1,0 +1,14 @@
+project_slug,build_cmd,side
+spring-projects__spring-security_CVE-2011-2732_2.0.6.RELEASE,mvn -q -B -DskipTests compile
+x-stream__xstream_CVE-2013-7285_1.4.6,mvn -q -B -DskipTests compile
+spring-security_CVE-2025-22223_6.4.3,"./gradlew --no-daemon -S -Dorg.gradle.dependency.verification=off -Dorg.gradle.warning.mode=none -Dorg.gradle.caching=false --rerun-tasks -x compileKotlin -x compileTestKotlin clean classes"
+incubator-seata_CVE-2025-32897_v2.2.0,mvn -q -B -DskipTests compile
+cassandra-lucene-index_CVE-2025-26511_cassandra-4.0.16-1.0.0,mvn clean package -B -V -e -Dfindbugs.skip -Dcheckstyle.skip -Dpmd.skip=true -Dspotbugs.skip -Denforcer.skip -Dmaven.javadoc.skip -DskipTests -Dmaven.test.skip.exec -Dlicense.skip=true -Drat.skip=true -Dspotless.check.skip=true
+alibaba__one-java-agent_CVE-2022-25842_0.0.1,mvn -Dbytekit.version=0.0.5 clean compile -B -V -e -U -DskipTests -DskipITs -Dfindbugs.skip -Dcheckstyle.skip -Dpmd.skip=true -Dspotbugs.skip -Denforcer.skip -Dmaven.javadoc.skip -Dlicense.skip=true -Drat.skip=true -Dspotless.check.skip=true -Djacoco.skip=true,fix
+camel_CVE-2025-30177_camel-4.10.2,env GITHUB_ACTIONS=true mvn -pl components/camel-undertow -am clean package -B -V -e -U -DskipTests -DskipITs -Dfindbugs.skip -Dcheckstyle.skip -Dpmd.skip=true -Dspotbugs.skip -Denforcer.skip -Dmaven.javadoc.skip -Dlicense.skip=true -Drat.skip=true -Dspotless.check.skip=true -Djacoco.skip=true,both
+tomcat_CVE-2025-52520_11.0.8,ant -q clean compile,both
+iotdb_CVE-2025-26795_v1.3.3,env GITHUB_ACTIONS=true mvn -Dtsfile.version=1.1.0 -pl iotdb-client/jdbc -am clean compile -B -V -e -U -DskipTests -DskipITs -Dfindbugs.skip -Dcheckstyle.skip -Dpmd.skip=true -Dspotbugs.skip -Denforcer.skip -Dmaven.javadoc.skip -Dlicense.skip=true -Drat.skip=true -Dspotless.check.skip=true -Djacoco.skip=true,both
+iotdb_CVE-2025-26864_v1.3.3,env GITHUB_ACTIONS=true mvn -Dtsfile.version=1.1.1 -Dratis.version=3.1.2 -Dratis-thirdparty-misc.version=1.0.8 -pl iotdb-core/node-commons -am clean compile -B -V -e -U -DskipTests -DskipITs -Dfindbugs.skip -Dcheckstyle.skip -Dpmd.skip=true -Dspotbugs.skip -Denforcer.skip -Dmaven.javadoc.skip -Dlicense.skip=true -Drat.skip=true -Dspotless.check.skip=true -Djacoco.skip=true,both
+jans_CVE-2025-53003_v1.7.0,mvn -Djans.version=1.7.0 -f jans-config-api/pom.xml -pl server -am clean compile -B -V -e -U -DskipTests -DskipITs -Dmaven.javadoc.skip=true -Dcheckstyle.skip -Dspotbugs.skip -Dmaven.compiler.failOnError=false -Dresolve.skip=true,both
+cassandra_CVE-2025-23015_cassandra-5.0-alpha2,ant -Dant.gen-doc.skip=true clean build,both
+inlong_CVE-2025-27531_2.0.0-RC0,mvn -pl inlong-manager/manager-pojo -am clean compile -B -V -e -U -DskipTests -DskipITs -Dfindbugs.skip -Dcheckstyle.skip -Dpmd.skip=true -Dspotbugs.skip -Denforcer.skip -Dmaven.javadoc.skip -Dlicense.skip=true -Drat.skip=true -Dspotless.check.skip=true -Djacoco.skip=true,both

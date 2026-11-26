@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Run AutoQL analysis sequentially for CVEs listed in a text file.
+"""Run AutoQL sequentially for CVEs listed in a text file.
 
 Example:
     python autoql_scripts/run_autoql_batch.py cve.txt \
+        --run-mode full \
         --exclude CVE-2022-25842 --exclude CVE-2022-32287
 
 The input and exclusion files accept one CVE per line, blank lines, and lines
@@ -94,7 +95,7 @@ def child_command(args, cve: str, output: Path) -> list[str]:
     command = [
         str(args.python), '-m', 'autoql.run_patch',
         '--cve', cve,
-        '--run-mode', 'analysis',
+        '--run-mode', args.run_mode,
         '--root', str(args.root),
         '--output', str(output),
     ]
@@ -169,6 +170,8 @@ def run_one(args, cve: str, output: Path, log_path: Path) -> dict:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('cve_file', type=Path)
+    parser.add_argument('--run-mode', choices=('analysis', 'full'), default='analysis',
+                        help='AutoQL execution mode passed to autoql.run_patch (default: analysis)')
     parser.add_argument('--exclude', action='append', default=[],
                         help='CVE to skip; repeat or use comma-separated values')
     parser.add_argument('--exclude-file', type=Path, action='append', default=[],

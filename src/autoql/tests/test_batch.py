@@ -1,12 +1,23 @@
 import json
 from pathlib import Path
+import runpy
 import subprocess
 import sys
 import tempfile
 import unittest
+from types import SimpleNamespace
 
 
 class BatchRunnerTests(unittest.TestCase):
+    def test_child_command_passes_full_run_mode(self):
+        script = Path(__file__).resolve().parents[3] / 'autoql_scripts' / 'run_autoql_batch.py'
+        namespace = runpy.run_path(str(script))
+        args = SimpleNamespace(
+            python=Path('/usr/bin/python3'), run_mode='full', root=Path('/repo'),
+            dataset=None, limits=None)
+        command = namespace['child_command'](args, 'CVE-2025-27531', Path('/batch/run'))
+        self.assertEqual(command[command.index('--run-mode') + 1], 'full')
+
     def test_failure_and_exclusion_do_not_stop_later_cves(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

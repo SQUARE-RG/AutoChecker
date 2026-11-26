@@ -9,59 +9,81 @@ from ``vulnerability_summary`` and the program-materialized evidence.
 
 def query_skeleton() -> str:
     """Return the sole CodeQL query skeleton supplied to query synthesis."""
-    return r"""Use the skeleton below as a general starting point.
-
-Choose the simplest CodeQL modeling strategy that matches the evidenced vulnerability mechanism. Use AST structure, API semantics, types, values, control flow, data flow, or taint tracking only when needed.
+    return r"""Choose an appropriate CodeQL modeling strategy based on the evidenced vulnerability mechanism.
 
 ```query
 /**
- * @name [Name derived from the vulnerability mechanism]
- * @description [Description of the detected vulnerable behavior]
+ * @name [Vulnerability name derived from the analysis]
+ * @description [Description derived from the vulnerability mechanism]
  * @problem.severity error
+ * @security-severity [Numeric security severity]
  * @precision high
  * @tags security
- * @kind [problem or path-problem]
- * @id autoql/[query-id]
+ * @kind path-problem
+ * @id autoql/[stable-query-id]
  */
-
 import java
+import semmle.code.java.dataflow.DataFlow
+import semmle.code.java.dataflow.TaintTracking
 
-// Add only the CodeQL libraries required by the chosen analysis.
-// Examples:
-// import semmle.code.java.dataflow.DataFlow
-// import semmle.code.java.dataflow.TaintTracking
+class Source extends DataFlow::Node {
+  Source() {
+    exists([AST node type derived from evidence] sourceNode |
+      [Semantic source constraints] and
+      this.asExpr() = [Source expression mapping]
+    )
+  }
+}
 
+class Sink extends DataFlow::Node {
+  Sink() {
+    exists([AST node type derived from evidence] sinkNode |
+      [Semantic sink constraints] and
+      this.asExpr() = [Sensitive operand mapping]
+    )
+  }
+}
 
-// Define the program elements and semantic relationships that
-// characterize the vulnerable behavior.
-//
-// These may model, for example:
-// - AST or API usage
-// - types, arguments, receivers, fields, annotations, or constants
-// - missing or incorrect conditions
-// - control-flow or state relationships
-// - data-flow or taint-flow sources, sinks, and propagation
-//
-// Add only what the vulnerability mechanism requires.
+class Sanitizer extends DataFlow::Node {
+  Sanitizer() {
+    exists([AST node type for an evidenced sanitizer] sanitizerNode |
+      [Semantic sanitizer constraints] and
+      this.asExpr() = [Sanitized value mapping]
+    )
+  }
+}
 
-[Relevant classes and predicates]
+module MyPathConfig implements DataFlow::ConfigSig {
+  predicate isSource(DataFlow::Node source) {
+    source instanceof Source
+  }
 
+  predicate isSink(DataFlow::Node sink) {
+    sink instanceof Sink
+  }
 
-// Optional data-flow or taint-tracking configuration.
-// Include this section only when propagation between values is
-// essential to detecting the vulnerability.
+  predicate isBarrier(DataFlow::Node sanitizer) {
+    sanitizer instanceof Sanitizer
+  }
 
-[Optional DataFlow/TaintTracking configuration]
+  predicate isAdditionalFlowStep(DataFlow::Node node1, DataFlow::Node node2) {
+    [Evidenced additional propagation step]
+  }
+}
 
-
-// Select the program element that represents the detected vulnerability.
+module MyPathFlow = TaintTracking::Global<MyPathConfig>;
+import MyPathFlow::PathGraph
 
 from
-  [Relevant query variables]
+  MyPathFlow::PathNode source,
+  MyPathFlow::PathNode sink
 where
-  [Semantic conditions defining the vulnerable behavior]
+  MyPathFlow::flowPath(source, sink)
 select
-  [Result entity and message, or path-problem result columns]
+  sink.getNode(),
+  source,
+  sink,
+  "[Alert message derived from the vulnerability]"
 ```
 
 For `@kind problem`, return the detected entity followed by its alert message.

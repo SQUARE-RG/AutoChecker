@@ -320,7 +320,7 @@ def render(spec, current, feedback, summaries, generation_phase='initial'):
     }
     system = SYSTEM_PROMPTS[generation_phase]
     if generation_phase == 'initial':
-        system += '\n\n' + query_skeleton()
+        system += '\n\n' +'# Codeql Query Skeleton\n' +query_skeleton()
     human = (
         'QUERY GENERATION PHASE:\n' + generation_phase +
         '\n\n' +
